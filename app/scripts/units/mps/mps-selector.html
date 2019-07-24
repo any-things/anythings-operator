@@ -1,0 +1,265 @@
+<link rel="import" href="../sys-ajax.html">
+<link rel="import" href="./mps-dialog.html">
+<link rel="import" href="./mps-list.html">
+<link rel="import" href="../../../bower_components/iron-icon/iron-icon.html">
+
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+
+<dom-module id="mps-selector">
+  <template>
+    <style include="shared-styles">
+      #container {
+        display: flex;
+        margin-bottom:10px;
+      }
+      #info-fields-container {
+        flex: 1;
+        display: grid;
+        grid-row-gap: 10px;
+      }
+      .info-field-container {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        margin: auto 10px auto 0;
+      }
+      span.label {
+        font-size: .8rem;
+        color: #D5D7DB;
+      }
+      input.info-input {
+        width: calc(100% - 20px);
+        font-size:1rem;
+      }
+      iron-icon {
+        width:2rem;height:2rem;
+        margin:33px auto 0 auto;padding:0;
+        fill:#8cc9e7;
+      }
+      iron-icon:active{
+        background-color:rgba(0,0,0,.3);
+        border-radius:7px;
+        fill:#f9a21f;
+      } 
+    </style>
+    <sys-ajax
+      id="get-data-ajax"
+      curl="[[resourceUrl]]"
+      custom-params="[[params]]"
+      method="GET">
+    </sys-ajax>
+
+    <div id="container">
+      <div id="info-fields-container"></div>
+      <iron-icon icon="list" on-click="showSelector"></iron-icon>
+    </div>
+  </template>
+
+  <script>
+    class MpsSelector extends Polymer.Element {
+      static get is() { return 'mps-selector' }
+      static get properties() {
+        return {
+          infoColumnCnt: {
+            type: Number,
+            value: 4,
+            observer: '_infoColumnCntChanged'
+          },
+
+          /**
+           * 조회를 통해 나타난 팝업의 리스트 중
+           * value로 가지고 있을 필드리스트
+           */
+          valueFields: {
+            type: Array,
+            value: () => {
+              return ['id'];
+            }
+          },
+
+          /**
+           * 정보성 데이터로 보여줄 대상 리스트
+           */
+          infoFields: {
+            type: Array,
+            value: () => {
+              return [];
+            },
+            observer: '_infoFieldsChanged'
+          },
+
+          /**
+           * 팝업에 나타나는 리스트의 컬럼 리스트
+           * mps-list의 해더 설정 방법과 동일
+           */
+          header: {
+            type: Array,
+            value: () => {
+              return [];
+            }
+          },
+
+          /**
+           * mps-list에 출력할 데이터를 조회하기 위한 url
+           */
+          resourceUrl: {
+            type: String
+          },
+
+          /**
+           * mps-list에 출력할 데이터를 조회할 때 포함할 query string
+           */
+          params: {
+            type: Object
+          },
+
+          responseHandler: {
+            type: Object
+          }
+        }
+      }
+
+      _infoColumnCntChanged(infoColumnCnt) {
+        this.setStyle(this.$['info-fields-container'], {
+          gridTemplateColumns: `repeat(${infoColumnCnt}, 1fr)`
+        })
+      }
+
+      /**
+       * infoFields가 변경 되면
+       * infoFields 정보를 바탕으로 input 엘리먼트를 생성하고 보여줌
+       */
+      _infoFieldsChanged(infoFields) {
+        infoFields.forEach(infoField => {
+          const infoFieldContainer = document.createElement('div');
+          infoFieldContainer.classList.add('info-field-container');
+          
+          const label = document.createElement('span');
+          label.classList.add('label');
+          label.innerText = infoField.display;
+          
+          const inputElement = document.createElement('input');
+          inputElement.classList.add('info-input');
+          inputElement.name = infoField.fieldname;
+          inputElement.readOnly = true;
+
+          infoFieldContainer.appendChild(label);
+          infoFieldContainer.appendChild(inputElement);
+
+          this.$['info-fields-container'].appendChild(infoFieldContainer);
+        });
+      }
+
+      /**
+       * 조회 버튼 click event handler
+       * 팝업을 출력하고 mps-list를 통해 조회 결과를 출력함
+       * 리스트를 선택하면 선택 대상이 지정되고
+       * 다시 한번 선택하면 해당 선택 항목으로 this.value를 초기화 함
+       */
+      showSelector() {
+        const container = document.createElement('div');
+        this.setStyle(container, {
+          display: 'flex',
+          flexDirection: 'column',
+          minWidth: '30vw',
+          minHeight: '30vh',
+          maxHeight: '80vh',
+          margin: '15px'
+        });
+        
+        const mpsList = document.createElement('mps-list');
+        mpsList.header = this.header;
+        mpsList.setAttribute('dialog', '');
+        mpsList.addEventListener('data-list-click', event => {
+          const selectedRow = event.detail.row;
+          if(this.selectedRow) this.selectedRow.classList.remove('selected');
+          selectedRow.classList.add('selected');
+          this.selectedRow = selectedRow;
+        });
+
+        const buttonContainer = document.createElement('div');
+        this.setStyle(buttonContainer, {
+          display: 'grid',
+          gridAutoFlow: 'column',
+          gridGap: '15px',
+          justifyContent: 'end',
+          marginTop: '15px'
+        });
+
+        const confirmBtn = document.createElement('button');
+        confirmBtn.innerText = t('button.confirm');
+        confirmBtn.onclick = () => {
+          if(this.selectedRow) {
+            this.initData(this.selectedRow.getData());
+            this.closeSelector();
+          } else {
+            this.closeSelector();
+          }
+        }
+        
+        buttonContainer.appendChild(confirmBtn);
+
+        container.appendChild(mpsList);
+        container.appendChild(buttonContainer);
+
+        document.dispatchEvent(new CustomEvent('open-dialog', {
+          detail: {
+            content: container,
+            width: 'fit',
+            openCallback: () => {
+              const getDataAjax = this.$['get-data-ajax'];
+              getDataAjax.addEventListener('sys-ajax-response', event => {
+                if(this.responseHandler && typeof this.responseHandler === 'function') {
+                  mpsList.data = this.responseHandler(event.detail);
+                } else {
+                  mpsList.data = event.detail.items ? event.detail.items : event.detail;
+                }
+              });
+
+              getDataAjax.generateRequest();
+            }
+          }
+        }))
+      }
+
+      setStyle(element, styleObj) {
+        for(let key in styleObj) {
+          element.style[key] = styleObj[key];
+        }
+      }
+
+      /**
+       * 팝업의 리스트에서 아이템이 선택되면 호출됨
+       * 선택한 로우에서 valueFields에 포함되는 값들을 추출하여 this.value object에 초기화함
+       * 초기화가 완료 되면 value-changed 이벤트를 발생시킨다.
+       */
+      initData(data) {
+        this.value = {};
+        this.valueFields.forEach(valueField => {
+          this.value[valueField] = data[valueField];
+        });
+
+        const inputList = Array.from(this.shadowRoot.querySelectorAll('input.info-input'));
+        inputList.forEach(input => {
+          const fieldName = input.getAttribute('name');
+          input.value = data[fieldName];
+        });
+        
+        this.dispatchEvent(new CustomEvent('value-changed', {
+          detail: {
+            value: this.value
+          }
+        }))
+      }
+
+      closeSelector() {
+        document.dispatchEvent(new CustomEvent('close-dialog'));
+      }
+    }
+
+    customElements.define(MpsSelector.is, MpsSelector);
+  </script>
+</dom-module>

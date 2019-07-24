@@ -1,0 +1,102 @@
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+
+<link rel="import" href="../../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../../bower_components/app-localize-behavior/app-localize-behavior.html">
+
+<dom-module id="mps-locale">
+  <script>
+    class MpsLocale extends Polymer.mixinBehaviors([Polymer.AppLocalizeBehavior], Polymer.Element) {
+      static get is() { return 'mps-locale' }
+
+      static get properties() {
+        return {
+          locale: {
+            type: String,
+            observer: '_localeChanged'
+          },
+
+          localeItems: {
+            type: Array,
+            value: function() {
+              return [{
+                code: 'en-US',
+                desc: 'English'
+              }, {
+                code: 'ko-KR',
+                desc: '한국어'
+              }, {
+                code: 'zh-CN',
+                desc: '中文'
+              }];
+            }
+          },
+
+          defaultLanguage: {
+            type: String,
+            value: 'ko-KR'
+          },
+
+          language: {
+            type: String,
+            notify: true
+          },
+
+          resources: {
+            type: Array,
+            notify: true
+          }
+        }
+      }
+
+      constructor() {
+        super();
+        let currentLocale = JSON.parse(localStorage.getItem('setting.locale'));
+        
+        if(!currentLocale) {
+          currentLocale = this._getBrowserLocale();
+          localStorage.setItem('setting.locale', JSON.stringify(currentLocale));
+        }
+        this.language = currentLocale;
+        this.resources = window.locales;
+				window.t = this.t();
+      }
+
+      connectedCallback() {
+        super.connectedCallback();
+        document.dispatchEvent(new CustomEvent('locale-ready'));
+      }
+
+      _getBrowserLocale() {
+        var localeItems = this.localeItems.map(item => {
+          return item.code
+        });
+        
+        if(localeItems.includes(navigator.language)) {
+          return navigator.language;
+        } else {
+          return this.defaultLanguage;
+        }
+      }      
+
+			t() {
+        var me = this;
+				var tt = function(key, ...params) {     
+					let result = me.localize(key, params[0], params[1]);	// FIXME depends params length
+					if (!result) {
+						let idx = key.indexOf('.');
+						result = key.substring(idx + 1);
+					}
+
+					return result;
+				}
+
+				return tt;
+			}      
+    }
+
+    customElements.define(MpsLocale.is, MpsLocale);
+  </script>
+</dom-module>

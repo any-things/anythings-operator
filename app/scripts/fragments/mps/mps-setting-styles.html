@@ -1,0 +1,53 @@
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+
+<dom-module id="mps-setting-styles">
+  <template>
+    <style>
+      .input-container, .checkbox-container, .radio-btn-container {
+        display: flex;
+        margin-bottom: .5rem;
+      }
+      .input-container label, .checkbox-container label, .radio-btn-container label {
+        min-width: 20%;
+        color:rgba(255,255,255,.8);
+        font-size:.8rem;
+        text-align:right;
+        margin: auto 0;
+        padding-right: .5rem;
+      }
+      .input-container input, .input-container select {
+        width: 100%;
+        flex: 1;
+      }
+      input[type=checkbox] {
+        margin: auto 0 auto auto;
+      }
+      .radio-btn-container .buttons {
+        flex: 1;
+        display: flex;
+        justify-content: flex-end;
+      }
+      .radio-btn-container .buttons label {
+        min-width: 0;
+        padding: 0;
+      }
+      input[type=radio] {
+        margin: auto 1vw auto 3vw;
+      }
+      #ble-mode {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+      }
+      .ble-container label {
+        color:rgba(255,255,255,.8);
+        font-size:.8rem;
+        margin: auto 0;
+        padding-right: 0.2rem;
+      }
+    </style>
+  </template>
+</dom-module>

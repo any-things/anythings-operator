@@ -1,0 +1,1299 @@
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+
+<link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
+
+<link rel="import" href="../../../mixins/mps/mps-scanner-mixin.html">
+<link rel="import" href="../../../mixins/mps/mps-mpi-on-off-mixin.html">
+<link rel="import" href="../../../mixins/mps/mps-message-subscribe-mixin.html">
+<link rel="import" href="../../../pda-libraries.html">
+
+<link rel="import" href="./pda-rtn-process-detail.html">
+<link rel="import" href="./pda-job-process-btn-popup.html">
+<link rel="import" href="../mps-adjust-qty-dialog.html">
+
+<link rel="import" href="../../../units/mps/mps-inspect-box.html">
+<link rel="import" href="../../../units/mps/mps-barcode-field.html">
+<link rel="import" href="../../../units/mps/mps-order-list.html">
+<link rel="import" href="../../../units/mps/mps-box-inspect-mpi-on-off.html">
+<link rel="import" href="../../../units/mps/mps-box-assign-popup.html">
+
+<!--
+  PDA > 반품 처리 화면
+-->
+<dom-module id="pda-rtn-process">
+  <template>
+    <style include="shared-styles">
+      :host {
+        display: flex;
+        flex-direction: column;
+        padding: 10px;
+        height: calc(100% - 20px);
+      }
+      #container {
+        display: flex;
+        flex-direction: column;
+        /* display: grid;
+        grid-template-rows: auto auto 1fr; */
+        flex: 1;
+        padding: 5px;
+        background-color: #5A6377;
+        border-radius: var(--things-default-border-radius);
+        color: rgba(255,255,255,.8);
+      }
+      #list-container {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+      }
+      #region-info-container {
+        display: flex;
+        font-size: .8rem;
+        border-bottom: 1px solid rgba(255,255,255,.2);
+      }
+      #region-info-container label, #region-info-container span{
+        flex: 1;
+        text-align: center;
+      }
+      #input-container {
+        display: flex;
+        flex-direction: column;
+      }
+      .input-row {
+        display: flex;
+        flex-direction: row;
+        margin-bottom: 5px;
+      }
+      .input-row .label {
+        font-size:.8rem;
+        margin: auto 5px auto auto;
+        min-width: 25%;
+        text-align: right;
+      }
+      .input-row input, mps-auto-popup-input {
+        width: 70%;
+      }
+      .col2 {
+        margin-top: 2px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+      }
+      button {
+        --operator-default-btn: {
+          background: #7f95bd;
+          background: linear-gradient(to bottom, #7f95bd 0%, #4e638a 100%);
+          /* border:none; */
+          border-top:.06rem solid #96b2e6;
+          border-bottom:.2rem solid #3a4b69;
+          /* border-radius:12px; */
+          margin:0;
+          padding:.3rem 1rem;
+          /* min-width:100px; */
+          color: #fff;
+          text-shadow: 0px .03rem .03rem rgba(0, 0, 0, 0.4);
+          font-size:.8rem;
+          font-family: 'cj-font';
+          outline: none;
+        }
+      }
+      button#clear-view-btn {
+        margin-left: auto;
+      }
+      button[current-mode=inspection-mode] {
+        @apply --operator-warn-btn;
+        min-width: auto !important;
+        margin: auto;
+      }
+      .invisible {
+        width: 0;
+        height: 0;
+        border: 0 solid black;
+        opacity: 0;
+      }
+
+      mps-order-list{
+        min-height: 100px;
+        flex: 1;
+      }
+    </style>
+
+    <!-- 상품 투입 전 상품 정보 조회를 위한 Ajax -->
+    <sys-ajax
+      id="find-sku-ajax"
+      method="GET"
+      content-type="application/json"
+      last-response="{{findSkuResponse}}"
+      on-sys-ajax-error="_handleFindAjaxError">
+    </sys-ajax>
+
+    <!-- 상품 투입 트랜잭션을 위한 Ajax -->
+    <sys-ajax
+      id="input-sku-ajax"
+      method="POST"
+      content-type="application/json"
+      last-response="{{inputSkuResponse}}"
+      on-sys-ajax-error="_inputSkuAjaxError">
+    </sys-ajax>
+
+    <!-- 상품 정보 스캔 투입 리스트 -->
+    <sys-ajax
+      auto
+      id="input-list-ajax"
+      method="GET"
+      content-type="application/json"
+      last-response="{{inputListResponse}}">
+    </sys-ajax>
+
+    <!-- 투입 이벤트의 거래처 작업 리스트 -->
+    <sys-ajax
+      id="input-job-details-ajax"
+      method="GET"
+      curl="/tablet_process/job_details/:region_cd/:side_cd/:zone_cd/:com_cd/:sku_cd"
+      content-type="application/json"
+      last-response="{{inputDetails}}">
+    </sys-ajax>
+
+    <!-- 슈트 정보 조회 Ajax -->
+    <sys-ajax
+      id="chute-info-ajax"
+      method="GET"
+      content-type="application/json"
+      on-sys-ajax-response="_chuteInfoResponse">
+    </sys-ajax>
+
+    <!-- Fullbox 요청 Ajax -->
+    <sys-ajax
+      id="request-fullbox-ajax"
+      method="POST"
+      content-type="application/json"
+      on-sys-ajax-response="_handleRequestFullboxResponse">
+    </sys-ajax>
+
+    <div id="container">
+      <!-- 상단 선택 호기 및 작업 존 표시 영역 -->
+      <div id="region-info-container" class="input-row">
+        <label>[[regionNmLabel]]</label>
+        <span id="view-region-nm">[[regionNm]]</span>
+        <label>[[zoneCdLabel]]</label>
+        <span id="view-zone-nm">[[zoneCd]]</span>
+      </div>
+
+      <div id="input-container">
+        <!-- SKU 정보 조회 시 복수개가 조회된 경우 실행되는 사용자가 고를 수 있는 팝업이 가미된 SKU Input -->
+        <mps-barcode-field
+          id="input"
+          timeout="2000"
+          value="{{skuBarCd}}"
+          button-text-callback="[[_skuButtonTextCallback]]"
+          selected-item="{{findSkuResponse}}"
+          on-keypress="_handleBarcodeKeypress">
+        </mps-barcode-field>
+
+        <!-- 상품 코드 표시 컴포넌트 행 -->
+        <div class="input-row">
+          <span class="label">[[skuCdLabel]]</span>
+          <input id="sku-cd" value$="[[skuCd]]" readonly>
+        </div>
+
+        <!-- 상품 명 표시 컴포넌트 행 -->
+        <div class="input-row">
+          <span class="label">[[skuNmLabel]]</span>
+          <input id="sku-nm" value="[[skuNm]]" readonly>
+        </div>
+      </div>
+
+      <div id="list-container">
+        <!-- 작업 리스트 표시를 위한 컴포넌트 -->
+        <mps-order-list
+          header="[[header]]"
+          items="[[items]]"
+          job-type="DAS"
+          is-data-polution="{{isDataPolution}}">
+        </mps-order-list>
+      </div>
+
+    </div>
+
+    <div class="col2">
+      <!-- 버튼 리스트 -->
+      <button active$="[[todoBtnActive]]" on-click="_clickMpiOnTodoJobs">[[relightBtnLabel]]</button>
+      <button on-click="refreshInputList">[[refreshBtnLabel]]</button>
+    </div>
+
+    <!-- 박스 검수 컴포넌트 -->
+    <mps-inspect-box
+      id="inspect-box"
+      region-cd="[[regionCd]]">
+    </mps-inspect-box>
+
+    <!-- 로케이션 - 박스 매핑 컴포넌트 -->
+    <mps-box-assign-popup
+      region-cd="[[regionCd]]"
+      input-value="{{inputValue}}"
+      on-before-assign-request="_handleBeforeAssignRequest"
+      on-need-inspect-box="_handleNeedInspectBox"
+      on-assign-finish="_handleBoxAssignResponse">
+    </mps-box-assign-popup>
+
+    <!-- 검수 On/Off 버튼 컴포넌트 -->
+    <mps-box-inspect-mpi-on-off
+      is-on-todo="[[todoBtnActive]]"
+      com-code="[[comCd]]"
+      sku-code="[[skuCd]]">
+    </mps-box-inspect-mpi-on-off>
+  </template>
+
+  <script>
+    class PdaRtnProcess extends MpsMessageSubscribeMixin(Polymer.Element) {
+      static get is() { return 'pda-rtn-process' }
+      static get properties() {
+        return {
+          /**
+           * @description 화면이 표시되는 이벤트시 처리하기 위한 변수
+           *******************************
+           * @type {Boolean}
+           */
+          visible: {
+            type: Boolean,
+            observer: '_visibleChanged'
+          },
+
+          /**
+           * @description 마지막으로 스캔했던 코드의 타입 (로케이션 코드, 표시기 코드 등)
+           ****************
+           * @type {String}
+           */
+          mappingCodeType: {
+            type: String
+          },
+
+          /**
+           * 호기 코드 라벨
+           ****************
+           * @type {String}
+           */
+          regionNmLabel: {
+            type: String,
+            value: () =>  t('label.region_nm'),
+          },
+
+          /**
+           * 존 코드 라벨
+           ****************
+           * @type {String}
+           */
+          zoneCdLabel: {
+            type: String,
+            value: () => t('label.zone_cd')
+          },
+
+          /**
+           * 상품 바코드 라벨
+           ****************
+           * @type {String}
+           */
+          skuBarcdLabel: {
+            type: String,
+            value: () => t('label.sku_barcd')
+          },
+
+          /**
+           * 상품 코드 라벨
+           ****************
+           * @type {String}
+           */
+          skuCdLabel: {
+            type: String,
+            value: () => t('label.sku_cd')
+          },
+
+          /**
+           * 상품 명 라벨
+           ****************
+           * @type {String}
+           */
+          skuNmLabel: {
+            type: String,
+            value: () => t('label.sku_nm')
+          },
+
+          /**
+           * 상품 수량 라벨
+           ****************
+           * @type {String}
+           */
+          skuQtyLabel: {
+            type: String,
+            value: () => t('label.sku_qty')
+          },
+
+          /**
+           * 재점등 버튼 라벨
+           ****************
+           * @type {String}
+           */
+          relightBtnLabel: {
+            type: String,
+            value: () => t('button.relight')
+          },
+
+          /**
+           * 초기화 버튼 라벨
+           ****************
+           * @type {String}
+           */
+          refreshBtnLabel: {
+            type: String,
+            value: () => t('button.refresh')
+          },
+
+          /**
+           * SKU 정보 조회 시 복수개가 조회된 경우 사용자가 고를 수 있는 팝업이 실행되는데 그 팝업에 표시할 타이틀
+           ****************
+           * @type {String}
+           */
+          popupTitleLabel: {
+            type: String,
+            value: () => t('label.sku')
+          },
+
+          /**
+           * 반품 작업 리스트 헤더
+           ****************
+           * @type {Array}
+           */
+          header: {
+            type: Array,
+            value: () => {
+              return [{
+                display: t('label.location'),
+                fieldname: 'loc_cd',
+                columnWidth: '0.5fr'
+              }, {
+                display: t('label.picking_qty') + '/' + t('label.picked_qty') + '/' + t('label.pick_qty'),
+                fieldname: 'total_qty',
+                columnWidth: '0.5fr',
+                style: {
+                  textAlign: 'center'
+                },
+                displayCallback: (rowData) => {
+                  return `${rowData['picking_qty']}/${rowData['picked_qty']}/${rowData['pick_qty']}`;
+                }
+              }, {
+                fieldname: 'id',
+                hidden: true
+              }, {
+                fieldname: 'status',
+                hidden: true
+              }, {
+                fieldname: 'picked_qty',
+                hidden: true
+              }, {
+                fieldname: 'pick_qty',
+                hidden: true
+              }, {
+                fieldname: 'picking_qty',
+                hidden: true
+              }, {
+                fieldname: 'com_cd',
+                hidden: true
+              }, {
+                fieldname: 'sku_cd',
+                hidden: true
+              }/*, {
+                display: t('label.sku_nm'),
+                fieldname: 'sku_nm'
+              }*/]
+            }
+          },
+
+          /**
+           * 투입 정보
+           ****************
+           * @type {String}
+           */
+          inputValue: {
+            type: String,
+            observer: '_inputValueChanged'
+          },
+
+          /**
+           * 상품 조회 시 응답
+           ****************
+           * @type {String}
+           */
+          findSkuResponse: {
+            type: Object,
+            observer: '_findSkuResponseChanged'
+          },
+
+          /**
+           * 작업 리스트 중 선택한 항목
+           ****************
+           * @type {String}
+           */
+          selectedInput: {
+            type: Object,
+            observer: '_selectedInputChanged'
+          },
+
+          /**
+           * 상품 투입시 응답
+           ****************
+           * @type {String}
+           */
+          inputSkuResponse: {
+            type: Object,
+            observer: '_inputSkuResponseChanged'
+          },
+
+          /**
+           * 투입 리스트 조회 시 응답
+           ****************
+           * @type {String}
+           */
+          inputListResponse: {
+            type: Object,
+            observer: '_inputListResponseChanged'
+          },
+
+          /**
+           * @description 투입 리스트
+           ****************
+           * @type {Array}
+           */
+          inputList: {
+            type: Array,
+            observer: '_inputListChanged'
+          },
+
+          /**
+           * @description 투입 정보 상세
+           ****************
+           * @type {Object}
+           */
+          inputDetails: {
+            type: Object,
+            observer: '_inputDetailsChanged'
+          },
+
+          /**
+           * 총 수량 라벨
+           ****************
+           * @type {Array}
+           */
+          totalQtyLabel: {
+            type: String,
+            value: () => t('label.total_picked_qty') + '/' + t('label.total_picking_qty')
+          },
+
+          /**
+           * 총 확정 수량 라벨
+           ****************
+           * @type {Array}
+           */
+          totalPickedQty: {
+            type: Number,
+            value: 0
+          },
+
+          /**
+           * 총 예정 수량 라벨
+           ****************
+           * @type {Array}
+           */
+          totalPickQty: {
+            type: Number,
+            value: 0
+          },
+
+          /**
+           * 총 확정 박스 수량 라벨
+           ****************
+           * @type {Array}
+           */
+          totalPickedBoxPcsQty: {
+            type: String
+          },
+
+          /**
+           * 총 예정 박스 수량 라벨
+           ****************
+           * @type {Array}
+           */
+          totalPickBoxPcsQty: {
+            type: String
+          },
+
+          /**
+           * @description 작업 유형
+           ****************
+           * @type {String}
+           */
+          jobType: {
+            type: String,
+            value: 'RTN'
+          },
+
+          /**
+           * @description ?
+           ****************
+           * @type {Boolean}
+           */
+          isDataPolution: {
+            type: Boolean,
+            observer: '_isDataPolutionChanged'
+          },
+
+          /**
+           * @description 호기 코드
+           ****************
+           * @type {String}
+           */
+          regionCd: {
+            type: String,
+            value: MPS_UTIL.getRegionCd(),
+            observer: '_regionCdChanged'
+          },
+
+          /**
+           * @description 호기 명
+           ****************
+           * @type {String}
+           */
+          regionNm: {
+            type: String,
+            notify: true,
+            value: MPS_UTIL.getRegionNm(),
+            observer: '_regionNmChanged'
+          },
+
+          /**
+           * @description 작업 존 코드
+           ****************
+           * @type {String}
+           */
+          zoneCd: {
+            type: String,
+            notify: true,
+            observer: '_zoneCdChanged'
+          }
+        }
+      }
+
+      /**
+       * @description connected callback
+       *********************
+       */
+      connectedCallback() {
+        super.connectedCallback();
+        document.addEventListener(`alert-closed-at-${location.hash.replace('#/', '')}`, event => {
+          if(!event.detail.hasCallback) {
+            this._initFocus();
+          }
+        });
+
+        // barcode input - focus on
+        this._initFocus();
+      }
+
+      /**
+       * @description 화면 표시 / 숨김 변동이 생긴 경우
+       *********************
+       * @param {Boolean} visible
+       */
+      _visibleChanged(visible) {
+        if (visible) {
+          this._reset();
+          this.refreshInputList();
+        }
+      }
+
+      /**
+       * @description 서버로 부터 메시지를 받아 처리
+       *********************
+       * @param {Object} data
+       */
+      refreshByWs(data) {
+        // 분류 작업 처리시 서버에서 메시지 전달
+        if (data === 'details') {
+          this.refreshInputDetails();
+
+        // 기타 메시지 인 경우
+        } else {
+          try {
+            let popup = this.adjustPopup;
+            if (popup) {
+              // Fullbox 처리 팝업이 떠 있는 경우 json 형태의 메시지가 전달된 경우 팝업을 해제
+              let d = JSON.parse(data);
+              if (d && d.refresh_type === 'full' && d.loc_cd === popup.locCd) {
+                popup.$['btn-close'].click();
+                this.refreshInputDetails();
+              }
+            }
+          } catch (e) {
+            console.warn(e);
+          }
+        }
+      }
+
+      /**
+       * @description 호기 코드 변경 시
+       *********************
+       * @param {String} regionCd
+       */
+      _regionCdChanged(regionCd) {
+        if (regionCd) {
+          window.localStorage.setItem('setting.regionCode', JSON.stringify(regionCd));
+        }
+      }
+
+      /**
+       * @description 호기 명 변경 시
+       *********************
+       * @param {String} regionNm
+       */
+      _regionNmChanged(regionNm) {
+        if (regionNm) {
+          window.localStorage.setItem('setting.regionName', JSON.stringify(regionNm));
+        }
+      }
+
+      /**
+       * @description 작업 존 코드 변경 시
+       *********************
+       * @param {String} zoneCd
+       */
+      _zoneCdChanged(zoneCd) {
+        if (zoneCd) {
+          window.localStorage.setItem('setting.zoneCode', JSON.stringify(zoneCd));
+          if(this.regionCd) {
+            WEB_MQTT.reset(this.regionCd, zoneCd);
+          }
+        }
+      }
+
+      /**
+       * @description
+       *********************
+       * @param {Object} isDataPolution
+       */
+      _isDataPolutionChanged(isDataPolution) {
+        if (isDataPolution) {
+          this.refreshInputList();
+        }
+      }
+
+      /**
+       * @description 투입 정보 변경시
+       *********************
+       * @param {Object} inputValue
+       */
+      _inputValueChanged(inputValue) {
+        if (!inputValue) return;
+
+        // 표시기 코드 (01로 시작하고 22자) or 로케이션 코드 (- 다음 네자리 숫자) or 박스 ID(16자리) 스캔시 ...
+        if ((inputValue.startsWith('01') && inputValue.length === 22) ||
+            inputValue.length === 16 ||
+            inputValue.search(/-[0-9][0-9][0-9][0-9]$/) >= 0) {
+          this._initFocus();
+
+        // 그 외 값은 상품 정보로 판단하여 상품 조회
+        } else {
+          let ajax = this.$['find-sku-ajax'];
+          ajax.curl = `/tablet_process/find_sku/${this.regionCd}/${inputValue}`;
+          ajax.generateRequest();
+        }
+      }
+
+      /**
+       * @description 상품 조회 요청 응답시
+       *********************
+       * @param {Object} findSkuResponse
+       */
+      _findSkuResponseChanged(findSkuResponse) {
+        if (!findSkuResponse || findSkuResponse.length === 0) {
+          document.dispatchEvent(new CustomEvent('show-toast', {
+            detail: {
+              type: t('error.VALIDATION_ERROR'),
+              message: t('text.cant_find_result_by_input')
+            }
+          }));
+
+          this._initFocus();
+          return;
+        }
+
+        if (findSkuResponse.length > 1) {
+          this.$.input.openPopup(findSkuResponse);
+        } else {
+          var selectedInput = findSkuResponse[0];
+          this.selectedInput = selectedInput;
+
+          // 투입 cjfl
+          this.doInputTransaction({
+            regionCd: this.regionCd,
+            sideCd: this.sideCd,
+            comCd: selectedInput.com_cd,
+            skuCd: selectedInput.sku_cd,
+            boxBarcd: selectedInput.box_barcd
+          });
+          this._initFocus();
+        }
+      }
+
+      /**
+       * @description 상품 조회 실패시
+       ******************
+       * @param {Object} e
+       */
+      _handleFindAjaxError(e) {
+        this._reset(true);
+      }
+
+      /**
+       * @description 상품 투입 리스트 선택 변경시
+       ******************
+       * @param {Object} selectedInput
+       */
+      _selectedInputChanged(selectedInput) {
+        this._reset();
+
+        if (selectedInput && selectedInput.sku_cd) {
+          this.comCd = selectedInput.com_cd;
+          this.skuCd = selectedInput.sku_cd;
+          this.skuNm = selectedInput.sku_nm;
+          this.orderId = selectedInput.order_id;
+        }
+      }
+
+      /**
+       * @description 상품 투입 리스트 선택 변경시
+       ******************
+       * @param {Object} inputSkuResponse
+       */
+      _inputSkuResponseChanged(inputSkuResponse) {
+        if (inputSkuResponse && inputSkuResponse.items && inputSkuResponse.items.length > 0) {
+          this.refreshInputDetails();
+        }
+      }
+
+      /**
+       * @description 상품 투입 리스트 선택 변경시
+       ******************
+       * @param {Object} inputSkuResponse
+       */
+      _inputListResponseChanged(inputListResponse) {
+        this.inputList = inputListResponse || [];
+        window.SOUND.playInfoSound();
+      }
+
+      /**
+       * @description 상품 투입 리스트 변경시
+       ******************
+       * @param {Object} inputList
+       */
+      _inputListChanged(inputList) {
+        if (!inputList || !inputList.items || inputList.items.length === 0) {
+          this.selectedInput = JSON.parse(JSON.stringify({}));
+        } else {
+          this.selectedInput = JSON.parse(JSON.stringify(inputList));
+          this.refreshInputDetails();
+        }
+      }
+
+      /**
+       * @description 상품 투입 리스트 중 선택된 상품 투입 상세 데이터 변경시
+       ******************
+       * @param {Array} inputDetails
+       * @Override inputDetails data structure변경.
+       */
+      _inputDetailsChanged(inputDetails) {
+        var items = this.sortByStatus(inputDetails);
+        this.items = items || [];
+
+        this._updateStatus(inputDetails);
+        window.SOUND.playInfoSound();
+      }
+
+      /**
+       * @description 투입 상품 리스트 조회
+       ******************
+       * @param {Object} event
+       */
+      refreshInputList(event) {
+        // 버튼 클릭으로 인한 refresh의 경우 event의 type을 click으로 받는다
+        // 버튼 클릭의 경우 현재 inputList가 response 되었을 때 현재 inputList와 조회 결과를 비교하지 않고 반드시
+        // this.inputList에 값을 초기화 하도록 forceRefresh flag를 true로 변환한다.
+        if (event && event.type === 'click') {
+          this.forceRefresh = true;
+        }
+
+        var { regionCd, zoneCd, sideCd, showOthersOrder } = this;
+        var ajax = this.$['input-list-ajax'];
+        ajax.curl = `/pda_process/rtn/latest_input/${regionCd}/${zoneCd}/${sideCd}`;
+        // 대상 외 작업 조회 여부 param setting
+        ajax.customParams = {
+          show_others_order: showOthersOrder
+        };
+      }
+
+      /**
+       * @description 상품 리스트 중 선택된 상품 정보 상세 조회
+       *********************
+       * @param {Boolean} mpiOnFlag 표시기 점등 여부
+       * @Override
+       */
+      refreshInputDetails(mpiOnFlag) {
+        let regionCd = this.regionCd;
+        let zoneCd = this.zoneCd;
+        let sideCd = MPS_UTIL.getSideCd();
+        let comCd = this.comCd ? this.comCd : '_na_';
+        let skuCd = this.skuCd ? this.skuCd : '_na_';
+        let headerColor = this.selectedInput ? this.selectedInput.mpi_color : 'Y';
+
+        // skuCd가 없으면 detail을 호출하지 않음.
+        if (skuCd === '_na_') return;
+
+        try {
+          this.validationBeforeRefreshDetail(zoneCd, sideCd);
+          let detailAjax = this.$['input-job-details-ajax'];
+          detailAjax.curl = `/tablet_process/job_details/${regionCd}/${sideCd}/${zoneCd}/${comCd}/${skuCd}`;
+          detailAjax.generateRequest();
+        } catch (error) {
+          MPS_UTIL.showMessage(error.title, error.message, error.callback);
+        }
+      }
+
+      /**
+       * @description 확정 수량
+       *********************
+       * @param {Number} pickedQty 예정 수량
+       */
+      _computeSkuPickedQty(pickedQty) {
+        return this._calcBoxPcsQty(pickedQty);
+      }
+
+      /**
+       * @description 예정 수량
+       *********************
+       * @param {Number} pickQty 예정 수량
+       */
+      _computeSkuPickQty(pickQty) {
+        return this._calcBoxPcsQty(pickQty);
+      }
+
+      /**
+       * @description 박스/낱개 수량 계산
+       *********************
+       * @param {Number} pcsQty 낱개 수량
+       */
+      _calcBoxPcsQty(pcsQty) {
+        pcsQty = pcsQty || 0;
+        var boxInQty = this.boxInQty || 1;
+        var boxPcsStr = Math.floor(pcsQty / boxInQty);
+        boxPcsStr += '-';
+        boxPcsStr += (pcsQty % boxInQty).toFixed(0);
+        return boxPcsStr;
+      }
+
+      /**
+       * @description 상품 투입 상세 정보로 현황 정보 리프레쉬
+       ******************
+       * @param {Array} inputDetails
+       */
+      _updateStatus(inputDetails) {
+        if (!inputDetails) return;
+
+        var custCds = [];
+
+        inputDetails.forEach((obj) => {
+          if (custCds.indexOf(obj.cust_cd) < 0) {
+            custCds.push(obj.cust_cd);
+          }
+
+          if (this.boxInQty != obj.box_in_qty) {  // inputDetails는 한개 제품 스캔 이력만 조회함.
+            this.boxInQty = obj.box_in_qty;
+          }
+        }, this);
+        this.custCdQty = custCds.length;
+
+        let totalPickQty = 0;     // 총 주문 수량
+        let totalPickedQty = 0;   // 총 확정 수량
+        let canceledQty = 0;      // 작업 취소된 상품 수량
+
+        inputDetails.forEach(item => {
+          totalPickQty += item.pick_qty;
+          totalPickedQty += item.picked_qty;
+          if (item.status === 'C') {  // FIXME
+            canceledQty += item.pick_qty;
+          }
+        });
+
+        this.totalPickQty = totalPickQty;
+        this.totalPickedQty = totalPickedQty;
+      }
+
+      /**
+       * @description 상품 투입 api 호출
+       ******************
+       * @param {Array} params
+       */
+      doInputTransaction(params) {
+        var { regionCd, sideCd, comCd, skuCd, boxBarcd } = params || this;
+
+        try {
+          this.validateBeforeRequest();
+        } catch (error) {
+          openAlert({
+            title: t('error.VALIDATION_ERROR'),
+            message: error,
+            confirmCallback: () => {
+              this._initFocus();
+            }
+          });
+
+          return;
+        }
+
+        var inputAjax = this.$['input-sku-ajax'];
+        // 연속 스캔 허용 여부 설정에서 조회
+        var isContinousScanAllowed = MPS_UTIL.isContinousScanAllowed();
+
+        // 마지막으로 스캔한 코드가 박스 바코드이면 박스째 투입으로 처리
+        if (this.inputValue === boxBarcd) {
+          inputAjax.curl = `/pda_process/box_input/${regionCd}/${sideCd}/${this.zoneCd}/${comCd}/${skuCd}?allow_continous_scan=${isContinousScanAllowed}`;
+        // 스캔한 코드가 상품 바코드이면 개별 상품 투입으로 처리
+        } else {
+          inputAjax.curl = `/pda_process/input_sku/${regionCd}/${sideCd}/${this.zoneCd}/${comCd}/${skuCd}?allow_continous_scan=${isContinousScanAllowed}`;
+        }
+
+        inputAjax.generateRequest();
+      }
+
+      /**
+       * @description 스캔한 상품 바코드로 조회한 결과 상품이  하나 이상인 경우 버튼 텍스트를 표시
+       *********************
+       * @param {Object} item
+       */
+      _skuButtonTextCallback(item) {
+        return `(${item.sku_cd})
+                ${item.sku_nm}`;
+      }
+
+      /**
+       * @description 상품 정보 상세 정보 리프레쉬 전 Validation Check
+       *********************
+       * @param {Boolean} zoneCd 표시기 점등 여부
+       * @param {Boolean} sideCd 호기 사이드 코드
+       */
+      validationBeforeRefreshDetail(zoneCd, sideCd) {
+        if (!zoneCd) {
+          throw {
+            title: t('error.SETTING_ERROR'),
+            message: t('text.zone_code_is_not_set'),
+            callback: this.moveToSetting
+          }
+        }
+
+        if (!sideCd) {
+          throw {
+            title: t('error.SETTING_ERROR'),
+            message: t('text.side_code_is_not_set'),
+            callback: this.moveToSetting
+          }
+        }
+      }
+
+      /**
+       * @description 상품 정보 조회 전 수행하는 validation
+       *********************
+       */
+      validateBeforeRequest() {
+        let skuCd = this.skuCd;
+
+        if (!skuCd || skuCd.length < 4) {
+          throw t('error.sku_barcd_invalid');
+        }
+      }
+
+      /**
+       * @description 상품 바코드 박스에서 엔터 이벤트 발생시
+       *********************
+       * @param {Object} e 엔터 이벤트
+       */
+      _handleBarcodeKeypress(e) {
+        if (e.keyCode != 13) {
+          return;
+        }
+
+        var value = e.currentTarget.getValue();
+        if (value) {
+          // 슈트 넘버 스캔시 처리
+          if (/^\d{3}$/.test(value)) {
+            this.chuteNumberScanned(value);
+          } else {
+            this.inputValue = null;
+            this.inputValue = value;
+          }
+        }
+      }
+
+      /**
+       * @description 슈트 번호가 스캔되었을때 유효한 슈트 정보인지 조회
+       *********************
+       * @param {Number} chuteNumber 슈트 번호
+       */
+      chuteNumberScanned(chuteNumber) {
+        const chuteInfoAjax = this.$['chute-info-ajax'];
+        chuteInfoAjax.curl = `/pda_process/chute_info/${chuteNumber}`;
+        chuteInfoAjax.generateRequest();
+      }
+
+      /**
+       * @description 유효한 슈트 번호에 대한 response가 오면 화면 정보를 업데이트하고 clear
+       *********************
+       * @param {Object} event
+       */
+      _chuteInfoResponse(event) {
+        this.regionNm = event.detail.region_nm;
+        this.regionCd = event.detail.region_cd;
+        this.zoneCd = event.detail.chute_no;
+        showToast('info', `${t('text.chute_changed')}`);
+        this._reset();
+      }
+
+      /**
+       * @description 슈트 정보 조회를 위한 AJAX 객체 리턴
+       *********************
+       * @return
+       */
+      _getChuteInfoAjax() {
+        return this.$['chute-info-ajax'];
+      }
+
+      /**
+       * @description 유효한 슈트 번호에 대한 response가 오면 화면 정보를 업데이트하고 clear
+       *********************
+       * @param {Object} event
+       */
+      _clickMpiOnTodoJobs(event) {
+        this.todoBtnActive = !this.todoBtnActive;
+        this._initFocus();
+      }
+
+      /**
+       * @description 미들웨어로부터 메시지 처리
+       ******************
+       * @param {String} type
+       * @param {String} title
+       * @param {String} message
+       * @param {Function} confirmCallback
+       */
+      showMessage(type, title, message, confirmCallback) {
+        switch (type) {
+          case 'error': {
+            mpsAlert.webAlert({ title: title, message: message, confirmText: t('button.cancel') });
+          } break;
+          case 'info':
+          default: {
+            showToast(type, message);
+          }
+        }
+
+        window.SOUND.playInfoSound();
+      }
+
+      /**
+       * @description 화면 리셋
+       ******************
+       * @param {Boolean} isItemReset
+       */
+      _reset(isItemReset) {
+        this.regionCd = this.regionCd;
+        this.zoneCd = this.zoneCd;
+        this.sideCd = MPS_UTIL.getSideCd();
+        this.showOthersOrder = false;
+
+        this.skuBarcd = '';
+        this.skuCd = '';
+        this.skuNm = '';
+
+        if (isItemReset) {
+          this.set('items', []);
+        }
+
+        this._initFocus();
+      }
+
+      /**
+       * @description 초기 셋업
+       ******************
+       */
+      _initFocus() {
+        this.$.input.select();
+      }
+
+      /**
+       * @description 작업 리스트 소팅
+       *********************
+       * @param {Array} items 작업 리스트
+       */
+      sortByStatus(items) {
+        if (!items || items.length === 0) {
+          return;
+        }
+
+        var doingList = items.filter((item) => {
+          return item.status != 'W' && item.status != 'F';
+        });
+        var waitList = items.filter((item) => {
+          return item.status == 'W';
+        });
+        var finishList = items.filter((item) => {
+          return item.status == 'F';
+        });
+        var list = doingList || [];
+
+        if (waitList || waitList.length) {
+          list = list.concat(waitList);
+        }
+
+        if (finishList || finishList.length) {
+          list = list.concat(finishList);
+        }
+
+        return list;
+      };
+
+      /**
+       * @description 상품 투입 트랜잭션 에러 시
+       **********************
+       * @param {Object} event
+       */
+      _inputSkuAjaxError(event) {
+        const response = event.detail;
+        openAlert({
+          title: response.code,
+          message: response.msg,
+          confirmCallback: () => {
+            this._initFocus();
+          }
+        });
+      }
+
+      /**
+       * @description  박스 검수 요청
+       **********************
+       * @param {Object} e
+       */
+      _handleNeedInspectBox(e) {
+        if (e && e.detail) {
+          var boxId = e.detail.boxId;
+          var inspectBox = this.$['inspect-box'];
+          inspectBox.getBoxInfo(boxId);
+        }
+      }
+
+      /**
+       * @description 로케이션 별 분류 수량 정보 리턴
+       *********************
+       * @param {Object} event 이벤트
+       */
+      _handleBoxAssignResponse(event) {
+        var response = event.detail;
+        if (!response) {
+          return;
+        }
+
+        var locCd = response.loc_cd;
+        var pickedQty = response.max_stock_qty;
+        var boxId = response.box_id;
+
+        if (pickedQty > 0) {
+          this._showAdjustFullboxQty(boxId, locCd, pickedQty);
+        }
+
+        this._initFocus();
+      }
+
+      /**
+       * @description 분할 Fullbox 처리
+       *********************
+       * @param {String} boxId 박스 ID
+       * @param {String} locCd 로케이션
+       * @param {Number} totalPickedQty 총 확정 수량
+       */
+      _showAdjustFullboxQty(boxId, locCd, totalPickedQty) {
+        if (!boxId || totalPickedQty <= 0) {
+          return;
+        }
+
+        const adjustPopup = document.createElement('mps-adjust-qty-dialog');
+        this.adjustPopup = adjustPopup;
+        adjustPopup.id = 'fullboxPopup';
+        adjustPopup.locCd = locCd;
+        adjustPopup.jobType = this.jobType;
+        adjustPopup.isNumberUpDown = true;
+
+        setTimeout(() => {
+          MPS_UTIL.showPopup(t('button.adjust_qty'), adjustPopup, 'fit', 'fit', () => {
+            adjustPopup.setCurrentQty(totalPickedQty);
+            adjustPopup.adjustQty = () => {
+              let adjustQty = parseInt(adjustPopup._getAdjustQtyInput().value);
+
+              if (adjustQty > totalPickedQty) {
+                adjustPopup._getAdjustQtyInput().style = 'color: red';
+                window.SOUND.playErrorSound();
+                return;
+              }
+
+              this._requestFullbox(boxId, locCd, adjustQty);
+              adjustPopup.closeDialog();
+            };
+          }, () => {
+            this._initFocus();
+            this.adjustPopup = null;
+          })
+        }, 100);
+      }
+
+      /**
+       * @description 분할 Fullbox 처리 요청
+       *********************
+       * @param {String} boxId 박스 ID
+       * @param {String} locCd 로케이션
+       * @param {Number} fullboxQty 풀 박스 수량
+       */
+      _requestFullbox(boxId, locCd, fullboxQty) {
+        var ajax = this.$['request-fullbox-ajax']
+        ajax.curl = `/pda_process/rtn/fullbox_by_split`;
+        ajax.body = { loc_cd : locCd, box_id : boxId, max_stock_qty : fullboxQty };
+        ajax.generateRequest();
+      }
+
+      /**
+       * @description 풀박스 결과 response처리 함수.
+       *********************
+       * @param {Object} event 풀 박스 처리 응답
+       */
+      _handleRequestFullboxResponse(event) {
+        showToast('info', t('text.processed'));
+      }
+
+      /**
+       * 박스 할당 request 직전 이벤트 핸들러
+       *********************
+       * @param {Object} event -> { detail: { ajax, params: { regionCd, lcCode, boxId } } }
+       */
+      _handleBeforeAssignRequest(event) {
+        var { ajax, params } = event.detail;
+        ajax.curl = `${ajax.curl}?skip_box_mapping=true`;
+      }
+    }
+
+    customElements.define(PdaRtnProcess.is, PdaRtnProcess);
+  </script>
+</dom-module>

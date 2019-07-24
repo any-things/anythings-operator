@@ -1,0 +1,63 @@
+{
+  "name": "cj-mps-operator",
+  "license": "BSD-3-Clause",
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-polyfill": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "browser-sync": "^2.18.13",
+    "connect-history-api-fallback": "^1.1.0",
+    "del": "^3.0.0",
+    "eslint": "^3.19.0",
+    "eslint-config-google": "^0.7.0",
+    "eslint-plugin-html": "^2.0.0",
+    "gulp": "^3.9.1",
+    "gulp-header-license": "^1.0.9",
+    "gulp-htmlmin": "^3.0.0",
+    "gulp-if": "^2.0.2",
+    "gulp-imagemin": "^3.4.0",
+    "gulp-load-plugins": "^1.5.0",
+    "gulp-minify-css": "^1.2.4",
+    "gulp-minify-html": "^1.0.6",
+    "gulp-size": "^2.1.0",
+    "gulp-uglify": "^3.0.0",
+    "gulp-useref": "^3.1.2",
+    "gulp-vulcanize": "^6.1.0"
+  },
+  "scripts": {
+    "lint": "npm run lint:javascript",
+    "lint:javascript": "eslint . --ext js,html --ignore-path .gitignore",
+    "serve": "gulp serve",
+    "start:android": "cordova run android",
+    "clean": "gulp clean",
+    "rebuild": "gulp build"
+  },
+  "version": "0.1.0",
+  "dependencies": {
+    "cordova-android": "^7.1.4",
+    "cordova-ios": "^4.5.5",
+    "cordova-plugin-ble-central": "^1.2.2",
+    "cordova-plugin-cache-clear": "^1.3.7",
+    "cordova-plugin-compat": "^1.2.0",
+    "cordova-plugin-dialogs": "^2.0.1",
+    "cordova-plugin-networkinterface": "^2.0.0",
+    "cordova-plugin-spinner": "^1.1.0",
+    "cordova-plugin-whitelist": "^1.3.3"
+  },
+  "cordova": {
+    "platforms": [
+      "android",
+      "ios"
+    ],
+    "plugins": {
+      "cordova-plugin-dialogs": {},
+      "cordova-plugin-whitelist": {},
+      "cordova-plugin-spinner": {},
+      "cordova-plugin-networkinterface": {},
+      "cordova-plugin-ble-central": {
+        "BLUETOOTH_USAGE_DESCRIPTION": "Allow to access bluetooth service"
+      },
+      "cordova-plugin-cache-clear": {}
+    }
+  }
+}

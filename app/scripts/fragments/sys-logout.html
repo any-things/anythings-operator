@@ -1,0 +1,67 @@
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../units/sys-translator.html">
+<link rel="import" href="../units/sys-ajax.html">
+
+<dom-module id="sys-logout">
+	<template>
+		<sys-ajax 
+			curl="[[logoutUrl]]" 
+			method="POST"
+			on-iron-ajax-response="_handleAjaxResponse">
+		</sys-ajax>
+
+    <iron-localstorage 
+      name="setting.user"
+      value="{{user}}">
+    </iron-localstorage>		
+	</template>
+	<script>
+		class SysLogout extends Polymer.Element {
+			static get is() { return 'sys-logout'; }
+
+			static get properties() {
+				return {
+					logoutUrl: {
+						type: String,
+						value: '/logout'
+					},
+
+					/**
+					 * signout에 사용될 ajax, iron-ajax
+					 * ***
+					 * @type {Object}
+					 */
+					_signoutAjax: {
+						type: Object,
+						value: {}
+					},
+
+					user: Object,
+				};
+			}
+
+			logout(e) {
+				this.shadowRoot.querySelector('sys-ajax').generateRequest();
+			}
+
+			_handleAjaxResponse(e) {
+				localStorage.removeItem('setting.user');
+
+				this.dispatchEvent(new CustomEvent('log-out', {
+					bubbles: true,
+					composed: true,
+					detail: true
+				}));
+
+				window.location.hash = "/login";
+			}
+		}
+		
+		window.customElements.define(SysLogout.is, SysLogout);
+	</script>
+</dom-module>

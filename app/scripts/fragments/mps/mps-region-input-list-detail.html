@@ -1,0 +1,313 @@
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+
+<link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
+
+<link rel="import" href="../../pda-libraries.html">
+
+<!--
+  공통 > 호기별 상품 정보 > 상품별 거래처 상세 정보
+-->
+
+<dom-module id="mps-region-input-list-detail">
+  <template>
+    <style>
+      :host {
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+        padding: 15px;
+        width: calc(100% - 30px);
+        height: calc(100% - 30px);
+      }
+      #container {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+      }
+      #summary {
+        display: flex;
+        flex-direction: column;
+        padding: 15px;
+        margin-bottom: 10px;
+        background-color:var(--things-primary-color) ;
+        border-radius:var(--things-default-border-radius);
+        color:#fff;
+      }
+      #summary span {
+        font-size: .8rem;
+      }
+      #summary .sku-info {
+        display: flex;
+      }
+      #summary .sku-info .label {
+        font-weight: bold;
+        margin-right: 5px;
+      }
+      #summary .sku-info .value {
+        flex: 1;
+        text-align: right;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+      }
+      #button-container {
+        display: grid;
+        margin-top: 15px;
+        justify-items: end;
+      }
+      button {
+        @apply --operator-default-btn;
+      }
+      button:active {
+        @apply --operator-default-btn-active;
+      }
+      button:focus{
+        outline:none
+      }
+    </style>
+
+    <!-- 투입 상품별 작업 리스트 조회 Ajax -->
+    <sys-ajax
+      auto
+      id="input-details-ajax"
+      method="GET"
+      content-type="application/json"
+      last-response="{{items}}">
+    </sys-ajax>
+
+    <!-- 팝업 상단 요약 정보 표시 영역 -->
+    <div id="container">
+      <!-- 상품 정보 표시 영역 -->
+      <div id="summary">
+        <div class="sku-info">
+          <span class="label">[[skuNameLabel]]</span>
+          <span class="value">[[skuName]]</span>
+        </div>
+
+        <!-- 총 피킹 수량 정보 표시 영역 -->
+        <div class="sku-info">
+          <span class="label">[[totalPickedQtyLabel]]</span>
+          <span class="value">[[totalPickQty]]</span>
+        </div>
+      </div>
+
+      <!-- 투입 상품 처리 리스트 표시 영역 -->
+      <mps-list
+        id="cust-list"
+        header="[[header]]"
+        data="[[items]]"
+        dialog
+        on-configured="_addCompleteAttribute">
+      </mps-list>
+
+      <!-- 버튼 표시 영역 -->
+      <div id="button-container">
+        <button id="back-btn" on-click="_backBtnClicked">[[backBtnLabell]]</button>
+      </div>
+    </div>
+  </template>
+
+  <script>
+    class MpsRegionInputListDetail extends Polymer.Element {
+      static get is() { return 'mps-region-input-list-detail' }
+      static get properties() {
+        return {
+
+          /**
+           * @description 상품명 라벨
+           ****************
+           * @type {String}
+           */
+          skuNameLabel: {
+            type: String,
+            value: () => t('label.sku_nm')
+          },
+
+          /**
+           * @description 총 피킹 수량 라벨
+           ****************
+           * @type {String}
+           */
+          totalPickedQtyLabel: {
+            type: String,
+            value: () => t('label.total_pick_qty')
+          },
+
+          /**
+           * @description 닫기 버튼 라벨
+           ****************
+           * @type {String}
+           */
+          backBtnLabell: {
+            type: String,
+            value: () => t('button.close')
+          },
+
+          /**
+           * @description 투입 시퀀스
+           ****************
+           * @type {String}
+           */
+          inputSeq: {
+            type: String
+          },
+
+          /**
+           * @description 고객사 코드
+           ****************
+           * @type {String}
+           */
+           comCd: {
+            type: String
+          },
+
+          /**
+           * @description 상품 코드
+           ****************
+           * @type {String}
+           */
+          skuCd: {
+            type: String
+          },
+
+          /**
+           * @description 상품 명
+           ****************
+           * @type {String}
+           */
+          skuName: {
+            type: String
+          },
+
+          /**
+           * @description 총 피킹 수량 정보 - 총 확정 / 총 예정
+           ****************
+           * @type {String}
+           */
+           totalPickQty: {
+            type: String
+          },
+
+          /**
+           * @description 부모 화면에서 선택한 데이터
+           ****************
+           * @type {Object}
+           */
+          data: {
+            type: Object,
+            observer: '_dataChanged'
+          },
+
+          /**
+           * @description 그리드 데이터
+           ****************
+           * @type {Array}
+           */
+          items: {
+            type: Array,
+            observer: '_itemsChanged'
+          },
+
+          /**
+           * @description 그리드 헤더 정보
+           ****************
+           * @type {Array}
+           */
+          header: {
+            type: Array,
+            value: function() {
+              return [{
+                display: t('label.location'),
+                fieldname: 'loc_cd'
+              }, {
+                display: t('label.cust_nm'),
+                fieldname: 'cust_nm'
+              }, {
+                display: t('label.qty'),
+                fieldname: 'display_qty',
+                columnWidth: '0.75fr',
+                style: {
+                  textAlign: 'right'
+                },
+                displayCallback: (value, rowData) => {
+                  return `${rowData['picked_qty']}/${rowData['pick_qty']}`;
+                }
+              }, {
+                fieldname: 'status',
+                hidden: true
+              }];
+            }
+          }
+        }
+      }
+
+      /**
+       * @description list의 데이터 상태에 따라 행의 색상을 변경
+       * R: Running 진행중, F: Finished 완료, U: Unfinished 미완료 (취소건이 포함되어 있어서 완료되지 않은 상태)
+       */
+      _addCompleteAttribute(event) {
+        const rows = event.detail.contentElements;
+        rows.forEach(row => {
+          const status = row.getData().status;
+          if(status === 'F') { // 완료 상태
+            row.classList.add('complete');
+          } else if(status === 'U') { // 미완료 상태
+            row.classList.add('canceled');
+          }
+        });
+      }
+
+     /**
+      * @description 상품 코드 값이 변경되면 해당 상품코드에 따른 거래처 리스트 조회
+      **************
+      * @param {Object} data
+      */
+      _dataChanged(data) {
+        if(data) {
+          this.comCd = data.com_cd;
+          this.skuCd = data.sku_cd;
+          this.skuName = data.sku_nm;
+          this.inputSeq = data.input_seq;
+
+          let regionCd = MPS_UTIL.getRegionCd();
+          let zoneCd = MPS_UTIL.getZoneCd();
+          const inputDetailsAjax = this.$['input-details-ajax'];
+          inputDetailsAjax.curl = `/tablet_process/das/input_status_details/${regionCd}/${zoneCd}/ALL/${this.comCd}/${this.skuCd}`;
+        }
+      }
+
+      /**
+       * @description 리스트 데이터 변경시 호출
+       ************
+       * @param {Array} items 리스트 데이터
+       */
+       _itemsChanged(items) {
+        if(items && items.length > 0) {
+          let totalPlan = 0, totalPicked = 0;
+          
+          items.forEach(function(item) {
+            totalPlan += (item.pick_qty ? item.pick_qty : 0);
+            totalPicked += (item.picked_qty ? item.picked_qty : 0);
+          });
+
+          this.totalPickQty = `${totalPicked} / ${totalPlan}`;
+
+        } else {
+          this.totalPickQty = '';
+        }
+      }
+
+      /**
+       * @description 팝업 닫기
+       */
+      _backBtnClicked() {
+        document.dispatchEvent(new CustomEvent('close-dialog'));
+      }
+    }
+
+    customElements.define(MpsRegionInputListDetail.is, MpsRegionInputListDetail);
+  </script>
+</dom-module>

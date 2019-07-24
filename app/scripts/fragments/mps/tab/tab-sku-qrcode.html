@@ -1,0 +1,46 @@
+<script type= "text/javascript" src = "../../../units/qrcode.min.js"></script>
+
+<dom-module id='tab-sku-qrcode'>
+    <template>
+        <style>
+            :host {
+                display: block;
+                margin-top: 50px;
+                margin-bottom: 50px;
+            }
+        </style>
+        <div id = "qrcode" >[[data]]</div>
+    </template>
+    <script>
+        class TabSkuQrcode extends Polymer.Element {
+            static get is() {
+                return 'tab-sku-qrcode';
+            }
+            static get properties() {
+                return {
+                    data:{
+                        type: String
+                    }
+                };
+            }
+            static get observers() {
+                return [
+                '_renderCode(data)'
+                ]
+            }
+            _renderCode(data){
+                var element = this.$['qrcode']
+                var content = {
+                    text : "",
+                    width: 380,
+                    height: 380
+                };
+                content.text = data;
+                var qrcodeImg = new QRCode(element,content);
+            }
+        }
+        window.customElements.define(TabSkuQrcode.is, TabSkuQrcode);
+    </script>
+</dom-module>
+
+

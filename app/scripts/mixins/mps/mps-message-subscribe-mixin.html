@@ -1,0 +1,96 @@
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+<script>
+  MpsMessageSubscribeMixin = superClass => {
+    return class MpsMessageSubscribeMixin extends superClass {
+      static get properties() {
+        return {
+          // iron-pages에서 이 화면이 표시되는지 여부
+          visible: {
+            type: Boolean
+          },
+
+          // 작업 유형. 메시지의 작업 유형과 이 값을 비교해 같을 때에만 동작한다.
+          // 이 믹스인을 사용하는 화면에서 입력해야 함
+          jobType: {
+            type: String
+          }
+        };
+      }
+      // lifecycle
+      connectedCallback() {
+        super.connectedCallback();
+
+        // MQTT 연결
+        WEB_MQTT.startConnectionMonitor(
+          MPS_UTIL.getRegionCd(),
+          MPS_UTIL.getZoneCd(),
+          MPS_UTIL.getDeviceType(),
+          MPS_UTIL.getBrokerAddress(),
+          MPS_UTIL.getBrokerPort(),
+          MPS_UTIL.getBrokerSiteCd()
+        );
+
+        // 메시지 수신 이벤트
+        document.addEventListener('mqtt-message-received', event => {
+          // 실제 나타나지 않은 화면이라면 동작 없음
+          if (!this.visible) return;
+          // 메시지 내용이 프로토콜에 의해 포맷된 메시지일 경우
+          else if (typeof event.detail === 'object') {
+            var {
+              equip_type: equipType,
+              job_type: jobType,
+              region_cd: regionCd,
+              action,
+              message
+            } = event.detail;
+          // 메시지 내용이 프로토콜과 관계없는 경우
+          } else {
+            var action = 'default';
+          }
+
+          // 메시지 프로퍼티의 action 값에 따라 동작 (새로고침, 정보 메시지, 에러 메시지)
+          switch (action) {
+            case WEB_MQTT.ACTION.REFRESH:
+              {
+                // 화면 리프레시. 이 믹스인을 사용하는 화면에서 구현
+                this.refreshByWs(message);
+              }
+              break;
+            case WEB_MQTT.ACTION.SHOW_INFO:
+              {
+                // 기기에서 설정한 작업과 메시지의 작업이 일치하고, iron-pages에서 현재 표시되고 있는 화면인 경우
+                if (jobType) {
+                  if (this.jobType === jobType) {
+                    showToast('info', message);
+                  }
+                } else {
+                  showToast('info', message);
+                }
+              }
+              break;
+            case WEB_MQTT.ACTION.SHOW_ERROR:
+              {
+                if (jobType) {
+                  if (this.jobType === jobType) {
+                    mpsAlert.webAlert({ title: t('title.error'), message, sound: 'error' });
+                  }
+                } else {
+                  mpsAlert.webAlert({ title: t('title.error'), message, sound: 'error' });
+                }
+              }
+              break;
+            default: {
+              console.log(event.detail);
+            }
+          }
+        });
+      }
+
+      // 화면 새로고침. 각 화면에서 구현
+      refreshByWs(message) {}
+    };
+  };
+</script>

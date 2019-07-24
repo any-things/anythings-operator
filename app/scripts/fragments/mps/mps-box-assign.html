@@ -1,0 +1,458 @@
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+
+<link rel="import" href="../../../bower_components/polymer/polymer-element.html">
+
+<link rel="import" href="../../tablet-libraries.html">
+
+<!--
+  공통 > 박스 할당 화면
+-->
+<dom-module id="mps-box-assign">
+  <template>
+    <style include="shared-styles">
+      :host {
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+        height: calc(100% - 40px);
+      }
+      #container {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+        background-color: #5A6377;
+        border-radius: var(--things-default-border-radius);
+        color: rgba(255,255,255,.8);
+      }
+      #input-container {
+        display: grid;
+        grid-template-columns: 30% calc(70% - 12px);
+        grid-gap:12px;
+      }
+      .list-container {
+        display: flex;
+        flex: 1;
+        margin-top: 12px;
+      }
+      .label {
+        font-size:.8rem;
+        margin: auto 5px auto auto;
+      }
+      .button-container {
+        text-align: right;
+        margin-top: 12px;
+      }
+    </style>
+
+    <!-- 박스 할당 서비스 -->
+    <sys-ajax
+      id="exec-job-mapping"
+      method="PUT"
+      content-type="application/json"
+      on-sys-ajax-response="_jobMappingResponse">
+    </sys-ajax>
+
+    <!-- 박스 - 로케이션 매핑 해제 서비스 -->
+    <sys-ajax
+      id="clear-job-mapping"
+      method="PUT"
+      content-type="application/json"
+      on-sys-ajax-response="_jobMappingResponse">
+    </sys-ajax>
+
+    <!-- 새로고침 서비스 -->
+    <sys-ajax
+      auto
+      id="refresh-ajax"
+      method="GET"
+      content-type="application/json"
+      last-response="{{refreshResponse}}">
+    </sys-ajax>
+
+    <div id="container">
+      <!-- 로케이션 / 박스 ID Input Box -->
+      <div id="input-container">
+        <span class="label">[[locCodeLabel]]</span>
+        <input barcode id="loc-cd" type="text" name="location_cd" on-keypress="_locInputKeypress">
+
+        <span class="label">[[boxIdLabel]]</span>
+        <input id="box-id" type="text" name="box_id" on-focus="_hideKeyboard" on-keypress="_boxInputKeypress">
+      </div>
+
+      <!-- 로케이션 - 박스 ID 할당 정보 리스트 -->
+      <div class="list-container">
+        <mps-list
+          header="[[header]]"
+          data="[[locations]]"
+          on-btn-click="_cellButtonClicked"
+          on-data-list-click="_onItemClick">
+        </mps-list>
+      </div>
+
+      <!-- 버튼 -->
+      <div class="button-container">
+        <button on-click="refreshList">[[refreshBtnLabel]]</button>
+        <button on-click="_clearView">[[resetBtnLabel]]</button>
+      </div>
+    </div>
+  </template>
+
+  <script>
+    class MpsBoxAssign extends MpsScannerMixin(Polymer.Element) {
+      static get is() { return 'mps-box-assign' }
+
+      static get properties() {
+        return {
+          /**
+           * @description iron-pages에서 이 화면의 표시 여부
+           ****************
+           * @type {Boolean}
+           */
+          visible: {
+            type: Boolean,
+            observer: '_visibleChanged'
+          },
+
+          /**
+           * @description 이 화면의 라우팅 URL
+           ****************
+           * @type {String}
+           */
+          routingUrl: {
+            type: String
+          },
+
+          /**
+           * @description 로케이션 코드 라벨 
+           ****************
+           * @type {String}
+           */
+          locCodeLabel: {
+            type: String, 
+            value: () => t('label.location')
+          },
+          
+          /**
+           * @description 박스 ID 라벨 
+           ****************
+           * @type {String}
+           */
+          boxIdLabel: {
+            type: String, 
+            value: () => t('label.box_id')
+          },
+
+          /**
+           * @description 초기화 버튼 라벨 
+           ****************
+           * @type {String}
+           */
+          resetBtnLabel: {
+            type: String, 
+            value: () => t('button.reset')
+          },
+          
+          /**
+           * @description 새로고침 버튼 라벨 
+           ****************
+           * @type {String}
+           */
+          refreshBtnLabel: {
+            type: String, 
+            value: () => t('button.refresh')
+          },
+
+          /**
+           * @description 그리드 헤더  
+           ****************
+           * @type {Array}
+           */
+          header: {
+            type: Array,
+            value: () => {
+              return [{
+                display: t('label.location'),
+                fieldname: 'loc_cd',
+                style: {
+                  textAlign: 'center'
+                }
+              }, {
+                display: t('label.box_id'),
+                fieldname: 'box_id',
+                displayCallback: value => {
+                  return value || '';
+                },
+                style: {
+                  textAlign: 'center'
+                }
+              }, {
+                display: '',
+                fieldname: 'clear_box_id',
+                columnWidth: '50px',
+                displayCallback: (value, row) => {
+                  return row.box_id || '';
+                },
+                button: (item, button) => {
+                  let text = '';
+                  if (item.box_id) {
+                    text = ' X ';
+                  } else {
+                    button.setAttribute('hidden', true);
+                  }
+                  return text;
+                }
+              }/*, {
+                display: t('menu.BoxAssign'),
+                fieldname: 'result',
+                displayCallback: value => {
+                  return t('label.success');
+                },
+                style: {
+                  textAlign: 'center'
+                }
+              }*/]
+            }
+          },
+
+          /**
+           * @description 새로고침 서비스 호출 결과
+           ****************
+           * @type {Object}
+           */
+          refreshResponse: {
+            type: Object,
+            observer: "_refreshResponseChanged"
+          },
+
+          /**
+           * @description 새로고침 서비스 호출 결과
+           ****************
+           * @type {Object}
+           */          
+          data: {
+            type: Array,
+            value: () => {
+              return [];
+            }
+          }
+        }
+      }
+
+      /**
+       * @description Life Cycle - connectedCallback
+       ********************************************
+       */
+      connectedCallback() {
+        super.connectedCallback();
+
+        // 현재 페이지의 URL을 저장
+        this.routingUrl = location.hash.replace('#/', '');
+
+        document.addEventListener(`alert-closed-at-${this.routingUrl}`, event => {
+          if(!event.detail.hasCallback) {
+            this._initialSetup();
+          }
+        });
+
+        document.addEventListener(`refresh-view-${this.routingUrl}`, event => {
+          this.refreshList();
+        });
+
+        this.refreshList();
+      }
+
+      /**
+       * @description 이 화면의 표시 상태가 바뀔 때 handle
+       */
+      _visibleChanged(visible) {
+        if (visible) {
+          this.refreshList();
+        }
+      }
+
+      /**
+       * @description 새로고침 서비스 호출 결과 변경시
+       *********************
+       * @param {Object} response
+       */
+      _refreshResponseChanged(response) {
+        this.locations = response && response.items;
+      }
+
+      /**
+       * @description 현재 호기의 로케이션 목록 ajax 호출
+       ********************************************
+       */
+      refreshList() {
+        const refreshAjax = this.$['refresh-ajax'];
+        var regionCd = MPS_UTIL.getRegionCd();
+        var equipZoneCd = MPS_UTIL.getZoneCd();
+        var params = {
+          query: JSON.stringify([{
+            name: 'region_cd',
+            operator: 'eq',
+            value: regionCd
+          }, {
+            name: 'com_cd',
+            operator: 'is_not_null'
+          }, {
+            name: 'equip_zone_cd',
+            operator: 'eq',
+            value: equipZoneCd
+          }]),
+          sort: JSON.stringify([{
+            field: 'loc_cd',
+            ascending: true
+          }]),
+          limit: 1000
+        };
+
+        refreshAjax.curl = encodeURI(`/location`);
+        refreshAjax.params = params;
+        this._clearView();
+        // refreshAjax.generateRequest();
+      }
+
+      /**
+       * @description 리스트 내부의 버튼 클릭 시 이벤트 핸들러
+       *********************
+       * @param {Object} event
+       */
+      _cellButtonClicked(event) {
+        let fieldname = event && event.detail && event.detail.fieldname;
+        let data = event && event.detail && event.detail.data;
+        let locCd = data.loc_cd;
+
+        if(fieldname === 'clear_box_id') {
+          this.clearJobMapping(locCd);
+        }
+      }
+
+      /**
+       * @description 박스 할당 초기화
+       *********************
+       * @param {String} locationCode
+       */
+      clearJobMapping(locationCode) {
+        let ajax = this.$['clear-job-mapping'];
+        var regionCd = MPS_UTIL.getRegionCd();
+        ajax.curl = `/pda_process/unassign/location_box/${regionCd}/${locationCode}`;
+        ajax.generateRequest();
+      }
+
+      /**
+       * @description loc-cd input keypress event handler
+       * loc-cd 바코드 스캔시 box-id 필드로 이동
+       *********************
+       * @param {Object} event
+       */
+      _locInputKeypress(event) {
+        if(event.charCode === 13) {
+          this.$['box-id'].select();
+        }
+      }
+
+      /**
+       * @description box-id input keypress event handler
+       * box-id 바코드 스캔시 job mapping transaction 시도
+       *********************
+       * @param {Object} event
+       */
+      _boxInputKeypress(event) {
+        if(event.charCode === 13) {
+          this.executeJobMapping();
+        }
+      }
+
+      /**
+       * @description validation 진행 후 job mapping transaction 시도
+       */
+      executeJobMapping() {
+        try {
+          this.validateBeforeMapping();
+          const execJobMappingAjax = this.$['exec-job-mapping'];
+          const locCd = this.$['loc-cd'].value;
+          const boxId = this.$['box-id'].value;
+          var regionCd = MPS_UTIL.getRegionCd();
+          execJobMappingAjax.curl = `/pda_process/assign/location_box/${regionCd}/${locCd}/${boxId}`;
+          execJobMappingAjax.generateRequest();
+        } catch (error) {
+          openAlert({
+            title: error.title,
+            message: error.message,
+            confirmCallback: error.confirmCallback
+          });
+        }
+      }
+
+      /**
+       * @description job mapping 시도 이전에 수행하는 유효성 검사
+       */
+      validateBeforeMapping() {
+        let locCd = this.$['loc-cd'].value;
+        let boxId = this.$['box-id'].value;
+
+        let isValidLocCd = false, isValidBoxId = false;
+
+        if (locCd) {
+          isValidLocCd = this.locations && this.locations.find(rowData => {
+            return locCd === rowData.loc_cd;
+          }) ? true : false;
+        }
+        if (boxId) {
+          isValidBoxId = true;
+        }
+        if(!isValidLocCd) {
+          throw {
+            title: t('error.VALIDATION_ERROR'),
+            message: t('error.loc_cd_invalid'),
+            confirmCallback: this._clearView.bind(this)
+          }
+        } else if(!isValidBoxId) {
+          throw {
+            title: t('error.VALIDATION_ERROR'),
+            message: t('error.box_id_invalid'),
+            confirmCallback: () => {
+              this.$['box-id'].select();
+            }
+          }
+        }
+      }
+
+      /**
+       * @description 박스 할당 요청 성공 event handler
+       *********************
+       * @param {Object} event
+       */
+      _jobMappingResponse(event) {
+        this._clearView();
+        this.refreshList();
+      }
+
+      /**
+       * @description 그리드의 아이템 클릭 이벤트 핸들러 
+       *********************
+       * @param {Object} event
+       */
+      _onItemClick(event) {
+        this.$['loc-cd'].value = event.detail.data.loc_cd;
+        this.$['box-id'].select();
+      }
+
+      /**
+       * @description 초기화 버튼을 통해 화면에서 설정한 값들을 초기화 함
+       */
+      _clearView() {
+        this.$['loc-cd'].value = '';
+        this.$['box-id'].value = '';
+        this._initialSetup();
+      }
+    }
+
+    customElements.define(MpsBoxAssign.is, MpsBoxAssign);
+  </script>
+</dom-module>

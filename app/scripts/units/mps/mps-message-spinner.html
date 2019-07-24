@@ -1,0 +1,86 @@
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+
+<link rel="import" href="../../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../../bower_components/paper-spinner/paper-spinner-lite.html">
+
+<dom-module id="mps-message-spinner">
+  <template>
+    <style>
+      div#modal {
+        display: grid;
+        position: absolute;
+        height: 100%;
+        width: 100%;
+      }
+      div#modal[active] {
+        z-index: 100;
+        background-color: rgba(0, 0, 0, 0.5);
+      }
+      #spinner-container {
+        margin: auto;
+        text-align: center;
+      }
+      #spinner-container p {
+        font-size: 1rem;
+        color: white;
+      }
+      paper-spinner-lite {
+        margin: auto;
+      }        
+    </style>
+
+    <div id="modal">
+      <div id="spinner-container">
+        <paper-spinner-lite id="msg-spinner"></paper-spinner-lite>
+        <p>[[message]]</p>
+      </div>
+    </div>
+  </template>
+
+  <script>
+    class MpsMessageSpinner extends Polymer.Element {
+      static get is() { return 'mps-message-spinner' }
+
+      connectedCallback() {
+        super.connectedCallback();
+        document.addEventListener('toggle-msg-spinner', event => {
+          const active = event.detail.active;
+          if(active) {
+            this._openMsgSpinner(event.detail.message);
+          } else {
+            this._closeMsgSpinner();
+          }
+        });
+
+        document.addEventListener('open-msg-spinner', event => {
+          this._openMsgSpinner(event.detail.message);
+        });
+
+        document.addEventListener('close-msg-spinner', event => {
+          this._closeMsgSpinner();
+        });
+      }
+
+      _openMsgSpinner(message = '') {
+        this.message = message;
+        this.$['msg-spinner'].active = true;
+        this._getModal().setAttribute('active', '');        
+      }
+
+      _closeMsgSpinner() {
+        this.$['msg-spinner'].active = false;
+        this._getModal().removeAttribute('active');
+        this.message = '';
+      }
+
+      _getModal() {
+        return this.$['modal'];
+      }
+    }
+
+    customElements.define(MpsMessageSpinner.is, MpsMessageSpinner);
+  </script>
+</dom-module>

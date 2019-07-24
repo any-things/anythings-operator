@@ -1,0 +1,89 @@
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+
+<dom-module id="kiosk-sku-selection">
+  <template>
+    <style>
+      :host {
+        flex: 1;
+        display: grid;
+        grid-template-rows: 1fr auto;
+        height: 100%;
+      }
+      mps-list {
+        margin: 20px;
+      }
+      #button-container {
+        display: grid;
+        grid-auto-flow: row;
+        justify-content: end;
+        padding: 20px;
+      } 
+      button {
+        @apply --operator-default-btn;
+      }
+      button:active {
+        @apply --operator-default-btn-active;
+      }
+    </style>
+    <mps-list
+      header="[[header]]"
+      data="[[skuList]]"
+      on-data-list-click="_skuSelected"
+      dialog>
+    </mps-list>
+    
+    <div id="button-container">
+      <button id="back-btn" on-click="closeDialog">[[confirmLabel]]</button>    
+    </div>
+  </template>
+
+  <script>
+    class KioskSkuSelection extends Polymer.Element {
+      static get is() { return 'kiosk-sku-selection' }
+      static get properties() {
+        return {
+          confirmLabel: { type: String, value: () => t('button.confirm')},
+          
+          header: {
+            type: Array,
+            value: () => [{
+              display: t('label.sku_nm'),
+              fieldname: 'sku_nm'
+            }, {
+              display: t('label.sku_cd'),
+              fieldname: 'sku_cd'
+            }, {
+              display: t('label.sku_barcd'),
+              fieldname: 'sku_barcd'
+            }, {
+              fieldname: 'id',
+              hidden: true
+            }]
+          },
+
+          skuList: {
+            type: Array
+          }
+        }
+      }
+
+      _skuSelected(event) {
+        if(this.selectedSkuEl) {
+          this.selectedSkuEl.classList.remove('complete');
+        }
+        event.detail.row.classList.add('complete');
+        this.selectedSkuEl = event.detail.row;
+        this.selectedSku = event.detail.data;
+      }
+
+      closeDialog() {
+        document.dispatchEvent(new CustomEvent('close-dialog'));
+      }
+    }
+
+    customElements.define(KioskSkuSelection.is, KioskSkuSelection);
+  </script>
+</dom-module>

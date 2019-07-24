@@ -1,0 +1,330 @@
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+
+<!--
+  공통 > 박스 리스트 > 박스 내품 팝업
+-->
+<dom-module id="mps-box-list-detail">
+  <template>
+    <style>
+      :host {
+        flex: 1;
+        display: grid;
+        height: 100%;
+      }
+
+      #contents {
+        flex: 1;
+        display: grid;
+        grid-template-rows: auto 1fr auto;
+      }
+
+      #btn-container {
+        display: flex;
+      }
+
+      .button {
+        flex: auto;
+      }
+
+      #header-form {
+        display: grid;
+        grid-template-columns: 1.5fr 1fr;
+        margin: 5px 10px 0 10px;
+        background-color: var(--things-primary-color);
+        border-radius: var(--things-default-border-radius);
+        color: #fff;
+      }
+
+      p {
+        margin: 0;
+      }
+
+      mps-list {
+        margin: 10px 10px 0px 10px;
+      }
+
+      button:focus {
+        outline: 0;
+      }
+
+      button {
+        background: #90cc5d;
+        background: linear-gradient(to bottom, #90cc5d 0%, #5a9802 100%);
+        border-top: .06rem solid #cdff9a;
+        border-bottom: .2rem solid #2e7b00;
+        border-left: none;
+        border-right: none;
+        border-radius: 12px;
+        margin: 10px 0;
+        padding: .3rem;
+        color: #fff;
+        text-shadow: 0px .03rem .03rem rgba(0, 0, 0, 0.4);
+        font-size: 1rem;
+        margin: 10px;
+      }
+
+      button:active {
+        background: #90cc5d;
+        background: linear-gradient(to bottom, #5a9802 0%, #90cc5d 100%);
+        text-shadow: .03rem 0rem .03rem rgba(0, 0, 0, 0.4);
+      }
+
+      #back-btn {
+        background: #737373;
+        background: linear-gradient(to bottom, #737373 0%, #585858 100%);
+        border-top: .06rem solid #999;
+        border-bottom: .2rem solid #333;
+        border-left: none;
+        border-right: none;
+        border-radius: 12px;
+        margin: 10px;
+        padding: .3rem;
+        color: #fff;
+        text-shadow: 0px .03rem .03rem rgba(0, 0, 0, 0.4);
+        font-size: 1rem;
+      }
+
+      #back-btn:active {
+        background: #737373;
+        background: linear-gradient(to bottom, #585858 0%, #737373 100%);
+        text-shadow: .03rem 0rem .03rem rgba(0, 0, 0, 0.4);
+      }
+
+      #left-col,
+      #right-col {
+        margin: 10px 10px 5px 10px;
+        color: #fff;
+        font-size: .5rem;
+      }
+
+      #left-col b,
+      #right-col b {
+        display: block;
+        font-size: 1rem
+      }
+
+      #right-col b span {
+        opacity: .7;
+        font-weight: normal;
+      }
+
+      #right-col {
+        padding-left: 10px;
+        border-left: 1px solid rgba(0, 0, 0, .2);
+      }
+
+      .input-row {
+        display: flex;
+        flex-direction: row;
+        margin-top: 5px;
+      }
+      .input-row .label {
+        font-size:.8rem;
+        margin: auto 5px auto auto;
+        min-width: 15%;
+        text-align: right;
+      }
+      .input-row input {
+        width: 80%;
+        margin: auto 10px auto auto;
+      }
+    </style>
+
+    <!-- 내품 목록 조회 Ajax -->
+    <sys-ajax
+      auto
+      id="box-details-ajax"
+      method="GET"
+      content-type="application/json"
+      last-response="{{items}}">
+    </sys-ajax>
+
+    <!-- 풀 박스 취소 Ajax -->
+    <sys-ajax
+      id="cancel-box-ajax"
+      method="DELETE"
+      content-type="application/json"
+      on-sys-ajax-response="closeDialog"
+      on-sys-ajax-error="closeDialog">
+    </sys-ajax>
+
+    <div id="contents">
+      <!-- 박스 ID 표시 영역 -->
+      <div class="input-row">
+        <span class="label">[[boxInfoLabel]]</span>
+        <input id="box-id" value$="[[boxInfo]]" readonly>
+      </div>
+
+      <!-- 투입 상품 처리 리스트 표시 영역 -->
+      <mps-list
+        dialog
+        header="[[header]]"
+        data="[[items]]">
+      </mps-list>
+
+      <!-- 버튼 블럭 -->
+      <div id="btn-container">
+        <!-- 닫기 버튼 -->
+        <button id="close-btn" class="button" on-click="closeDialog">[[closeBtnLabel]]</button>
+        <!-- 박스 취소 버튼 -->
+        <button id="cancel-btn" class="button" on-click="cancelBox" hidden="[[!isBoxCancelEnabled]]">[[cancelBtnLabel]]</button>
+      </div>
+    </div>
+  </template>
+
+  <script>
+    class MpsBoxListDetail extends Polymer.Element {
+      static get is() { return 'mps-box-list-detail' }
+      static get properties() {
+        return {
+          /**
+           * 박스 실적
+           *******************
+           * @type {Object}
+           */
+          boxResult: {
+            type: Object,
+            observer: '_boxResultChanged'
+          },
+
+          /**
+           * 박스 ID
+           *******************
+           * @type {String}
+           */
+          boxResultId: {
+            type: String,
+            observer: '_boxResultIdChanged'
+          },
+
+          /**
+           * @description 박스 ID 라벨
+           ****************
+           * @type {String}
+           */
+          boxInfoLabel: {
+            type: String,
+            value: () => t('label.box')
+          },
+
+          /**
+           * 닫기 버튼 label
+           *******************
+           * @type {String}
+           */
+          closeBtnLabel: {
+            type: String,
+            value: () => t('button.close')
+          },
+
+          /**
+           * 풀 박스 취소 버튼 label
+           *******************
+           * @type {String}
+           */
+          cancelBtnLabel: {
+            type: String,
+            value: () => t('button.cancel_full')
+          },
+
+          /**
+           * @description PDA인지 여부
+           ****************
+           * @type {Boolean}
+           */
+          isBoxCancelEnabled: {
+            type: Boolean,
+            value: false
+          },
+
+          /**
+           * @description 박스 정보 표시 값
+           ****************
+           * @type {String}
+           */
+          boxInfo: {
+            type: String
+          },
+
+          /**
+           * @description 그리드 헤더
+           ****************
+           * @type {Array}
+           */
+          header: {
+            type: Array,
+            value: function () {
+              return [{
+                display: t('label.sku_nm'),
+                fieldname: 'sku_nm'
+              }, {
+                display: t('label.qty'),
+                columnWidth: '0.2fr',
+                style: {
+                  textAlign: 'center'
+                },
+                fieldname: 'picked_qty'
+              }];
+            }
+          }
+        }
+      }
+
+      /**
+       * @description 선택한 박스 정보가 변경된 이후 박스 상세 정보 조회
+       *******************
+       * @param {Object} boxResult
+       */
+      _boxResultChanged(boxResult) {
+        if(boxResult && boxResult.id) {
+          this.boxResultId = boxResult.id;
+          this.boxInfo = `${boxResult.box_id} [${boxResult.loc_cd}(${boxResult.box_seq})]`;
+        }
+      }
+
+      /**
+       * @description 팝업 닫기
+       *******************
+       * @param {String} boxResultId
+       */
+      _boxResultIdChanged(boxResultId) {
+        var ajax = this.$['box-details-ajax'];
+        ajax.curl = `/box_result/${boxResultId}/box_detail`;
+        ajax.generateRequest();
+      }
+
+      /**
+       * @description 박싱 작업 취소
+       ****************
+       * @param {Object} event
+       */
+      cancelBox(event) {
+        openConfirm({
+          title: '풀 박스 취소', //t('title.cancel_confirmation'),
+          message: '풀 박스 취소하시겠습니까?', //t('text.Sure to process'),
+          critical: true,
+          confirmCallback: () => {
+            var ajax = this.$['cancel-box-ajax'];
+            var batchId = this.boxResult.batch_id;
+            var locCd = this.boxResult.loc_cd;
+            var boxId = this.boxResult.box_id;
+            ajax.curl = `/tablet_process/cancel_box/${batchId}/${locCd}/${boxId}`;
+            ajax.generateRequest();
+          }
+        });
+      }
+
+      /**
+       * @description 팝업 닫기
+       */
+      closeDialog() {
+        document.dispatchEvent(new CustomEvent('close-dialog'));
+      }
+    }
+
+    customElements.define(MpsBoxListDetail.is, MpsBoxListDetail);
+  </script>
+</dom-module>

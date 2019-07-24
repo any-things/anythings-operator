@@ -1,0 +1,925 @@
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+
+<link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
+
+<link rel="import" href="../../../mixins/mps/mps-scanner-mixin.html">
+<link rel="import" href="../../../mixins/mps/mps-mpi-on-off-mixin.html">
+<link rel="import" href="../../../mixins/mps/mps-message-subscribe-mixin.html">
+<link rel="import" href="../../../pda-libraries.html">
+
+<link rel="import" href="./pda-rtn-process-detail.html">
+<link rel="import" href="./pda-job-process-btn-popup.html">
+<link rel="import" href="../mps-adjust-qty-dialog.html">
+
+<link rel="import" href="../../../units/mps/mps-inspect-box.html">
+<link rel="import" href="../../../units/mps/mps-barcode-field.html">
+<link rel="import" href="../../../units/mps/mps-order-list.html">
+<link rel="import" href="../../../units/mps/mps-box-inspect-mpi-on-off.html">
+<link rel="import" href="../../../units/mps/mps-box-assign-popup.html">
+
+<!--
+  PDA > 반품 잔량 풀박스 처리 화면
+-->
+<dom-module id="pda-rtn-fullbox">
+  <template>
+    <style include="shared-styles">
+      :host {
+        display: flex;
+        flex-direction: column;
+        padding: 10px;
+        height: calc(100% - 20px);
+      }
+      #container {
+        display: flex;
+        flex-direction: column;
+        /* display: grid;
+        grid-template-rows: auto auto 1fr; */
+        flex: 1;
+        padding: 5px;
+        background-color: #5A6377;
+        border-radius: var(--things-default-border-radius);
+        color: rgba(255,255,255,.8);
+      }
+      #list-container {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+      }
+      #region-info-container {
+        display: flex;
+        font-size: .8rem;
+        border-bottom: 1px solid rgba(255,255,255,.2);
+      }
+      #region-info-container label, #region-info-container span{
+        flex: 1;
+        text-align: center;
+      }
+      #input-container {
+        display: flex;
+        flex-direction: column;
+      }
+      .input-row {
+        display: flex;
+        flex-direction: row;
+        margin-bottom: 5px;
+      }
+      .input-row .label {
+        font-size:.8rem;
+        margin: auto 5px auto auto;
+        min-width: 25%;
+        text-align: right;
+      }
+      .input-row input, mps-auto-popup-input {
+        width: 70%;
+      }
+      .col2 {
+        margin-top: 2px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+      }
+      button {
+        --operator-default-btn: {
+          background: #7f95bd;
+          background: linear-gradient(to bottom, #7f95bd 0%, #4e638a 100%);
+          /* border:none; */
+          border-top:.06rem solid #96b2e6;
+          border-bottom:.2rem solid #3a4b69;
+          /* border-radius:12px; */
+          margin:0;
+          padding:.3rem 1rem;
+          /* min-width:100px; */
+          color: #fff;
+          text-shadow: 0px .03rem .03rem rgba(0, 0, 0, 0.4);
+          font-size:.8rem;
+          font-family: 'cj-font';
+          outline: none;
+        }
+      }
+      .invisible {
+        width: 0;
+        height: 0;
+        border: 0 solid black;
+        opacity: 0;
+      }
+
+      #extra-alert-div {
+        /* padding: 15px 15px 0px 15px; */
+        display: flex;
+        height: 0px;
+        overflow: hidden;
+        color: #FFFF00;
+        word-break: keep-all;
+        text-align: center;
+        opacity: 0;
+        font-size: 8vmin;
+        transition: height 0.5s, opacity 0.8s;
+        -webkit-transition: height 0.5s, opacity 0.8s;
+      }
+
+      #extra-alert-div[visible] {
+        /* padding: 15px 15px 0px 15px; */
+        height: 24vh;
+        opacity: 1;
+      }
+
+      #extra-alert-div>div {
+        margin: auto;
+      }
+
+      mps-order-list{
+        min-height: 100px;
+        flex: 1;
+      }
+    </style>
+
+    <!-- 슈트 정보 조회 Ajax -->
+    <sys-ajax
+      id="chute-info-ajax"
+      method="GET"
+      content-type="application/json"
+      on-sys-ajax-response="_chuteInfoResponse">
+    </sys-ajax>
+
+    <!-- 박스 유효성 체크 Ajax -->
+    <sys-ajax
+      id="box-info-ajax"
+      method="GET"
+      curl="/pda_process/is_usable_box/:region_cd/:box_id"
+      content-type="application/json"
+      on-sys-ajax-response="_boxInfoResponse"
+      on-sys-ajax-error="_boxInfoError"
+      custom-error-handler>
+    </sys-ajax>
+
+    <!-- 로케이션 별 풀박스 수량 조회 Ajax -->
+    <sys-ajax
+      id="loc-info-ajax"
+      method="GET"
+      curl="/pda_process//:loc_cd"
+      content-type="application/json"
+      on-sys-ajax-response="_locInfoResponse"
+      on-sys-ajax-error="_locInfoError"
+      custom-error-handler>
+    </sys-ajax>
+
+    <!-- 잔량 처리 트랜잭션 Ajax -->
+    <sys-ajax
+      id="fullbox-remains-ajax"
+      method="POST"
+      content-type="application/json"
+      on-sys-ajax-response="_fullboxRemainsResponse"
+      on-sys-ajax-error="_fullboxRemainsError">
+    </sys-ajax>
+
+    <div id="container">
+      <!-- 상단 선택 호기 및 작업 존 표시 영역 -->
+      <div id="region-info-container" class="input-row">
+        <label>[[regionNmLabel]]</label>
+        <span id="view-region-nm">[[regionNm]]</span>
+        <label>[[zoneCdLabel]]</label>
+        <span id="view-zone-nm">[[zoneCd]]</span>
+      </div>
+
+      <div id="input-container">
+        <!-- SKU 정보 조회 시 복수개가 조회된 경우 실행되는 사용자가 고를 수 있는 팝업이 가미된 SKU Input -->
+        <mps-barcode-field
+          id="input"
+          timeout="2000"
+          value="{{inputValue}}"
+          on-keypress="_handleBarcodeKeypress">
+        </mps-barcode-field>
+
+        <!-- 박스 ID 표시 컴포넌트 행 -->
+        <div class="input-row">
+          <span class="label">[[boxIdLabel]]</span>
+          <input id="box-id" value$="[[boxId]]" readonly>
+        </div>
+      </div>
+
+      <div id="list-container">
+        <!-- 잔량 처리 표시를 위한 컴포넌트 -->
+        <div id="extra-alert-div" visible$="[[displayMessageEnabled]]">
+          <div>[[message]]</div>
+        </div>
+
+        <!-- 작업 리스트 표시를 위한 컴포넌트 -->
+        <mps-list header="[[header]]" data="[[data]]" job-type="DAS">
+        </mps-list>
+      </div>
+    </div>
+
+    <div class="col2">
+      <!-- 버튼 리스트 -->
+      <button on-click="_reset">[[resetBtnLabel]]</button>
+      <button id='btn-fullbox' on-click="doTransaction" hidden>[[btnFullboxLabel]]</button>
+    </div>
+  </template>
+
+  <script>
+    class PdaRtnFullbox extends Polymer.Element {
+      static get is() { return 'pda-rtn-fullbox' }
+      static get properties() {
+        return {
+          /**
+           * @description 화면이 표시되는 이벤트시 처리하기 위한 변수
+           *****************
+           * @type {Boolean}
+           */
+          visible: {
+            type: Boolean,
+            observer: '_visibleChanged'
+          },
+
+          /**
+           * @description 작업 유형
+           ****************
+           * @type {String}
+           */
+          jobType: {
+            type: String,
+            value: 'RTN'
+          },
+
+          /**
+           * @description 호기 코드 라벨
+           ****************
+           * @type {String}
+           */
+          regionNmLabel: {
+            type: String,
+            value: () =>  t('label.region_nm'),
+          },
+
+          /**
+           * @description 존 코드 라벨
+           ****************
+           * @type {String}
+           */
+          zoneCdLabel: {
+            type: String,
+            value: () => t('label.zone_cd')
+          },
+
+          /**
+           * @description 박스 ID 라벨
+           ****************
+           * @type {String}
+           */
+          boxIdLabel: {
+            type: String,
+            value: () => t('label.box_id')
+          },
+
+          /**
+           * @description 로케이션 코드 라벨
+           ****************
+           * @type {String}
+           */
+          locCdLabel: {
+            type: String,
+            value: () => t('label.loc_cd')
+          },
+
+          /**
+           * @description 상품 명 라벨
+           ****************
+           * @type {String}
+           */
+          skuNmLabel: {
+            type: String,
+            value: () => t('label.sku_nm')
+          },
+
+          /**
+           * @description 초기화 버튼 라벨
+           ****************
+           * @type {String}
+           */
+          resetBtnLabel: {
+            type: String,
+            value: () => t('button.reset')
+          },
+
+          /**
+           * Fullbox 버튼 라벨
+           ****************
+           * @type {String}
+           */
+          btnFullboxLabel: {
+            type: String,
+            value: () => t('button.full_box')
+          },
+
+          /**
+           * @description 메시지 표시 활성화 여부
+           ****************
+           * @type {String}
+           */
+          displayMessageEnabled: {
+            type: Boolean,
+            value: () => true
+          },
+
+          /**
+           * @description 표시할 메시지
+           ****************
+           * @type {String}
+           */
+          message: {
+            type: String,
+            value: () => ''
+          },
+
+          /**
+           * @description 반품 작업 리스트 헤더
+           ****************
+           * @type {Array}
+           */
+          header: {
+            type: Array,
+            value: () => {
+              return [{
+                display: t('label.location'),
+                fieldname: 'loc_cd',
+                columnWidth: '0.3fr',
+              }, {
+                display: t('label.sku_cd'),
+                fieldname: 'sku_cd',
+                columnWidth: '0.6fr',
+              }, {
+                display: t('label.qty'),
+                fieldname: 'picked_qty',
+                columnWidth: '0.1fr',
+                style: {
+                  textAlign: 'center'
+                }
+              }, {
+                fieldname: 'sku_cd',
+                hidden: true
+              }, {
+                fieldname: 'mpi_cd',
+                hidden: true
+              }, {
+                fieldname: 'status',
+                hidden: true
+              }]
+            }
+          },
+
+          /**
+           * @description 반품 작업 리스트
+           ****************
+           * @type {Array}
+           */
+          data: {
+            type: Array,
+            value: () => {
+              return [];
+            }
+          },
+
+          /**
+           * @description 마지막으로 스캔했던 코드의 타입 (로케이션 코드, 표시기 코드 등)
+           ****************
+           * @type {String}
+           */
+          mappingCodeType: {
+            type: String
+          },
+
+          /**
+           * @description 스캔 정보
+           ****************
+           * @type {String}
+           */
+          inputValue: {
+            type: String,
+            observer: '_inputValueChanged'
+          },
+
+          /**
+           * @description 박스 ID 값
+           ****************
+           * @type {String}
+           */
+          boxId: {
+            type: String
+          },
+
+          /**
+           * @description 로케이션 코드 값
+           ****************
+           * @type {String}
+           */
+          locCd: {
+            type: String
+          },
+
+          /**
+           * @description 총 확정 수량 라벨
+           ****************
+           * @type {Array}
+           */
+          totalPickedQty: {
+            type: Number,
+            value: 0
+          },
+
+          /**
+           * @description 호기 코드
+           ****************
+           * @type {String}
+           */
+          regionCd: {
+            type: String,
+            value: MPS_UTIL.getRegionCd(),
+            observer: '_regionCdChanged'
+          },
+
+          /**
+           * @description 호기 명
+           ****************
+           * @type {String}
+           */
+          regionNm: {
+            type: String,
+            notify: true,
+            value: MPS_UTIL.getRegionNm(),
+            observer: '_regionNmChanged'
+          },
+
+          /**
+           * @description 작업 존 코드
+           ****************
+           * @type {String}
+           */
+          zoneCd: {
+            type: String,
+            notify: true,
+            observer: '_zoneCdChanged'
+          }
+        }
+      }
+
+      /**
+       * @description connected callback
+       *********************
+       */
+      connectedCallback() {
+        super.connectedCallback();
+
+        document.addEventListener(`alert-closed-at-${location.hash.replace('#/', '')}`, event => {
+          if(!event.detail.hasCallback) {
+            this._reset();
+          }
+        });
+
+        this._reset();
+      }
+
+      /**
+       * @description 화면 표시 / 숨김 변동이 생긴 경우
+       *********************
+       * @param {Boolean} visible
+       */
+      _visibleChanged(visible) {
+      }
+
+      /**
+       * @description 호기 코드 변경 시
+       *********************
+       * @param {String} regionCd
+       */
+      _regionCdChanged(regionCd) {
+        if (regionCd) {
+          window.localStorage.setItem('setting.regionCode', JSON.stringify(regionCd));
+        }
+      }
+
+      /**
+       * @description 호기 명 변경 시
+       *********************
+       * @param {String} regionNm
+       */
+      _regionNmChanged(regionNm) {
+        if (regionNm) {
+          window.localStorage.setItem('setting.regionName', JSON.stringify(regionNm));
+        }
+      }
+
+      /**
+       * @description 작업 존 코드 변경 시
+       *********************
+       * @param {String} zoneCd
+       */
+      _zoneCdChanged(zoneCd) {
+        if (zoneCd) {
+          window.localStorage.setItem('setting.zoneCode', JSON.stringify(zoneCd));
+        }
+      }
+
+      /**
+       * @description 투입 정보 변경시
+       *********************
+       * @param {String} inputValue
+       */
+      _inputValueChanged(inputValue) {
+        if (!inputValue) return;
+
+        // 1. 박스 ID인 경우
+        if (inputValue.search(/^[A-Z0-9]{1}[A-Z,\s]{4}[0-9]{11}$/) >= 0) {
+          this._checkBoxId(inputValue);
+
+        // 2. 표시기 코드인 경우
+        } else if(inputValue.startsWith('01') && inputValue.length === 22) {
+          var mpiCd = inputValue.substring(2, 8);
+          this._checkMpiCd(mpiCd);
+
+        // 3. 로케이션 코드인 경우
+        } else if(inputValue.search(/^[A-Z]{1}[0-9]{3}-[0-9][0-9][0-9][0-9]$/) >= 0) {
+          this._checkLocCd(inputValue);
+
+        // 4. 기타
+        } else {
+          this._setErrorMessage(t('text.invalid_input_data'));
+        }
+
+        this._initFocus();
+      }
+
+      /**
+       * @description 박스 ID가 유효한 지 서버에서 체크
+       ******************
+       * @param {String} boxId
+       */
+      _checkBoxId(boxId) {
+        if(this.boxId) {
+          this._setErrorMessage('박스ID는 이미 스캔했습니다. 박스를 교체하시려면 초기화한 후에 교체하세요.');
+        } else {
+          this.boxId = boxId;
+          var ajax = this.$['box-info-ajax'];
+          ajax.curl = `/pda_process/is_usable_box/${this.regionCd}/${boxId}`;
+          ajax.generateRequest();
+        }
+      }
+
+      /**
+       * @description 박스 ID 유효성 체크
+       *********************
+       * @param {Object} event
+       */
+      _boxInfoResponse(event) {
+        this.mappingCodeType = 'BOX_ID';
+        this.message = '로케이션 코드 혹은 표시기 코드를 스캔하세요.';
+      }
+
+      /**
+       * @description 박스 ID 유효성 체크 에러
+       *********************
+       * @param {Object} event
+       */
+      _boxInfoError(event) {
+        this.boxId = '';
+        this.message = '이미 사용된 박스입니다.';
+      }
+
+      /**
+       * @description 로케이션 코드가 유효한 지 서버에서 체크하고 현재 로케이션에 분류된 수량을 체크
+       ******************
+       * @param {String} locCd
+       */
+      _checkLocCd(locCd) {
+        if(!this.boxId) {
+          this._setErrorMessage('박스 ID를 먼저 스캔하세요.');
+        } else {
+          if(this.data.length >= 5) {
+            this._setErrorMessage('로케이션 다섯개까지만 처리 가능합니다.');
+          } else {
+            var found = this.data.find(function(item) {
+              return item.loc_cd === locCd;
+            });
+
+            if(found) {
+              this._setErrorMessage('로케이션은 이미 추가되었습니다.');
+            } else {
+              this.locCd = locCd;
+              var ajax = this.$['loc-info-ajax'];
+              ajax.curl = `/pda_process/rtn/location_qty/${locCd}`;
+              ajax.generateRequest();
+            }
+          }
+        }
+      }
+
+      /**
+       * @description 표시기 코드가 유효한 지 서버에서 체크하고 현재 로케이션에 분류된 수량을 체크
+       ******************
+       * @param {String} locCd
+       */
+      _checkMpiCd(mpiCd) {
+        if(!this.boxId) {
+          this._setErrorMessage('박스 ID를 먼저 스캔하세요.');
+        } else {
+          if(this.data.length >= 5) {
+            this._setErrorMessage('로케이션 다섯개까지만 처리 가능합니다.');
+          } else {
+            var found = this.data.find(function(item) {
+              return item.mpi_cd === mpiCd;
+            });
+
+            if(found) {
+              this._setErrorMessage('스캔한 로케이션은 이미 추가되었습니다.');
+            } else {
+              this.mpiCd = mpiCd;
+              var ajax = this.$['loc-info-ajax'];
+              ajax.curl = `/pda_process/rtn/location_qty/${mpiCd}`;
+              ajax.generateRequest();
+            }
+          }
+        }
+      }
+
+      /**
+       * @description 로케이션 정보 조회 응답시
+       *********************
+       * @param {Object} event
+       */
+      _locInfoResponse(event) {
+        if (!event || !event.detail) return;
+        var item = event.detail;
+
+        // 1. 수량 조절 다이얼로그를 띄운다.
+        var locCd = item.loc_cd;
+        var pickedQty = item.max_stock_qty;
+
+        if (pickedQty > 0) {
+          this._showAdjustFullboxQty(item, locCd, pickedQty);
+          this.message = '처리할 셀[' + locCd + ']의 상품 수량을 조정하세요.';
+        } else {
+          this._setErrorMessage('스캔한 셀[' + locCd + ']에 분류한 상품이 없습니다.');
+        }
+
+        // 2. 포커스 리셋
+        this._initFocus();
+      }
+
+      /**
+       * @description 로케이션 정보 응답 에러시
+       *********************
+       * @param {Object} event
+       */
+      _locInfoError(event) {
+        if(event && event.detail && event.detail.msg) {
+          this.message = '에러-' + event.detail.msg;
+        } else {
+          this.message = '에러 - 로케이션을 다시 스캔해주세요.';
+        }
+      }
+
+      /**
+       * @description Fullbox 트랜잭션 처리
+       ******************
+       */
+      doTransaction() {
+        try {
+          this.validateBeforeRequest();
+        } catch (error) {
+          openAlert({
+            title: t('error.VALIDATION_ERROR'),
+            message: error,
+            confirmCallback: () => {
+              this._initFocus();
+            }
+          });
+          return;
+        }
+
+        this._requestFullbox();
+      }
+
+      /**
+       * @description 트랜잭션 처리 전 유효성 체크
+       *********************
+       */
+      validateBeforeRequest() {
+        if(!this.boxId) {
+          throw '박스 ID가 비어있습니다.';
+        }
+
+        if(!this.data || this.data.length == 0) {
+          throw '처리할 로케이션이 없습니다.';
+        }
+      }
+
+      /**
+       * @description 바코드 박스에서 엔터 이벤트 발생시
+       *********************
+       * @param {Object} e 엔터 이벤트
+       */
+      _handleBarcodeKeypress(e) {
+        if (e.keyCode != 13 || !e || !e.currentTarget || !e.currentTarget.getValue()) {
+          return;
+        }
+
+        var value = e.currentTarget.getValue();
+        // 슈트 넘버 스캔시 처리
+        if (/^\d{3}$/.test(value)) {
+          this.chuteNumberScanned(value);
+        } else {
+          this.inputValue = null;
+          this.inputValue = value;
+        }
+      }
+
+      /**
+       * @description 슈트 번호가 스캔되었을때 유효한 슈트 정보인지 조회
+       *********************
+       * @param {Number} chuteNumber 슈트 번호
+       */
+      chuteNumberScanned(chuteNumber) {
+        const chuteInfoAjax = this.$['chute-info-ajax'];
+        chuteInfoAjax.curl = `/pda_process/chute_info/${chuteNumber}`;
+        chuteInfoAjax.generateRequest();
+      }
+
+      /**
+       * @description 유효한 슈트 번호에 대한 response가 오면 화면 정보를 업데이트하고 clear
+       *********************
+       * @param {Object} event
+       */
+      _chuteInfoResponse(event) {
+        this.regionNm = event.detail.region_nm;
+        this.regionCd = event.detail.region_cd;
+        this.zoneCd = event.detail.chute_no;
+        showToast('info', `${t('text.chute_changed')}`);
+        this._reset();
+      }
+
+      /**
+       * @description 슈트 정보 조회를 위한 AJAX 객체 리턴
+       *********************
+       * @return
+       */
+      _getChuteInfoAjax() {
+        return this.$['chute-info-ajax'];
+      }
+
+      /**
+       * @description 화면 리셋
+       ******************
+       */
+      _reset() {
+        this.inputValue = '';
+        this.boxId = '';
+        this.locCd = '';
+        this.message = '잔량 처리할 박스 ID를 스캔하세요';
+        this.set('data', []);
+        this._initFocus();
+      }
+
+      /**
+       * @description 포커스 초기화
+       ******************
+       */
+      _initFocus() {
+        this.$.input.value = '';
+        this.$.input.select();
+      }
+
+      /**
+       * @description 분할 Fullbox 처리
+       *********************
+       * @param {Object} locInfo 로케이션 정보
+       * @param {String} locCd 로케이션
+       * @param {Number} totalPickedQty 총 확정 수량
+       */
+      _showAdjustFullboxQty(locInfo, locCd, totalPickedQty) {
+        const adjustPopup = document.createElement('mps-adjust-qty-dialog');
+        this.adjustPopup = adjustPopup;
+        adjustPopup.id = 'fullboxRemainsPopup';
+        adjustPopup.locCd = locCd;
+        adjustPopup.jobType = this.jobType;
+        adjustPopup.isNumberUpDown = true;
+
+        setTimeout(() => {
+          MPS_UTIL.showPopup(t('button.adjust_qty'), adjustPopup, 'fit', 'fit', () => {
+            adjustPopup.setCurrentQty(totalPickedQty);
+            adjustPopup.adjustQty = () => {
+              let adjustQty = parseInt(adjustPopup._getAdjustQtyInput().value);
+
+              if (adjustQty > totalPickedQty) {
+                adjustPopup._getAdjustQtyInput().style = 'color: red';
+                window.SOUND.playErrorSound();
+
+              } else {
+                // 그리드 데이터 업데이트
+                this._updateGridData({ region_cd : locInfo.region_cd, loc_cd : locInfo.loc_cd, mpi_cd : locInfo.mpi_cd, sku_cd : locInfo.sku_cd, picked_qty : adjustQty, status : 'W' });
+                // 팝업 닫기
+                adjustPopup.closeDialog();
+              }
+            };
+          }, () => {
+            this._initFocus();
+            this.adjustPopup = null;
+          })
+        }, 100);
+      }
+
+      /**
+       * @description 그리드 데이터 업데이트
+       *********************
+       * @param {Object} gridItem
+       */
+      _updateGridData(gridItem) {
+        // 그리드 데이터 업데이트
+        var data = this.data.slice();
+        data.push(gridItem);
+        this.set('data', data);
+        this._showFullboxButton();
+
+        if(data.length >= 5) {
+          this.message = '[풀 박스] 버튼을 눌러서 잔량 처리하세요';
+        } else {
+          this.message = '다음 처리할 로케이션을 스캔하세요';
+        }
+      }
+
+      /**
+       * @description 분할 Fullbox 처리 요청
+       *********************
+       */
+      _requestFullbox() {
+        var ajax = this.$['fullbox-remains-ajax']
+        ajax.curl = `/pda_process/rtn/fullbox_remains/${this.boxId}`;
+        ajax.body = this.data.map(function(item) {
+          return { region_cd : item.region_cd, loc_cd : item.loc_cd, max_stock_qty : item.picked_qty };
+        });
+        ajax.generateRequest();
+      }
+
+      /**
+       * @description 잔량 처리 성공시
+       *********************
+       * @param {Object} event
+       */
+      _fullboxRemainsResponse(event) {
+        this.message = '잔량 처리 완료되었습니다.';
+        this._reset();
+        this._hideFullboxButton();
+      }
+
+      /**
+       * @description 풀박스 버튼 표시
+       *********************
+       */
+      _showFullboxButton() {
+        this.$['btn-fullbox'].hidden = false;
+      }
+
+      /**
+       * @description 풀박스 버튼 숨기기
+       *********************
+       */
+      _hideFullboxButton() {
+        this.$['btn-fullbox'].hidden = true;
+      }
+
+      /**
+       * @description 잔량 처리 에러시
+       **********************
+       * @param {Object} event
+       */
+      _fullboxRemainsError(event) {
+        if(!event || !event.detail) return;
+
+        const response = event.detail;
+        if(response.msg) {
+          this.message = response.msg;
+
+          openAlert({
+            title: response.code,
+            message: response.msg,
+            confirmCallback: () => {
+              this._initFocus();
+            }
+          });
+        }
+      }
+
+      /**
+       * @description 에러 메시지 설정
+       *********************
+       * @param {String} msg 메시지 설정
+       */
+      _setErrorMessage(msg) {
+        window.SOUND.playErrorSound();
+        this.message = msg;
+      }
+    }
+
+    customElements.define(PdaRtnFullbox.is, PdaRtnFullbox);
+  </script>
+</dom-module>

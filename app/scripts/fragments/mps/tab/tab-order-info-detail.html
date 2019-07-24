@@ -1,0 +1,277 @@
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+<link rel="import" href="./tab-sku-qrcode.html">
+<dom-module id="tab-order-info-detail">
+  <template>
+    <style>
+      :host {
+        flex: 1;
+      }
+      #container {
+        display: grid;
+        height: calc(100% - 40px);
+        padding: 20px;
+        text-align: -webkit-center;
+      }
+      button {
+        @apply --operator-default-btn;
+        margin-top: 15px;
+      }
+      button:active {
+        @apply --operator-default-btn-active;
+      }
+      #close-btn {
+        background: #737373;
+        background: linear-gradient(to bottom, #737373 0%, #585858 100%);
+        border-top:.06rem solid #999;border-bottom:.2rem solid #333;
+        border-left:none;border-right:none;
+        border-radius:12px;
+        margin:15px 0;padding:.3rem;
+        color: #fff;
+        text-shadow: 0px .03rem .03rem rgba(0, 0, 0, 0.4);
+        font-size:1rem;
+      }
+      #close-btn:active{
+        background: #737373;
+        background: linear-gradient(to bottom, #585858 0%, #737373 100%);
+        text-shadow: .03rem 0rem .03rem rgba(0, 0, 0, 0.4);
+      }
+    </style>
+
+    <sys-ajax
+      id="job-handle-ajax"
+      content-type="application/json">
+    </sys-ajax>
+
+    <div id="container">
+      <button on-click="adjustQty" hidden$="[[hideAdjustBtn]]">[[adjustQtyLabel]]</button>
+
+      <template is="dom-if" if="[[showQrCode]]">
+        <tab-sku-qrcode data = [[skuCd]]></tab-sku-qrcode>
+      </template>
+
+      <template is="dom-if" if="[[showFullBoxBtn]]">
+        <button on-click="labelPrint">[[fullBoxLabel]]</button>
+      </template>
+
+      <template is="dom-if" if="[[showJobCancelBtn]]">
+        <button on-click="jobCancel">[[jobCancelLabel]]</button>
+      </template>
+
+      <template is="dom-if" if="[[showJobFinishBtn]]">
+        <button on-click="jobFinish">[[jobFinishLabel]]</button>
+      </template>
+
+      <button id="close-btn" on-click="closeDialog">[[closeDialogLabel]]</button>
+    </div>
+  </template>
+
+  <script>
+    class TabOrderInfoDetail extends Polymer.Element {
+      static get is() { return 'tab-order-info-detail' }
+      static get properties() {
+        return {
+          //label locale 처리
+          adjustQtyLabel: {type: String, value: () => t('button.adjust_qty')},
+          fullBoxLabel: {type: String, value: () => t('button.full_box')},
+          jobCancelLabel: {type: String, value: () => t('button.job_cancel')},
+          jobFinishLabel: {type: String, value: () => t('button.job_complete')},
+          closeDialogLabel: {type: String, value: () => t('button.close')},
+
+          /**
+           * 선택한 작업 정보의 id
+           ********************
+           * @type {String}
+           */
+          jobId: String,
+
+          /**
+           * 현재 선택된 작업의 완료 여부
+           * 작업 완료 여부에 따라 활성화 되는 버튼이 결정됨
+           ********************
+           * @type {Boolean}
+           */
+          isFinished: {
+            type: Boolean,
+            observer: '_buttonActivate'
+          },
+
+          /**
+           * DAS / DPS 작업 타입
+           * 팝업을 출력하기 전 초기화 해야함
+           */
+          jobType: {
+            type: String
+          },
+          skuCd: {
+            type: String
+          },
+
+          pickingQty: {
+            type: Number,
+            observer: '_pickingQtyChanged'
+          },
+
+          pickedQty: {
+            type: Number
+          },
+
+          pickQty: {
+            type: Number
+          }
+        }
+      }
+
+      /**
+       * 작업처리 ajax 일괄 처리를 위함 function
+       ********************
+       * @param {Object} ajaxInfo
+       */
+      getJobHandleAjax(ajaxInfo) {
+        const jobHandlerAjax = this.$['job-handle-ajax'];
+        jobHandlerAjax.curl = ajaxInfo.curl;
+        jobHandlerAjax.method = ajaxInfo.method;
+        jobHandlerAjax.addEventListener('sys-ajax-response', ajaxInfo.responseCallback);
+        return jobHandlerAjax;
+      }
+
+      /**
+       * 라벨 출력
+       */
+      labelPrint() {
+        let fullBoxAjax = this.getJobHandleAjax({
+          curl: `/tablet_process/fullbox/${this.jobId}`,
+          method: 'POST',
+          responseCallback: this._fullBoxResponsed.bind(this)
+        });
+
+        fullBoxAjax.generateRequest();
+      }
+
+      /**
+       * 작업 취소
+       */
+      jobCancel() {
+        let jobCancelAjax = this.getJobHandleAjax({
+          curl: `/tablet_process/cancel_job/${this.jobId}`,
+          method: 'PUT',
+          responseCallback: this._jobCancelResponsed.bind(this)
+        });
+
+        jobCancelAjax.generateRequest();
+      }
+
+      /**
+       * 작업 완료
+       */
+      jobFinish() {
+        let jobFinishAjax = this.getJobHandleAjax({
+          curl: `/tablet_process/finish_job/${this.jobId}`,
+          method: 'PUT',
+          responseCallback: this._jobFinishResponsed.bind(this)
+        });
+
+        jobFinishAjax.generateRequest();
+      }
+
+      _pickingQtyChanged(pickingQty) {
+        if(pickingQty <= 1) {
+          this.hideAdjustBtn = true;
+        } else {
+          this.hideAdjustBtn = false;
+        }
+      }
+
+      adjustQty() {
+        this.closeDialog({
+          detail: {
+            type: 'adjust-qty',
+            pickQty: this.pickQty,
+            jobId: this.jobId,
+            pickedQty: this.pickedQty,
+            pickingQty: this.pickingQty
+          }
+        });
+      }
+
+      /**
+       * 라벨 출력, full box response event handler
+       ********************
+       * @param {Object} event
+       */
+      _fullBoxResponsed(event) {
+        this.closeDialog();
+      }
+
+      /**
+       * 작업 취소 reponse event handler
+       ********************
+       * @param {Object} event
+       */
+      _jobCancelResponsed(event) {
+        this.closeDialog();
+      }
+
+      /**
+       * 작업 완료 response event handler
+       ********************
+       * @param {Object} event
+       */
+      _jobFinishResponsed(event) {
+        this.closeDialog();
+      }
+
+      /**
+       * isFinished의 값에 따라 화면에 출력할 버튼을 결정
+       ********************
+       * @param {Boolean} isFinished
+       */
+      _buttonActivate(isFinished) {
+        if(!this.jobType) {
+          throw new Error('jobType is not defiend');
+        }
+        if(this.jobType === 'DAS' || this.jobType === 'DAS2') {
+          if(isFinished) {
+            this.showFullBoxBtn = true;
+            this.showJobCancelBtn = false;
+            this.showJobFinishBtn = false;
+            this.showQrCode = false;
+            this.hideAdjustBtn = true;
+          } else {
+            this.showFullBoxBtn = true;
+            this.showJobCancelBtn = true;
+            this.showJobFinishBtn = true;
+            this.showQrCode = false;
+          }
+        } else if (this.jobType === 'DPS') {
+          if(isFinished){
+            this.showJobFinishBtn = true;
+            this.hideAdjustBtn = true;
+            this.showQrCode = true;
+            this.showJobCancelBtn = false;
+          }else{
+            this.hideAdjustBtn = false;
+          }
+        }
+        if(JSON.parse(localStorage.getItem('setting.isQps'))){
+          this.showJobFinishBtn = true;
+          this.hideAdjustBtn = true;
+          this.showQrCode = true;
+          this.showJobCancelBtn = false;
+        }
+      }
+
+      /**
+       * 뒤로가기 버튼 클릭 event handler
+       * 다이얼로그 close 이벤트 발생
+       */
+      closeDialog(event) {
+        document.dispatchEvent(new CustomEvent('close-dialog', event));
+      }
+    }
+
+    customElements.define(TabOrderInfoDetail.is, TabOrderInfoDetail);
+  </script>
+</dom-module>

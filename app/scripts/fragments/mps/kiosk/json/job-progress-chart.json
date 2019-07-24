@@ -1,0 +1,459 @@
+{
+    "left": 0,
+    "top": 0,
+    "width": 800,
+    "height": 500,
+    "links": [],
+    "type": "model-layer",
+    "translate": {
+        "x": 128.09384164222877,
+        "y": 205.63856304985347
+    },
+    "scale": {
+        "x": 1.3049999999999997,
+        "y": 1.3049999999999997
+    },
+    "fillStyle": "#0288ca",
+    "components": [
+        {
+            "type": "text",
+            "left": 303.76987811340217,
+            "top": 23.739924557417723,
+            "width": 199.99999999999966,
+            "height": 27.849131179766438,
+            "text": "작업 진척율",
+            "fillStyle": "#fff",
+            "strokeStyle": "#000",
+            "alpha": 1,
+            "hidden": false,
+            "lineWidth": 5,
+            "lineDash": "solid",
+            "lineCap": "butt",
+            "textAlign": "center",
+            "textBaseline": "top",
+            "textWrap": false,
+            "fontFamily": "NanumBarunGothic",
+            "fontSize": 35,
+            "rotation": 0,
+            "fontColor": "#fff"
+        },
+        {
+            "type": "progress-circle",
+            "cy": 249.49532837754893,
+            "cx": 195.53924650574385,
+            "rx": 142.57477519127218,
+            "ry": 145.51495016611298,
+            "value": "#{data}",
+            "startAngle": 200,
+            "endAngle": 160,
+            "fontSize": 100,
+            "strokeStyle": "#fff",
+            "blankStrokeStyle": "rgba(0,0,0,.15)",
+            "fontFamily": "Arial",
+            "fontColor": "#fff",
+            "text": "#{data}",
+            "alpha": 1,
+            "hidden": false,
+            "lineWidth": 35,
+            "lineDash": "solid",
+            "lineCap": "butt",
+            "rotation": 0,
+            "shadow": {
+                "left": 1,
+                "top": 2,
+                "blurSize": 2,
+                "color": "rgba(0,0,0,.2)"
+            },
+            "bold": true,
+            "paddingRight": 10,
+            "id": "progressRate",
+            "data": 80
+        },
+        {
+            "type": "text",
+            "left": 244.0922373176611,
+            "top": 208.00146240315294,
+            "width": 36.18278517160951,
+            "height": 27.84913117976646,
+            "text": "%",
+            "fillStyle": "#fff",
+            "strokeStyle": "#000",
+            "alpha": 1,
+            "hidden": false,
+            "lineWidth": 5,
+            "lineDash": "solid",
+            "lineCap": "butt",
+            "textAlign": "center",
+            "textBaseline": "top",
+            "textWrap": false,
+            "fontFamily": "Arial",
+            "fontSize": 30,
+            "rotation": 0,
+            "fontColor": "#fff"
+        },
+        {
+            "type": "ellipse",
+            "rx": 57.346482724636246,
+            "ry": 57.3464827246363,
+            "cx": 195.53924650574385,
+            "cy": 397.213904125441,
+            "fillStyle": "#fff",
+            "strokeStyle": "#0288ca",
+            "alpha": 1,
+            "hidden": false,
+            "lineWidth": 7,
+            "lineDash": "solid",
+            "lineCap": "butt",
+            "rotation": 0
+        },
+        {
+            "type": "text",
+            "left": 610.076791925254,
+            "top": 331.99021847794234,
+            "width": 150.90564801045684,
+            "height": 23.901756761224078,
+            "text": "피킹수량 (%)",
+            "fillStyle": "#999",
+            "strokeStyle": "#000",
+            "alpha": 1,
+            "hidden": false,
+            "lineWidth": 5,
+            "lineDash": "solid",
+            "lineCap": "butt",
+            "textAlign": "right",
+            "textBaseline": "top",
+            "textWrap": true,
+            "fontFamily": "Arial",
+            "fontSize": 23,
+            "rotation": 0,
+            "bold": false,
+            "fontColor": "#fff"
+        },
+        {
+            "type": "text",
+            "left": 610.1618071707061,
+            "top": 252.19964731442596,
+            "width": 149.56455101263032,
+            "height": 63.1431938279359,
+            "text": "#{data}",
+            "fillStyle": "#F97371",
+            "strokeStyle": "#000",
+            "alpha": 1,
+            "hidden": false,
+            "lineWidth": 5,
+            "lineDash": "solid",
+            "lineCap": "butt",
+            "textAlign": "right",
+            "textBaseline": "top",
+            "textWrap": true,
+            "fontFamily": "Arial",
+            "fontSize": 75,
+            "rotation": 0,
+            "bold": true,
+            "fontColor": "#fff",
+            "id": "textRate",
+            "shadow": {
+                "left": 1,
+                "top": 2,
+                "blurSize": 2,
+                "color": "rgba(0,0,0,.2)"
+            }
+        },
+        {
+            "type": "ellipse",
+            "rx": 41.76254554479897,
+            "ry": 41.762545544798755,
+            "cx": 563.3038504065486,
+            "cy": 224.99105398871723,
+            "fillStyle": "rgba(0,0,0,.1)",
+            "strokeStyle": "#000",
+            "alpha": 1,
+            "hidden": false,
+            "lineWidth": 0,
+            "lineDash": "solid",
+            "lineCap": "butt",
+            "rotation": 0
+        },
+        {
+            "type": "gauge-circle",
+            "cx": 563.3038504065486,
+            "cy": 224.9910539887172,
+            "rx": 135.78955281438655,
+            "ry": 136.47584721036432,
+            "fontSize": 15,
+            "fillStyle": "#ff00ff",
+            "fontColor": "black",
+            "lineWidth": 0,
+            "value": "#{data}",
+            "startValue": 0,
+            "endValue": 100,
+            "step": 20,
+            "colorStops": [
+                {
+                    "color": "#4fd0ff",
+                    "position": 70
+                },
+                {
+                    "color": "#fff",
+                    "position": 85
+                },
+                {
+                    "color": "#3cdf4b",
+                    "position": 100
+                }
+            ],
+            "textFillStyle": "#585858",
+            "stepFillStyle": "rgba(0,0,0,.3)",
+            "needleFillStyle": "#585858",
+            "ratio": 85.33946458055716,
+            "startAngle": -150,
+            "endAngle": 90,
+            "subStep": 5,
+            "stepTextSize": 4,
+            "stepNeedleSize": 1,
+            "alpha": 1,
+            "rotation": 0,
+            "innerCircleFillStyle": "#fff",
+            "showStartValue": true,
+            "showEndValue": true,
+            "inText": true,
+            "text": "",
+            "id": "gaugeRate",
+            "data": 50.9,
+            "mappings": [
+                {
+                    "rule": "value",
+                    "target": "#textRate",
+                    "property": "data"
+                }
+            ]
+        },
+        {
+            "type": "chartjs",
+            "top": 382.7677536267184,
+            "left": 408.0900809617989,
+            "width": 367,
+            "height": 100,
+            "lineWidth": 3,
+            "alpha": 1,
+            "chart": {
+                "type": "bar",
+                "data": {
+                    "labels": [],
+                    "datasets": [
+                        {
+                            "label": "series 1",
+                            "type": "bar",
+                            "data": [],
+                            "backgroundColor": "#fff",
+                            "borderColor": "#fff",
+                            "borderWidth": 0,
+                            "dataKey": "data",
+                            "yAxisID": "left",
+                            "displayValue": false
+                        }
+                    ],
+                    "labelDataKey": "hour"
+                },
+                "options": {
+                    "theme": "light",
+                    "xGridLine": false,
+                    "yGridLine": false,
+                    "legend": {
+                        "display": false,
+                        "position": "top",
+                        "labels": {
+                            "fontColor": "rgba(255, 255, 255, 0.5)",
+                            "fontSize": 8
+                        }
+                    },
+                    "scales": {
+                        "xAxes": [
+                            {
+                                "gridLines": {
+                                    "display": false,
+                                    "zeroLineColor": "rgba(255, 255, 255, 0.5)",
+                                    "color": "rgba(255, 255, 255, 0.1)"
+                                },
+                                "scaleLabel": {
+                                    "display": false
+                                },
+                                "ticks": {
+                                    "display": true,
+                                    "fontColor": "rgba(255, 255, 255, 0.5)",
+                                    "fontSize": 8
+                                },
+                                "barThickness": 6,
+                                "stacked": false
+                            }
+                        ],
+                        "yAxes": [
+                            {
+                                "id": "left",
+                                "position": "left",
+                                "gridLines": {
+                                    "display": false,
+                                    "zeroLineColor": "rgba(255, 255, 255, 0.5)",
+                                    "color": "rgba(255, 255, 255, 0.1)"
+                                },
+                                "scaleLabel": {
+                                    "display": false
+                                },
+                                "ticks": {
+                                    "autoMin": false,
+                                    "autoMax": false,
+                                    "display": false,
+                                    "fontColor": "rgba(255, 255, 255, 0.5)",
+                                    "fontSize": 8,
+                                    "stepSize": ""
+                                },
+                                "stacked": false
+                            },
+                            {
+                                "id": "right",
+                                "position": "right",
+                                "gridLines": {
+                                    "zeroLineColor": "rgba(255, 255, 255, 0.5)",
+                                    "color": "rgba(255, 255, 255, 0.1)"
+                                },
+                                "scaleLabel": {
+                                    "display": false
+                                },
+                                "ticks": {
+                                    "autoMin": true,
+                                    "autoMax": true,
+                                    "display": true,
+                                    "fontColor": "rgba(255, 255, 255, 0.5)",
+                                    "fontSize": 8
+                                },
+                                "stacked": false
+                            }
+                        ]
+                    },
+                    "tooltips": {
+                        "callbacks": {},
+                        "footerFontSize": 8,
+                        "bodyFontSize": 8,
+                        "titleFontSize": 8
+                    },
+                    "stacked": false
+                }
+            },
+            "data": [
+                {
+                    "__field1": "hour",
+                    "__field2": "data"
+                },
+                {
+                    "__field1": ".",
+                    "__field2": "40"
+                },
+                {
+                    "__field1": ".",
+                    "__field2": "55"
+                },
+                {
+                    "__field1": "3",
+                    "__field2": "87"
+                },
+                {
+                    "__field1": ".",
+                    "__field2": "50"
+                },
+                {
+                    "__field1": ".",
+                    "__field2": "65"
+                },
+                {
+                    "__field1": "6",
+                    "__field2": "62"
+                },
+                {
+                    "__field1": ".",
+                    "__field2": "82"
+                },
+                {
+                    "__field1": ".",
+                    "__field2": "100"
+                },
+                {
+                    "__field1": "9",
+                    "__field2": "78"
+                },
+                {
+                    "__field1": ".",
+                    "__field2": "64"
+                },
+                {
+                    "__field1": ".",
+                    "__field2": "34"
+                },
+                {
+                    "__field1": "12",
+                    "__field2": "15"
+                },
+                {
+                    "__field1": ".",
+                    "__field2": "15"
+                },
+                {
+                    "__field1": ".",
+                    "__field2": "42"
+                },
+                {
+                    "__field1": "15",
+                    "__field2": "42"
+                },
+                {
+                    "__field1": ".",
+                    "__field2": "48"
+                },
+                {
+                    "__field1": ".",
+                    "__field2": "48"
+                },
+                {
+                    "__field1": "18",
+                    "__field2": "75"
+                },
+                {
+                    "__field1": ".",
+                    "__field2": "93"
+                },
+                {
+                    "__field1": ".",
+                    "__field2": "81"
+                },
+                {
+                    "__field1": "21",
+                    "__field2": "61"
+                },
+                {
+                    "__field1": ".",
+                    "__field2": "41"
+                },
+                {
+                    "__field1": ".",
+                    "__field2": "85"
+                },
+                {
+                    "__field1": "24",
+                    "__field2": "70"
+                }
+            ],
+            "rotation": 0,
+            "fontSize": 8,
+            "id": "chart",
+            "lineCap": "round"
+        },
+        {
+            "type": "image-view",
+            "top": 368.24446002636785,
+            "left": 160.67250612225214,
+            "width": 69.7334807669834,
+            "height": 57.93888819814629,
+            "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGkAAABfCAYAAADroemKAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyhpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNi1jMTQwIDc5LjE2MDQ1MSwgMjAxNy8wNS8wNi0wMTowODoyMSAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIDIwMTggKE1hY2ludG9zaCkiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6Q0I5QzBDNkM0MUREMTFFOEJCNjlEODFENzhGRTkwRjciIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6Q0I5QzBDNkQ0MUREMTFFOEJCNjlEODFENzhGRTkwRjciPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDpDQjlDMEM2QTQxREQxMUU4QkI2OUQ4MUQ3OEZFOTBGNyIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDpDQjlDMEM2QjQxREQxMUU4QkI2OUQ4MUQ3OEZFOTBGNyIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PsztCTUAAAKVSURBVHja7JpPTsJAHIWnxh1yGzmArkXXJCaeATcudKkLN3IGExP2wp4DwG2AdZ3RIRkaKUU67Zv4fckkxWB/z3lOO39elue5cdw9fBhP37ahbT3bzkwcVrbNbXuzbbr54fvrbes6nAY1Tgqfn237tO0iYscYf29XY+JrGlEdciZd2fbYggZXsx/8B7eqQ92k++DaDf1L27q2ZXtakX3f7/p7T4PfGQrqkOE0uD4Prt0zehbxPTALRk2xtooOyZHUDa4XDdRe7KitokN24rBh2UDtZU3faUKHpEmASYBJmARtTsH/Sibyt2SMJMAkwCRMAkzCJLoAkyCiSU3sBlc5cVXRIWNSuBvcxLlKL7heCeqQNCk8V3EnlO7svxOhZsffOzwFnQvqkCHcFhp50Y6+afa8fySoQ3IkucTMSwsaXM1JEOVqVUcKE4cn227Mz9n/OmLdta9x7WsaUR0SZJtwJLBOgjomDsSMt2PGSnFnYsYJ6CBmXNCh0h+7TCJmLBp3Jmasr4OYcQI6iBmnoIN1EotZwCRMArltoSMgZhxZByOJxx1gEiYBJgEmYRJImETMWEgHMeME4s7EjBOIOxMz1tdBzLioQ6U/yiYOxIwFdRAzZp0EdUDMmJhx6cKNmHFFHcSMCzpU+mOXScR7iRlvPX+JGVfXQczYEDMuhZhxxRqsk1jMAiZhEshtCx0BMePIOhhJPO4AkzAJMAkwCZNAwiTivUI6iBkTM/4VYsaH6SBmnIAOYsZFHSr9UTZxIN4rqIOYcQJ8v5MGgwE9Ich4PN6aODCcNMnYcUh8xwEwCQ6eOJjd5/J1vavqOvdX0dOoDkYSjzvAJEwCtYlD7MWs2mI5T0QHi1ked4BJ/wmOKhLgS4ABAIehSbZOQowdAAAAAElFTkSuQmCC",
+            "rotation": 0
+        }
+    ]
+}

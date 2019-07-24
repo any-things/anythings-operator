@@ -1,0 +1,747 @@
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+
+<link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
+
+<link rel="import" href="../../../pda-libraries.html">
+
+<!--
+  PDA > 재고 적치 화면
+-->
+<dom-module id="pda-stock-load">
+  <template>
+    <style include="shared-styles">
+      :host {
+        display: block;
+        padding: 10px;
+        height: calc(100% - 40px);
+        overflow-y: auto;
+      }
+      #container {
+        padding: 20px;
+        background-color: #5A6377;
+        border-radius: var(--things-default-border-radius);
+        color: rgba(255,255,255,.8);
+      }
+      .input-container {
+        display: grid;
+        grid-template-columns: 35% 65%;
+        grid-gap:7px 0;
+      }
+      .label {
+        font-size:.8rem;
+        margin: auto 5px auto auto;
+      }
+      #button-group {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        grid-gap: 15px;
+        margin-top: 15px;
+        justify-items: end;
+      }
+      #bottom-container{
+        display: grid;
+        grid-template-columns: 30% 30% 30%;
+        margin-top: 10px;
+        grid-gap: 15px;
+        padding: 20px;
+        background-color: #5A6377;
+        border-radius: var(--things-default-border-radius);
+        color: rgba(255,255,255,.8);
+      }
+    </style>
+
+    <!-- 상품 적치를 가이드할 추천 로케이션 정보 조회를 위한 Ajax -->
+    <sys-ajax
+      id="location-ajax"
+      method="GET"
+      content-type="application/json"
+      on-sys-ajax-response="_renderLocationCombo">
+    </sys-ajax>
+
+    <!-- 추천 로케이션 리스트에서 선택시에 해당 로케이션의 재고 정보 조회를 위한 Ajax -->
+    <sys-ajax
+      id="order-stock-ajax"
+      method="GET"
+      content-type="application/json"
+      on-sys-ajax-response="_fillOrderStockInfo">
+    </sys-ajax>
+
+    <!-- 재고 적치 트랜잭션을 위한 Ajax -->
+    <sys-ajax
+      id="load-stock-ajax"
+      method="PUT"
+      content-type="application/json"
+      on-sys-ajax-error="_clearView"
+      on-sys-ajax-response="_stockSuccess">
+    </sys-ajax>
+
+    <!-- LED ON Ajax -->
+    <sys-ajax
+      id="led-on-ajax"
+      method="GET"
+      content-type="application/json">
+    </sys-ajax>
+    
+    <!-- LED OFF Ajax -->
+    <sys-ajax
+      id="led-off-ajax"
+      method="GET"
+      content-type="application/json">
+    </sys-ajax>
+
+    <!-- 호기 정보 조회 Ajax -->
+    <sys-ajax
+      id="region-get-ajax"
+      method="GET"
+      content-type="application/json"
+      on-sys-ajax-response="_regionSetting">
+    </sys-ajax>
+
+    <div id="container">
+      <div class="input-container">
+        <span class="label">[[skuBarcdLabel]]</span>
+        <!-- SKU 정보 조회 시 복수개가 조회된 경우 실행되는 사용자가 고를 수 있는 팝업이 가미된 SKU Input -->
+        <mps-auto-popup-input
+          hide-keyboard
+          id="sku-barcd"
+          resource-url="[[getSkuAjaxUrl]]"
+          popup-title="[[popupTitleLabel]]"
+          allowed-focus-out
+          button-txt-callback="[[_skuButtonTxtCallback]]"
+          on-item-selected="_searchRecommendLocations">
+        </mps-auto-popup-input>
+
+        <span class="label">[[skuNameLabel]]</span>
+        <input id="sku-nm" readonly>
+
+        <span class="label">[[orderQtyLabel]]</span>
+        <input id="order-qty" readonly>
+
+        <span class="label">[[stockQtyLabel]]</span>
+        <input id="stock-qty" readonly>
+
+        <!-- <span class="label">[[allocQtyLabel]]</span>
+        <input id="alloc-qty" readonly> -->
+
+        <span class="label">[[inputQtyLabel]]</span>
+        <input id="input-qty" type="number" min="1" max = "[[inputMaxQty]]" on-keypress="_inputQtyKeypressHandler">
+        
+        <span class="label" hidden>[[locationLabel]]</span>
+        <select id="location" on-change="_locationSelected" hidden>
+          <option></option>
+        </select>
+
+        <span class="label">[[changeLocLabel]]</span>
+        <input id="change-loc" on-focus="_hideKeyboard" on-keypress="_locScanHandler">
+        <span class="label" hidden>[[loadUnitLabel]]</span>
+        <select id="load-unit" hidden>
+          <option>[[indivisualLabel]]</option>
+          <option>[[boxLabel]]</option>
+        </select>
+      </div>
+
+      <div id="button-group">
+        <button id="reset-btn" on-click="_clearView">[[resetBtnLabel]]</button>
+        <button id="load-btn" on-click="_load">[[loadBtnLabel]]</button>
+      </div>
+    </div>
+    <div id = "bottom-container">
+      <select id="region-combo" on-change="_getZoneItems"></select>
+      <button id = "on-btn" class= 'btn' on-click="_ledOn">[[ledOnBtnLabel]]</button>
+      <button id = "off-btn" class= 'btn' on-click="_ledOff">[[ledOffBtnLabel]]</button>
+    </div>
+  </template>
+
+  <script>
+    class PdaStockLoad extends MpsScannerMixin(Polymer.Element) {
+      static get is() { return 'pda-stock-load' }
+
+      static get properties() {
+        return {
+
+          /**
+           * 변경 로케이션 라벨
+           ***************
+           * @type {String}
+           */
+          changeLocLabel: {
+            type: String,
+            value: () => t('label.change_loc')
+          },
+
+          /**
+           * 상품 바코드 라벨
+           ***************
+           * @type {String}
+           */
+          skuBarcdLabel: {
+            type: String,
+            value: () => t('label.sku_barcd')
+          },
+
+          /**
+           * 상품명 라벨
+           ***************
+           * @type {String}
+           */
+          skuNameLabel: {
+            type: String,
+            value: () => t('label.sku_nm')
+          },
+
+          /**
+           * 로케이션 라벨
+           ***************
+           * @type {String}
+           */
+          locationLabel: {
+            type: String,
+            value: () => t('label.recommend_location')
+          },
+
+          /**
+           * 주문 수량 라벨
+           ***************
+           * @type {String}
+           */
+          orderQtyLabel: {
+            type: String,
+            value: () => t('label.order_qty')
+          },
+
+          /**
+           * 적치 수량 라벨
+           ***************
+           * @type {String}
+           */
+          stockQtyLabel: {
+            type: String,
+            value: () => t('label.stock_qty')
+          },
+
+          /**
+           * 할당 수량 라벨
+           ***************
+           * @type {String}
+           */
+          allocQtyLabel: {
+            type: String,
+            value: () => t('label.alloc_qty')
+          },
+
+          /**
+           * 입력 수량 라벨
+           ***************
+           * @type {String}
+           */
+          inputQtyLabel: {
+            type: String,
+            value: () => t('label.input_qty')
+          },
+
+          /**
+           * 초기화 버튼 라벨
+           ***************
+           * @type {String}
+           */
+          resetBtnLabel: {
+            type: String,
+            value: () => t('button.reset')
+          },
+
+          /**
+           * 적치 버튼 라벨
+           ***************
+           * @type {String}
+           */
+          loadBtnLabel: {
+            type: String,
+            value: () => t('button.load')
+          },
+
+          /**
+           * SKU 정보 조회 후 복수개가 조회된 경우 사용자가 고를 수 있는 팝업이 실행되는데 그 팝업에 표시할 타이틀
+           ****************
+           * @type {String}
+           */
+          popupTitleLabel: {
+            type: String,
+            value: () => t('label.sku')
+          },
+
+          /**
+           * 적치 처리 대상 로케이션 코드
+           ***************
+           * @type {String}
+           */
+          selectedLocationCd: {
+            type: String,
+            value: ''
+          },
+
+          /**
+           * SKU 정보 조회를 위한 URL
+           ****************
+           * @type {String}
+           */
+          getSkuAjaxUrl: {
+            type: String,
+            value : `/pda_process/find_stock_sku/${MPS_UTIL.getRegionCd()}/:inputValue`
+          },
+          /**
+           * 점등 버튼 라벨
+           ****************
+           * @type {String}
+           */
+           ledOnBtnLabel: {
+            type: String,
+            value: () => t('button.led_on')
+          },
+          /**
+           * 소등 버튼 라벨
+           ****************
+           * @type {String}
+           */
+          ledOffBtnLabel: {
+            type: String,
+            value: () => t('button.led_off')
+          }
+        }
+      }
+
+      /**
+       * 스캔한 바코드를 통해 재고 정보를 조회
+       ******************
+       * @param {Object} event
+       */
+      /*_barcdScanHandler(event) {
+        if(event.keyCode === 13) {
+          let skuCd = event.currentTarget.value;
+          if(skuCd) {
+            this._getSkuInfo(skuCd);
+          } else {
+            MPS_UTIL.showMessage(t('error.VALIDATION_ERROR'), t('error.barcd_is_not_typed'), this._initialSetup.bind(this));
+          }
+        }
+      }*/
+
+      connectedCallback() {
+        super.connectedCallback();
+        document.addEventListener(`alert-closed-at-${location.hash.replace('#/', '')}`, event => {
+          if(!event.detail.hasCallback) {
+            this._initialSetup();
+          }
+        });
+        this._getRegionItems();
+      }
+
+      /**
+       * 스캔한 skuBarcd를 통해 재고 정보를 조회
+       ******************
+       * @param {String} skuBarcd
+       */
+      _getSkuInfo(skuBarcd) {
+        const skuInfoAjax = this.$['sku-info-ajax'];
+        let regionCd = MPS_UTIL.getRegionCd();
+        skuInfoAjax.curl = `/pda_process/find_stock_sku/${regionCd}/${skuBarcd}`;
+        skuInfoAjax.generateRequest();
+      }
+
+      /**
+       * 적치 대상 상품 선택 완료시 적치 위치 콤보박스를 구성하기 위해 대상 location을 조회함
+       ***************
+       * @param {Object} event
+       */
+      _searchRecommendLocations(event) {
+        let skuInfo = event.detail;
+        this.$['sku-barcd'].value = skuInfo.sku_barcd;
+        this.$['sku-nm'].value = skuInfo.sku_nm;
+        this.comCd = skuInfo.com_cd;
+        // order stock을 조회하기 위해 this.skuCd 초기화
+        this.skuCd = skuInfo.sku_cd;
+        // 적치 대상 로케이션 리스트를 조회
+        this._getLocationList(skuInfo);
+      }
+
+      /**
+       * 적치 대상 상품 선택 완료시 적치 위치 콤보박스를 구성하기 위해 대상 location을 조회함
+       ***************
+       * @param {String} skuCd
+       */
+      _getLocationList(skuInfo) {
+        if (skuInfo) {
+          if (skuInfo.sku_cd && skuInfo.sku_cd.length >= 4) {
+            const locationAjax = this.$['location-ajax'];
+            let regionCd = MPS_UTIL.getRegionCd();
+            locationAjax.curl = `/pda_process/dps/recommend_load_locs/${regionCd}/${skuInfo.sku_cd}/${skuInfo.com_cd}`;
+            locationAjax.generateRequest();
+          }
+        }
+      }
+
+      /**
+       * location-ajax response event handler
+       * location 조회 후 combo box를 구성함
+       ***************
+       * @param {Object} response
+       */
+      _renderLocationCombo(response) {
+        let locations = response.detail;
+        const locationCombo = this.$['location'];
+        this._clearCombobox(locationCombo);
+        locations.forEach(location => {
+          const option = document.createElement('option');
+          option.innerText = location;
+          option.setAttribute('loc-id', location);
+          locationCombo.appendChild(option);
+        });
+        this.locCd = null;
+        this.locCd = locationCombo.selectedOptions[0].getAttribute('loc-id');
+        this.getOrderStockInfo();
+        // // 추천 로케이션이 1개일 경우 _locationSelected를 직접 호출
+        // if(locations.length == 1) {
+        //   locationCombo.options[1].selected = true;
+        //   this._locationSelected();
+        // // locations가 복수라면 focus 이동 후 location 스캔하거나 선택할 때 까지 대기
+        // } else {
+        //   this.$['change-loc'].select();
+        // }
+      }
+
+      /**
+       * _locationSelected를 수동 호출 / select on change event handler를 통해 호출 됨
+       * 선택한 location 정보를 바탕으로 재고 수량을 조회함
+       */
+      _locationSelected() {
+        const locationCombo = this.$['location'];
+        this.$['change-loc'].value = '';
+        this.locCd = null;
+        this.locCd = locationCombo.selectedOptions[0].getAttribute('loc-id');
+        this.getOrderStockInfo();
+      }
+
+      /**
+       * 추천 로케이션 리스트에서 선택시에 해당 로케이션의 재고 정보를 조회한다
+       */
+      getOrderStockInfo() {
+        try {
+          this.validateBeforeOrderStockAjax();
+          const regionCd = MPS_UTIL.getRegionCd();
+          const orderStockAjax = this.$['order-stock-ajax'];
+          orderStockAjax.curl = `/pda_process/dps/find_order_stock/${regionCd}/${this.locCd}/${this.skuCd}`;
+          orderStockAjax.generateRequest();
+        } catch (error) {
+          document.dispatchEvent(new CustomEvent('show-toast',{
+              detail:{
+                type: `${error.title}`,
+                message: `${error.message}`
+              }
+          }));
+        }
+      }
+
+      /**
+       * 재고 정보 조회 전 Validation Check
+       */
+      validateBeforeOrderStockAjax() {
+        if(!this.locCd) {
+          document.dispatchEvent(new CustomEvent('show-toast',{
+              detail:{
+                type: t('error.VALIDATION_ERROR'),
+                message: t('error.loc_cd_invalid')
+              }
+          }));
+        } else if (!this.skuCd) {
+          document.dispatchEvent(new CustomEvent('show-toast',{
+              detail:{
+                type: t('error.VALIDATION_ERROR'),
+                message: t('error.invalid_sku_cd')
+              }
+          }));
+        }
+      }
+
+      /**
+       * SKU 정보 조회 시 복수개가 조회된 경우 사용자가 고를 수 있는 버튼이 실행되는데 그 버튼에 표시할 내용
+       *******************
+       * @param {Object} item
+       */
+      _skuButtonTxtCallback(item) {
+        return `(${item.sku_cd})
+                ${item.sku_nm}`;
+      }
+
+      /**
+       * order-stock-ajax response event handler
+       * 조회 결과를 화면에 출력 & 변경 로케이션 input으로 focus 이동
+       ******************
+       * @param {Object} response
+       */
+      _fillOrderStockInfo(response) {
+        let data = response.detail;
+        if(data.fixed_flag){
+          this.orderQtyLabel = t('label.max_load_qty');
+        }else{
+          this.orderQtyLabel = t('label.order_qty');
+        }
+        if(data.input_qty <= 0) {
+          document.dispatchEvent(new CustomEvent('show-toast',{
+            detail:{
+              type:t('error.out_of_valid_qty'),
+              message:t('text.stock_load_done')
+            }
+          }));
+          this._clearView();
+        }else {
+          // 조회를 통해 구한 값을 input에 출력
+          this.$['order-qty'].value = data.picked_qty;
+          this.$['stock-qty'].value = data.stock_qty;
+          this.$['input-qty'].value= data.input_qty;
+          setTimeout(500);
+          data.input_qty <= 1 ? this.$['change-loc'].select() : this.$['input-qty'].select();
+        }
+      }
+
+      /**
+       * 변경 로케이션에 엔터 키 핸들러
+       ******************
+       * @param {Object} event
+       */
+      _locScanHandler(event) {
+        if(event.keyCode === 13 && /([FR]{1}[0-9]{2}[-]{1}[0-9]{3}[-]{1}[0-9]{2})/g.exec(this.$['change-loc'].value)) {
+          this.locCd = null;
+          this.locCd = this.$['change-loc'].value;
+          this.$['location'].value = '';
+          this.$['change-loc'].select();
+          this._load();
+        }else if(event.keyCode === 13){
+          document.dispatchEvent(new CustomEvent('show-toast',{
+            detail:{
+              type:t(''),
+              message:t("error.loc_cd_invalid")
+            }
+          }))
+          this.$['change-loc'].value = '';
+          this.$['change-loc'].select();
+        }
+      }
+
+      /**
+       * input-qty keypress event handler
+       * 1. input-qty에서 바코드 리드시 keypress event가 발생함
+       * 2. 발생한 이벤트의 charCode가 13이 아니면 selectedLocationCd에 붙여 스캔한 로케이션 코드를 초기화함
+       * 3. 발생한 이벤터의 charCode가 13이면 _load()를 호출하여 적치 trx를 수행함
+       ********************
+       * @param {Object} event
+       */
+      _inputQtyKeypressHandler(event) {
+        if(event.charCode === 13) {
+          if(Number(this.$['order-qty'].value)-Number(this.$['stock-qty'].value)< Number(this.$['input-qty'].value)){
+            document.dispatchEvent(new CustomEvent('show-toast',{
+              detail:{
+                type: t('error.VALIDATION_ERROR'),
+                message: t('error.out_of_valid_qty')
+              }
+            }));
+          }else{
+            this.$['change-loc'].select();
+          }
+        }
+      }
+
+      /**
+       * 재고 적치 transaction
+       */
+      _load() {
+        if(Number(this.$['order-qty'].value) - Number(this.$['stock-qty'].value)>= Number(this.$['input-qty'].value) && /([FR]{1}[0-9]{2}[-]{1}[0-9]{3}[-]{1}[0-9]{2})/g.exec(this.$['change-loc'].value) && Number(this.$['input-qty'].value) > 0 && this.$['change-loc'].value.length > 0){
+          try {
+            // 재고 적치전 validation 수행
+            this.validateBeforeLoadStock();
+            let regionCd = MPS_UTIL.getRegionCd();
+            let loadQty = this.inputQty;
+            let qtyUnit = 'P';
+            const loadStockAjax = this.$['load-stock-ajax'];
+            loadStockAjax.curl = `/pda_process/dps/load_stock/${regionCd}/${this.$['change-loc'].value}/${this.skuCd}/${loadQty}/${qtyUnit}/${this.comCd}`;
+            loadStockAjax.generateRequest();
+
+          } catch (error) {
+            document.dispatchEvent(new CustomEvent('show-toast',{
+              detail:{
+                type: `${error.title}`,
+                message:`${error.message}`
+              }
+            }));
+            this.$['change-loc'].select();
+          }
+        }else{
+          if(Number(this.$['order-qty'].value)-Number(this.$['stock-qty'].value)< Number(this.$['input-qty'].value)) {
+            document.dispatchEvent(new CustomEvent('show-toast',{
+              detail:{
+                type: t('error.VALIDATION_ERROR'),
+                message: t('error.out_of_valid_qty')
+              }
+            }));
+            this.$['input-qty'].select();
+          } else if(this.$['change-loc'].value == null || this.$['change-loc'].value == '') {
+            document.dispatchEvent(new CustomEvent('show-toast',{
+              detail:{
+                type: t('error.loc_cd_invalid'),
+                message: t('error.loc_cd_invalid'),
+              }
+            }));
+            this.$['change-loc'].select();
+          } else if(Number(this.$['input-qty'].value) <= 0 || this.$['input-qty'].value == '' || this.$['input-qty'].value == undefined){
+            document.dispatchEvent(new CustomEvent('show-toast',{
+              detail:{
+                type: t('text.input_qty_none'),
+                message: t('text.input_qty_none'),
+              }
+            }));
+            this.$['input-qty'].select();
+          } else {
+            document.dispatchEvent(new CustomEvent('show-toast',{
+              detail:{
+                type: t('text.invalid_value'),
+                message: t('text.invalid_value'),
+              }
+            }));
+            this.$['change-loc'].select();
+          }
+        }
+      }
+
+      /**
+       * 재고적치 transaction이전 validation
+       * 1. 입력 수량이 빈값인지 확인
+       * 2. 로케이션을 선택했는지 확인
+       */
+      validateBeforeLoadStock() {
+        this.inputQty = this.$['input-qty'].value;
+
+        if (!this.locCd) {
+          document.dispatchEvent(new CustomEvent('show-toast',{
+              detail:{
+                type: t('error.VALIDATION_ERROR'),
+                message: t('text.location_is_not_set')
+              }
+          }));
+        } else if(!this.inputQty || this.inputQty <= 0) {
+          document.dispatchEvent(new CustomEvent('show-toast',{
+              detail:{
+                type: t('error.VALIDATION_ERROR'),
+                message: t('text.invalid_value')
+              }
+          }));
+        } else if (!this.skuCd) {
+          document.dispatchEvent(new CustomEvent('show-toast',{
+              detail:{
+                type: t('error.VALIDATION_ERROR'),
+                message: t('error.invalid_sku_cd')
+              }
+          }));
+        }
+      }
+
+      /**
+       * 입력 수량 인풋 박스에 포커스
+       */
+      focusQtyInput() {
+        this.$['input-qty'].select();
+      }
+
+      /**
+       * 변경 로케이션 인풋 박스에 포커스
+       */
+      focusChangeLocInput() {
+        this.$['change-loc'].select();
+      }
+
+      /**
+       * combo box에 구성된 option을 제거
+       *******************
+       * @param {Object} combobox
+       */
+      _clearCombobox(combobox) {
+        while (combobox.children.length) {
+          combobox.removeChild(combobox.firstChild);
+        }
+      }
+      _stockSuccess(){
+        document.dispatchEvent(new CustomEvent('show-toast',{
+          detail:{
+            type: '',
+            message: t('text.stock_load_success')
+          }
+        }));
+        this._clearView();
+      }
+      /**
+       * trx 완료 후 input 필드를 초기화 및 this.skuCd, this.locCd 초기화
+       * 초기화 후 _initialSetup 호출
+       */
+      _clearView() {
+        this._clearCombobox(this.$['location']);
+        this.$['sku-barcd'].value = '';
+        this.$['sku-nm'].value = '';
+        this.$['change-loc'].value = '';
+        this.$['order-qty'].value = '';
+        this.$['stock-qty'].value = '';
+        this.$['input-qty'].value = '';
+
+        this.skuCd = null;
+        this.locCd = null;
+        this.selectedLocationCd = '';
+
+        this._initialSetup();
+      }
+
+      _initialSetup() {
+        this.$['sku-barcd']._initialSetup();
+      }
+
+      _getRegionItems() {
+        const regionGetAjax = this.$['region-get-ajax'];
+        regionGetAjax.baseUrl = JSON.parse(localStorage.getItem('setting.baseUrl'));
+        regionGetAjax.customParams = {
+          query: [{
+            "name":"region_type",
+            "operator":"noteq",
+            "value":"O"
+          }]
+        };
+        regionGetAjax.curl = `/region`;
+        regionGetAjax.generateRequest();
+      }
+
+      _ledOn(){
+        const ledOnajax = this.$['led-on-ajax'];
+        let regionCd = this.$['region-combo'].value;
+        ledOnajax.curl = `/pda_process/dps/led/on/${regionCd}`;
+        ledOnajax.generateRequest();
+      }
+
+      _ledOff(){
+        const ledOffajax = this.$['led-off-ajax'];
+        let regionCd = this.$['region-combo'].value;
+        ledOffajax.curl = `/pda_process/dps/led/off/${regionCd}`;
+        ledOffajax.generateRequest();
+      }
+
+      _regionSetting(e){
+        e.detail.items.forEach(region => {
+          const option = new Option(region.region_nm, region.region_cd);
+          if(this.regionCode === region.region_cd) {
+            option.selected = true;
+            this.regionName = region.region_nm;
+          }
+          this.$['region-combo'].appendChild(option);
+        })
+      }
+    }
+
+    customElements.define(PdaStockLoad.is, PdaStockLoad);
+  </script>
+</dom-module>

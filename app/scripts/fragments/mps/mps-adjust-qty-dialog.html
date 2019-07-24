@@ -1,0 +1,185 @@
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+
+<link rel="import" href="../../../bower_components/polymer/polymer-element.html">
+
+<link rel="import" href="../../units/things-number-up-down.html">
+
+<!--
+  작업 처리 중 수량 조정 팝업
+-->
+
+<dom-module id="mps-adjust-qty-dialog">
+  <template>
+    <style include="shared-styles">
+      :host {
+        flex: 1;
+        width: 100%;
+      }
+      #container {
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+      }
+      .input-row {
+        display: flex;
+        flex-direction: row;
+        margin-bottom: 15px;
+      }
+      .input-row .label {
+        font-size:.8rem;
+        margin: auto 5px auto auto;
+        min-width: 30%;
+        text-align: right;
+      }
+      .input-row input {
+        width: 70%;
+        text-align: right;
+      }
+      #container #button-container {
+        display: flex;
+      }
+      button {
+        margin: auto;
+      }
+    </style>
+
+    <sys-ajax
+      id="adjust-qty-ajax"
+      method="PUT"
+      content-type="application/json"
+      on-sys-ajax-response="closeDialog">
+    </sys-ajax>
+
+    <div id="container">
+      <div class="input-row">
+        <span class="label">[[currentQtyLabel]]</span>
+        <input type="number" id="current-qty" readonly>
+      </div>
+
+      <!-- <dom-if if="[[!isNumberUpDown]]">
+        <template>
+          <div class="input-row">
+            <span class="label">[[adjustQtyLabel]]</span>
+            <input type="number" id="adjust-qty" min="1">
+          </div>
+        </template>
+      </dom-if> -->
+
+      <!-- <dom-if if="[[isNumberUpDown]]"> -->
+        <!-- <template> -->
+          <div class="input-row">
+            <span class="label">[[adjustQtyLabel]]</span>
+            <things-number-up-down id="adjust-qty" value="{{confirmValue}}" min="1"></things-number-up-down>
+          </div>
+        <!-- </template> -->
+      <!-- </dom-if> -->
+
+      <div id="button-container">
+        <button id="btn-close" on-click="closeDialog">[[closeButtonLabel]]</button>
+        <button on-click="adjustQty">[[applyButtonLabel]]</button>
+      </div>
+    </div>
+  </template>
+
+  <script>
+    class MpsAdjustQtyDialog extends Polymer.Element {
+      static get is() { return 'mps-adjust-qty-dialog' }
+
+      static get properties() {
+        return {
+          /**
+           * 작업 유형
+           ****************
+           * @type {String}
+           */
+          jobType: {
+            type: String,
+            value: 'DAS'
+          },
+
+          currentQtyLabel: {
+            type: String,
+            value: () => t('label.current_qty')
+          },
+
+          adjustQtyLabel: {
+            type: String,
+            value: () => t('label.adjust_qty')
+          },
+
+          applyButtonLabel: {
+            type: String,
+            value: () => t('button.apply')
+          },
+
+          closeButtonLabel: {
+            type: String,
+            value: () => t('button.close')
+          },
+
+          isNumberUpDown: {
+            type: Boolean,
+            value: false
+          }
+        }
+      }
+
+      setCurrentQty(qty) {
+        const currentQtyInput = this._getCurrentQtyInput();
+        currentQtyInput.value = parseInt(qty);
+        const adjustQtyInput = this._getAdjustQtyInput();
+        adjustQtyInput.setAttribute('max', parseInt(qty) - 1);
+        if (this.isNumberUpDown) {
+          adjustQtyInput.value = qty;
+          adjustQtyInput.setAttribute('max', parseInt(qty));
+        } else {
+          adjustQtyInput.value = 1;
+          adjustQtyInput.setAttribute('max', parseInt(qty) - 1);
+        }
+      }
+
+      _getCurrentQtyInput() {
+        return this.$['current-qty'];
+      }
+
+      _getAdjustQtyInput() {
+        return this.$['adjust-qty'];
+      }
+
+      adjustQty() {
+        const adjustQty = parseInt(this._getAdjustQtyInput().value);
+        const currentQty = parseInt(this._getCurrentQtyInput().value);
+        if(adjustQty > currentQty) {
+          openAlert({
+            title: t('text.invalid_value'),
+            message: t('text.adjust_value_invalid')
+          });
+        } else {
+          const adjustQtyAjax = this._getAdjustQtyAjax();
+          adjustQtyAjax.curl = `/tablet_process/split_job/${this.jobId}`;
+          adjustQtyAjax.body = {
+            req_box_qty: 0,
+            req_pick_qty: currentQty,
+            res_box_qty: 0,
+            res_picked_qty: adjustQty
+          };
+          adjustQtyAjax.generateRequest();
+        }
+      }
+
+      _getAdjustQtyAjax() {
+        return this.$['adjust-qty-ajax'];
+      }
+
+      closeDialog() {
+        document.dispatchEvent(new CustomEvent('close-dialog'));
+      }
+
+    }
+
+    customElements.define(MpsAdjustQtyDialog.is, MpsAdjustQtyDialog);
+  </script>
+</dom-module>

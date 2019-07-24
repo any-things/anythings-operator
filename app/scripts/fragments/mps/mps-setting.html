@@ -1,0 +1,365 @@
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+
+<link rel="import" href="../../../bower_components/polymer/polymer-element.html">
+
+<link rel="import" href="./mps-setting-common.html">
+<link rel="import" href="./mps-setting-tab.html">
+<link rel="import" href="./mps-setting-pda.html">
+<link rel="import" href="./mps-setting-kiosk.html">
+
+<link rel="import" href="../../mixins/mps/mps-network-info-mixin.html">
+
+<link rel="import" href="../../units/things-sound.html">
+
+<dom-module id="mps-setting">
+  <template>
+    <style include="shared-styles">
+      :host {
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+        min-height: calc(100% - 40px);
+      }
+      #container {
+        padding: 20px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        background-color: #5A6377;
+        border-radius: var(--things-default-border-radius);
+      }
+      #button-container {
+        margin: auto 0 0 auto;
+      }
+      #device-combo {
+        width: 20vw;
+      }
+
+      .version {
+        font: 14px arial;
+        color: white;
+        position: relative;
+        text-align: right;
+        margin-top: 5px;
+      }
+    </style>
+
+    <div id="container">
+      <mps-setting-common
+        id="common-setting"
+        locales="[[locales]]"
+        on-session-responsed="_sessionResponseHandler"
+        on-session-unauthorized="_sessionUnauthHandler">
+      </mps-setting-common>
+
+      <div id="button-container">
+        <select id="device-combo" on-change="_deviceChanged" hidden$="[[!isDevMode]]">
+          <option>TABLET</option>
+          <option>PDA</option>
+          <option>KIOSK</option>
+        </select>
+
+        <button id="login-btn" on-click="_moveToLogin">[[loginBtnLabel]]</button>
+      </div>
+      
+      <!-- <div class="version">[[version]]</div> -->
+    </div>
+
+    <things-sound></things-sound>
+  </template>
+
+  <script>
+    class MpsSetting extends Polymer.Element {
+      static get is() { return 'mps-setting' }
+
+      static get properties() {
+        return {
+          visible: {
+            type: Boolean,
+            observer: '_visibleChanged'
+          },
+
+          /**
+           * @description label setup
+           */
+          loginBtnLabel: { type: String, value: t('label.login') },
+
+          /**
+           * @description 로그인 여부 flag
+           */
+          isNotLogin: {
+            type: Boolean
+          },
+
+          /**
+           * @description 선택한 장비 유형
+           */
+          deviceType: {
+            type: String,
+            observer: '_deviceTypeChanged'
+          },
+
+          /**
+           * @description 언어 리스트
+           */
+          locales: {
+            type: Array,
+            value: () => [{
+              code: 'en-US',
+              desc: 'English'
+            }, {
+              code: 'ko-KR',
+              desc: '한국어'
+            }, {
+              code: 'zh-CN',
+              desc: '中文'
+            }]
+          },
+
+          /**
+           * @description 개발모드 여부 flag
+           * isDevMode에 의해 장비 변경 콤보 박스의 출력 여부를 결정
+           */
+          isDevMode: {
+            type: Boolean
+          },
+
+          version: {
+            type: String,
+            computed: '_computeVersion()'
+          }
+        }
+      }
+
+      static get observers() {
+        return [
+          '_initViews(isNotLogin, deviceType)'
+        ]
+      }
+
+      _visibleChanged(visible) {
+        if (visible) {
+          var settingPda = this.shadowRoot.querySelector('mps-setting-pda')
+          if (settingPda) {
+            settingPda.resetRegionInfo();
+          }
+        }
+      }
+
+      connectedCallback() {
+        super.connectedCallback();
+        this.commonSetting = this.$['common-setting'];
+      }
+
+      _computeVersion() {
+        return window.CONST.VERSION;
+      }
+
+      /**
+       * @description 설정 화면 initialize
+       * 로그인 X => 공통 설정화면만 출력
+       * 로그인 O => 공통 설정화면 & 장비에 따른 설정 화면 출력
+       */
+      _initViews(isNotLogin, deviceType) {
+        if(isNotLogin === undefined) return;
+        
+        this._removePrevSetting();
+
+        if(isNotLogin) {
+          this._showLoginBtn();
+        } else if (!isNotLogin && deviceType) {
+          this._hideLoginBtn();
+          let viewName;
+          switch(deviceType) {
+            case 'TABLET':
+              viewName = 'mps-setting-tab';
+              break;
+
+            case 'PDA':
+              viewName = 'mps-setting-pda';
+              break;
+
+            case 'KIOSK':
+              viewName = 'mps-setting-kiosk';
+              break;
+          }
+
+          this._appendSetting(viewName);
+        } 
+      }
+
+      /**
+       * @description 이전에 initialize된 장비별 설정화면을 제거
+       * 개발 모드에서 장비 변경시 이전 설정을 제거하기 위함
+       */
+      _removePrevSetting() {
+        if(this.setting) {
+          this._getContainer().removeChild(this.setting);
+          this.setting = null;
+        }
+      }
+
+      /**
+       * @description 장비 유형에 따른 설정 화면을 container에 append
+       */
+      _appendSetting(viewName) {
+        this.setting = document.createElement(viewName);        
+        this._getContainer().insertBefore(this.setting, this._getBtnContainer());
+      }
+
+      /**
+       * @description 개발 모드에서 장치 콤보의 값이 변경 되었을 경우
+       * 화면을 재구성 하기 위해 localStorage 값 변경 및 reload를 실시
+       */
+      _deviceChanged(event) {
+        localStorage.setItem('setting.deviceType', JSON.stringify(event.currentTarget.selectedOptions[0].value));
+        location.reload(true);
+      }
+
+      /**
+       * @description localStorage에 설정되어 있는 deviceType의 값이 변경되면
+       * 개발모드에서 사용하는 장치 변경 콤보에 현재 값을 표시함
+       */
+      _deviceTypeChanged(deviceType) {
+        if(this.isDevMode) {
+          const options = Array.from(this.$['device-combo'].options);
+          options.forEach(opt => {
+            if(opt.value === deviceType) {
+              opt.selected = true;
+            }
+          });
+        }
+      }
+
+      _showLoginBtn() {
+        this._getLoginBtn().hidden = false;
+      }
+
+      _hideLoginBtn() {
+        this._getLoginBtn().hidden = true;
+      }
+
+      /**
+       * @description 설정 화면이 들어가는 컨테이너 리턴
+       */
+      _getContainer() {
+        return this.$['container'];
+      }
+
+      /**
+       * @description 버튼 컨테이너 리턴
+       */
+      _getBtnContainer() {
+        return this.$['button-container'];
+      }
+
+      /**
+       * @description 로그인 버튼 리턴
+       */
+      _getLoginBtn() {
+        return this.$['login-btn'];
+      }
+
+      /**
+       * @description 로그인 되지 않은 상태일 때 활성화 되는
+       * 로그인 화면으로 이동 버튼 click event halder
+       * 로그인 화면으로 이동함
+       */
+      _moveToLogin() {
+        this.commonSetting.saveSetting();
+        location.hash = '/login';
+        this.reloadApp();
+      }
+
+      /**
+       * @description mps-setting-common은 현재 사용자가
+       * 관리 도메인의 주소가 유효한지 & 현재 선택한 사이트 도메인에 로그인 되어 있는지를 확인함
+       * 관리 도메인의 주소가 유효하며 사이트 도메인에 정상 로그인 된 상태일 때 호출 됨
+       * session-responsed 이벤트를 발생시키고 mps-operator-app의 event handler를 통해 화면상 필요한 작업을 수행함
+       */
+      _sessionResponseHandler(event) {
+        this.dispatchEvent(new CustomEvent('session-responsed', {
+          detail: event.detail
+        }));
+
+        // 현재 사용중인 장비가 PDA 혹은 KIOSK이고 로그인이 정상적으로 완료 되었을 경우
+        // 서버를 통해 broker address, broker port, broker site를 조회 하고 결과를 localStorage에 저장함
+        this.setting._getBrokerAddress();
+        this.setting._getBrokerPort();
+        this.setting._getBrokerSite();
+      }
+
+      /**
+       * @description mps-setting-common은 현재 사용자가
+       * 관리 도메인의 주소가 유효한지 & 현재 선택한 사이트 도메인에 로그인 되어 있는지를 확인함
+       * 관리 도메인의 주소가 유효하지만 사이트 도메인에 로그인하지 않은 상태 일 때 호출 됨
+       * session-unauthorized 이벤트를 발생시키고 mps-operator-app의 event handler를 통해 로그인 화면으로 이동함
+       */
+      _sessionUnauthHandler() {
+        this.dispatchEvent(new CustomEvent('session-unauthorized'));
+      }
+
+      /**
+       * @description 저장 버튼 클릭 이벤트 핸들러
+       * 로그인 X => 공통 설정만 저장
+       * 로그인 O => 공통 설정 및 장치에 따른 설정 저장
+       * localStorage에 저장된 값을 통해 화면을 다시 구성하기 위해 reload
+       */
+      saveSetting() {
+        if(this.isNotLogin || this.isNotLogin === undefined) {
+          this.commonSetting.saveSetting();
+          this.reloadApp();
+        } else if (!this.isNotLogin) {
+          this.commonSetting.saveSetting();
+          this.setting.saveSetting().then(() => {
+            this.reloadApp();
+          })
+          .catch(error => {
+            let title = error.detail ? error.detail.code : 'Error';
+            let message = error.detail ? error.detail.msg : 'Error occured while saving setting.';
+            this._showErrorMessage(title, message, () => {
+              location.hash = '/mps_setting'
+            });
+          });
+        }
+      }
+
+      /**
+       * @description 에러 메시치 출력 공통 method
+       */
+      _showErrorMessage(title, message, confirmCallback) {
+        openAlert({
+          title: title,
+          message: message,
+          confirmCallback: confirmCallback
+        });
+      }
+
+      checkSession() {
+        this.commonSetting._checkDomainSiteSession();
+      }
+
+      /**
+       * @description web view cache clear
+       **************************
+       * windows에 CacheClear가 있다면 (cordova plugin 사용 가능한 상태)
+       * webview cache를 클리어한 후 리로드
+       * 없을 경우 리로드
+       */
+      reloadApp() {
+        if('CacheClear' in window) {
+          window.CacheClear(() => {
+            location.reload(true);
+          });
+        } else {
+          location.reload(true);
+        }
+      }
+    }
+
+    customElements.define(MpsSetting.is, MpsSetting);
+  </script>
+</dom-module>

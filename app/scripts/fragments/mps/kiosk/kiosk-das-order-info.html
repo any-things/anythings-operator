@@ -1,0 +1,1085 @@
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+
+<link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../../kiosk-libraries.html">
+<link rel="import" href="./kiosk-order-info-detail.html">
+<link rel="import" href="./kiosk-sku-selection.html">
+
+<!--
+  KIOSK > DAS 작업 화면
+-->
+<dom-module id="kiosk-das-order-info">
+  <template>
+    <style>
+      #container {
+        display: flex;
+        flex-direction: column;
+        height: calc(100% - 40px);
+        padding: 20px 20px;
+      }
+      #top-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-gap: 20px;
+        margin-bottom: 20px;
+      }
+      .barchart-section{
+        background-color:#5A6377;
+        border-radius:var(--things-default-border-radius);
+        padding: 10px;
+        color: #fff;
+      }
+      .barchart{
+        display: grid;
+        grid-template-columns: 1fr 15% 15%;
+      }
+      .chart-row {
+        display:grid;
+        grid-template-columns: 1fr 15% 15%;
+        font-size: .8rem;
+        margin-bottom: 10px;
+      }
+      .chart-row .col-header {
+        text-align: right;
+      }
+      .chart-row .bar-chart {
+        display: flex;
+        flex-direction: row;
+      }
+      .chart-row .bar-chart .label {
+        width: 5vw;
+        font-size: .8rem;
+        margin: auto 10px auto auto;
+      }
+      .chart-row .bar-chart .bar {
+        display: inline-block;
+        flex: 1;
+        background-color: rgba(0,0,0,.2);
+        border-radius: var(--things-default-border-radius);
+      }
+      .chart-row .bar-chart .chart-value {
+        display: inline-block;
+        border-radius: var(--things-default-border-radius);
+        margin: 5px;
+        text-align: right;
+      }
+      .chart-row .bar-chart #order-bar {background-color:#3cde4b}
+      .chart-row .bar-chart #sku-bar {background-color:#25b2e6}
+      .chart-row .bar-chart #pcs-bar {background-color:#01c9c6}
+
+      .chart-row .num-data {
+        text-align: right;
+        margin: auto 0;
+      }
+      #middle-container {
+        display: flex;
+        background-color: #5A6377;
+        border-radius:var(--things-default-border-radius);
+        margin-bottom: 20px;
+        padding: 10px;
+      }
+      #middle-container input {
+        width: 10vw;
+        margin: auto;
+      }
+      #middle-container .label {
+        font-size: .8rem;
+        margin: auto 15px;
+      }
+      #middle-container .label#cust-cnt {
+        width: 12vw;
+      }
+      #middle-container .label#sku-barcd {
+        width: 15vw;
+      }
+      #middle-container mps-auto-popup-input {
+        flex: 1;
+        margin: auto 10px auto auto;
+      }
+      .label {
+        text-align: right;
+        color: #D5D7DB;
+      }
+      button {
+        @apply --operator-default-btn;
+      }
+      button:active {
+        @apply --operator-default-btn-active;
+      }
+      button:focus{
+        outline:none
+      }
+      input {
+        background-color: rgba(0,0,0,.25);
+        border: 1px solid rgba(255,255,255,.2);
+        height:54px;
+        color: #fff;
+        font-size:1.3rem;
+        text-align: center;
+      }
+      input:focus{
+        outline:none;
+      }
+      #refresh-btn *{
+        vertical-align:middle
+      }
+    </style>
+
+    <!-- KIOSK 스캔 Ajax -->
+    <sys-ajax
+      id="input-sku-ajax"
+      curl="/kiosk_process/das/input/:region_cd/:side_cd/:com_cd/:sku_cd"
+      method="POST"
+      content-type="application/json"
+      last-response="{{orderDataSet}}"
+      custom-error-handler
+      on-sys-ajax-error="_onInputSkuError">
+    </sys-ajax>
+
+    <!-- 상품 검수 트랜잭션을 위한 Ajax -->
+    <sys-ajax
+      id="inspect-sku-ajax"
+      method="POST"
+      content-type="application/json"
+      custom-error-handler
+      on-sys-ajax-response="_onInspectionSuccess"
+      on-sys-ajax-error="_onInputSkuError">
+    </sys-ajax>
+
+    <!-- 주문 정보 표시를 위한 Ajax -->
+    <sys-ajax
+      auto
+      id="batch-summary-ajax"
+      method="GET"
+      content-type="application/json"
+      last-response="{{orderDataSet}}"
+      on-sys-ajax-error="_stopAutoRefresh">
+    </sys-ajax>
+
+    <div id="container">
+      <!-- 진행율 -->
+      <div id="top-container">
+        <!-- 총 진행율 -->
+        <div id="proc-rate-total" class="barchart-section">
+          <div class="chart-row">
+            <span>[[totalProcRateLabel]]</span>
+            <span class="col-header">[[pickedLabel]]</span>
+            <span class="col-header">[[pickingLabel]]</span>
+          </div>
+
+          <div class="chart-row">
+            <div class="bar-chart">
+              <span class="label">[[orderLabel]]</span>
+              <div class="bar">
+                <span id="order-bar" class="chart-value" style="width:calc([[totalProgressRate]]% - 10px)">[[totalProgressRate]]%</span>
+              </div>
+            </div>
+
+            <span class="num-data">[[totalOrderPicked]]</span>
+            <span class="num-data">[[totalOrderPicking]]</span>
+          </div>
+
+          <div class="chart-row">
+            <div class="bar-chart">
+              <span class="label">SKU</span>
+              <div class="bar">
+                <span id="sku-bar" class="chart-value" style="width:calc([[totalProgressRateBySku]]% - 10px)">[[totalProgressRateBySku]]%</span>
+              </div>
+            </div>
+
+            <span class="num-data">[[totalSkuPicked]]</span>
+            <span class="num-data">[[totalSkuPicking]]</span>
+          </div>
+
+          <div class="chart-row">
+            <div class="bar-chart">
+              <span class="label">Total</span>
+              <div class="bar">
+                <span id="pcs-bar" class="chart-value" style="width:calc([[totalGaugeRate]]% - 10px)">[[totalGaugeRate]]%</span>
+              </div>
+            </div>
+
+            <span class="num-data">[[totalPcsPicked]]</span>
+            <span class="num-data">[[totalPcsPicking]]</span>
+          </div>
+        </div>
+
+        <!-- 호기별 진행율 -->
+        <div id="region-proc-rate" class="barchart-section">
+          <div class="chart-row">
+            <span>[[regionProcRateLabel]]</span>
+            <span class="col-header">[[pickedLabel]]</span>
+            <span class="col-header">[[pickingLabel]]</span>
+          </div>
+
+          <div class="chart-row">
+            <div class="bar-chart">
+              <span class="label">[[orderLabel]]</span>
+              <div class="bar">
+                <span id="order-bar" class="chart-value" style="width:calc([[progressRate]]% - 10px)">[[progressRate]]%</span>
+              </div>
+            </div>
+
+            <span class="num-data">[[orderPicked]]</span>
+            <span class="num-data">[[orderPicking]]</span>
+          </div>
+
+          <div class="chart-row">
+            <div class="bar-chart">
+              <span class="label">SKU</span>
+              <div class="bar">
+                <span id="sku-bar" class="chart-value" style="width:calc([[progressRateBySku]]% - 10px)">[[progressRateBySku]]%</span>
+              </div>
+            </div>
+
+            <span class="num-data">[[skuPicked]]</span>
+            <span class="num-data">[[skuPicking]]</span>
+          </div>
+
+          <div class="chart-row">
+            <div class="bar-chart">
+              <span class="label">Total</span>
+              <div class="bar">
+                <span id="pcs-bar" class="chart-value" style="width:calc([[gaugeRate]]% - 10px)">[[gaugeRate]]%</span>
+              </div>
+            </div>
+
+            <span class="num-data">[[pcsPicked]]</span>
+            <span class="num-data">[[pcsPicking]]</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Input Box 영역 : 바코드 스캔 -->
+      <div id="middle-container">
+        <span class="label">[[custCntLabel]]</span>
+
+        <input id="cust-cnt">
+
+        <span class="label">[[skuBarcdLabel]]</span>
+
+        <mps-auto-popup-input
+          id="sku-barcode"
+          popup-title="[[popupTitleLabel]]"
+          button-txt-callback="[[_skuButtonTxtCallback]]"
+          on-before-request="_customAjaxHandler"
+          on-item-selected="itemSelected">
+        </mps-auto-popup-input>
+
+        <span class="label">[[unfinishedLabel]]</span>
+        <input type="checkbox" id="unfinished-only">
+
+        <button id="refresh-btn" on-click="refresh">
+          <img src="./images/icon-refresh.png"/>
+          <span>[[refreshLabel]]</span>
+        </button>
+      </div>
+
+      <!-- 투입 리스트 -->
+      <mps-list
+        header="[[header]]"
+        page="[[page]]"
+        total="[[total]]"
+        limit="[[limit]]"
+        data="[[items]]"
+        on-data-list-click="showDetailList"
+        show-paginator
+        on-paginator-changed="_pageChanged">
+      </mps-list>
+    </div>
+  </template>
+
+  <script>
+    class KioskDasOrderInfo extends Polymer.Element {
+      static get is() { return 'kiosk-das-order-info' }
+
+      static get properties() {
+        return {
+          /**
+           * 스캔한 상품 정보
+           ****************
+           * @type {Object}
+           */
+          sku: {
+            type: Object
+          },
+
+          /**
+           * 작업 유형
+           ****************
+           * @type {String}
+           */
+          jobType: {
+            type: String,
+            value: 'DAS',
+            readOnly: true
+          },
+
+          /**
+           * 거래처 수 라벨
+           ****************
+           * @type {String}
+           */
+          custCntLabel: {
+            type: String,
+            value: function() {
+              return t('label.cust_cnt');
+            }
+          },
+
+          /**
+           * 상품 바코드 라벨
+           ****************
+           * @type {String}
+           */
+          skuBarcdLabel: {
+            type: String,
+            value: function() {
+              return t('label.sku_barcd');
+            }
+          },
+
+          /**
+           * 미완료 라벨
+           ****************
+           * @type {String}
+           */
+          unfinishedLabel: {
+            type: String,
+            value: function() {
+              return t('label.unfinished');
+            }
+          },
+
+          /**
+           * 새로고침 버튼 라벨
+           ****************
+           * @type {String}
+           */
+          refreshLabel: {
+            type: String,
+            value: function() {
+              return t('button.refresh');
+            }
+          },
+
+          /**
+           * 총 진행율 라벨
+           ****************
+           * @type {String}
+           */
+          totalProcRateLabel: {
+            type: String,
+            value: () => t('label.total_proc_rate')
+          },
+
+          /**
+           * 호기별 진행율 라벨
+           ****************
+           * @type {String}
+           */
+          regionProcRateLabel: {
+            type: String,
+            value: () => t('label.region_proc_rate')
+          },
+
+          /**
+           * 주문 라벨
+           ****************
+           * @type {String}
+           */
+          orderLabel: {
+            type: String,
+            value: function() {
+              return t('label.customer');
+            }
+          },
+
+          /**
+           * 확정 라벨
+           ****************
+           * @type {String}
+           */
+          pickedLabel: {
+            type: String,
+            value: function() {
+              return t('label.picked_qty');
+            }
+          },
+
+          /**
+           * 예정 라벨
+           ****************
+           * @type {String}
+           */
+          pickingLabel: {
+            type: String,
+            value: function() {
+              return t('label.pick_qty');
+            }
+          },
+
+          /**
+           * 자동 리프레쉬 활성화
+           ****************
+           * @type {Boolean}
+           */
+          enableAutoRefresh: {
+            type: Boolean
+          },
+
+          /**
+           * 그리드 헤더 정보
+           ****************
+           * @type {Array}
+           */
+          header: {
+            type: Array,
+            value: function() {
+              return [{
+                display: t('label.input_seq'),
+                fieldname: 'input_seq',
+                columnWidth: '1fr',
+                style: {
+                  color: '#fff',
+                  textAlign: 'center'
+                }
+              }, {
+                display: t('label.sku_cd'),
+                fieldname: 'sku_cd',
+                columnWidth: '2fr',
+                style: {
+                  color: '#fff',
+                  textAlign: 'left'
+                }
+              }, {
+                display: t('label.sku_nm'),
+                fieldname: 'sku_nm',
+                columnWidth: '3.5fr',
+                style: {
+                  color: '#fff'
+                }
+              }, {
+                display: t('label.cust_cnt'),
+                fieldname: 'item_count',
+                style: {
+                  color: '#fff',
+                  textAlign: 'right'
+                }
+              }, {
+                display: t('label.picked_qty') + ' (PCS)',
+                fieldname: 'picked_qty',
+                style: {
+                  color: '#fff',
+                  textAlign: 'right'
+                }
+              }, {
+                display: t('label.pick_qty') + ' (PCS)',
+                fieldname: 'pick_qty',
+                style: {
+                  color: '#fff',
+                  textAlign: 'right'
+                }
+              }, {
+                display: t('label.status'),
+                fieldname: 'status',
+                style: {
+                  color: '#fff',
+                  textAlign: 'right'
+                }
+              }, {
+                fieldname: 'id',
+                hidden: true
+              }]
+            }
+          },
+
+          /**
+           * 페이지 정보
+           ****************
+           * @type {Number}
+           */
+          page: {
+            type: Number,
+            value: 1
+          },
+
+          /**
+           * Limit 정보
+           ****************
+           * @type {Number}
+           */
+          limit: {
+            type: Number,
+            value: 100
+          },
+
+          /**
+           * 총 아이템 개수
+           ****************
+           * @type {Number}
+           */
+          total: {
+            type: Number
+          },
+
+          /**
+           * 그리드 데이터
+           ****************
+           * @type {Array}
+           */
+          items: {
+            type: Array,
+            observer: '_itemsChanged'
+          },
+
+          /**
+           * 주문 데이터 셋
+           ****************
+           * @type {Object}
+           */
+          orderDataSet: {
+            type: Object,
+            observer: '_orderDataSetChanged'
+          },
+
+          /**
+           * 주문 확정
+           ****************
+           * @type {Number}
+           */
+          orderPicked: {
+            type: Number,
+            value: 0
+          },
+
+          /**
+           * 주문 예정
+           ****************
+           * @type {Number}
+           */
+          orderPicking: {
+            type: Number,
+            value: 0
+          },
+
+          /**
+           * SKU 확정
+           ****************
+           * @type {Number}
+           */
+          skuPicked: {
+            type: Number,
+            value: 0
+          },
+
+          /**
+           * SKU 예정
+           ****************
+           * @type {Number}
+           */
+          skuPicking: {
+            type: Number,
+            value: 0
+          },
+
+          /**
+           * PCS 확정
+           ****************
+           * @type {Number}
+           */
+          pcsPicked: {
+            type: Number,
+            value: 0
+          },
+
+          /**
+           * PCS 예정
+           ****************
+           * @type {Number}
+           */
+          pcsPicking: {
+            type: Number,
+            value: 0
+          },
+
+          /**
+           * 작업 진행율 (SKU)
+           ****************
+           * @type {Number}
+           */
+          progressRateBySku: {
+            type: Number,
+            value: 0
+          },
+
+          /**
+           * 작업 진행율 (주문)
+           ****************
+           * @type {Number}
+           */
+          progressRate: {
+            type: Number,
+            value: 0
+          },
+
+          /**
+           * 작업 진행율 (PCS)
+           ****************
+           * @type {Number}
+           */
+          gaugeRate: {
+            type: Number,
+            value: 0
+          },
+
+          /**
+           * SKU 선택 팝업 타이틀
+           */
+          popupTitleLabel: {
+            type: String,
+            value: () => t('label.sku')
+          },
+
+          /**
+           * 상세 리스트 필드 정보
+           ****************
+           * @type {Array}
+           */
+          detailListFields: {
+            type: Array,
+            value: () => [{
+              display: t('label.cust_cd'),
+              fieldname: 'cust_cd',
+              columnWidth: '1fr',
+            }, {
+              display: t('label.cust_nm'),
+              fieldname: 'cust_nm',
+              columnWidth: '1fr',
+            }, {
+              display: t('label.location'),
+              fieldname: 'loc_cd',
+              columnWidth: '1fr',
+              style: {
+                textAlign: 'center'
+              }
+            }, {
+              display: t('label.picked_qty'),
+              fieldname: 'picked_qty',
+              columnWidth: '.2fr',
+              style: {
+                textAlign: 'right'
+              }
+            }, {
+              display: t('label.pick_qty'),
+              fieldname: 'pick_qty',
+              columnWidth: '.2fr',
+              style: {
+                textAlign: 'right'
+              }
+            }/*, {
+              display: t('label.status'),
+              fieldname: 'status',
+              columnWidth: '.3fr',
+              style: {
+                textAlign: 'center'
+              }
+            }*/]
+          }
+        }
+      }
+
+      static get listeners() {
+        return {
+          'page-changed-to-kiosk_das_ord_info' : '_routingChanged'
+        }
+      }
+
+      /**
+       * @description ready
+       ******************
+       */
+      connectedCallback() {
+        super.connectedCallback();
+
+        // 1. 새로고침
+        this.enableAutoRefresh = true;
+        this.startAutoRefresh();
+
+        // 2. 페이지 변경 이벤트 핸들러
+        document.addEventListener('page-changed', (e) => {
+          this._routingChanged(e);
+        });
+
+        // 3. 호기 선택 체크
+        if(!MPS_UTIL.getRegionCd()) {
+          MPS_UTIL.showMessage(t('text.selecting_region'), t('text.select_region'));
+        }
+
+        document.addEventListener(`alert-closed-at-${location.hash.replace('#/', '')}`, event => {
+          if(!event.detail.hasCallback) {
+            this._initialSetup();
+          }
+        });
+      }
+
+      /**
+       * @description 페이지 변경 시
+       ******************
+       * @param {Object} e
+       */
+      _routingChanged(e) {
+        if(e.detail.currentPage == 'kiosk_das_ord_info') {
+          this._initialSetup();
+          this.enableAutoRefresh = true;
+        } else {
+          this.enableAutoRefresh = false;
+        }
+      }
+
+      /**
+       * @description 초기 셋업
+       ******************
+       */
+      _initialSetup() {
+        this.$['sku-barcode'].select();
+      }
+
+      /**
+       * @description 자동 리프레쉬 시작
+       ******************
+       */
+      startAutoRefresh() {
+        if(this.enableAutoRefresh) {
+          this.refresh();
+        }
+
+        setTimeout(function() {
+          this.startAutoRefresh();
+        }.bind(this), MPS_UTIL.getRefreshInterval());
+      }
+
+      /**
+       * @description 자동 리프레쉬 요청 에러 발생시 자동 리프레쉬를 중지하기 위해 enableAutoRefresh를 초기화
+       ******************
+       */
+      _stopAutoRefresh(error) {
+        console.log('auto refresh stopped.');
+        this.enableAutoRefresh = false;
+      }
+
+      /**
+       * @description 그리드 데이터 변경 핸들러 cust-cnt input에 가장 최근에 조회된 데이터의 거래처 수를 표기함
+       ***********************
+       * @param {Array} items
+       */
+      _itemsChanged(items) {
+        if(this._scannedFlag) {
+          this.$['cust-cnt'].value = items[0].item_count;
+        }
+
+        this._barcodeInputReset();
+      }
+
+      /**
+       * @description 바코드 입력 박스 리셋
+       ***********************
+       */
+      _barcodeInputReset() {
+        if(this._scannedFlag) {
+          this.$['sku-barcode'].value = '';
+          this._scannedFlag = false;
+        }
+
+        this.$['sku-barcode'].focus();
+      }
+
+      /**
+       * @description 새로고침 버튼 클릭 핸들러
+       ***********************
+       * @param {Object} e
+       */
+      refresh(e) {
+        this._barcodeInputReset();
+        this.getBatchSummary();
+      }
+
+      /**
+       * @description mps-list paginator-changed event handler
+       * mps-list의 page, limit, total property가 변경 되면 호출 됨
+       * event.detail을 통해 현재 리스트의 page, limit을 초기화 하고
+       * batch summary 조회를 요청
+       ***********************
+       * @param {Object} event
+       */
+      _pageChanged(event) {
+        this.page = event.detail.page;
+        this.limit = event.detail.limit;
+        this.getBatchSummary();
+      }
+
+      /**
+       * @description batch-summary를 조회 하는 ajax 호출
+       ***********************
+       */
+      getBatchSummary() {
+        const regionCd = MPS_UTIL.getRegionCd();
+        if(regionCd) {
+          const batchSummaryAjax = this.$['batch-summary-ajax'];
+          let status = this.$['unfinished-only'].checked == true ? 'U' : '';
+          batchSummaryAjax.curl = `/kiosk_process/das/batch_summary/${regionCd}?status=${status}`;
+          batchSummaryAjax.params = {
+            page: this.page,
+            limit: this.limit
+          };
+          batchSummaryAjax.generateRequest();
+        }
+      }
+
+      /**
+       * @description 웹 소켓으로 부터 데이터를 받아서 리프레쉬
+       * 자동 리프레쉬를 활성화 하기 위해 명시적으로 enableAutoRefresh flag를 true로 초기화
+       *******************
+       * @param {String} dataStr
+       */
+      refreshByWs(dataStr) {
+        this.enableAutoRefresh = true;
+        this.orderDataSet = JSON.parse(dataStr);
+      }
+
+      /**
+       * @description 주문 데이터 셋 변경시 핸들러
+       * 주문 데이터의 조회결과가 있으면 데이터 자동 조회를 활성화 하기 위해
+       * enableAutoRefresh flag의 값을 true로 명시적으로 초기화
+       *******************
+       * @param {Object} orderDataSet
+       */
+      _orderDataSetChanged(orderDataSet) {
+        if(orderDataSet) this.enableAutoRefresh = true;
+
+        if(Array.isArray(orderDataSet)) {
+          this.showSkuSelectPopup(orderDataSet);
+        } else {
+          this.updateScreen(orderDataSet);
+        }
+      }
+
+      /**
+       * @description SKU 선택 팝업 화면 표시
+       *******************
+       * @param {Array} skuList
+       */
+      showSkuSelectPopup(skuList) {
+        const popup = document.createElement('kiosk-sku-selection');
+        popup.skuList = skuList;
+        var self = this;
+
+        MPS_UTIL.showPopup(t('title.sku_selection'), popup, null, null, null, () => {
+          self.sku = popup.selectedSku;
+          this.inputSku(self.sku.com_cd, self.sku.sku_cd, self.sku.sku_barcd);
+        });
+      }
+
+      /**
+       * @description 화면 데이터 리프레쉬
+       *******************
+       * @param {Object} orderDataSet
+       */
+      updateScreen(orderDataSet) {
+        if(orderDataSet) {
+          this.total = orderDataSet.total;
+          this.items = orderDataSet.items ? orderDataSet.items : [];
+          this.orderPicking = orderDataSet.order_picking_qty;
+          this.orderPicked = orderDataSet.order_picked_qty;
+          this.skuPicking = orderDataSet.sku_picking_qty;
+          this.skuPicked = orderDataSet.sku_picked_qty;
+          this.pcsPicking = orderDataSet.pcs_picking_qty;
+          this.pcsPicked = orderDataSet.pcs_picked_qty;
+
+          this.totalOrderPicking = orderDataSet.tot_order_picking_qty;
+          this.totalOrderPicked = orderDataSet.tot_order_picked_qty;
+          this.totalSkuPicking = orderDataSet.tot_sku_picking_qty;
+          this.totalSkuPicked = orderDataSet.tot_sku_picked_qty;
+          this.totalPcsPicking = orderDataSet.tot_pcs_picking_qty;
+          this.totalPcsPicked = orderDataSet.tot_pcs_picked_qty;
+
+          this.progressRate = Number((!this.orderPicking || this.orderPicking == 0 || !this.orderPicked || this.orderPicked == 0) ? 0 : ((this.orderPicked / this.orderPicking) * 100).toFixed(1));
+          this.progressRateBySku = Number((!this.skuPicking || this.skuPicking == 0 || !this.skuPicked || this.skuPicked == 0) ? 0 : ((this.skuPicked / this.skuPicking) * 100).toFixed(1));
+          this.gaugeRate = Number((!this.pcsPicking || this.pcsPicking == 0 || !this.pcsPicked || this.pcsPicked == 0) ? 0 : ((this.pcsPicked / this.pcsPicking) * 100).toFixed(1));
+
+          this.totalProgressRate = Number((!this.totalOrderPicking || this.totalOrderPicking == 0 || !this.totalOrderPicked || this.totalOrderPicked == 0) ? 0 : ((this.totalOrderPicked / this.totalOrderPicking) * 100).toFixed(1));
+          this.totalProgressRateBySku = Number((!this.totalSkuPicking || this.totalSkuPicking == 0 || !this.totalSkuPicked || this.totalSkuPicked == 0) ? 0 : ((this.totalSkuPicked / this.totalSkuPicking) * 100).toFixed(1));
+          this.totalGaugeRate = Number((!this.totalPcsPicking || this.totalPcsPicking == 0 || !this.totalPcsPicked || this.totalPcsPicked == 0) ? 0 : ((this.totalPcsPicked / this.totalPcsPicking) * 100).toFixed(1));
+        }
+      }
+
+      /**
+       * @description 상품 투입 트랜잭션
+       ***********************
+       * @param {String} comCd
+       * @param {String} skuCd
+       * @param {String} skuBarcd
+       */
+      inputSku(comCd, skuCd, skuBarcd) {
+        if (skuCd && skuCd.length >= 3) {
+          var regionCd = MPS_UTIL.getRegionCd();
+          var workLoc = MPS_UTIL.getWorkLoc();
+          var startAssortAjax = this.$['input-sku-ajax'];
+          let status = this.$['unfinished-only'].checked == true ? 'U' : '';
+
+          var url = `/kiosk_process/das/input/${regionCd}/${workLoc}/${comCd}/${skuCd}`;
+          url = url + '?page=' + this.page + '&limit=' + this.limit;
+          if(status && status.length > 0) {
+            url = url + '&status=' + status;
+          }
+
+          startAssortAjax.curl = url;
+          startAssortAjax.generateRequest();
+        }
+      }
+
+      /**
+       * @description SKU 선택 팝업에 나타날 아이템 텍스트 구성을 위한 콜백
+       ***********************
+       * @param {Object} item
+       */
+      _skuButtonTxtCallback(item) {
+        return `${item.com_cd}
+                (${item.sku_cd})
+                ${item.sku_nm}`;
+      }
+
+      /**
+       * @description mps-auto-popup-input before-request event handler
+       ***********************
+       * @param {Object} event
+       */
+      _customAjaxHandler(event) {
+        event.preventDefault();
+        const input = event.detail.input;
+        const ajax = event.detail.ajax;
+        const skuCd = input.value;
+        ajax.curl = `/kiosk_process/find_sku/${MPS_UTIL.getRegionCd()}/${skuCd}`;
+        ajax.generateRequest();
+      }
+
+      /**
+       * @description SKU 선택 팝업을 통해 SKU가 선택되었을 때
+       ***********************
+       * @param {Object} event
+       */
+      itemSelected(event) {
+        this.sku = event.detail;
+        this.$['sku-barcode'].value = '';
+        this.inputSku(this.sku.com_cd, this.sku.sku_cd, this.sku.sku_barcd);
+        SOUND.playInfoSound();
+        this._scannedFlag = true;
+      }
+
+      /**
+       * @description 상품 투입 에러시
+       *******************
+       * @param {Object} event
+       */
+      _onInputSkuError(event) {
+        var detail = event.detail ? event.detail : event.detail.body;
+
+        if(detail && detail.msg == 'already-input-sku') {
+          openConfirm({
+            title: t('text.checking_inspection'),
+            message: t('text.check_inspection'),
+            confirmCallback: () => {
+              const regionCd = MPS_UTIL.getRegionCd();
+              const sideCd = MPS_UTIL.getSideCd();
+              let zoneCd = MPS_UTIL.getZoneCd();
+              let comCd = this.sku.com_cd;
+              let skuCd = this.sku.sku_cd;
+              this.doInspectTransaction(regionCd, sideCd, zoneCd, comCd, skuCd);
+              this._initialSetup();
+              this._scannedFlag = false;
+            },
+            cancelCallback: () => {
+              this._barcodeInputReset();
+            }
+          });
+        } else {
+          MPS_UTIL.showMessage(detail.code, detail.msg, () => {
+            this._initialSetup();
+            this._scannedFlag = false;
+          });
+        }
+      }
+
+      /**
+       * @description 검수 성공시
+       *******************
+       * @param {Object} event
+       */
+      _onInspectionSuccess(event) {
+        this.refresh(event);
+      }
+
+      /**
+       * @description 상품 검수 api 호출
+       ******************
+       * @param {String} regionCd
+       * @param {String} sideCd
+       * @param {String} zoneCd
+       * @param {String} comCd
+       * @param {String} skuCd
+       */
+       doInspectTransaction(regionCd, sideCd, zoneCd, comCd, skuCd) {
+        try {
+          if(!skuCd || skuCd.length < 4) {
+            throw t('error.sku_barcd_invalid');
+          }
+          const inspectAjax = this.$['inspect-sku-ajax'];
+          inspectAjax.curl = `/pda_process/inspection_by_mpi/${regionCd}/${sideCd}/${zoneCd}/${comCd}/${skuCd}`
+          inspectAjax.generateRequest();
+        } catch (error) {
+          openAlert({
+            title: t('error.VALIDATION_ERROR'),
+            message: error,
+            confirmCallback: () => {
+              this._initialSetup();
+            }
+          });
+        }
+      }
+
+      /**
+       * @description 상세 리스트 조회
+       ***********************
+       * @param {Object} event
+       */
+      showDetailList(event) {
+        const regionCd = MPS_UTIL.getRegionCd();
+        const inputSeq = event.detail.data.input_seq;
+        document.dispatchEvent(new CustomEvent('open-form-list-dialog', {
+          detail: {
+            title: t('title.das_order_info_detail') + ' [' + event.detail.data.sku_nm + ']',
+            listFields: this.detailListFields,
+            listDataReqUrl: `/kiosk_process/das/input_details/${regionCd}/${inputSeq}`,
+            handleListDataAfterSet: params => {
+              const rows = params.listElement.getRows();
+              rows.forEach(row => {
+                const rowData = row.getData();
+                if(parseInt(rowData.pick_qty) === parseInt(rowData.picked_qty)) {
+                  row.classList.add('complete');
+                }
+              });
+            },
+
+            closeCallback: this._initialSetup.bind(this)
+          }
+        }));
+      }
+    }
+
+    customElements.define(KioskDasOrderInfo.is, KioskDasOrderInfo);
+  </script>
+
+</dom-module>

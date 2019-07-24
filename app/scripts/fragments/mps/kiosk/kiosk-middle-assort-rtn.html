@@ -1,0 +1,607 @@
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+
+<link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="./kiosk-sku-selection.html">
+
+<dom-module id="kiosk-middle-assort-rtn">
+  <template>
+    <style include="shared-styles">
+      #container {
+        display: flex;
+        flex-direction: column;
+        height: calc(100% - 20px);
+        padding: 10px;
+      }
+      #top-container {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 10px;
+      }
+      #middle-container {
+        display: grid;
+        background-color: #5A6377;
+        grid-template-columns: 1fr 2fr;
+        grid-gap: 10px;
+        padding: 10px;
+        border-radius: 15px;
+        margin-bottom: 20px;
+      }
+      .label {
+        text-align: right;
+        color: #D5D7DB;
+        font-size: 25pt;
+        margin: auto 15px auto 0;
+      }
+      label{
+        line-height:54px;
+      }
+      .input-container {
+        display: flex;
+        flex-direction: row;
+        color:#fff;
+      }
+      .input-container input#sku-barcode {
+        margin: auto;
+      }
+      .input-container span#sku-nm {
+        margin: auto 0;
+        flex: 1;
+      }
+
+      .input-container span#box-in-qty {
+        margin: auto 10px auto 0;
+      }
+      .bottom-container {
+        display: flex;
+        flex: 1;
+        /* display: grid; */
+        /* grid-template-columns: repeat(5, 1fr); */
+      }
+      .seq-region-block {
+        display: grid;
+        margin: auto;
+        border-radius: 15px;
+        color:#fff;
+        /* font-size: 4vw; */
+        font-size: 25vh;
+        font-weight:bold;
+        text-align:center;
+        text-shadow: 4px 3px 2px rgba(0,0,0,.7);
+      }
+      .button-container {
+        display: grid;
+        justify-content: end;
+      }
+      #date-picker span {
+        margin: auto 10px auto auto;
+        color: #D5D7DB;
+        font-size: .8rem;
+      }
+      #date-picker input {
+        font-size: .8rem;
+        height: 1rem;
+      }
+    </style>
+
+    <!--sys-ajax
+      auto
+      id="batch-code-ajax"
+      curl="/kiosk_process/RTN/running_batch_groups"
+      method="GET"
+      last-response="{{lastBatchCodeResp}}">
+    </sys-ajax-->
+
+    <sys-ajax
+      id="middle-assort-rtn-ajax"
+      on-sys-ajax-response="_middleAssortRtnAjaxResponsed">
+    </sys-ajax>
+
+    <div id="container">
+      <div id="top-container">
+        <div id="date-picker">
+          <span>[[jobDateLabel]]</span>
+          <input type="date" required value="[[_jobDateDefaultValue]]" on-change="_jobDateChanged">
+        </div>
+
+        <mps-selector
+          info-column-cnt="[[selectorInfoFields.length]]"
+          value-fields="[[selectorValueFields]]"
+          info-fields="[[selectorInfoFields]]"
+          header="[[selectorColumns]]"
+          resource-url="[[selectorResourceUrl]]"
+          params="[[selectorParams]]"
+          on-value-changed="_batchCodeChanged">
+        </mps-selector>
+      </div>
+
+      <div id="middle-container">
+        <div class="input-container">
+          <label class="label">[[skuBarcd]]</label>
+
+          <mps-auto-popup-input
+            id="sku-barcode"
+            popup-title="[[popupTitleLabel]]"
+            button-txt-callback="[[_skuButtonTxtCallback]]"
+            on-before-request="_customAjaxHandler"
+            on-item-selected="itemSelected">
+          </mps-auto-popup-input>
+
+        </div>
+        <div class="input-container">
+          <label class="label">[[skuNmLabel]] : </label>
+          <span id="sku-nm">[[skuNm]]</span>
+
+          <label class="label">[[boxInQtyLabel]] : </label>
+          <span id="box-in-qty">[[boxInQty]]</span>
+        </div>
+      </div>
+
+      <div class="bottom-container">
+        <div class="seq-region-block">
+          <span>[[displayValue]]</span>
+        </div>
+        <template is="dom-repeat" items="[[midAssortResp.items]]">
+          <div class="seq-region-block">
+            <span>[[item.job_batch_seq]] - [[item.region_nm]]</span>
+          </div>
+        </template>
+      </div>
+
+      <!--div class="button-container">
+        <button on-click="refresh">[[refreshLabel]]</button>
+      </div-->
+
+    </div>
+  </template>
+
+  <script>
+    class KioskMiddleAssortRtn extends Polymer.Element {
+      static get is() {
+        return 'kiosk-middle-assort-rtn'
+      }
+
+      static get properties() {
+        return {
+          /**
+           * 선택하세요. 라벨
+           ****************
+           * @type {String}
+           */
+          selectLabel: {
+            type: String,
+            value: t('text.select')
+          },
+
+          /**
+           * 상품명 라벨
+           ****************
+           * @type {String}
+           */
+          skuNmLabel: {
+            type: String,
+            value: t('label.sku_nm')
+          },
+
+          /**
+           * 입수 라벨
+           ****************
+           * @type {String}
+           */
+          boxInQtyLabel: {
+            type: String,
+            value: t('label.box_in_qty')
+          },
+
+          /**
+           * 새로고침 버튼 라벨
+           ****************
+           * @type {String}
+           */
+          refreshLabel: {
+            type: String,
+            value: t('button.refresh')
+          },
+
+          /**
+           * 상품 바코드
+           ****************
+           * @type {String}
+           */
+          skuBarcd: {
+            type: String,
+            value: t('label.sku_barcd')
+          },
+
+          /**
+           * 상품 명
+           ****************
+           * @type {String}
+           */
+          skuNm: {
+            type: String
+          },
+
+          /**
+           * 호기 리스트
+           ****************
+           * @type {Array}
+           */
+          regionList: {
+            type: Array
+          },
+
+          /**
+           * 배치 그룹 ID
+           ****************
+           * @type {String}
+           */
+          batchGroupId: {
+            type: String
+          },
+
+          /**
+           * 상품 바코드 파라미터
+           ****************
+           * @type {Object}
+           */
+          skuBarcodeParams: {
+            type: Object
+          },
+
+          /**
+           * 호기 존
+           ****************
+           * @type {String}
+           */
+          regionZone: {
+            type: String
+          },
+
+          /**
+           * 바코드
+           ****************
+           * @type {Object}
+           */
+          lastBarcodeResp: {
+            type: Object,
+            observer: '_lastBarcodeRespChanged'
+          },
+
+          /**
+           * 배치 코드
+           ****************
+           * @type {Object}
+           */
+          /*lastBatchCodeResp: {
+            type: Array,
+            observer: '_lastBatchCodeRespChanged'
+          },*/
+
+          /**
+           * 작업 배치 값 선택시 Keep할 값 필드 리스트
+           ****************
+           * @type {Array}
+           */
+          selectorValueFields: {
+            type: Array,
+            value: () => {
+              return ['job_id', 'batch_group_id']
+            }
+          },
+
+          /**
+           * 작업 배치 선택 화면에 표시할 필드
+           ****************
+           * @type {Array}
+           */
+          selectorInfoFields: {
+             type: Array,
+             value: () => {
+               return [{
+                 display: t('label.dc_cd'),
+                 fieldname: 'dc_cd'
+               }, {
+                 display: t('label.com_cd'),
+                 fieldname: 'com_cd'
+               }, {
+                 display: t('label.job_id'),
+                 fieldname: 'job_id'
+               }, {
+                 display: t('label.batch_group_id'),
+                 fieldname: 'batch_group_id'
+               }];
+             }
+          },
+
+          /**
+           * 작업 배치 선택 화면의 컬럼 정보
+           ****************
+           * @type {Array}
+           */
+          selectorColumns: {
+             type: Array,
+             value: () => {
+               return [{
+                 display: t('label.dc_cd'),
+                 fieldname: 'dc_cd'
+               }, {
+                 display: t('label.com_cd'),
+                 fieldname: 'com_cd',
+                 displayCallback: (value) => {
+                   return value ? value : 'N/A';
+                 }
+               }, {
+                 display: t('label.job_id'),
+                 fieldname: 'job_id'
+               }, {
+                 display: t('label.batch_group_id'),
+                 fieldname: 'batch_group_id'
+               }]
+             }
+          },
+
+          /**
+           * 작업 배치 선택 화면이 호출할 URL
+           ****************
+           * @type {String}
+           */
+          selectorResourceUrl: {
+            type: String,
+            value: '/job_batch/search/middle_class'
+          },
+
+          /**
+           * 작업 배치 선택 화면이 호출할 파라미터
+           ****************
+           * @type {Object}
+           */
+          selectorParams: {
+             type: Object,
+             value: () => {
+               return {
+                 sort: [{
+                   field: 'job_id',
+                   ascending: false
+                 }],
+                 query: [{
+                   name: 'job_date',
+                   value: (() => {
+                     let today = new Date();
+                     return today.toISOString().slice(0, 10);
+                   })()
+                 }]
+               }
+             }
+          },
+
+          /**
+           * 작업일자 라벨
+           ****************
+           * @type {String}
+           */
+          jobDateLabel: {
+            type: String,
+            value: () => {
+              return t('label.job_date')
+            }
+          },
+
+          /**
+           * 작업일자 기본 값
+           ****************
+           * @type {String}
+           */
+          _jobDateDefaultValue: {
+            type: String,
+            value: () => {
+              let today = new Date();
+              return today.toISOString().slice(0, 10);
+            }
+          },
+
+          /**
+           * 상품 선택 팝업 타이틀
+           ****************
+           * @type {String}
+           */
+          popupTitleLabel: {
+            type: String,
+            value: () => t('label.sku')
+          }
+        }
+      }
+
+      connectedCallback() {
+        super.connectedCallback();
+        document.addEventListener(`alert-closed-at-${location.hash.replace('#/', '')}`, event => {
+          if(!event.detail.hasCallback) {
+            this.focusSkuInput();
+          }
+        });
+      }
+
+      /**
+       * 바코드 정보 변경시
+       ***********************
+       * @param {Object} response
+       */
+      _lastBarcodeRespChanged(response) {
+        if(response) {
+          this.regionList = response;
+        }
+      }
+
+      /**
+       * 상품 선택 팝업에 나타날 아이템 텍스트 구성을 위한 콜백
+       ***********************
+       * @param {Object} item
+       */
+      _skuButtonTxtCallback(item) {
+        return `(${item.sku_cd})
+                ${item.sku_nm}`;
+      }
+
+      /**
+       * mps-auto-popup-input before-request event handler
+       ***********************
+       * @param {Object} event
+       */
+      _customAjaxHandler(event) {
+        event.preventDefault();
+        const input = event.detail.input;
+        const ajax = event.detail.ajax;
+
+        try {
+          const skuCd = input.value;
+          this.validateBeforeAssort(skuCd);
+          ajax.curl = `/kiosk_process/find_sku/${MPS_UTIL.getRegionCd()}/${skuCd}`;
+          // TODO 아래 형식으로 변경
+          //ajax.curl = `/kiosk_process/middle_assort/find_sku/${배치 그룹 ID}/${skuCd}`;
+          ajax.generateRequest();
+        } catch (error) {
+          MPS_UTIL.showMessage(error.title, error.message, error.confirmCallback);
+        }
+      }
+
+      /**
+       * 상품 선택 팝업을 통해 상품이 선택되었을 때
+       ***********************
+       * @param {Object} event 항목 선택
+       */
+      itemSelected(event) {
+        const selectedSku = event.detail;
+        const middleAssortRtnAjax = this.$['middle-assort-rtn-ajax'];
+        middleAssortRtnAjax.curl = `/kiosk_process/RTN/middle_assort/${this.batchGroupId}/${selectedSku.sku_cd}`;
+        // TODO 아래 형식으로 변경
+        // middleAssortWeightAjax.curl = `/kiosk_process/DAS/middle_assort/${this.batchListParams}/${selectedSku.com_cd}/${selectedSku.sku_cd}`;
+        middleAssortRtnAjax.generateRequest();
+      }
+
+      /**
+       * 중분류 ajax response event handler
+       ***********************
+       * @param {Object} event
+       */
+      _middleAssortRtnAjaxResponsed(event) {
+        this.midAssortResp = event.detail
+        var regionCd = MPS_UTIL.getRegionCd();
+        var workLoc = MPS_UTIL.getWorkLoc();
+        this.skuNm = this.midAssortResp && this.midAssortResp.sku_nm;
+        this.boxInQty = this.midAssortResp && this.midAssortResp.box_in_qty;
+      }
+
+      /**
+       * 배치 코드 변경시
+       ***********************
+       * @param {Object} e
+       */
+      _batchCodeChanged(e) {
+        this.batchGroupId = e.detail.value.batch_group_id;
+        this.focusSkuInput()
+      }
+
+      /**
+       * 상품 입력 박스 포커스
+       ***********************
+       */
+      focusSkuInput() {
+        this.$['sku-barcode'].select();
+      }
+
+      /**
+       * 바코드 입력 박스
+       ***********************
+       */
+      clearBarcdInput() {
+        this.$['sku-barcode'].value = '';
+      }
+
+      /**
+       * 배치 코드 변경시
+       ***********************
+       * @param {String} skuCd
+       */
+      validateBeforeAssort(skuCd) {
+        if(!this.batchGroupId) {
+          throw {
+            title: t('label.batch_group'),
+            message: t('text.NOTHING_SELECTED')
+          }
+        } else if (!skuCd) {
+          throw {
+            title: t('label.sku_barcd'),
+            message: t('error.sku_barcd_invalid'),
+            confirmCallback: this.focusSkuInput.bind(this)
+          }
+        }
+      }
+
+      /**
+       * 새로고침
+       ***********************
+       */
+      refresh() {
+        this.clearBarcdInput();
+        this.clearValues();
+        //this.clearBatchCombo();
+        //this.$['batch-code-ajax'].generateRequest();
+      }
+
+      /**
+       * 값 클리어
+       ***********************
+       */
+      clearValues() {
+        this.batchGroupId = '';
+        this.skuNm = '';
+        this.boxInQty = '';
+        this.displayValue = '';
+        this.set('midAssortResp', {}); // mps-auto-popup-input으로 전환하면서 주석 처리
+      }
+
+      /**
+       * 작업일자 변경 핸들러
+       ***********************
+       * @param {Object} event
+       */
+      _jobDateChanged(event) {
+        this.jobDate = event.currentTarget.value;
+        this.selectorParams = {
+          sort: [{
+            field: 'job_id',
+            ascending: false
+          }],
+          query: [{
+            name: 'job_date',
+            value: this.jobDate
+          }]
+        };
+      }
+
+      /*_lastBatchCodeRespChanged(response) {
+        if(!response) {
+          return;
+        }
+
+        var batchCodeCombo = this.$['batch-code'];
+        response.forEach((item, idx) => {
+          batchCodeCombo.options[batchCodeCombo.options.length] = new Option(item, item);
+        });
+      }
+
+      clearBatchCombo() {
+        const batchCodeCombo = this.$['batch-code'];
+        while(batchCodeCombo.children.length) {
+          batchCodeCombo.firstChild.remove();
+        }
+
+        batchCodeCombo.insertBefore(new Option(`--${this.selectLabel}--`, 'empty'), batchCodeCombo.firstChild);
+      }*/
+    }
+
+    customElements.define(KioskMiddleAssortRtn.is, KioskMiddleAssortRtn);
+  </script>
+</dom-module>

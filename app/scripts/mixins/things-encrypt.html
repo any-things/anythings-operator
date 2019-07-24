@@ -1,0 +1,27 @@
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+
+<script src="../../bower_components/crypto-js/crypto-js.js"></script>
+
+<script>
+    Things.Encrypt = (superClass) => {
+        return class EncryptMixin extends superClass {
+            // static get is() { return 'things-nfc'; }
+
+            static get propertie() {
+                return {
+                    encryptedPassword: String
+                };
+            }
+
+            sha256(value) {
+                var hash = CryptoJS.SHA256(value);
+                var encrypted = CryptoJS.enc.Hex.stringify(hash);
+
+                return encrypted;
+            }
+        };
+    }
+</script>

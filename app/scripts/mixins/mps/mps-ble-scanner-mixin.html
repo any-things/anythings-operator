@@ -1,0 +1,238 @@
+<link rel="import" href="../../units/mps/mps-alert.html">
+
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+<script>
+  MpsBleScannerMixin = superClass => {
+    return class MpsBleScannerMixin extends superClass {
+      static get properties() {
+        return {
+          /**
+           * 이 믹스인을 사용하는 화면의 라우팅 URL
+           */
+          routingUrl: {
+            type: String
+          },
+
+          /**
+           * 연결 대상 device id
+           */
+          deviceId: {
+            type: String
+          },
+
+          /**
+           * notification 대상 serviceUUID
+           */
+          serviceUUID: {
+            type: String,
+            value: (() => 'fff0')
+          },
+
+          /**
+           * notification 대상 characteristicUUID
+           */
+          characteristicUUID: {
+            type: String,
+            value: (() => 'fff1')
+          }
+        }
+      }
+
+      /**
+       * 라우팅 변경시 현재 연결된 장비가 있다면 ble 연결을 해제함
+       */
+      connectedCallback() {
+        super.connectedCallback();
+
+        // 이 믹스인이 포함된 화면의 라우팅 URL을 저장
+        this.routingUrl = location.hash.replace('#/', '');
+
+        // 페이지 변경 시 이 믹스인이 포함된 화면이 아니면 블루투스 연결 해제
+        // 이 믹스인이 포함된 화면이면 블루투스 재연결
+        document.addEventListener('page-changed', event => {
+          const currentPage = event.detail.currentPage;
+          const prevPage = event.detail.prevPage;
+          if(!this.isCurrentPage(currentPage) && 'ble' in window) {
+            this.isConnected()
+                .then(isConnected => {
+                  if(isConnected) this.disconnectDevice();
+                });
+          } else if ('ble' in window) {
+            this.isConnected()
+                .then(isConnected => {
+                  if(!isConnected) this.connectDevice();
+                })
+          }
+        });
+      }
+
+      /**
+       * page-changed 이벤트 핸들러에 의해 호출되며
+       * 변경된 페이지가 현재 믹스인이 포함되어 있는 화면인지 여부를 return
+       */
+      isCurrentPage(currentPage) {
+        return currentPage === this.routingUrl;
+      }
+
+      /**
+       * @description 현재 ble 장비와 연결
+       * 1. bluetooth 사용하도록 설정 되었는지 확인
+       * 2. 이미 연결되어 있는 장비인지 확인
+       * 3. 연결 가능한 상태라면 주변 장치 검색을 중단
+       * 4. 연결
+       * 5. 연결 성공호  startNotification을 호출
+       */
+      connectDevice() {
+        if(this.deviceId) {
+          this.isEnabled()
+              .then(isEnabled => {
+                if(isEnabled) {
+                  return this.isConnected();
+                } else {
+                  document.dispatchEvent(new CustomEvent('show-toast',{
+                        detail:{
+                          type: t('error.SETTING_ERROR'),
+                          message: t('text.bluetooth_is_not_on')
+                        }
+                  }));
+                }
+              })
+              .then(isConnected => {
+                if(isConnected) {
+                  document.dispatchEvent(new CustomEvent('show-toast',{
+                        detail:{
+                          type: t('title.connect_scanner'),
+                          message: t('text.bluetooth_scanner_connected')
+                        }
+                  }));
+                } else {
+                  this.stopScanDevices();
+
+                  if(this.beforeConnect && typeof this.beforeConnect === 'function') this.beforeConnect();
+                  
+                  ble.connect(this.deviceId, () => {
+                    this.startNotification();
+                    document.dispatchEvent(new CustomEvent('show-toast',{
+                        detail:{
+                          type: t('title.connect_scanner'),
+                          message: t('text.bluetooth_scanner_connected')
+                        }
+                    }));
+                    if(this.afterConnect && typeof this.afterConnect === 'function') this.afterConnect();
+                  });
+                }
+              })
+        } else {
+          this.scanDevices()
+        }
+      }
+
+      /**
+       * @description 주변에 연결 가능한 장치가 있는지 검색함
+       * deviceFound라는 명칭의 함수를 반드시 구현해야 함 (장비 검색에 성공 했을 때 호출하는 callback)
+       */
+      scanDevices() {
+        ble.startScan([], device => { 
+          if(this.deviceFound && typeof this.deviceFound === 'function') {
+            this.deviceFound(device);
+          } else {
+            throw new Error('deviceFound callback function is not defined.');
+          }
+        }, this._failCallback.bind(this));
+      }
+
+      /**
+       * @description 장치 검색을 중단함
+       */
+      stopScanDevices() {
+        ble.stopScan();
+      }
+
+      /**
+       * @description deviceId를 통해 연결되어 있는 장비를 연결 해제함
+       */
+      disconnectDevice() {
+        if(this.beforeDisconnect && typeof this.beforeDisconnect === 'function') this.beforeDisconnect();
+
+        ble.disconnect(this.deviceId, () => {
+          document.dispatchEvent(new CustomEvent('show-toast',{
+              detail:{
+                type: t('title.disconnect_scanner'),
+                message: t('text.bluetooth_scanner_disconnected')
+              }
+          }));
+          if(this.afterDisconnect && typeof this.afterDisconnect === 'function') this.afterDisconnect();
+        });
+      }
+
+      /**
+       * @description 장치 연결이 성공적으로 완료 되었을 때 호출 되며
+       * 스캐너를 통해 입력된 값을 문자로 치환하여 scanned 함수를 호출 함
+       * scanned라는 명칭의 함수를 반드시 구현해야 함 (스캔에 성공 했을 때 호출하는 callback)
+       */
+      startNotification() {
+        ble.startNotification(this.deviceId, this.serviceUUID, this.characteristicUUID, buffer => {
+          if(this.scanned && typeof this.scanned === 'function') {
+            this.scanned(String.fromCharCode.apply(null, new Uint8Array(buffer)));
+          } else {
+            throw new Error('scanned callback function is not defined');
+          }
+          
+        }, this._failCallback.bind(this));
+      }
+
+      /**
+       * @description 현재 tablet이 사용할 수 있는지를 채크함
+       * 사용할 수 있다면 true를 반환하는 promise return
+       * 사용 할 수 없다면 false를 반환하는 promise return
+       */
+      isEnabled(successCallback, failCallback) {
+        return new Promise(resolve => {
+          ble.isEnabled(() => {
+            resolve(true);
+          }, () => {
+            resolve(false);
+          })
+        });
+      }
+
+      /**
+       * @description this.deviceId를 통해 해당 장비가 연결되어 있는 상태인지를 확인함
+       * 연결되어 있다면 true를 반환하는 promise return
+       * 연결되어 있지 않다면 false를 반환하는 promise return
+       */
+      isConnected() {
+        return new Promise(resolve => {
+          ble.isConnected(this.deviceId, () => {
+            resolve(true);
+          }, () => {
+            resolve(false);
+          })
+        })
+      }
+
+      /**
+       * @description MpsBleScannerMixin에서 공통적으로 사용하는 failCallback 함수
+       * ble 연결을 위해 android는 위치 서비스가 활성화 되어 있는 상태여야 하기 때문에 
+       * parameter로 돌아온 error message에 location service와 관련된 내용이 있다면 관련 메시지를 출력함
+       * (TODO: 근본적인 해결을 위해서는 location service가 활성화 된 상태인지 먼저 확인 한 뒤 connect를 시도해야함)
+       * 그 외의 경우 exception 발생
+       ******************
+       * @param {String} fail 에러 메시지를 리턴함
+       */
+      _failCallback(fail) {
+        if(typeof fail === 'string' && fail.length > 0 && fail.toLowerCase().indexOf('location service') >= 0) {
+          openAlert({
+            title: t('error.SETTING_ERROR'),
+            message: t('text.location_service_is_not_on')
+          });
+        }
+
+        throw new Error(fail);
+      }
+    }
+  }
+</script>

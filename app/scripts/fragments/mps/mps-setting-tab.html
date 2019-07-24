@@ -1,0 +1,471 @@
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+
+<link rel="import" href="../../../bower_components/polymer/polymer-element.html">
+
+<link rel="import" href="./mps-setting-styles.html">
+
+<!--
+  태블릿 설정 화면
+-->
+<dom-module id="mps-setting-tab">
+  <template>
+    <style include="shared-styles mps-setting-styles"></style>
+
+    <sys-ajax
+      id="broker-addrs-ajax"
+      method="GET"
+      content-type="application/json"
+      on-sys-ajax-response="_setBrokerAddress">
+    </sys-ajax>
+
+    <sys-ajax
+      id="broker-port-ajax"
+      method="GET"
+      content-type="application/json"
+      on-sys-ajax-response="_setBrokerPort">
+    </sys-ajax>
+
+    <sys-ajax
+      id="broker-site-ajax"
+      method="GET"
+      content-type="application/json"
+      on-sys-ajax-response="_setBrokerSite">
+    </sys-ajax>
+
+    <sys-ajax
+      auto
+      method="GET"
+      curl="/settings/show_by_name?name=mps.chute.side.set"
+      content-type="application/json"
+      last-response="{{chuteSideSetResponse}}">
+    </sys-ajax>
+
+    <sys-ajax
+      id="region-items-ajax"
+      method="GET"
+      content-type="application/json"
+      on-sys-ajax-response="_renderRegionCombo">
+    </sys-ajax>
+
+    <sys-ajax
+      id="zone-items-ajax"
+      method="GET"
+      content-type="application/json"
+      on-sys-ajax-response="_renderZoneCombo">
+    </sys-ajax>
+
+    <sys-ajax
+      id="update-setting-ajax"
+      method="PUT"
+      content-type="application/json">
+    </sys-ajax>
+
+    <sys-ajax
+      id="job-combo-ajax"
+      method="GET"
+      content-type="application/json"
+      on-sys-ajax-response="_renderJobCombo">
+  </sys-ajax>
+
+    <div id="region" class="input-container">
+      <label>[[regionLabel]]</label>
+      <select id="region-combo" on-change="_getZoneItems"></select>
+    </div>
+
+    <div id="zone" class="input-container">
+      <label>[[zoneLabel]]</label>
+      <select id="zone-combo"></select>
+    </div>
+
+    <div id="center" class="input-container">
+        <label>[[jobLabel]]</label>
+        <select id="job-combo" on-change="_hiddenDiv"></select>
+    </div>
+
+    <div id="other-order" class="radio-btn-container">
+      <label>[[othersOrdLabel]]</label>
+
+      <div class="buttons">
+        <input name="others-order" value="true" type="radio" checked>
+        <label>[[showLabel]]</label>
+
+        <input name="others-order" value="false" type="radio">
+        <label>[[hideLabel]]</label>
+      </div>
+    </div>
+
+    <div id="work-loc" class="radio-btn-container">
+      <label>[[workLocLabel]]</label>
+      <div class="buttons">
+
+        <!-- TODO: template로 처리해야 됨. -->
+        <dom-if if="[[isLeftRight]]">
+          <template>
+            <input value="f" name="work-location" type="radio" work-loc-name$="[[frontLabel]]">
+            <label>[[leftLabel]]</label>
+            
+            <input value="r" name="work-location" type="radio" work-loc-name$="[[rearLabel]]">
+            <label>[[rightLabel]]</label>
+            
+            <input value="all" name="work-location" type="radio" work-loc-name$="[[leftLabel]]/[[rightLabel]]" checked>
+            <label>[[leftLabel]]/[[rightLabel]]</label>
+          </template>
+        </dom-if>
+
+        <dom-if if="[[!isLeftRight]]">
+          <template>
+            <input value="F" name="work-location" type="radio" work-loc-name$="[[frontLabel]]">
+            <label>[[frontLabel]]</label>
+
+            <input value="R" name="work-location" type="radio" work-loc-name$="[[rearLabel]]">
+            <label>[[rearLabel]]</label>
+
+            <input value="ALL" name="work-location" type="radio" work-loc-name$="[[frontLabel]]/[[rearLabel]]" checked>
+            <label>[[frontLabel]]/[[rearLabel]]</label>
+          </template>
+        </dom-if>
+
+        <input value="T" name="work-location" type="radio" work-loc-name$="[[allLabel]]">
+        <label>[[allLabel]]</label>
+      </div>
+    </div>
+
+    <div id="show-full-code" class="radio-btn-container">
+      <label>[[showFullCodeLabel]]</label>
+
+      <div class="buttons">
+        <input name="show-full-code" type="radio" value="true" checked>
+        <label>[[yesLabel]]</label>
+
+        <input name="show-full-code" type="radio" value="false">
+        <label>[[noLabel]]</label>
+      </div>
+    </div>
+
+    <div id="auto-pick" class="checkbox-container">
+      <label>[[autoPickingLabel]]</label>
+      <input type="checkbox" id="auto-pick-input">
+    </div>
+    <div id="ble-mode" class="ble-container" style="display: none">
+      <label>BLEMODE</label>
+      <img id="ble-img" style="height: 150px; width: 150px"></img>
+    </div>
+  </template>
+
+  <script>
+    class MpsSettingTab extends MpsSettingMixin(MpsNetworkInfoMixin(Polymer.Element)) {
+      static get is() { return 'mps-setting-tab' }
+
+      static get properties() {
+        return {
+          /**
+           * @description 자동 피킹 라벨
+           */
+          autoPickingLabel: {
+            type: String,
+            value: () => t('label.auto_picking')
+          },
+
+          /**
+           * @description 작업 대상 외 주문 보기
+           */
+          othersOrdLabel: {
+            type: String,
+            value: () => t('label.show_others_order')
+          },
+
+          /**
+           * @description 보이기 라벨
+           */
+          showLabel: {
+            type: String,
+            value: () => t('label.show')
+          },
+
+          /**
+           * @description 숨기기 라벨
+           */
+          hideLabel: {
+            type: String,
+            value: () => t('label.hide')
+          },
+
+          /**
+           * @description 투입 코드 모두 보기 라벨
+           */
+          showFullCodeLabel: {
+            type: String,
+            value: () => t('label.show_full_code')
+          },
+
+          isLeftRight: {
+            type: String,
+            value: false
+          },
+
+          chuteSideSetResponse: {
+            type: Object,
+            observer: '_chuteSideSetResponseChanged'
+          },
+
+          /**
+           * @description 예 라벨
+           */
+          yesLabel: {
+            type: String, value: () => t('label.yes')
+          },
+
+          /**
+           * @description 아니오 라벨
+           */
+          noLabel: {
+            type: String, value: () => t('label.no')
+          },
+
+          /**
+           * @description device type
+           */
+          deviceType: {
+            type: String,
+            value: 'TABLET'
+          },
+
+          /**
+           * @description 나와 관계 없는 주문 보기 설정 값
+           */
+          showOthersOrder: {
+            type: Boolean,
+            value: () => JSON.parse(localStorage.getItem('setting.showOthersOrder'))
+          },
+
+          /**
+           * @description 나와 관계 없는 주문 보기 설정 값 변경을 위한 localStorage key
+           */
+          showOthersOrderLSKey: {
+            type: String,
+            value: 'setting.showOthersOrder'
+          },
+
+          /**
+           * @description 투입 코드 모두 보기 설정 값
+           */
+          showFullCode: {
+            type: Boolean,
+            value: () => JSON.parse(localStorage.getItem('setting.showFullCode'))
+          },
+
+          /**
+           * @description 투입 코드 모두 보기 설정 값 변경을 위한 localStorage key
+           */
+          showFullCodeLSKey: {
+            type: String,
+            value: 'setting.showFullCode'
+          },
+
+          /**
+           * @description 자동 피킹 여부 설정 값
+           */
+          autoPicking: {
+            type: Boolean,
+            value: () => JSON.parse(localStorage.getItem('setting.autoPicking'))
+          },
+
+          /**
+           * @description 자동 피킹 여부 설정 값 변경을 위한 localStorage key
+           */
+          autoPickingLSKey: {
+            type: String,
+            value: 'setting.autoPicking'
+          },
+          srcUrl: {
+            type: String,
+            value: JSON.parse(localStorage.getItem('setting.srcUrl'))
+          }
+        }
+      }
+
+      connectedCallback() {
+        super.connectedCallback();
+        this._setIpAddress();
+        this._getRegionItems();
+        this._setDefaultValues();
+        this._getJobItems();
+        this._hiddenDiv();
+      }
+
+      _chuteSideSetResponseChanged(chuteSideSetResponse) {
+        if (!chuteSideSetResponse) {
+          return;
+        }
+
+        if (chuteSideSetResponse.value === 'LEFT_RIGHT') {
+          this.isLeftRight = true;
+        } else {
+          this.isLeftRight = false;
+        }
+      }
+
+      /**
+       * @description TABLET의 현재 IP 주소를 조회하여 localStorage에 저장함
+       */
+      _setIpAddress() {
+        this.getIpAddress(networInfo => {
+          this._setLocalStorage('setting.ipAddress', networInfo.ip);
+        }, () => {
+          openAlert({
+            title: t('error.SETTING_ERROR'),
+            text: t('text.check_wifi_setting')
+          });
+        });
+      }
+
+      /**
+       * @description 설정 항목들의 기본값을 저장하기 위한 함수
+       */
+      _setDefaultValues() {
+        this._setShowOthersOrderDefaultValue();
+        this._setWorkLocDefaultValue();
+        this._setFullCodeDefaultValue();
+        this._setAutoPickingDefaultValue();
+      }
+
+      /**
+       * @description connectedCallback에 의해 호출 되며 현재 설정된 설정 값을
+       * 로컬스토리지를 통해 조회하고 초기화함
+       */
+      _setShowOthersOrderDefaultValue() {
+        const showOthersOrderOpts = this._getShowOthersOrderOpts();
+        showOthersOrderOpts.forEach(showOthersOrderOpt => {
+          if(this.showOthersOrder === JSON.parse(showOthersOrderOpt.value)) {
+            showOthersOrderOpt.checked = true;
+          }
+        });
+      }
+
+      /**
+       * @description connectedCallback에 의해 호출 되며 현재 설정된 설정 값을
+       * 로컬스토리지를 통해 조회하고 초기화함
+       */
+      _setFullCodeDefaultValue() {
+        const showFullCodeOpts = this._getShowFullCodeOpts();
+        showFullCodeOpts.forEach(showFullCodeOpt => {
+          if(this.showFullCode === JSON.parse(showFullCodeOpt.value)) {
+            showFullCodeOpt.checked = true;
+          }
+        });
+      }
+
+      /**
+       * @description connectedCallback에 의해 호출 되며 현재 설정된 설정 값을
+       * 로컬스토리지를 통해 조회하고 초기화함
+       */
+      _setAutoPickingDefaultValue() {
+        const autoPickingInput = this._getAutoPickingInput();
+        autoPickingInput.checked = this.autoPicking;
+      }
+
+      /**
+       * @description 설정 저장을 수행함
+       * 설정 저장 전 updateSetting을 통해 서버에 변경 사항을 저장함
+       * update 요청이 정상적으로 호출 되면 로컬스토리지의 값을 업데이트함
+       */
+      saveSetting() {
+        return new Promise((resolve, reject) => {
+          this.updateSetting().then(() => {
+            this._setLocalStorage(this.regionCodeLSKey, this._getRegionCombo().selectedOptions[0].value);
+            this._setLocalStorage(this.regionNameLSKey, this._getRegionCombo().selectedOptions[0].innerText);
+            this._setLocalStorage(this.zoneCodeLSKey, this._getZoneCombo().selectedOptions[0].value);
+            this._setLocalStorage(this.workLocLSKey, this._getSelectedOpt(this._getWorkLocationOpts()).value);
+            this._setLocalStorage(this.workLocNameLSKey, this._getSelectedOpt(this._getWorkLocationOpts()).getAttribute('work-loc-name'));
+            this._setLocalStorage(this.showOthersOrderLSKey, JSON.parse(this._getSelectedOpt(this._getShowOthersOrderOpts()).value));
+            this._setLocalStorage(this.showFullCodeLSKey, JSON.parse(this._getSelectedOpt(this._getShowFullCodeOpts()).value));
+            this._setLocalStorage(this.autoPickingLSKey, this._getAutoPickingInput().checked);
+            this._setLocalStorage(this.jobNameLSKey, this._getJobCombo().selectedOptions[0].value);
+            resolve();
+          })
+          .catch(error => {
+            reject(error);
+          })
+        });
+      }
+
+      /**
+       * @description 설정 값 변경을 서버에 요청함
+       */
+      updateSetting() {
+        return new Promise((resolve, reject) => {
+          const regionCombo = this._getRegionCombo();
+          const regionCode = regionCombo.selectedOptions.length === 1 ? regionCombo.selectedOptions[0].value : null;
+          const zoneCombo = this._getZoneCombo()
+          const zoneCode = zoneCombo.selectedOptions.length === 1 ? zoneCombo.selectedOptions[0].value : null;
+
+          if(!regionCode || !zoneCode) {
+            throw {
+              detail: {
+                code: t('error.SETTING_ERROR'),
+                msg: !regionCode ? t('text.region_code_is_not_set') : t('text.zone_code_is_not_set')
+              }
+            };
+          }
+
+          const updateSettingAjax = this._getUpdateSettingAjax();
+          updateSettingAjax.curl = `/${this.deviceType.toLowerCase()}/update/setting`
+          updateSettingAjax.params = {
+            region_cd: regionCode,
+            equip_zone_cd: zoneCode
+          };
+
+          updateSettingAjax.addEventListener('sys-ajax-response', () => {
+            resolve();
+          });
+          updateSettingAjax.addEventListener('sys-ajax-error', error => {
+            reject(error);
+          });
+
+          updateSettingAjax.generateRequest();
+        });
+      }
+
+      /**
+       * @description return 나와 관계 없는 주문 보기 input elements
+       */
+      _getShowOthersOrderOpts() {
+        return Array.from(this.$['other-order'].querySelectorAll('input[name=others-order]'));
+      }
+
+      /**
+       * @description return 투입 코드 모두 보기 input elements
+       */
+      _getShowFullCodeOpts() {
+        return Array.from(this.$['show-full-code'].querySelectorAll('input[name=show-full-code]'));
+      }
+
+      /**
+       * @description return 자동 피킹 input element
+       */
+      _getAutoPickingInput() {
+        return this.$['auto-pick-input'];
+      }
+
+      _hiddenDiv(){
+        if(this.$['job-combo'].value == 'QPS' || this.jobName == 'QPS'){
+          this._setLocalStorage('setting.isQps', true);
+          this.$['other-order'].setAttribute('style',`display: none`);
+          this.$['auto-pick'].setAttribute('style',`display: none`);
+          this.$['ble-mode'].setAttribute('style',`display: flex;`);
+          this.$['ble-img'].setAttribute('src',this.srcUrl+'/images/ble-mode.png');
+        }else{
+          this._setLocalStorage('setting.isQps', false);
+          this.$['other-order'].setAttribute('style',`display: flex`);
+          this.$['auto-pick'].setAttribute('style',`display: flex`);
+          this.$['ble-mode'].setAttribute('style',`display: none`);
+        }
+      }
+    }
+
+    customElements.define(MpsSettingTab.is, MpsSettingTab);
+  </script>
+</dom-module>

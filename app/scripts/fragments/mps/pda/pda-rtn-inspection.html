@@ -1,0 +1,777 @@
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+
+<link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
+
+<link rel="import" href="../mps-adjust-qty-dialog.html">
+<link rel="import" href="../../../units/mps/mps-barcode-field.html">
+<link rel="import" href="../../../units/mps/mps-order-list.html">
+<link rel="import" href="../../../units/mps/job-process-summary.html">
+
+<!--
+  PDA > 반품 검수 화면
+-->
+<dom-module id="pda-rtn-inspection">
+  <template>
+    <style include="shared-styles mps-setting-styles">
+      :host {
+        display: flex;
+        flex-direction: column;
+        padding: 10px;
+        height: calc(100% - 20px);
+      }
+      #container {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        padding: 5px;
+        background-color: #5A6377;
+        border-radius: var(--things-default-border-radius);
+        color: rgba(255,255,255,.8);
+      }
+      #region-info-container {
+        display: flex;
+        font-size: .8rem;
+        border-bottom: 1px solid rgba(255,255,255,.2);
+      }
+      #region-info-container label, #region-info-container span{
+        flex: 1;
+        text-align: center;
+      }
+      #input-container {
+        display: flex;
+        flex-direction: column;
+      }
+      .input-row {
+        display: flex;
+        flex-direction: row;
+        margin-bottom: 5px;
+      }
+      .input-row .label {
+        vertical-align: middle;
+        font-size:.8rem;
+        margin: 8px 5px auto auto;
+        min-width: 25%;
+        text-align: right;
+      }
+      .input-row input, mps-auto-popup-input {
+        width: 75%;
+      }
+      mps-list{
+        flex: 1;
+      }
+      #total-qty {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        margin-top: 5px;
+        background-color:rgba(204, 5, 5, 0.2);
+        border-radius:var(--things-default-border-radius);
+        font-size: .8rem;
+        padding: 5px 5px 5px 5px
+      }
+      #total-qty span {
+        margin-left: 15px;
+      }
+      #total-qty span.qty {
+        margin: auto !important;
+      }
+      button {
+        --operator-default-btn: {
+          background: #7f95bd;
+          background: linear-gradient(to bottom, #7f95bd 0%, #4e638a 100%);
+          /* border:none; */
+          border-top:.06rem solid #96b2e6;
+          border-bottom:.2rem solid #3a4b69;
+          /* border-radius:12px; */
+          margin:0;
+          padding:.3rem 1rem;
+          /* min-width:100px; */
+          color: #fff;
+          text-shadow: 0px .03rem .03rem rgba(0, 0, 0, 0.4);
+          font-size:.8rem;
+          font-family: 'cj-font';
+          outline: none;
+        }
+      }
+      .col2 {
+        margin-top: 2px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .radio-btn-container {
+        display: grid;
+        grid-template-columns: 100px 1fr;
+      }
+    </style>
+
+    <!-- 박스 ID로 박스 정보 조회를 위한 Ajax -->
+    <sys-ajax
+      id="box-info-ajax"
+      method="GET"
+      content-type="application/json"
+      last-response="{{boxInfo}}"
+      on-sys-ajax-error="_handleAjaxError">
+    </sys-ajax>
+
+    <!-- 스캔한 ID의 타입을 판단하기 위한 Ajax -->
+    <sys-ajax
+      id="find-scan-type-ajax"
+      method="GET"
+      content-type="application/json"
+      on-sys-ajax-response="_handleScanTypeFoundSuccess"
+      on-sys-ajax-error="_handleAjaxError">
+    </sys-ajax>
+
+    <!-- 로케이션 - 박스 ID 요청 Ajax -->
+    <sys-ajax
+      id="box-mapping-ajax"
+      method="PUT"
+      content-type="application/json"
+      on-sys-ajax-response="_handleBoxMappingSuccess"
+      on-sys-ajax-error="_handleAjaxError">
+    </sys-ajax>
+
+    <!-- Fullbox 요청 Ajax -->
+    <sys-ajax
+      id="request-fullbox-ajax"
+      method="POST"
+      content-type="application/json"
+      on-sys-ajax-response="_handleRequestFullboxSuccess"
+      on-sys-ajax-error="_handleAjaxError">
+    </sys-ajax>
+
+    <!-- 화면 컨테이너 -->
+    <div id="container">
+      <div id="input-container">
+        <!-- 상품 코드 혹은 상품 바코드 입력 컴포넌트 행 -->
+        <mps-barcode-field id="input" timeout="2000" value="{{skuBarCd}}"
+          button-text-callback="[[_skuButtonTextCallback]]" selected-item="{{findSkuResponse}}"
+          on-keypress="_handleBarcodeKeypress">
+        </mps-barcode-field>
+
+        <!-- 배치 ID 표시 컴포넌트 행 -->
+        <div class="input-row">
+          <span class="label">[[batchIdLabel]]</span>
+          <input id="batch-id" value$="[[batchId]]" readonly>
+        </div>
+
+        <!-- 박스 ID 표시 컴포넌트 행 -->
+        <div class="input-row">
+          <span class="label">[[boxIdLabel]]</span>
+          <input id="box-id" value$="[[boxId]]" readonly>
+        </div>
+
+        <!-- 고객사 코드 표시 컴포넌트 행 -->
+        <div class="input-row">
+          <span class="label">[[comCdLabel]]</span>
+          <input id="com-cd" value$="[[comCd]]" readonly>
+        </div>
+
+        <!-- 로케이션 표시 컴포넌트 행 -->
+        <div class="input-row">
+          <span class="label">[[locCdLabel]]</span>
+          <input id="loc-cd" value$="[[locCd]]" readonly>
+        </div>
+
+        <!-- 총 SKU 수 컴포넌트 행 -->
+        <div class="input-row">
+          <span class="label">[[skuCntLabel]]</span>
+          <input id="sku-cnt" value$="[[skuCnt]]" readonly>
+        </div>
+
+        <!-- 상품 코드 표시 컴포넌트 행 -->
+        <div class="input-row">
+          <span class="label">[[skuCdLabel]]</span>
+          <input id="sku-cd" value$="[[skuCd]]" readonly>
+        </div>
+
+        <!-- 상품 명 표시 컴포넌트 행 -->
+        <div class="input-row">
+          <span class="label">[[skuNmLabel]]</span>
+          <input id="sku-nm" value$="[[skuNm]]" readonly>
+        </div>
+
+        <!-- 총 확정 수 컴포넌트 행 -->
+        <div class="input-row">
+          <span class="label">[[boxQtyLabel]]</span>
+          <input id="box-qty" value$="[[boxQty]]" readonly>
+        </div>
+
+        <!-- 메시지 컴포넌트 행 -->
+        <div class="input-row">
+          <span class="label">[[msgLabel]]</span>
+          <input id="msg" value$="[[msg]]" readonly>
+        </div>
+
+        <!-- 작업 유형 컴포넌트 행 -->
+        <div class="radio-btn-container">
+          <label>[[jobTypeLabel]]</label>
+          <div class="buttons">
+            <input value="RTN" name="job-type" type="radio" job-name$="[[rtnTypeLabel]]"
+              on-click="_handleJobTypeClick" checked>
+            <label>[[rtnTypeLabel]]</label>
+            <input value="RTN3" name="job-type" type="radio" job-name$="[[rtn3TypeLabel]]"
+              on-click="_handleJobTypeClick">
+            <label>[[rtn3TypeLabel]]</label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 버튼 컨테이너 -->
+    <div class="col2">
+      <button id='btn-fullbox' on-click="fullbox" hidden>[[btnFullboxLabel]]</button>
+      <button id='btn-reset' on-click="resetScreen">[[btnResetLabel]]</button>
+    </div>
+  </template>
+
+  <script>
+    class PdaRtnInspection extends Polymer.Element {
+      static get is() { return 'pda-rtn-inspection' }
+
+      static get properties() {
+        return {
+          /**
+           * 화면 표시 여부
+           ****************
+           * @type {String}
+           */
+          visible: {
+            type: Boolean,
+            observer: '_visibleChanged'
+          },
+
+          /**
+           * 배치 ID 라벨
+           ****************
+           * @type {String}
+           */
+          batchIdLabel: {
+            type: String,
+            value: () => t('label.job_batch')
+          },
+
+          /**
+           * 박스 ID 라벨
+           ****************
+           * @type {String}
+           */
+          boxIdLabel: {
+            type: String,
+            value: () => t('label.box_id')
+          },
+
+          /**
+           * 고객사 코드 라벨
+           ****************
+           * @type {String}
+           */
+          comCdLabel: {
+            type: String,
+            value: () => t('label.com_cd')
+          },
+
+          /**
+           * 상품 코드 라벨
+           ****************
+           * @type {String}
+           */
+          skuCdLabel: {
+            type: String,
+            value: () => t('label.sku_cd')
+          },
+
+          /**
+           * 상품 명 라벨
+           ****************
+           * @type {String}
+           */
+          skuNmLabel: {
+            type: String,
+            value: () => t('label.sku_nm')
+          },
+
+          /**
+           * 로케이션 라벨
+           ****************
+           * @type {String}
+           */
+          locCdLabel: {
+            type: String,
+            value: () => t('label.location')
+          },
+
+          /**
+           * 박스 수량 라벨
+           ****************
+           * @type {String}
+           */
+          boxQtyLabel: {
+            type: String,
+            value: () => t('label.box_qty')
+          },
+
+          /**
+           * 상품 수량 라벨
+           ****************
+           * @type {String}
+           */
+          skuCntLabel: {
+            type: String,
+            value: () => t('label.sku_cnt')
+          },
+
+          /**
+           * 작업 유형 라벨
+           ****************
+           * @type {String}
+           */
+          jobTypeLabel: {
+            type: String,
+            value: () => t('label.job_nm')
+          },
+
+          /**
+           * 반품 유형 라벨
+           ****************
+           * @type {String}
+           */
+          rtnTypeLabel: {
+            type: String,
+            value: () => t('label.job_type_rtn')
+          },
+
+          /**
+           * 무오더 반품 라벨
+           ****************
+           * @type {String}
+           */
+          rtn3TypeLabel: {
+            type: String,
+            value: () => t('label.job_type_rtn3')
+          },
+
+          /**
+           * 메시지 라벨
+           ****************
+           * @type {String}
+           */
+          msgLabel: {
+            type: String,
+            value: () => t('label.message')
+          },
+
+          /**
+           * 초기화 버튼 라벨
+           ****************
+           * @type {String}
+           */
+          btnResetLabel: {
+            type: String,
+            value: () => t('button.reset')
+          },
+
+          /**
+           * Fullbox 버튼 라벨
+           ****************
+           * @type {String}
+           */
+          btnFullboxLabel: {
+            type: String,
+            value: () => t('button.full_box')
+          },
+
+          /**
+           * 박스 정보
+           ****************
+           * @type {Object}
+           */
+          boxInfo: {
+            type: Object,
+            observer: '_boxInfoChanged'
+          },
+
+          /**
+           * 배치 ID 값
+           ****************
+           * @type {String}
+           */
+          batchId: {
+            type: String
+          },
+
+          /**
+           * 박스 ID 값
+           ****************
+           * @type {String}
+           */
+          boxId: {
+            type: String
+          },
+
+          /**
+           * 호기 코드 값
+           ****************
+           * @type {String}
+           */
+          regionCd: {
+            type: String
+          },
+
+          /**
+           * 로케이션 값
+           ****************
+           * @type {String}
+           */
+          locCd: {
+            type: String
+          },
+
+          /**
+           * 고객사 코드 값
+           ****************
+           * @type {String}
+           */
+          comCd: {
+            type: String
+          },
+
+          /**
+           * 상품 코드 값
+           ****************
+           * @type {String}
+           */
+          skuCd: {
+            type: String
+          },
+
+          /**
+           * 상품 명 값
+           ****************
+           * @type {String}
+           */
+          skuNm: {
+            type: String
+          },
+
+          /**
+           * 박스 내 총 상품 종류 수
+           ****************
+           * @type {String}
+           */
+          skuCnt: {
+            type: String
+          },
+
+          /**
+           * 박스 내 총 상품 수량
+           ****************
+           * @type {String}
+           */
+          boxQty: {
+            type: Number,
+            value: 0
+          },
+
+          /**
+           * 화면 작업 유형
+           ****************
+           * @type {String}
+           */
+          jobType: {
+            type: String,
+            value: 'RTN'
+          },
+
+          /**
+           * 메시지 값
+           ****************
+           * @type {String}
+           */
+          msg: {
+            type: String
+          }
+        }
+      }
+
+      /**
+       * @description 화면 표시 / 숨김 변동이 생긴 경우
+       *********************
+       * @param {Boolean} visible
+       */
+      _visibleChanged(visible) {
+        if (visible) {
+          this.resetScreen();
+        }
+      }
+
+      /**
+       * @description 박스 정보 응답 후 ...
+       *********************
+       * @param {Object} boxInfo 박스 정보
+       */
+      _boxInfoChanged(boxInfo) {
+        this.resetScreen(true);
+
+        if (boxInfo) {
+          this.batchId = boxInfo.batch_id;
+          this.comCd = boxInfo.com_cd;
+          this.locCd = boxInfo.loc_cd;
+          this.regionCd = boxInfo.region_cd;
+          this.boxQty = boxInfo.picked_qty;
+          this.boxId = boxInfo.box_id;
+          let skuCd = null, skuNm = null;
+
+          // 1. 로케이션 정보라면
+          if(boxInfo.is_location && boxInfo.is_location === true) {
+            this.skuCd = boxInfo.sku_cd;
+            if(this.boxQty && this.boxQty > 0) {
+              if(this.boxId) {
+                this.msg = `[상품] Full 처리할 수량 : ${this.boxQty}개`;
+                this.$['btn-fullbox'].hidden = false;
+              } else {
+                this.msg = '[상품] 박스 ID를 스캔하여 박스 매핑하세요.';
+                this.$['btn-fullbox'].hidden = true;
+              }
+
+            } else {
+              this.msg = '[상품] Full 처리할 수량 없음';
+              this.$['btn-fullbox'].hidden = true;
+            }
+
+          // 2. 박스 정보라면
+          } else {
+            this.skuCnt = boxInfo.box_sku_cnt;
+            this.skuCd = boxInfo.pack_type;
+            this.skuNm = boxInfo.order_group;
+            this.msg = '[박스] 정상 처리 된 박스';
+            this.$['btn-fullbox'].hidden = true;
+          }
+        }
+      }
+
+      /**
+       * @description 상품 바코드 박스에서 엔터 이벤트 발생시
+       *********************
+       * @param {Object} e 엔터 이벤트
+       */
+      _handleBarcodeKeypress(e) {
+        if (e.keyCode === 13) {
+          var value = e.currentTarget.getValue();
+
+          if(value) {
+            // 스캔한 값이 유효한 지 체크
+            if(value.trim().length <= 4) {
+              showToast('error', '유효하지 않은 바코드입니다.');
+            // 스캔한 값이 어떤 유형인지 체크
+            } else {
+              var ajax = this.$['find-scan-type-ajax'];
+              ajax.curl = `/pda_process/find_input_type/${this.jobType}/${value}`;
+              ajax.generateRequest();
+            }
+          }
+        }
+      }
+
+      /**
+       * @description 작업 유형 라디오 버튼 클릭시
+       ****************
+       * @param {Object} e
+       */
+      _handleJobTypeClick(e) {
+        this.jobType = e.currentTarget.value;
+      }
+
+      /**
+       * @description 박스 매핑 성공 후 처리 핸들러
+       *********************
+       * @param {Object} event 박스 매핑 결과 응답 정보
+       */
+      _handleBoxMappingSuccess(event) {
+        var response = event.detail;
+
+        if (response && response.box_id) {
+          this.boxId = response.box_id;
+          this.boxQty = response.max_stock_qty;
+          this.$['btn-fullbox'].hidden = false;
+          this.msg = '로케이션-박스 매핑 완료. 풀박스 처리하세요.';
+        }
+      }
+
+      /**
+       * @description 투입 ID 스캔 유형 조회 이후 핸들러
+       *********************
+       * @param {Object} event
+       */
+      _handleScanTypeFoundSuccess(event) {
+        if(!event || !event.detail || !event.detail.scan_type) return;
+
+        var scanType = event.detail.scan_type;
+        var inputId = event.detail.input_id;
+
+        // 1. 스캔 유형이 박스 ID 이면 ...
+        if(scanType === 'BOX_ID') {
+          if(this.regionCd && this.skuCd && this.locCd) {
+            // 박스 정보 조회
+            if(this.boxId && this.boxId.trim().length == 16) {
+              this._findBoxInfo(inputId);
+            // 로케이션 - 박스 매핑
+            } else {
+              this.locationBoxIdMapping(this.regionCd, this.locCd, inputId);
+            }
+          } else {
+            // 박스 정보 조회
+            this._findBoxInfo(inputId);
+          }
+
+        // 2. 스캔 유형이 로케이션 코드 이면 ...
+        } else if(scanType === 'SKU_CD' || scanType === 'SKU_BARCD') {
+          // 상품 코드로 상품과 매핑된 로케이션 및 로케이션 내 분류확정 수량 정보 조회
+          this._findBoxInfo(inputId);
+
+        // 3. 그 외라면
+        } else {
+          this.msg = '유효하지 않은 바코드입니다.';
+          showToast('error', this.msg);
+        }
+      }
+
+      /**
+       * @description 풀박스 성공 후 처리 핸들러
+       *********************
+       * @param {Object} event 풀 박스 결과 응답 정보
+       */
+      _handleRequestFullboxSuccess(event) {
+        this.resetScreen();
+        showToast('info', t('text.processed'));
+      }
+
+      /**
+       * @description 서비스 호출 에러 핸들러
+       *********************
+       * @param {Object} e
+       */
+      _handleAjaxError(e) {
+        this.msg = (e && e.detail && e.detail.msg) ? e.detail.msg : '';
+        this._initFocus();
+      }
+
+      /**
+       * @description 박스 정보 조회
+       *********************
+       * @param {String} value 박스 정보
+       */
+      _findBoxInfo(value) {
+        var ajax = this.$['box-info-ajax'];
+        ajax.curl = `/pda_process/${this.jobType}/check_box/${value}/true`;
+        ajax.generateRequest();
+      }
+
+      /**
+       * @description 포커스를 Input 박스에 이동
+       ******************
+       */
+      _initFocus() {
+        this.$.input.select();
+      }
+
+      /**
+       * @description 분할 풀 박스 처리 ...
+       *********************
+       * @param {String} boxId 박스 ID
+       * @param {String} locCd 로케이션
+       * @param {Number} totalPickedQty 분할 풀 박스 수량
+       */
+      _showSplitFullboxPopup(boxId, locCd, totalPickedQty) {
+        if (!boxId || totalPickedQty <= 0) return;
+
+        const adjustPopup = document.createElement('mps-adjust-qty-dialog');
+        adjustPopup.id = 'fullboxPopup';
+        adjustPopup.locCd = locCd;
+        adjustPopup.jobType = this.jobType;
+        adjustPopup.isNumberUpDown = true;
+        this.adjustPopup = adjustPopup;
+
+        setTimeout(() => {
+          MPS_UTIL.showPopup(t('button.adjust_qty'), adjustPopup, 'fit', 'fit', () => {
+            adjustPopup.setCurrentQty(totalPickedQty);
+            adjustPopup.adjustQty = () => {
+              let adjustQty = parseInt(adjustPopup._getAdjustQtyInput().value);
+
+              // 조정 수량이 원래 확정 수량보다 크다면 에러
+              if (adjustQty > totalPickedQty) {
+                adjustPopup._getAdjustQtyInput().style = 'color: red';
+                window.SOUND.playErrorSound();
+              // 조정 수량이 원래 확정 수량보다 작다면 분할 Fullbox 요청
+              } else {
+                var ajax = this.$['request-fullbox-ajax'];
+                ajax.curl = '/pda_process/rtn/fullbox_by_split';
+                ajax.body = { loc_cd : locCd, max_stock_qty : adjustQty, box_id : boxId };
+                ajax.generateRequest();
+                adjustPopup.closeDialog();
+              }
+            };
+          }, () => {
+            this._initFocus();
+            this.adjustPopup = null;
+            this.msg = null;
+          })
+        }, 200);
+      }
+
+      /**
+       * @description 초기화
+       *********************
+       * @param {Boolean} exceptBoxInfo boxInfo 제외 후 리셋인지 여부
+       */
+      resetScreen(exceptBoxInfo) {
+        this.batchId = '';
+        this.boxId = '';
+        this.comCd = '';
+        this.regionCd = '';
+        this.locCd = '';
+        this.skuCd = '';
+        this.skuNm = '';
+        this.skuCnt = 0;
+        this.boxQty = 0;
+        this.msg = '';
+        this._initFocus();
+        this.$['btn-fullbox'].hidden = true;
+
+        if(!(exceptBoxInfo && exceptBoxInfo === true)) {
+          this.boxInfo = null;
+        }
+      }
+
+      /**
+       * @description 로케이션 - 박스 ID 매핑 요청
+       *********************
+       * @param {String} regionCd
+       * @param {String} locCd
+       * @param {String} boxId
+       */
+      locationBoxIdMapping(regionCd, locCd, boxId) {
+        var ajax = this.$['box-mapping-ajax'];
+        ajax.curl = `/pda_process/assign/location_box/${regionCd}/${locCd}/${boxId}?skip_region_check=true&skip_box_mapping=true`;
+        ajax.generateRequest();
+      }
+
+      /**
+       * @description Fullbox 처리
+       *********************
+       */
+      fullbox() {
+        if (this.boxId && this.locCd && this.boxQty && this.boxQty > 0) {
+          // 분할 Fullbox 팝업을 띄워서 수량 조정 후 Fullbox
+          this._showSplitFullboxPopup(this.boxId, this.locCd, this.boxQty);
+        }
+      }
+    }
+
+    customElements.define(PdaRtnInspection.is, PdaRtnInspection);
+  </script>
+
+</dom-module>

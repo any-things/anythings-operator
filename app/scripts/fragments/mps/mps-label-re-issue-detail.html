@@ -1,0 +1,233 @@
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+
+<!--
+  Tablet > DAS 라벨 재발행 팝업
+  PDA > DAS 라벨 재발행 팝업 공통 화면
+-->
+
+<dom-module id="mps-label-re-issue-detail">
+  <template>
+    <style include="shared-styles">
+      :host {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        font-size: .8rem;
+      }
+      #container {
+        display: flex;
+        flex-direction: column;
+        margin: 5vw;
+      }
+      .input-container {
+        display: flex;
+        flex-direction: column;
+        border-radius:var(--things-default-border-radius);
+        margin-bottom: 3vh;
+      }
+      .input-container input{
+        background-color: #efefef;
+        border: 1px solid rgba(0,0,0,.1);
+        color: #333;
+        flex: 1;
+      }
+      .input-container input#invoice-input {
+        text-align: right;
+      }
+    </style>
+
+    <!-- 송장 라벨 재발행 -->
+    <sys-ajax
+      id="invoke-print-ajax"
+      method="POST"
+      content-type="application/json"
+      on-sys-ajax-response="_closeDialog">
+    </sys-ajax>
+
+    <div id="container">
+      <div class="input-container">
+        <label class="label">
+          [[custNameLabel]]
+        </label>
+        <input id="cust-nm-input" readonly>
+      </div>
+
+      <div class="input-container">
+        <label class="label">
+          [[locationLabel]]
+        </label>
+        <input id="loc-cd-input" readonly>
+      </div>
+
+      <div class="input-container">
+        <label class="label">
+          [[invoiceLabel]]
+        </label>
+        <input id="invoice-input" readonly>
+      </div>
+
+      <div id="button-container">
+        <button on-click="_closeDialog">[[closeBtnLabel]]</button>
+        <button on-click="_invokePrint">[[invokePrintBtnLabel]]</button>
+      </div>
+    </div>
+  </template>
+
+  <script>
+    class MpsLabelReIssueDetail extends Polymer.Element {
+      static get is() { return 'mps-label-re-issue-detail' }
+      static get properties() {
+        return {
+          /**
+           * 거래처 명 label
+           */
+          custNameLabel: {
+            type: String,
+            value: () => t('label.cust_cd')
+          },
+
+          /**
+           * 로케이션  label
+           */
+          locationLabel: {
+            type: String,
+            value: () => t('label.loc_cd')
+          },
+
+          /**
+           * 송장 번호 label
+           */
+          invoiceLabel: {
+            type: String,
+            value: () => t('label.label_cd')
+          },
+
+          /**
+           * 닫기 버튼 label
+           */
+          closeBtnLabel: {
+            type: String,
+            value: () => t('button.close')
+          },
+
+          /**
+           * 재발행 버튼 label
+           */
+          invokePrintBtnLabel: {
+            type: String,
+            value: () => t('button.reprint')
+          },
+
+          /**
+           * 거래처 명 label
+           */
+          custName: {
+            type: String,
+            observer: '_custNameChanged'
+          },
+
+          /**
+           * 박스 실적 ID
+           */
+          boxResultId: {
+            type: String
+          },
+
+          /**
+           * print 대상 송장 번호
+           */
+          invoiceId: {
+            type: String,
+            observer: '_invoiceIdChanged'
+          },
+
+          /**
+           * print 대상 송장 번호
+           */
+          locCd: {
+            type: String,
+            observer: '_locCdChanged'
+          }
+        }
+      }
+
+      /**
+       * custNameChanged event handler
+       * custName이 변경되면 cust-nm-input의 값을 변경함
+       */
+      _custNameChanged(custName) {
+        const custNameInput = this._getCustNameInput();
+        custNameInput.value = custName;
+      }
+
+      /**
+       * invoiceIdChanged event handler
+       * invoiceId가 변경되면 invoice-input의 값을 변경함
+       */
+      _invoiceIdChanged(invoiceId) {
+        const invoiceInpupt = this._getInvoiceInput();
+        invoiceInpupt.value = invoiceId;
+      }
+
+      /**
+       * locCdChanged event handler
+       * locCd가 변경되면 loc-cd-input의 값을 변경함
+       */
+      _locCdChanged(locCd) {
+        const locInpupt = this._getLocCdInput();
+        locInpupt.value = locCd;
+      }
+
+      /**
+       * invoke print button click event handler
+       * invoiceId를 바탕으로 라벨 재 발행 요청을 보냄
+       */
+      _invokePrint() {
+        const invokePrintAjax = this._getInvokePrintAjax();
+        invokePrintAjax.curl = `/tablet_process/box/reprint/${this.boxResultId}`;
+        invokePrintAjax.generateRequest();
+      }
+
+      /**
+       * close button click event handler
+       * 팝업 닫기
+       */
+      _closeDialog() {
+        document.dispatchEvent(new CustomEvent('close-dialog'));
+      }
+
+      /**
+       * @return cust-nm-input element
+       */
+      _getCustNameInput() {
+        return this.$['cust-nm-input'];
+      }
+
+      /**
+       * @return invoice-input element
+       */
+      _getInvoiceInput() {
+        return this.$['invoice-input'];
+      }
+
+      /**
+       * @return loc-cd-input element
+       */
+      _getLocCdInput() {
+        return this.$['loc-cd-input'];
+      }
+
+      /**
+       * @return invoke-print-ajax element
+       */
+      _getInvokePrintAjax() {
+        return this.$['invoke-print-ajax'];
+      }
+    }
+
+    customElements.define(MpsLabelReIssueDetail.is, MpsLabelReIssueDetail);
+  </script>
+</dom-module>

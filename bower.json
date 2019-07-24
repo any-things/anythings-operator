@@ -1,0 +1,40 @@
+{
+  "name": "cj-mps-mobile",
+  "homepage": "http://elements.hatiolab.com/",
+  "authors": [
+    "hatio lab"
+  ],
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "license": "http://license.hatiolab.com/EULA",
+  "dependencies": {
+    "polymer": "Polymer/polymer#^2.6.0",
+    "app-layout": "polymerelements/app-layout#^2.1.0",
+    "app-route": "polymerelements/app-route#^2.1.0",
+    "app-localize-behavior": "polymerelements/app-localize-behavior#^2.0.1",
+    "paper-spinner": "polymerelements/paper-spinner#^2.1.0",
+    "iron-localstorage": "polymerelements/iron-localstorage#^2.1.1",
+    "iron-form": "polymerelements/iron-form#^2.3.0",
+    "iron-pages": "polymerelements/iron-pages#^2.1.0",
+    "iron-icons": "polymerelements/iron-icons#^2.1.1",
+    "vaadin-combo-box": "vaadin/vaadin-combo-box#^3.0.5",
+    "crypto-js": "^3.1.9",
+    "things-license-checker-min": "ThingsElements/things-license-checker-min#^2.4.0",
+    "chart.js": "Chart.js#2.4.0",
+    "things-scene-chartjs": "ThingsElements/things-scene-chartjs",
+    "things-scene-table": "ThingsElements/things-scene-table",
+    "things-scene-progressbar": "ThingsElements/things-scene-progressbar",
+    "things-scene-half-roundrect": "ThingsElements/things-scene-half-roundrect",
+    "things-scene-gauge": "ThingsElements/things-scene-gauge",
+    "things-scene-form": "ThingsElements/things-scene-form"
+  },
+  "devDependencies": {
+    "web-component-tester": "Polymer/web-component-tester#^6.0.0-prerelease.7"
+  },
+  "private": true
+}

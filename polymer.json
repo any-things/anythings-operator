@@ -1,0 +1,60 @@
+{
+  "entrypoint": "app/index.html",
+  "shell": "app/scripts/mps-operator-app.html",
+  "fragments": [
+    "app/scripts/fragments/**/*",
+    "app/scripts/mixins/**/*",
+    "app/scripts/units/**/*",
+    "app/bower_components/**/*"
+  ],
+  "sources": [
+    "app/check.html",
+    "app/static/**/*",
+    "app/scripts/**/*",
+    "app/images/**/*",
+    "app/styles/*",
+    "bower.json"
+  ],
+  "extraDependencies": [
+    "app/manifest.json",
+    "app/bower_components/webcomponentsjs/webcomponents-lite.js",
+    "app/bower_components/things-license-checker-min/things-license-checker-without-grid.min.js",
+    "app/licenses/things/things-lic.js",
+    "app/lib/**/*",
+    "app/locales/ko-KR.js",
+    "app/locales/en-US.js",
+    "app/locales/zh-CN.js",
+    "app/error_pages/*"
+  ],
+  "lint": {
+    "rules": ["polymer-2"],
+    "ignoreWarnings": [ "databind-with-unknown-property", "unknown-superclass" ]
+  },
+  "builds": [{
+    "name": "debug",
+    "bundle": false,
+    "addServiceWorker": false,
+    "js": {
+      "minify": false
+    },
+    "css": {
+      "minify": false
+    },
+    "html": {
+      "minify": false
+    }
+  }, {
+    "name": "release",
+    "bundle": true,
+    "addServiceWorker": false,
+    "js": {
+      "minify": true
+    },
+    "css": {
+      "minify": true
+    },
+    "html": {
+      "minify": true
+    }
+  }]
+}

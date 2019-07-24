@@ -1,0 +1,308 @@
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+
+<link rel="import" href="../../../bower_components/polymer/polymer-element.html">
+
+<link rel="import" href="../../tablet-libraries.html">
+
+<link rel="import" href="./mps-box-list-detail.html">
+
+<!--
+  공통 > 박스 리스트
+-->
+
+<dom-module id="mps-box-list">
+  <template>
+    <style include="shared-styles">
+      :host {
+        display: grid;
+        grid-template-rows: 1fr;
+        padding: 10px;
+        height: calc(100% - 20px);
+      }
+      #button-container {
+        display: grid;
+        grid-template-columns: auto auto;
+        justify-content: end;
+        margin-top: 10px;
+      }
+    </style>
+
+    <!-- 박스 처리 리스트 조회 Ajax -->
+    <sys-ajax
+      auto
+      id="box-list-ajax"
+      method="GET"
+      content-type="application/json"
+      last-response="{{boxList}}">
+    </sys-ajax>
+
+    <!-- 박스 취소 활성화 여부 조회 Ajax -->
+    <sys-ajax
+      id="cancel-box-enabled-ajax"
+      method="GET"
+      content-type="application/json"
+      on-sys-ajax-response="_cancelBoxEnabledResponsed">
+    </sys-ajax>
+
+    <!-- 리스트  -->
+    <mps-list
+      id="cust-list"
+      header="[[header]]"
+      data="[[boxList]]"
+      on-data-list-click="_onListClick">
+    </mps-list>
+
+    <!-- 버튼 컨테이너 -->
+    <div id="button-container">
+      <button is-pda$="[[isPda]]" on-click="searchBoxList">[[refreshBtnLabel]]</button>
+    </div>
+  </template>
+
+  <script>
+    class MpsBoxList extends Polymer.Element {
+      static get is() { return 'mps-box-list' }
+
+      static get properties() {
+        return {
+          /**
+           * @description PDA인지 여부
+           ****************
+           * @type {Boolean}
+           */
+          isPda: {
+            type: Boolean
+          },
+
+          /**
+           * @description iron-pages에서 이 화면의 표시 여부
+           ****************
+           * @type {Boolean}
+           */
+          visible: {
+            type: Boolean,
+            observer: '_visibleChanged'
+          },
+
+          /**
+           * 이 화면의 라우팅 URL
+           ****************
+           * @type {String}
+           */
+          routingUrl: {
+            type: String
+          },
+
+          /**
+           * @description 작업 유형
+           ****************
+           * @type {Boolean}
+           */
+          jobType: {
+            type: Boolean,
+            value: () => MPS_UTIL.getJobName()
+          },
+
+          /**
+           * 새로고침 라벨
+           ****************
+           * @type {Array}
+           */
+          refreshBtnLabel: {
+            type: String,
+            value: () => t('button.refresh')
+          },
+
+          /**
+           * @description PDA인지 여부
+           ****************
+           * @type {Boolean}
+           */
+          isBoxCancelEnabled: {
+            type: Boolean,
+            value: false
+          },
+
+          /**
+           * 그리드 헤더
+           ****************
+           * @type {Array}
+           */
+          header: {
+            type: Array,
+            value: function() {
+              return [{
+                // 반품 화면일 때 로케이션 대신 상품 표시
+                display: MPS_UTIL.getJobName() === 'RTN' ? t('label.sku') : t('label.customer'),
+                fieldname: 'cust_nm',
+                columnWidth: '0.5fr',
+                displayCallback: (value, rowData) => {
+                  return `(${rowData.box_seq}) ${value}`;
+                },
+              }, {
+                display: t('label.location'),
+                fieldname: 'loc_cd',
+                columnWidth: '0.175fr',
+                style: {
+                  textAlign: 'center'
+                },
+                displayCallback: (value) => {
+                  return `${value.split('-')[1]}`;
+                }
+              }, {
+                display: t('label.box_id'),
+                fieldname: 'box_id',
+                columnWidth: '0.325fr',
+                displayCallback: (value) => {
+                  return value.substring(MPS_UTIL.getInvoiceFieldSubstr());
+                },
+                style: {
+                  textAlign: 'center'
+                }
+              }, {
+                fieldname: 'box_seq',
+                hidden: true
+              }, {
+                fieldname: 'batch_id',
+                hidden: true
+              }, {
+                fieldname: 'id',
+                hidden: true
+              }]
+            }
+          },
+
+          /**
+           * 그리드 데이터
+           ****************
+           * @type {Array}
+           */
+          boxList: {
+            type: Array,
+            value: function() {
+              return [/*{
+                box_seq: '1',
+                cust_nm: '거래처 1',
+                loc_cd: 'M01-001',
+                box_id: 'BCD10492850',
+                batch_id: '',
+                id: ''
+              }, {
+                box_seq: '2',
+                cust_nm: '거래처 1',
+                loc_cd: 'M01-001',
+                box_id: 'BCD10492850',
+                batch_id: '',
+                id: ''
+              }, {
+                box_seq: '3',
+                cust_nm: '거래처 1',
+                loc_cd: 'M01-001',
+                box_id: 'BCD10492850',
+                batch_id: '',
+                id: ''
+              }*/];
+            }
+          }
+        }
+      }
+
+      /**
+       * connectedCallback
+       */
+      connectedCallback() {
+        super.connectedCallback();
+
+        // 현재 페이지의 URL을 저장
+        this.routingUrl = location.hash.replace('#/', '');
+
+        // 해더의 refresh button 클릭시 발생하는 refres-view-[route] event handler
+        document.addEventListener(`refresh-view-${this.routingUrl}`, event => {
+          this.searchBoxList();
+        });
+
+        this.searchBoxList();
+      }
+
+      /**
+       * @description 이 화면의 표시 상태가 바뀔 때 handle
+       *******************
+       * @param {Boolean} visible
+       */
+      _visibleChanged(visible) {
+        if (visible) {
+          this.searchBoxList();
+
+          /*var brokerSite = MPS_UTIL.getBrokerSiteCd();
+          if(this.jobType == 'DAS' && (brokerSite == 'ym01' || brokerSite == 'ym02')) {
+            var boxCancelEnabledAjax = this.$['cancel-box-enabled-ajax'];
+            boxCancelEnabledAjax.curl = '/company_setting/BD5393FB-DBEC-4DF1-A996-4CB3E3F26324';
+            boxCancelEnabledAjax.generateRequest();
+          }*/
+        }
+      }
+
+      /**
+       * @description 박스 취소 활성화 여부 ...
+       *******************
+       * @param {Object} event
+       */
+      _cancelBoxEnabledResponsed(event) {
+        this.isBoxCancelEnabled = (event.detail && event.detail.value) ? event.detail.value === 'true' : false;
+      }
+
+      /**
+       * @description 송장 번호가 발행된 박스 리스트 조회
+       *******************
+       */
+      searchBoxList() {
+        var ajax = this.$['box-list-ajax'];
+        ajax.curl = `/tablet_process/boxed_list/${MPS_UTIL.getRegionCd()}/${MPS_UTIL.getZoneCd()}/${MPS_UTIL.getSideCd()}`;
+
+        // 최초 조회 이후 baseUrl이 초기화 되었다면 명시적으로 generateRequest를 호출함
+        if(ajax.baseUrl) {
+          ajax.generateRequest();
+        }
+      }
+
+      /**
+       * @description 박스 리스트에서 항목 선택시
+       *******************
+       * @param {Object} event
+       */
+      _onListClick(event) {
+        let boxResult = event.detail.data;
+        this._showDetailPopup(boxResult);
+      }
+
+      /**
+       * 박스 내품 팝업 표시
+       *******************
+       * @param {Object} boxResult
+       */
+      _showDetailPopup(boxResult) {
+        const mpsBoxListDetail = document.createElement('mps-box-list-detail');
+        mpsBoxListDetail.boxResult = boxResult;
+
+        var brokerSite = MPS_UTIL.getBrokerSiteCd();
+        if(this.jobType == 'DAS' && (brokerSite == 'ym01' || brokerSite == 'ym02')) {
+          mpsBoxListDetail.isBoxCancelEnabled = true;
+        }
+
+        document.dispatchEvent(new CustomEvent('open-dialog', {
+          detail: {
+            title: t('title.inbox_list'),
+            content: mpsBoxListDetail,
+            closeCallback: () => {
+              this.searchBoxList();
+            }
+          }
+        }));
+      }
+    }
+
+    customElements.define(MpsBoxList.is, MpsBoxList);
+  </script>
+</dom-module>

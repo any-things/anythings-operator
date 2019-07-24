@@ -1,0 +1,676 @@
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+
+<link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="./kiosk-sku-selection.html">
+<link rel="import" href="../../../kiosk-libraries.html">
+
+<!--
+  KIOSK 중분류 화면
+ -->
+
+<dom-module id="kiosk-middle-assort">
+  <template>
+    <style include="shared-styles">
+      #container {
+        height: calc(100% - 20px);
+        padding: 10px;
+        display: flex;
+        flex-direction: column;
+      }
+      #top-container {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 10px;
+      }
+      #header-section {
+        display: flex;
+      }
+      #summary-container {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+      }
+      #summary-container span {
+        color: #D5D7DB;
+        font-size: 25pt;
+        font-weight: bold;
+      }
+      #middle-container {
+        display: grid;
+        background-color: #5A6377;
+        grid-template-columns: 1fr 2fr;
+        grid-gap:20px;
+        padding: 10px 20px;
+        border-radius:var(--things-default-border-radius);
+        margin-bottom:20px;
+      }
+      .label {
+        text-align: right;
+        color: #D5D7DB;
+        font-size: 25pt;
+        margin: auto 15px auto 0;
+      }
+      label{
+        line-height:54px;
+      }
+      .input-container {
+        display: grid;
+        grid-template-columns: max-content auto;
+        color:#fff;
+        align-items: center;
+      }
+      .region-container {
+        flex: 1;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+        grid-gap:15px;
+      }
+      .region {
+        display: flex;
+        flex-direction: column;
+        border:1px solid rgba(0,0,0,.3);
+        border-radius:4px;
+        background: rgba(0,0,0,.3);
+        background: linear-gradient(to bottom, rgba(255,255,255,.1) 0%, rgba(0,0,0,.3) 100%);
+        overflow:hidden
+      }
+      .region div{
+        border-bottom:1px solid rgba(0,0,0,.2);
+        color:#fff;
+        font-size:1.1rem;
+      }
+      .region .title{
+        background-color:#3f91cc;
+        border-bottom: 2px solid rgba(0,0,0,.5);
+        padding:5px 0 3px 0;
+        color:#fff;
+        text-align:center !important;
+        font-size:2rem;
+      }
+      .tile-container {
+        flex: 1;
+        display: grid;
+        justify-content: center;
+        align-content: center;
+      }
+      .region div span.tile {
+        color:#fff;
+        font-size: 6.6vw;
+      }
+      /*.region div span{
+        display:inline-block;
+        padding:8px 10px 0 15px;
+        width:30%;
+        color:#ccc;
+        font-size:.7rem;
+        text-align:left;
+      }*/
+      .region.sum div{
+        color:#fffbd7
+      }
+      .region.sum .title{
+        background-color:#ee6e30;
+      }
+      #date-picker {
+        display: flex;
+        margin: auto 0;
+      }
+      #date-picker span {
+        margin: auto 10px auto auto;
+        color: #D5D7DB;
+        font-size: .8rem;
+      }
+      #date-picker input {
+        font-size: .8rem;
+        height: 1rem;
+      }
+      #fix-btn-section {
+        display: flex;
+        margin-left: auto;
+      }
+      #fix-btn-section label, #fix-btn-section input {
+        margin: auto;
+        margin-left: .5rem;
+      }
+    </style>
+
+    <!--
+      * description : 중분류 시 상품스캔후 호기별 수량 검색
+      * params : @PathVariable(batch_id), @PathVariable(skubarcode)
+      * response :
+     -->
+
+     <sys-ajax
+      id="middle-assort-ajax"
+      on-sys-ajax-response="_middleAssortResponsed">
+    </sys-ajax>
+
+    <div id="container">
+      <div id="top-container">
+        <div id="header-section">
+          <div id="date-picker">
+            <span>[[jobDateLabel]]</span>
+            <input type="date" required value="[[_jobDateDefaultValue]]" on-change="_jobDateChanged">
+          </div>
+
+          <div id="fix-btn-section">
+            <div class="input-container">
+              <input id="fix-btn" value="fixed" name="fix-radio" type="radio">
+              <label for="fix-btn">[[fixedLabel]]</label>
+            </div>
+
+            <div class="input-container">
+              <input id="non-fix-btn" value="nonfixed" name="fix-radio" type="radio" checked>
+              <label for="non-fix-btn">[[nonfixedLabel]]</label>
+            </div>
+          </div>
+        </div>
+
+        <mps-selector
+          info-column-cnt="[[selectorInfoFields.length]]"
+          value-fields="[[selectorValueFields]]"
+          info-fields="[[selectorInfoFields]]"
+          header="[[selectorColumns]]"
+          resource-url="[[selectorResourceUrl]]"
+          params="[[selectorParams]]"
+          on-value-changed="_batchCodeChanged">
+        </mps-selector>
+
+        <div id="summary-container">
+          <span>Total: [[totalPcsQty]]</span>
+          <span>Pallet: [[totalPallet]]</span>
+          <span>BOX: [[totalBox]]</span>
+          <span>PCS: [[totalPcs]]</span>
+        </div>
+      </div>
+
+      <div id="middle-container">
+        <div class="input-container">
+          <span class="label">[[skuBarcdLabel]]</span>
+
+          <mps-auto-popup-input
+            id="sku-barcode"
+            popup-title="[[popupTitleLabel]]"
+            button-txt-callback="[[_skuButtonTxtCallback]]"
+            on-before-request="_customAjaxHandler"
+            on-item-selected="itemSelected"
+            max-length=13>
+          </mps-auto-popup-input>
+        </div>
+        <div class="input-container">
+          <span class="label">[[skuNmLabel]]</span>
+          <label>([[boxInQtyLabel]] : [[boxInQty]]) [[skuNm]]</label>
+        </div>
+      </div>
+
+      <div id="regions" class="region-container">
+        <dom-repeat id="region-dom-repeat" items="[[regionList]]" as="item">
+          <template>
+            <div class="region">
+              <div class="title"><span>[[item.region_nm]]</span></div>
+              <!-- <template is="dom-if" if="[[item.pallet_qty]]">
+                <div class="tile-container"><span class="tile">[[item.pallet_qty]]</span></div>
+              </template>
+
+              <template is="dom-if" if="[[item.box_qty]]">
+                <div class="tile-container"><span class="tile">[[item.box_qty]]</span></div>
+              </template> -->
+
+              <template is="dom-if" if="[[item.pcs_qty]]">
+                <div class="tile-container"><span class="tile">[[_calcRegionDisplay(item)]]</span></div>
+              </template>
+            </div>
+          </template>
+        </dom-repeat>
+      </div>
+
+    </div>
+  </template>
+
+  <script>
+    class KioskMiddleAssort extends Polymer.Element {
+      static get is() {
+        return 'kiosk-middle-assort'
+      }
+
+      static get properties() {
+        return {
+          /**
+           * 배치 라벨
+           ****************
+           * @type {String}
+           */
+          batchLabel: {
+            type: String,
+            value: t('label.job_batch')
+          },
+
+          /**
+           * 상품 코드 라벨
+           ****************
+           * @type {String}
+           */
+          skuBarcdLabel: {
+            type: String,
+            value: t('label.sku_barcd')
+          },
+
+          /**
+           * 상품 명 라벨
+           ****************
+           * @type {String}
+           */
+          skuNmLabel: {
+            type: String,
+            value: t('label.sku_nm')
+          },
+
+          /**
+           * 입수 라벨
+           ****************
+           * @type {String}
+           */
+          boxInQtyLabel: {
+            type: String,
+            value: t('label.box_in_qty')
+          },
+
+          /**
+           * 고정 수량 라벨
+           ****************
+           * @type {String}
+           */
+          fixedLabel: {
+            type: String,
+            value: t('label.total')
+          },
+
+          /**
+           * 가변 수량 라벨
+           ****************
+           * @type {String}
+           */
+          nonfixedLabel: {
+            type: String,
+            value: t('label.non_classed')
+          },
+
+          /**
+           * 상품 명
+           ****************
+           * @type {String}
+           */
+          skuNm: {
+            type: String
+          },
+
+          /**
+           * 박스 입수
+           ****************
+           * @type {Number}
+           */
+          boxInQty: {
+            type: Number
+          },
+
+          /**
+           * 호기별 분류 정보 리스트
+           ****************
+           * @type {Array}
+           */
+          regionList: {
+            type: Array
+          },
+
+          /**
+           * 배치 리스트 파라미터
+           ****************
+           * @type {String}
+           */
+          batchListParams: {
+            type: String
+          },
+
+          /**
+           * 작업 배치 값 선택시 Keep할 값 필드 리스트
+           ****************
+           * @type {Array}
+           */
+          selectorValueFields: {
+            type: Array,
+            value: () => {
+              return ['job_id', 'batch_group_id']
+            }
+          },
+
+          /**
+           * 작업 배치 선택 화면에 표시할 필드
+           ****************
+           * @type {Array}
+           */
+          selectorInfoFields: {
+            type: Array,
+            value: () => {
+              return [{
+                display: t('label.dc_cd'),
+                fieldname: 'dc_cd'
+              }, {
+                display: t('label.job_date'),
+                fieldname: 'job_date'
+              }, {
+                display: t('label.job_id'),
+                fieldname: 'job_id'
+              }, {
+                display: t('label.batch_group_id'),
+                fieldname: 'batch_group_id'
+              }];
+            }
+          },
+
+          /**
+           * 작업 배치 선택 화면의 컬럼 정보
+           ****************
+           * @type {Array}
+           */
+          selectorColumns: {
+            type: Array,
+            value: () => {
+              return [{
+                display: t('label.dc_cd'),
+                fieldname: 'dc_cd'
+              }, {
+                display: t('label.job_date'),
+                fieldname: 'job_date'
+              }, {
+                display: t('label.job_id'),
+                fieldname: 'job_id'
+              }, {
+                display: t('label.batch_group_id'),
+                fieldname: 'batch_group_id'
+              } /*{
+                display: t('label.com_cd'),
+                fieldname: 'com_cd',
+                displayCallback: (value) => {
+                  return value ? value : 'N/A';
+                }
+              },*/]
+            }
+          },
+
+          /**
+           * 작업 배치 선택 화면이 호출할 URL
+           ****************
+           * @type {String}
+           */
+          selectorResourceUrl: {
+            type: String,
+            value: '/job_batch/search/middle_class'
+          },
+
+          /**
+           * 작업 배치 선택 화면이 호출할 파라미터
+           ****************
+           * @type {Object}
+           */
+          selectorParams: {
+            type: Object,
+            value: () => {
+              return {
+                sort: [{
+                  field: 'job_id',
+                  ascending: false
+                }],
+                query: [{
+                  name: 'job_date',
+                  value: (() => {
+                    let today = new Date();
+                    return today.toISOString().slice(0, 10);
+                  })()
+                }]
+              }
+            }
+          },
+
+          /**
+           * 작업일자 라벨
+           ****************
+           * @type {String}
+           */
+          jobDateLabel: {
+            type: String,
+            value: () => {
+              return t('label.job_date')
+            }
+          },
+
+          /**
+           * 작업일자 기본 값
+           ****************
+           * @type {String}
+           */
+          _jobDateDefaultValue: {
+            type: String,
+            value: () => {
+              let today = new Date();
+              return today.toISOString().slice(0, 10);
+            }
+          },
+
+           /**
+            * 상품 선택 팝업 타이틀
+            ****************
+            * @type {String}
+            */
+          popupTitleLabel: {
+            type: String,
+            value: () => t('label.sku')
+          }
+        }
+      }
+
+      connectedCallback() {
+        super.connectedCallback();
+
+        // dom-repeat을 통해 regions list가 그려지고 뒤 dom-change event handler
+        // this.$['region-dom-repeat'].addEventListener('dom-change', event => {
+        //   // regions div 내부의 region div를 모두 추출
+        //   let regions = this.$['regions'].querySelectorAll('div.region');
+        //   // 마지막 region에는 sum class를 추가 나머지는 sum class를 제거
+        //   regions.forEach((region, idx) => {
+        //     if(regions.length - 1 === idx) {
+        //       region.classList.add('sum');
+        //     } else {
+        //       region.classList.remove('sum');
+        //     }
+        //   });
+        // });
+
+        document.addEventListener(`alert-closed-at-${location.hash.replace('#/', '')}`, event => {
+          if(!event.detail.hasCallback) {
+            this._initialSetup();
+          }
+        });
+      }
+
+      /**
+       * 초기 셋업
+       */
+      _initialSetup() {
+        this.$['sku-barcode'].select();
+      }
+
+      /**
+       * sku 선택 팝업에 나타날 아이템 텍스트 구성을 위한 콜백
+       ***********************
+       * @param {Object} item
+       */
+      _skuButtonTxtCallback(item) {
+        return `${item.com_cd} : ${item.sku_cd}
+                ${item.sku_nm}`;
+      }
+
+      /**
+       * mps-auto-popup-input before-request event handler
+       ***********************
+       * @param {Object} event
+       */
+      _customAjaxHandler(event) {
+        event.preventDefault();
+        const input = event.detail.input;
+        const ajax = event.detail.ajax;
+
+        if(this.batchListParams) {
+          const skuCd = input.value;
+          ajax.curl = `/kiosk_process/middle_assort/find_sku/${this.batchListParams}/${skuCd}`;
+        } else {
+          MPS_UTIL.showMessage(t('button.confirm'), t('text.select_operation_batch'));
+        }
+
+        ajax.generateRequest();
+      }
+
+      /**
+       * 고정/비고정 라디오 버튼을 통해 현재 고정 상태인지 여부를 리턴함
+       ***********************
+       * @return
+       */
+      _getIsFixed() {
+        return this._getFixedRadioBtn().checked;
+      }
+
+      /**
+       * 상품 선택 팝업을 통해 상품이 선택되었을 때
+       ***********************
+       * @param {Object} event 항목 선택
+       */
+      itemSelected(event) {
+        const selectedSku = event.detail;
+        const middleAssortAjax = this.$['middle-assort-ajax'];
+        // 고정, 가변 선택값을 파라미터로 전달
+        var isVarQtyFlag = !this._getIsFixed();
+        middleAssortAjax.curl = `/kiosk_process/DAS/middle_assort/${this.batchListParams}/${selectedSku.com_cd}/${selectedSku.sku_cd}?var_qty_flag=${isVarQtyFlag}`;
+        middleAssortAjax.generateRequest();
+      }
+
+      /**
+       * 중분류 ajax response event handler
+       ***********************
+       * @param {Object} event 중분류 결과
+       */
+      _middleAssortResponsed(event) {
+        const middleClass = event.detail;
+        this.skuNm = middleClass.sku_nm;
+        this.pltInBoxQty = middleClass.plt_box_qty;
+        this.boxInQty = middleClass.box_in_qty;
+        this.regionList = middleClass.items;
+        this.totalPcsQty = this.computeTotalPcsQty(this.regionList);
+        this.computeTotalValues(this.pltInBoxQty, this.boxInQty, this.totalPcsQty);
+        this._initialSetup();
+      }
+
+      /**
+       * @description 호기 수량 정보 표시
+       ***********************
+       * @param {Object} item
+       */
+      _calcRegionDisplay(item) {
+        if(!this.boxInQty || this.boxInQty == 0) {
+          return `${item.pcs_qty}`
+        } else {
+          return `${Math.floor(item.pcs_qty / this.boxInQty)}/${item.pcs_qty % this.boxInQty}`
+        }
+      }
+
+      /**
+       * 중분류 대상 상품 총 수량을 계산하여 return
+       ***********************
+       * @param {Array} regions 중분류 대상 호기 리스트
+       * @return {Number} totalPcsQty 중분류 대상 상품 총 수량
+       */
+      computeTotalPcsQty(regions) {
+        let totalPcsQty = 0;
+        regions.forEach(region => {
+          totalPcsQty = totalPcsQty + region.pcs_qty;
+        });
+
+        return totalPcsQty;
+      }
+
+      /**
+       * 팔렛, 박스, 낱개 수량을 계산함
+       ***********************
+       * @param {Number} pltInBoxQty 팔렛트 당 적재 박스 수량
+       * @param {Number} boxInQty 박스 당 상품 입수량
+       * @param {Number} totalPcsQty 중분류 대상 상품 총 수량
+       */
+      computeTotalValues(pltInBoxQty, boxInQty, totalPcsQty) {
+        if(boxInQty <= 0) {
+          this.totalPallet = 0;
+          this.totalBox = 0;
+          this.totalPallet = totalPcsQty;
+
+        } else if (pltInBoxQty <= 0) {
+          this.totalPallet = 0;
+          // 남은 낱개 수량 =  낱개수량을 박스 입수량으로 나눈 나머지
+          this.totalPcs = totalPcsQty % boxInQty; // 남은 낱개 수량
+          // 모두 박스에 담았을 때 박스 수량 = 낱개수량 나누기 박스 입수량
+          this.totalBox = Math.floor(totalPcsQty / boxInQty);
+
+        } else {
+          // 남은 낱개 수량 =  낱개수량을 박스 입수량으로 나눈 나머지
+          this.totalPcs = totalPcsQty % boxInQty; // 남은 낱개 수량
+          // 모두 박스에 담았을 때 박스 수량 = 낱개수량 나누기 박스 입수량
+          let boxQty = Math.floor(totalPcsQty / boxInQty);
+          // 남은 박스 수량 = 박스 수량을 팔렛 입수량으로 나눈 나머지
+          this.totalBox = boxQty % pltInBoxQty;
+          // 모든 박스를 팔렛트에 담았을 때 팔랫 수량 = 박스 수량 나누기 팔렛 입수량
+          this.totalPallet = Math.floor(boxQty / pltInBoxQty);
+        }
+      }
+
+      /**
+       * 배치 코드 변경 핸들러
+       ***********************
+       * @param {Object} e
+       */
+      _batchCodeChanged(e) {
+        this.batchListParams = e.detail.value.batch_group_id;
+        this._initialSetup();
+      }
+
+      /**
+       * 작업일자 변경 핸들러
+       ***********************
+       * @param {Object} event
+       */
+      _jobDateChanged(event) {
+        this.jobDate = event.currentTarget.value;
+        this.selectorParams = {
+          sort: [{
+            field: 'job_id',
+            ascending: false
+          }],
+          query: [{
+            name: 'job_date',
+            value: this.jobDate
+          }]
+        };
+      }
+
+      /**
+       * 전체 / 미분류 선택을 위한 라디오 버튼 엘리먼트 리턴
+       * 전체 : 주문 전체 수량으로 중분류 계산
+       * 미분류 : 미분류 작업만 대상으로 중분류 계산
+       *************************
+       * return fix-btn element
+       */
+      _getFixedRadioBtn() {
+        return this.$['fix-btn'];
+      }
+    }
+
+    customElements.define(KioskMiddleAssort.is, KioskMiddleAssort);
+  </script>
+</dom-module>

@@ -1,0 +1,78 @@
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+
+
+<!DOCTYPE html>
+<custom-style>
+    <style>
+        /* :host > * { */
+        html {
+            /* color style */
+            --things-primary-background-color: #354052;
+            --things-secondary-background-color: #434854;
+            --things-primary-color: #0288ca;
+            --things-secondary-color: #49a8df;
+            --things-focus-background-color: #4caf50;
+            --things-whitegrey-background-color:rgba(0, 0, 0, .05);
+            --things-lightgrey-background-color:rgba(0, 0, 0, .1);
+            --things-white-background-color:#fff;
+            --things-error-color:var(--paper-deep-orange-700);
+            --things-primary-text-color: #fff;
+            --things-dark-text-color: #585858;
+            --things-sidebar-background-color:#555c6b;
+            --paper-slide-height:auto;
+            --paper-toast-background-color:rgba(109,107,171,.8);
+            --paper-toast-color:var(--things-white-background-color);
+            --paper-input-container-color:rgba(0,0,0,.2);
+            --paper-checkbox-unchecked-color:rgba(119,125,142,.7);
+            --paper-checkbox-unchecked-ink-color:rgba(119,125,142,.7);
+            --paper-checkbox-checked-color: #716fb3;
+            --paper-checkbox-size:16px;
+            --paper-radio-button-unchecked-color:rgba(119,125,142,.7);
+            --paper-radio-button-unchecked-ink-color:rgba(119,125,142,.7);
+            --paper-radio-button-checked-color: #716fb3;
+            --paper-radio-button-checked-ink-color: #716fb3;
+            --paper-radio-button-label-color:var(--things-primary-text-color);
+            --paper-radio-button-label-spacing:5px;
+            --paper-fab-background:var(--things-primary-background-color);
+            --paper-fab-keyboard-focus-background:var(--things-focus-background-color);
+            --things-chartcolor-type1:rgba(237,70,83,1);
+            --things-chartcolor-type2:rgba(255,128,51,1);
+            --things-chartcolor-type3:rgba(252,214,3,1);
+            --things-chartcolor-type4:rgba(117,184,72,1);
+            --things-chartcolor-type5:rgba(54, 162, 235,1);
+            --things-chartcolor-type6:rgba(113,111,179,1);
+            --things-chartcolor-type7:rgba(170,170,170,1);
+            --things-chartcolor-type1-background:rgba(237,70,83,.4);
+            --things-chartcolor-type2-background:rgba(255,128,51,.4);
+            --things-chartcolor-type3-background:rgba(252,214,3,.4);
+            --things-chartcolor-type4-background:rgba(117,184,72,.4);
+            --things-chartcolor-type5-background:rgba(54, 162, 235,.4);
+            --things-chartcolor-type6-background:rgba(113,111,179,.4);
+            --things-chartcolor-type7-background:rgba(170,170,170,.4);
+
+            --things-default-border-radius:.4rem;
+            --app-drawer-width:4rem;
+            
+            /* common style */
+            --app-toolbar-font-size : 1rem;
+            --border-radius-clear: {
+                -webkit-border-radius: 0px;
+                -moz-border-radius: 0px;
+                border-radius: 0px;
+            }
+            --things-tablet-body-padding: {
+                padding: 25px 35px 20px 35px;
+            }
+        }
+    </style>
+</custom-style>
+<script>
+    var importDoc = document.currentScript.ownerDocument;
+    var style = importDoc.querySelector('style');
+    if (style) {
+        document.head.appendChild(style);
+    }
+</script>

@@ -1,0 +1,100 @@
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/app-localize-behavior/app-localize-behavior.html">
+<link rel="import" href="./sys-ajax.html">
+
+<dom-module id="sys-translator">
+	<template>
+		<style></style>
+	</template>
+
+	<script>
+		class SysTranslator extends Polymer.mixinBehaviors(
+			[Polymer.AppLocalizeBehavior], Polymer.Element) {
+			static get is() { return 'sys-translator'; }
+
+			static get properties() {
+				return {
+					src: String,
+
+					result: {
+						type: String,
+						notify: true,
+						computed: '_computeResult(src, resources, language)'
+					},
+
+					resources: {
+						type: Object,
+						// computed: '_computeResources()',
+						observer: '_resourcesChanged'
+					},
+
+					language: {
+						type: String,
+						// computed: '_computeLanguage()',
+						observer: '_languageChanged'
+					}
+				};
+			}
+
+			connectedCallback() {
+				super.connectedCallback();
+			}
+
+			// _computeResources() {
+			// 	if (this.resources) {
+			// 		return this.resources;
+			// 	} else {
+			// 		let resources = typeof globals === 'undefined' || !globals ? {} : globals.langData;
+			// 		return resources;
+			// 	}
+			// }
+
+			// _computeLanguage() {
+			// 	if (this.language) {
+			// 		return this.locale;
+			// 	} else {
+			// 		let locale = typeof globals === 'undefined' || !globals ? '' : globals.locale;
+			// 		return locale
+			// 	}
+			// }
+
+			_computeResult(src, resources, language) {
+				return this.makeResult();
+			}
+
+			_resourcesChanged(resources) {
+				this.result = this.makeResult()
+			}
+
+			_languageChanged(language) {
+				if (!language) {
+					return;
+				}
+				this.result = this.makeResult()
+			}
+
+			makeResult() {
+				var src = this.src;
+				if (!this.resources) {
+					return this.src;
+				}
+
+				var result = this.localize(src);
+				if (!result) {
+					let idx = src.indexOf('.');
+					result = src.substring(idx + 1);
+				}
+
+				return result;
+			}
+		}
+
+		customElements.define(SysTranslator.is, SysTranslator);
+	</script>
+
+</dom-module>

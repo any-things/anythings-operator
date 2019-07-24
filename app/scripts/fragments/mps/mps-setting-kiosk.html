@@ -1,0 +1,495 @@
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+
+<link rel="import" href="../../../bower_components/polymer/polymer-element.html">
+
+<!-- 
+  MPS Operator KIOSK 설정 화면
+ -->
+
+<dom-module id="mps-setting-kiosk">
+  <template>
+    <style include="shared-styles mps-setting-styles">
+      .button-container {
+        margin-left: .5rem;
+      }
+    </style>
+
+    <sys-ajax
+      id="broker-addrs-ajax"
+      method="GET"
+      content-type="application/json"
+      on-sys-ajax-response="_setBrokerAddress">
+    </sys-ajax>
+
+    <sys-ajax
+      id="broker-port-ajax"
+      method="GET"
+      content-type="application/json"
+      on-sys-ajax-response="_setBrokerPort">
+    </sys-ajax>
+
+    <sys-ajax
+      id="broker-site-ajax"
+      method="GET"
+      content-type="application/json"
+      on-sys-ajax-response="_setBrokerSite">
+    </sys-ajax>
+
+    <sys-ajax
+      id="region-items-ajax"
+      method="GET"
+      content-type="application/json"
+      on-sys-ajax-response="_renderRegionCombo">
+    </sys-ajax>
+
+    <sys-ajax
+      id="kiosk-menu-ajax"
+      last-response="{{kioskMenuList}}">
+    </sys-ajax>
+
+    <sys-ajax
+      id="printer-ajax"
+      method="GET"
+      on-sys-ajax-response="_renderPrinterCombo">
+    </sys-ajax>
+
+    <sys-ajax
+      id="update-setting-ajax"
+      method="PUT"
+      content-type="application/json">
+    </sys-ajax>
+
+    <div id="region" class="input-container">
+      <label>[[regionLabel]]</label>
+      <select id="region-combo" ></select>
+    </div>
+
+    <div id="screen" class="input-container">
+      <label>[[screenLabel]]</label>
+      <select id="screen-combo"></select>
+
+      <div class="button-container">
+        <button id="move-btn" on-click="_moveToScreen">[[moveBtnLabel]]</button>
+      </div>
+    </div>
+
+    <div id="screen" class="input-container">
+      <label>[[printLabel]]</label>
+      <select id="printers-combo"></select>
+    </div>
+
+    <div id="interval" class="input-container">
+      <label>[[intervalLabel]]</label>
+      <input type="number" id="interval-input" min="30" value="[[kioskInterval]]">
+    </div>
+
+    <div id="code-type" class="input-container">
+      <label for="code-type">[[codeTypeLabel]]</label>
+      <select id="code-type-combo"></select>
+    </div>
+
+    <div id="input-type" class="input-container">
+      <label for="input_type">[[inputTypeLabel]]</label>
+      <select id="input-type-combo"></select>
+    </div> 
+
+    <div id="work-loc" class="radio-btn-container">
+      <label>[[workLocLabel]]</label>
+      <div class="buttons">
+        <input value="F" name="work-location" type="radio" work-loc-name$="[[frontLabel]]">
+        <label>[[frontLabel]]</label>
+
+        <input value="R" name="work-location" type="radio" work-loc-name$="[[rearLabel]]">
+        <label>[[rearLabel]]</label>
+
+        <input value="ALL" name="work-location" type="radio" work-loc-name$="[[frontLabel]]/[[rearLabel]]" checked>
+        <label>[[frontLabel]]/[[rearLabel]]</label>
+      </div>
+    </div>
+  </template>
+
+  <script>
+    class MpsSettingKiosk extends MpsSettingMixin(Polymer.Element) {
+      static get is() { return 'mps-setting-kiosk' }
+
+      static get properties() {
+        return {
+          /**
+           * @description label setup
+           */
+          screenLabel: {type: String, value: () => t('label.screen')},
+          moveBtnLabel: {type: String, value: () => t('button.move')},
+          intervalLabel: {type: String, value: () => t('label.req_interval')},
+          codeTypeLabel: {type: String, value: () => t('label.code_type')},
+          inputTypeLabel: {type: String, value: () => t('label.input_type')},
+          printLabel: {type: String, value: () => t('label.default_printer')},
+
+          /**
+           * @description device type
+           */
+          deviceType: {
+            type: String,
+            value: 'KIOSK'
+          },
+
+          /**
+           * @description 키오스크 기본 화면 값
+           */
+          kioskScreen: {
+            type: String,
+            value: () => JSON.parse(localStorage.getItem('setting.kioskScreen'))
+          },
+
+          /**
+           * @description 키오스크 기본 화면 설정 값 저장을 위한 localStorage의 key
+           */
+          kioskScreenLSKey: {
+            type: String,
+            value: 'setting.kioskScreen'
+          },
+
+          /**
+           * @description 키오스크 프린터 아이디 설정 값
+           */
+          kioskPrinterId: {
+            type: String,
+            value: () => JSON.parse(localStorage.getItem('setting.kioskPrinterId'))
+          },
+
+          /**
+           * @description 키오스크 프린터 아이디 설정 값 저장을 위한 localStorage의 key
+           */
+          kioskPrinterIdLSKey: {
+            type: String,
+            value: 'setting.kioskPrinterId'
+          },
+
+          /**
+           * @description 키오스크 데이터 조회 주기
+           */
+          kioskInterval: {
+            type: Number,
+            value: () => {
+              let kioskInterval = parseInt(JSON.parse(localStorage.getItem('setting.kioskInterval')));
+              if(!kioskInterval) {
+                kioskInterval = 5;
+                localStorage.setItem('setting.kioskInterval', JSON.stringify(kioskInterval));
+              }
+              return kioskInterval;
+            }
+          },
+
+          /**
+           * @description 키오스크 데이터 조회 주기 값 저장을 위한 localStorage key
+           */
+          kioskIntervalLSKey: {
+            type: String,
+            value: 'setting.kioskInterval'
+          },
+
+          /**
+           * @description 키오스크 코드 타입
+           */
+          kioskCodeType: {
+            type: String,
+            value: () => JSON.parse(localStorage.getItem('setting.kioskCodeType'))
+          },
+
+          /**
+           * @description 키오스크 코드 타입 설정 값 저장을 위한 localStorage key
+           */
+          kioskCodeTypeLSKey: {
+            type: String,
+            value: 'setting.kioskCodeType'
+          },
+
+          /**
+           * @description 키오스크 투입 유형 설정 값
+           */
+          kioskInputType: {
+            type: String,
+            value: () => JSON.parse(localStorage.getItem('setting.kioskInputType'))
+          },
+
+          /**
+           * @description 키오스크 투입 유형 설정 값 저장을 위한 localStorage key
+           */
+          kioskInputTypeLSKey: {
+            type: String,
+            value: 'setting.kioskInputType'
+          },
+
+          /**
+           * @description 키오스크 화면 리스트
+           */
+          kioskMenuList: {
+            type: Array,
+            observer: '_renderScreenCombo'
+          },
+
+          /**
+           * @description 키오스크 코드 유형 리스트
+           */
+          kioskCodeTypes: {
+            type: Array,
+            value: () => {
+              return [{
+                name: t('label.barcode'),
+                value: 'barcode'
+              }, {
+                name: t('label.qrcode'),
+                value: 'qrcode'
+              }];
+            },
+            observer: '_renderCodeCombo'
+          },
+
+          /**
+           * @description 키오스크 투입 유형 리스트
+           */
+          kioskInputTypes: {
+            type: Array,
+            value: () => {
+              return [{
+                name: t('label.box'),
+                value: 'box'
+              }, {
+                name: t('label.bucket'),
+                value: 'bucket'
+              }];
+            },
+            observer: '_renderInputTypeCombo'
+          }
+        }
+      }
+
+      connectedCallback() {
+        super.connectedCallback();
+        this._getRegionItems();
+        this._getKioskMenus();
+        this._getPrinters();
+        this._setDefaultValues();
+      }
+
+      _getKioskMenus() {
+        const kioskMenusAjax = this._getKioskMenuAjax();
+        kioskMenusAjax.curl = `/menus/user_menus/${this.deviceType}`;
+        kioskMenusAjax.baseUrl = this._getLocalStorage('setting.baseUrl');
+        kioskMenusAjax.customParams = {
+          query: [{
+            name: 'hidden_flag', operator: 'is_not_true'
+          }]
+        };
+
+        kioskMenusAjax.generateRequest();
+      }
+
+      _getPrinters() {
+        const printersAjax = this._getPrintersAjax();
+        printersAjax.curl = '/printer';
+        printersAjax.baseUrl = this._getLocalStorage('setting.baseUrl');
+        printersAjax.generateRequest();
+      }
+
+      _getKioskMenuAjax() {
+        return this.$['kiosk-menu-ajax'];
+      }
+
+      _getPrintersAjax() {
+        return this.$['printer-ajax'];
+      }
+
+      _getPrintersCombo() {
+        return this.$['printers-combo'];
+      }
+
+      /**
+       * @description 설정 항목들의 기본값을 저장하기 위한 함수
+       */
+      _setDefaultValues() {
+        this._setWorkLocDefaultValue();
+      }
+
+      _renderPrinterCombo(event) {
+        const printers = event.detail;
+        const printersCombo = this._getPrintersCombo();
+
+        if(event && event.detail) {
+          event.detail.items.forEach(printer => {
+            const option = new Option(printer.printer_nm, printer.id);
+            
+            if(this.kioskPrinterId === printer.id) {
+              option.selected = true;
+            }
+
+            printersCombo.appendChild(option);
+          })
+        }
+      }
+
+      /**
+       * @description 키오스크 메뉴 리스트 change event handler
+       * 키오스크의 메뉴 리스트가 변경되면 설정 콤보를 출력
+       * menu-info-changed 이벤트를 발생시켜 sys-route를 통해 데이터를 기반으로한
+       * header의 title을 결정함
+       */
+      _renderScreenCombo(screenList) {
+        const screenCombo = this._getScreenCombo();
+        this._clearCombo(screenCombo);
+        if(!screenList || screenList.length === 0) return;
+        screenList.forEach(screen => {
+          const option = new Option(t('menu.' + screen.name), screen.routing);
+
+          if(this.kioskScreen === screen.routing) {
+            option.selected = true;
+          };
+
+          screenCombo.appendChild(option);
+        });
+
+        document.dispatchEvent(new CustomEvent('menu-info-changed', {
+          detail: screenList
+        }));
+      }
+
+      /**
+       * @description 코드 유형 리스트 change event handler
+       * 코드 유형 리스트가 변경되면 코드 유헝 설정 콤보를 출력
+       */
+      _renderCodeCombo(codeTypes) {
+        const codeCombo = this._getCodeTypeCombo();
+        this._clearCombo(codeCombo);
+        codeTypes.forEach(codeType => {
+          const option = new Option(codeType.name, codeType.value);
+
+          if(this.kioskCodeType === codeType.value) {
+            option.selected = true;
+          };
+
+          codeCombo.appendChild(option);
+        });
+      }
+
+      /**
+       * @description 투입 유형 리스트 change event handler
+       * 투입 유형 리스트가 변경되면 투입 유형 설정 콤보를 출력
+       */
+      _renderInputTypeCombo(inputTypes) {
+        const inputTypeCombo = this._getInputTypeCombo();
+        this._clearCombo(inputTypeCombo);
+        inputTypes.forEach(inputType => {
+          const option = new Option(inputType.name, inputType.value);
+
+          if(this.kioskInputType === inputType.value) {
+            option.selected = true;
+          };
+
+          inputTypeCombo.appendChild(option);
+        });
+      }
+
+      _moveToScreen(event) {
+        if(this._getScreenCombo().selectedOptions[0] && this._getScreenCombo().selectedOptions[0].value) {
+          const selectedKioskScreen = this._getScreenCombo().selectedOptions[0].value
+          if(selectedKioskScreen) {
+            location.hash = `/${selectedKioskScreen}`;
+          }
+        }
+      }
+
+      /**
+       * @description 설정 저장을 수행함
+       * 설정 저장 전 updateSetting을 통해 서버에 변경 사항을 저장함
+       * update 요청이 정상적으로 호출 되면 로컬스토리지의 값을 업데이트함
+       */
+      saveSetting() {
+        return new Promise((resolve, reject) => {
+          this.updateSetting().then(() => {
+            this._setLocalStorage(this.regionCodeLSKey, this._getRegionCombo().selectedOptions[0].value)
+            this._setLocalStorage(this.regionNameLSKey, this._getRegionCombo().selectedOptions[0].innerText);
+            this._setLocalStorage(this.kioskScreenLSKey, this._getScreenCombo().selectedOptions[0] ? this._getScreenCombo().selectedOptions[0].value : 'mps_setting');
+            this._setLocalStorage(this.kioskPrinterIdLSKey, this._getPrintersCombo().selectedOptions[0] ? this._getPrintersCombo().selectedOptions[0].value : null);
+            const kioskInterval = parseInt(this._getKioskIntervalInput().value);
+            this._setLocalStorage(this.kioskIntervalLSKey,  kioskInterval >= 30 ? kioskInterval : 30);
+            this._setLocalStorage(this.kioskCodeTypeLSKey, this._getCodeTypeCombo().selectedOptions[0].value);
+            this._setLocalStorage(this.kioskInputTypeLSKey, this._getInputTypeCombo().selectedOptions[0].value);
+            this._setLocalStorage(this.workLocLSKey, this._getSelectedOpt(this._getWorkLocationOpts()).value);
+            this._setLocalStorage(this.workLocNameLSKey, this._getSelectedOpt(this._getWorkLocationOpts()).getAttribute('work-loc-name'));
+            resolve();
+          })
+          .catch(error => {
+            reject(error);
+          });
+        })
+      }
+
+      /**
+       * @description 설정 값 변경을 서버에 요청함
+       */
+      updateSetting() {
+        return new Promise((resolve, reject) => {
+          const regionCombo = this._getRegionCombo();
+          const regionCode = regionCombo.selectedOptions.length === 1 ? regionCombo.selectedOptions[0].value : null;
+          const workLocation = this._getSelectedOpt(this._getWorkLocationOpts()).value;
+
+          if(!regionCode || !workLocation) {
+            throw {
+              detail: {
+                code: t('error.SETTING_ERROR'),
+                msg: !regionCode ? t('text.region_code_is_not_set') : t('text.side_code_is_not_set')
+              }
+            };
+          }
+
+          const updateSettingAjax = this._getUpdateSettingAjax();
+          updateSettingAjax.curl = `/${this.deviceType.toLowerCase()}/update/setting`
+          updateSettingAjax.params = {
+            region_cd: regionCode,
+            side_cd: workLocation
+          };
+
+          updateSettingAjax.addEventListener('sys-ajax-response', () => {
+            resolve();
+          });
+          updateSettingAjax.addEventListener('sys-ajax-error', event => {
+            reject(event);
+          });
+          updateSettingAjax.generateRequest();
+        })
+      }
+
+      /**
+       * @description return 스크린 설정 콤보
+       */
+      _getScreenCombo() {
+        return this.$['screen-combo']
+      }
+
+      /**
+       * @description return 키오스크 데이터 조회 주기 input element
+       */
+      _getKioskIntervalInput() {
+        return this.$['interval-input']
+      }
+
+      /**
+       * @description return 코드 유형 select element
+       */
+      _getCodeTypeCombo() {
+        return this.$['code-type-combo'];
+      }
+
+      /**
+       * @description return 투입 유형 select element
+       */
+      _getInputTypeCombo() {
+        return this.$['input-type-combo'];
+      }
+    }
+
+    customElements.define(MpsSettingKiosk.is, MpsSettingKiosk);
+  </script>
+</dom-module>

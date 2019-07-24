@@ -1,0 +1,637 @@
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+
+<link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
+
+<link rel="import" href="../../../tablet-libraries.html">
+
+<link rel="import" href="../../../mixins/mps/mps-ble-scanner-mixin.html">
+<link rel="import" href="../../../mixins/mps/tab-ord-info-common-mixin.html">
+<link rel="import" href="../../../mixins/mps/mps-message-subscribe-mixin.html">
+
+<link rel="import" href="../../../../styles/tab-order-info-styles.html">
+
+<link rel="import" href="./tab-order-info-detail.html">
+<link rel="import" href="./tab-bluetooth-scanner-selector.html">
+
+<link rel="import" href="../mps-adjust-qty-dialog.html">
+
+<!--
+  태블릿 - DAS 작업 정보 화면
+-->
+
+<dom-module id="tab-das-order-info">
+  <template>
+    <style include="tab-order-info-styles">
+      #status {
+        border-top-left-radius:0px;border-bottom-left-radius:0px;
+      }
+      #prod-info {
+        border-top-left-radius:0px;border-bottom-left-radius:0px;
+        overflow: hidden;
+      }
+      #info-section{
+        display:grid;
+        grid-template: 100px 100px / 200px auto;
+      }
+      #info-section .prod-img{
+        grid-row: 1 / 3;
+        background:url("../../../../images/bg-noimg.png") 50% 50% no-repeat;
+        width:200px;height:200px;
+        border-top-left-radius:12px;border-bottom-left-radius:12px;
+      }
+      .list-container {
+        overflow: auto;
+        height: 100%;
+      }
+    </style>
+
+    <!-- 상품 정보 스캔 투입 리스트 -->
+    <sys-ajax
+      auto
+      id="input-list-ajax"
+      method="GET"
+      content-type="application/json"
+      on-sys-ajax-response="_inputListResponsed">
+    </sys-ajax>
+
+    <!-- 상품 투입 -->
+    <sys-ajax
+      id="input-sku-ajax"
+      method="POST"
+      content-type="application/json"
+      on-sys-ajax-response="_inputSkuResponsed">
+    </sys-ajax>
+
+    <!-- 상품 정보 스캔 투입 리스트 페이지네이션 -->
+    <sys-ajax
+      id="input-list-pages-ajax"
+      method="GET"
+      content-type="application/json"
+      on-sys-ajax-response="_inputListPageResponsed">
+    </sys-ajax>
+
+    <!-- 투입 이벤트의 거래처 작업 리스트 -->
+    <sys-ajax
+      id="input-job-details-ajax"
+      method="GET"
+      curl="/tablet_process/input_details/:region_cd/:job_input_seq_id/:side_cd/:zone_cd"
+      content-type="application/json"
+      last-response="{{inputDetails}}">
+    </sys-ajax>
+
+    <!-- 태블릿 작업 존의 처리 안된 혹은 처리 완료된 작업을 조회하여 표시기에 점등 -->
+    <sys-ajax
+      id="mpi-on-jobs-ajax"
+      method="PUT"
+      curl="/tablet_process/das/mpi_on/:job_input_seq_id/:region_cd/:zone_cd/:side_cd/:done_or_todo"
+      content-type="application/json">
+    </sys-ajax>
+
+    <!-- 부족한 상품을 채우기 위해 표시기에 불을 켜는 요청 -->
+    <sys-ajax
+      id="mpi-off-my-zone-ajax"
+      method="PUT"
+      curl="/tablet_process/mpi_off/:region_cd/:zone_cd/:side_cd"
+      content-type="application/json">
+    </sys-ajax>
+
+    <!-- 상품 및 작업 정보 표시를 위한 영역 -->
+    <div id="info-section">
+
+      <!-- 상품 이미지 표시를 위한 영역 -->
+      <img class="prod-img" src="[[prodImgSrc]]"/>
+
+      <div id="status">
+        <!-- 현재 투입 상품에 대한 작업 진행율 표시를 위한 영역 -->
+        <div id="chart">[[pickedPercent]]<span>%</span></div>
+
+        <!-- 리프레쉬, 표시기 재점등 버튼을 표시하기 위한 영역 -->
+        <img id="back-to-current-btn" src="./images/iconbtn-das-order3.png" on-click="refreshInputList" />
+        <img id="mpi-on-todo-btn" src="./images/iconbtn-das-order1.png" on-click="mpiOnTodoJobs" />
+        <img id="mpi-on-done-btn" src="./images/iconbtn-das-order2.png" on-click="mpiOnDoneJobs" />
+
+        <!-- 현재 투입 상품에 대한 예정 수량 표시를 위한 영역 -->
+        <div id="picked-qty">
+          [[pickedQtyLabel]]
+          <span>[[pickedQty]]</span>
+        </div>
+
+        <!-- 현재 투입 상품에 대한 확정 수량 표시를 위한 영역 -->
+        <div id="total-pick-qty">
+          [[totalOrdQtyLabel]]
+          <span>[[totalPickQty]]</span>
+        </div>
+      </div>
+
+      <!-- 상품 코드, 상품 명, 블루투스 연결 버튼 표시를 위한 영역 -->
+      <div id="prod-info">
+        <div id="prod-info-left">
+          <span>[[skuCd]]</span>
+          <span class="prodname">[[skuNm]]</span>
+        </div>
+        <iron-icon id="bluetooth-btn" icon="[[bluetoothIcon]]" on-click="bluetoothIconClicked"></iron-icon>
+      </div>
+    </div>
+
+    <!-- 작업 내용 표시를 위한 영역 -->
+    <div id="content">
+
+      <!-- 앞쪽 로케이션 작업 표시를 위한 영역 -->
+      <dom-if if="[[showFront]]">
+        <template>
+          <div id="left-section" class="list-container">
+            <button class="list-header-btn" disabled>[[frontBtnLabel]]</button>
+
+            <mps-list
+              id="front-list"
+              hide-header
+              header="[[header]]"
+              data="[[frontDetailList]]"
+              on-data-list-click="showProcessPopup"
+              on-configured="_addOrderStatusAttr">
+            </mps-list>
+          </div>
+        </template>
+      </dom-if>
+
+      <!-- 뒤쪽 로케이션 작업 표시를 위한 영역 -->
+      <dom-if if="[[showRear]]">
+        <template>
+          <div id="right-section" class="list-container">
+            <button class="list-header-btn" disabled>[[rearBtnLabel]]</button>
+
+            <mps-list
+              id="rear-list"
+              hide-header
+              header="[[header]]"
+              data="[[rearDetailList]]"
+              on-data-list-click="showProcessPopup"
+              on-configured="_addOrderStatusAttr">
+            </mps-list>
+          </div>
+        </template>
+      </dom-if>
+
+      <!-- 앞/뒤 모든 로케이션 작업 표시를 위한 영역 -->
+      <dom-if if="[[showTotal]]">
+        <template>
+          <div id="total-section" class="list-container">
+            <button class="list-header-btn" disabled>[[totalBtnLabel]]</button>
+
+            <mps-list
+              id="total-list"
+              hide-header
+              header="[[header]]"
+              data="[[totalDetailList]]"
+              on-data-list-click="showProcessPopup"
+              on-configured="_addOrderStatusAttr">
+            </mps-list>
+          </div>
+        </template>
+      </dom-if>
+    </div>
+
+    <!-- 작업 진도율 표시기 -->
+    <mps-job-indicator
+      id="das-job-indicator"
+      job-type="[[jobType]]"
+      selected-input="{{selectedInput}}"
+      on-item-selected="_selectedInputChanged"
+      on-item-selected-by-click="_selectedInputChanged"
+      show-full-code$="[[showFullCode]]"
+      input-list="[[inputList]]"
+      on-swipe-left="swipeLeft"
+      on-swipe-right="swipeRight"
+      on-configured="_addJobStatusAttr">
+    </mps-job-indicator>
+
+    <!-- SKU 정보 조회 시 복수개가 조회된 경우 실행되는 사용자가 고를 수 있는 팝업이 가미된 SKU Input -->
+    <mps-auto-popup-input
+      hidden
+      hide-keyboard
+      id="sku-barcd"
+      resource-url="[[getSkuAjaxUrl]]"
+      popup-title="[[popupTitleLabel]]"
+      button-txt-callback="[[_skuButtonTxtCallback]]"
+      on-item-selected="inputSku"
+      max-length=13>
+    </mps-auto-popup-input>
+  </template>
+
+  <script>
+    class TabDasOrderInfo extends MpsMessageSubscribeMixin(TabOrdInfoCommonMixin(MpsBleScannerMixin(Polymer.Element))) {
+      static get is() { return 'tab-das-order-info' }
+
+      static get properties() {
+        return {
+          /**
+           * @description SKU 정보 조회 시 복수개가 조회된 경우 사용자가 고를 수 있는 팝업이 실행되는데 그 팝업에 표시할 타이틀
+           ****************
+           * @type {String}
+           */
+          popupTitleLabel: {
+            type: String,
+            value: () => t('label.sku')
+          },
+
+          /**
+           * @description 그리드 헤더 라벨
+           ****************
+           * @type {Array}
+           */
+          header: {
+            type: Array,
+            value: function() {
+              return [{
+                fieldname: 'loc_cd',
+                columnWidth: 'auto',
+                displayCallback: value => '(' + (value ? value.substring(4) : '') + ')'
+              }, {
+                fieldname: 'cust_nm',
+                columnWidth: '3fr'
+              }, {
+                fieldname: 'picking_sum',
+                displayCallback: (value, rowData) => {
+                  return `${rowData['picked_qty']}/${rowData['pick_qty']}`;
+                },
+                style: {
+                  textAlign: 'right',
+                  width: 'max-content'
+                }
+              }, {
+                fieldname: 'picked_qty',
+                hidden: true
+              }, {
+                fieldname: 'pick_qty',
+                hidden: true
+              }, {
+                fieldname: 'id',
+                hidden: true
+              }, {
+                fieldname: 'status',
+                hidden: true
+              }]
+            }
+          },
+
+          /**
+           * @description 작업자 위치 정보 - 앞, 뒤
+           ****************
+           * @type {String}
+           */
+          defaultWorkLoc: {
+            type: String,
+            value: 'F'
+          },
+
+          /**
+           * @description 투입 리스트의 상품 코드를 전체 보이게 할 것인지 뒷 자리 4자리만 보여줄 것인지 여부 설정
+           ****************
+           * @type {Boolean}
+           */
+          showFullCode: {
+            type: Boolean,
+            value: () => {
+              return MPS_UTIL.getShowFullCode()
+            }
+          },
+
+          /**
+           * @description 작업 유형
+           ****************
+           * @type {String}
+           */
+          jobType: {
+            type: String,
+            value: 'DAS'
+          },
+
+          /**
+           * @description SKU 정보 조회를 위한 URL
+           ****************
+           * @type {String}
+           */
+          getSkuAjaxUrl: {
+            type: String,
+            value: `/tablet_process/find_sku/${MPS_UTIL.getRegionCd()}/:inputValue`
+          },
+
+          /**
+           * @description 조회한 SKU 정보
+           ****************
+           * @type {Object}
+           */
+          skuInfo: {
+            type: Object
+          }
+        }
+      }
+
+      /**
+       * @description SKU 정보 조회 시 복수개가 조회된 경우 사용자가 고를 수 있는 버튼이 실행되는데 그 버튼에 표시할 내용
+       *******************
+       * @param {Object} item
+       */
+      _skuButtonTxtCallback(item) {
+        return `${item.com_cd} : ${item.sku_cd}
+                ${item.sku_nm}`;
+      }
+
+      /**
+       * @description list configured event handler
+       * list 구성이 완료 되면 status 데이터를 바탕으로 status attribute를 추가함
+       *********************
+       * @param {Object} event
+       */
+      _addOrderStatusAttr(event) {
+        let list = event.detail.contentElements;
+        list.forEach(row => {
+          let data = row.getData();
+          if(data.status === 'C') { // 취소된 데이터에 canceled class 추가
+            row.classList.add('canceled');
+          } else if(data.status !== 'W' && data.status !== 'I' && data.status !== 'P') {
+            if(parseInt(data.picked_qty) >= parseInt(data.pick_qty)) {
+              // 완료된 데이터에 complete class를 추가
+              row.classList.add('complete');
+            }
+          }
+        });
+      }
+
+      /**
+       * @description 상품 투입 상세 정보로 현황 정보 리프레쉬
+       ******************
+       * @param {Array} inputDetails
+       */
+      _updateStatus(inputDetails) {
+        // input detail의 내용이 없을 경우 다음 아이템을 선택함 == 나와 관계 없는 작업들 처리...
+        if(inputDetails.length === 0 && !this.holdIndicator && MPS_UTIL.getAutoPicking()) {
+          if(!this.$['das-job-indicator'].selectNextItem()) {
+            this.refreshInputList();
+          }
+        }
+
+        let totalPickQty = 0;     // 총 주문 수량
+        let pickedQty = 0;        // 총 확정 수량
+        let canceledQty = 0;      // 작업 취소된 상품 수량
+
+        inputDetails.forEach(item => {
+          totalPickQty += item.pick_qty;
+          pickedQty += item.picked_qty;
+          item.left_qty = item.pick_qty - item.picked_qty;
+          if(item.status === 'C') canceledQty += item.pick_qty;
+        });
+
+        // pickedCanceldPercent를 완료 + 취소된 작업의 전체 작업 대비 퍼센트를 계산하여
+        // 다음 블럭을 선택하는 기준 percent로 삼는다.
+        // inputDetails 중에 완료되지 않았지만 취소상태인 작업이 있다면 해당 작업도 이후에 처리할 것이기 때문에
+        // 다음 블럭을 선택하거나 inputList를 다시 조회해야함
+        const pickedCanceldPercent =
+          (totalPickQty && totalPickQty > 0 && pickedQty && pickedQty > 0) ?
+          Math.floor((pickedQty + canceledQty) / totalPickQty * 100) : 0;
+        this.totalPickQty = totalPickQty;
+        this.pickedQty = pickedQty;
+
+        const selectedInputData = this.$['das-job-indicator'].getBlockById(this.selectedInput.id).getData();
+        if(selectedInputData.my_zone_progress_rate > 0) {
+          this.pickedPercent = selectedInputData.my_zone_progress_rate;
+        } else {
+          this.pickedPercent =
+            (totalPickQty && totalPickQty > 0 && pickedQty && pickedQty > 0) ?
+            Math.floor(pickedQty / totalPickQty * 100) : 0;
+        }
+
+        this._updateBlockChart(this.pickedPercent);
+
+        // 작업률 100% & 자동피킹이 true로 설정 && 사용자에 의해 클릭을 통해 변경되지 않은 경우 => true
+        if(pickedCanceldPercent === 100 && MPS_UTIL.getAutoPicking() && !this.holdIndicator) {
+          // 다음 아이템이 없을 경우 false를 리턴함
+          if(!this.$['das-job-indicator'].selectNextItem()) {
+            // 마지막 아이템일 경우 input list를 다시 조회
+            this.refreshInputList();
+          }
+        } else if (this.holdIndicator) {
+          // holdIndicator flag에 의해 selectNextItem을 호출 하지 않은 경우 holdIndicator의 값을 변경
+          this.holdIndicator = false;
+        }
+      }
+
+      /**
+       * @description 미들웨어로 부터 데이터 리프레쉬
+       ******************
+       * @param {Object} data
+       */
+      refreshByWs(data) {
+        if(data == 'input-added') {
+          // 투입 정보 리스트가 없는 경우 투입 정보 리스트 조회
+          if(!this.inputList || this.inputList.length < 4) {
+            this.refreshInputList();
+          }
+        } else {
+          // 투입 정보 리프레쉬
+          this.refreshInputDetails();
+        }
+      }
+
+      /**
+       * @description 선택된 버킷 즉 주문의 상품 중에서 아직 처리가 안 된 상품 및 개수를 표시기로 표시
+       * toggle 버튼이기 때문에 active attribute를 추가/제거 함
+       *********************
+       * @param {Object} event
+       */
+      mpiOnTodoJobs(event) {
+        if(!this.inputDetails || this.inputDetails.length == 0) return;
+
+        const mpiOnTodoJobsBtn = event.currentTarget;
+        const isButtonActive = mpiOnTodoJobsBtn.getAttribute('active');
+
+        // 태블릿의 작업 존의 모든 표시기 소등
+        if(isButtonActive === '') {
+          mpiOnTodoJobsBtn.removeAttribute('active');
+          this.mpiOffByTabletZone();
+
+        // 태블릿의 작업 존에 현재 선택된 버킷 (즉 주문) 중에 처리 안 된 작업 리스트에 대한 표시기 점등
+        } else {
+          mpiOnTodoJobsBtn.setAttribute('active', '');
+          this.mpiOnByTabletZone('todo');
+        }
+      }
+
+      /**
+       * @description 이미 처리한 작업에 대해서 확인을 위해서 다시 한 번 표시기에 점등
+       * toggle 버튼이기 때문에 active attribute를 추가/제거 함
+       *********************
+       * @param {Object} event
+       */
+      mpiOnDoneJobs(event) {
+        if(!this.inputDetails || this.inputDetails.length == 0) return;
+
+        const mpiOnDoneJobsBtn = event.currentTarget;
+        const isButtonActive = mpiOnDoneJobsBtn.getAttribute('active');
+
+        // 태블릿의 작업 존의 모든 표시기 소등
+        if(isButtonActive === '') {
+          mpiOnDoneJobsBtn.removeAttribute('active');
+          this.mpiOffByTabletZone();
+
+        // 태블릿의 작업 존에 현재 선택된 버킷 (즉 주문) 중에 처리 완료된 작업 리스트에 대한 표시기 점등
+        } else {
+          mpiOnDoneJobsBtn.setAttribute('active', '');
+          this.mpiOnByTabletZone('done');
+        }
+      }
+
+      /**
+       * @description 태블릿 작업 존에 해당하는 표시기 리스트를 소등한다.
+       */
+      mpiOffByTabletZone() {
+        const mpiOffAjax = this.$['mpi-off-my-zone-ajax'];
+        let regionCd = MPS_UTIL.getRegionCd();
+        let zoneCd = MPS_UTIL.getZoneCd();
+        let sideCd = MPS_UTIL.getSideCd();
+        mpiOffAjax.curl = `/tablet_process/mpi_off/${regionCd}/${zoneCd}/${sideCd}`;
+        mpiOffAjax.generateRequest();
+      }
+
+      /**
+       * @description mode에 따라 태블릿의 작업 존에 현재 선택된 버킷 (즉 주문) 중에 처리 안 된 혹은 처리 완료된 작업 리스트에 대한 표시기 점등
+       **************************
+       * @param {String} mode
+       */
+      mpiOnByTabletZone(mode) {
+        const mpiOnAjax = this.$['mpi-on-jobs-ajax'];
+        let inputSeqId = this.selectedInput.id;
+        let regionCd = MPS_UTIL.getRegionCd();
+        let zoneCd = MPS_UTIL.getZoneCd();
+        let sideCd = MPS_UTIL.getSideCd();
+        mpiOnAjax.curl = `/tablet_process/das/mpi_on/${inputSeqId}/${regionCd}/${zoneCd}/${sideCd}/${mode}`;
+        mpiOnAjax.generateRequest();
+      }
+
+      /**
+       * @description 작업 팝업 정보 표시
+       ******************
+       * @param {Object} event
+       */
+      showProcessPopup(event) {
+        // status가 'F'면 완료된 작업
+        let status = event.detail.data.status;
+        if(status === 'W' || status == 'I' || status == 'P' || status == 'F') {
+          const popup = document.createElement('tab-order-info-detail');
+          const data = event.detail.data;
+          popup.jobType = this.jobType;
+          popup.jobId = data.id;
+          popup.pickQty = data.pick_qty;
+          popup.pickedQty = data.picked_qty;
+          popup.isFinished = (status === 'F');
+          MPS_UTIL.showPopup(t('title.job_select'), popup, 'fit', 'fit', null, closeParam => {
+            if(closeParam && typeof closeParam === 'object' && closeParam.type === 'adjust-qty') {
+              const adjustPopup = document.createElement('mps-adjust-qty-dialog');
+
+              setTimeout(() => {
+                MPS_UTIL.showPopup(t('button.adjust_qty'), adjustPopup, 'fit', 'fit', () => {
+                  adjustPopup.setCurrentQty(closeParam.pickQty);
+                  adjustPopup.jobId = closeParam.jobId;
+                }, this.refreshInputDetails.bind(this));
+              }, 100);
+            } else {
+              this.refreshInputDetails.bind(this)
+            }
+          });
+        }
+      }
+
+      /**
+       * @description 왼쪽으로 Swipe - 현재 페이지보다 이전 페이지로 페이지네이션 처리
+       ********************
+       * @param {Object} event
+       */
+      swipeLeft(event) {
+        /*if(!this.inputList || this.inputList.length == 0) return;
+        let startInputSeq = this.inputList[0].input_seq;
+        this.paginateInputList(startInputSeq, 'DOWN');*/
+      }
+
+      /**
+       * @description 오른쪽으로 Swipe - 현재 페이지보다 이후 페이지로 페이지네이션 처리
+       ********************
+       * @param {Object} event
+       */
+      swipeRight(event) {
+        /*if(!this.inputList || this.inputList.length == 0) return;
+        let startInputSeq = this.inputList[this.inputList.length - 1].input_seq;
+        this.paginateInputList(startInputSeq, 'UP');*/
+      }
+
+      /**
+       * @description 투입 상품 리스트 페이지네이션 조회
+       ********************
+       * @param {Number} startInputSeq
+       * @param {String} upDownMode UP / DOWN
+       */
+      paginateInputList(startInputSeq, upDownMode) {
+        let regionCd = MPS_UTIL.getRegionCd();
+        let zoneCd = MPS_UTIL.getZoneCd();
+        let sideCd = MPS_UTIL.getSideCd();
+        let pageAjax = this.$['input-list-pages-ajax'];
+        pageAjax.customParams = { show_others_order: MPS_UTIL.getShowOthersOrder() };
+        pageAjax.curl = `/tablet_process/input_pages/${regionCd}/${zoneCd}/${sideCd}/${upDownMode}/${startInputSeq}`;
+        pageAjax.generateRequest();
+      }
+
+      /**
+       * @description 블루투스 subscribe callback
+       * 연결된 블루투스 장비에 의해 호출됨
+       * MpsBluetoothScannerMixin을 사용하는 컴퍼넌트는 scanned 함수를 구현해야 함
+       ******************
+       * @param {String} skuCd 스캔한 상품 바코드
+       */
+      scanned(skuCd) {
+        skuCd = skuCd ? skuCd.trim() : skuCd;
+        if(skuCd && skuCd.length > 3) {
+          this.$['sku-barcd']._setInputValue(skuCd);
+          this.$['sku-barcd']._triggerAjax();
+        }
+      }
+
+      /**
+       * @description DAS 분류 상품 투입
+       ******************
+       * @param {Object} event
+       */
+      inputSku(event) {
+        let skuInfo = event.detail;
+        const regionCd = MPS_UTIL.getRegionCd();
+        const sideCd = MPS_UTIL.getSideCd();
+        let zoneCd = MPS_UTIL.getZoneCd();
+        let comCd = skuInfo.com_cd;
+        let skuCd = skuInfo.sku_cd;
+
+        try {
+          const inputAjax = this.$['input-sku-ajax'];
+          inputAjax.curl = `/tablet_process/input_sku/${regionCd}/${sideCd}/${zoneCd}/${comCd}/${skuCd}`;
+          inputAjax.generateRequest();
+        } catch (error) {
+          openAlert({ title: t('error.VALIDATION_ERROR'), message: error });
+        }
+      }
+
+      /**
+       * @description DAS 상품 투입 응답시 ...
+       ******************
+       * @param {Object} event
+       */
+      _inputSkuResponsed(event) {
+        let response = event.currentTarget.lastResponse;
+        if (response.items && response.items.length > 0) {
+          this.refreshInputList();
+        }
+      }
+    }
+
+    customElements.define(TabDasOrderInfo.is, TabDasOrderInfo);
+  </script>
+</dom-module>

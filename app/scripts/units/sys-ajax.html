@@ -1,0 +1,297 @@
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../../bower_components/iron-localstorage/iron-localstorage.html">
+<link rel="import" href="../units/mps/mps-alert.html">
+
+<dom-module id="sys-ajax">
+	<template>
+		<style>
+			:host{
+				position:absolute
+			}
+		</style>
+
+		<iron-localstorage
+			name="setting.baseUrl"
+			value="{{baseUrl}}"
+			on-iron-localstorage-load-empty="_initDefaultBaseUrl">
+		</iron-localstorage>
+
+		<iron-ajax
+			id="ajax"
+			auto="[[auto]]"
+			url="[[url]]"
+			method="[[method]]"
+			with-credentials="[[withCredentials]]"
+			loading="{{loading}}"
+			params="[[params]]"
+			body="[[body]]"
+			headers="[[headers]]"
+			content-type="[[contentType]]"
+			last-response="{{lastResponse}}"
+			timeout="[[timeout]]"
+			on-iron-ajax-response="_handleAjaxResponse"
+			on-iron-ajax-error="_handleAjaxError">
+		</iron-ajax>
+	</template>
+
+	<script>
+		class SysAjax extends Polymer.Element {
+			static get is() { return 'sys-ajax' }
+
+			static get properties() {
+				return {
+					auto: Boolean,
+					contentType: String,
+					method: String,
+					curl: {
+						type: String,
+						observer: '_curlChanged'
+					},
+
+					withCredentials: {
+						type: Boolean,
+						value: true
+					},
+
+					baseUrl: {
+						type: String,
+						observer: '_baseUrlChanged'
+					},
+
+					customParams: {
+						type: Object,
+						observer: '_customParamsChanged'
+					},
+
+					timeout: {
+						type: Number,
+						value: 10000
+					},
+
+					hiddenSpinner: {
+						type: Boolean
+					},
+
+					/**
+					 * ajax 에러 발생시 직접 핸들링을 하기 위한 flag
+					 * customErrorHandler가 true이면 에러 발생시
+					 * 공통 처리 부분을 제외하고 sys-ajax-error 이벤트만 발생시킴
+					 */
+					customErrorHandler: {
+						type: Boolean,
+						value: false
+					},
+
+					body: Object,
+
+					selectFields: {
+						type: Array,
+						observer: '_selectFieldsChanged'
+					},
+
+					headers: {
+						type: Object,
+						computed: '_computeHeaders()'
+					},
+
+					loading: {
+						type: Boolean,
+						notify: true,
+						observer: '_loadingChanged'
+					},
+					
+					/**
+					 * lastRequest's response.
+					 *
+					 * Note that lastResponse and lastError are set when lastRequest finishes,
+					 * so if loading is true, then lastResponse and lastError will correspond
+					 * to the result of the previous request.
+					 *
+					 * The type of the response is determined by the value of `handleAs` at
+					 * the time that the request was generated.
+					 *
+					 * @type {Object}
+					 */
+					lastResponse: {
+						type: Object,
+						notify: true
+					},
+
+					hasToast: {
+						type: Boolean,
+						value: true
+					},
+					toastMessage: String
+				}
+			}
+
+			connectedCallback() {
+				super.connectedCallback();
+				document.addEventListener('base-url-changed', event => {
+					this.baseUrl = event.detail;
+				});
+			}
+
+			_initDefaultBaseUrl() {
+				this.baseUrl = location.origin + '/rest';
+			}
+
+			_computeHeaders() {
+				if (window.globals) {
+					var locale = window.globals.locale;
+				}
+
+				if (!locale) {
+					let l = localStorage.getItem("setting.locale");
+					locale = l ? JSON.parse(l) : '';
+				}
+
+				return {
+					'x-locale': locale
+				};
+			}
+
+			_curlChanged(curl) {
+				// console.log(this.baseUrl + ': ' + curl);
+
+				if (this.baseUrl === undefined) {
+					return;
+				}
+
+				if (curl === undefined) {
+					this.url = '';
+					return;
+				}
+
+				if (curl.indexOf('http') >= 0) {
+					this.url = curl;
+				} else {
+					this.url = `${this.baseUrl}${curl}`;
+				}
+			}
+
+			_baseUrlChanged(baseUrl) {
+				this._curlChanged(this.curl);
+			}
+
+			_customParamsChanged(customParams) {
+				if (!customParams) {
+					return;
+				}
+
+				Object.keys(customParams).forEach((key) => {
+					let value = customParams[key];
+					if (Array.isArray(value)) {
+						customParams[key] = JSON.stringify(value);
+					}
+				});
+
+				this.params = {};
+				this.params = Object.assign(this.params, customParams);
+			}
+
+			generateRequest() {
+				if (!this.url) {
+					return;
+				}
+
+				this.$.ajax.generateRequest();
+			}
+
+			_selectFieldsChanged(selectFields) {
+				if (!selectFields) {
+					return;
+				}
+				this.params = this.params || {};
+				this.params.select = selectFields.join(',');
+			}
+
+			_handleAjaxResponse(e, request) {
+				var response = request.xhr.response;
+				var event = new CustomEvent(
+						'sys-ajax-response',
+						{ detail: response, bubbles: true, composed: true });
+
+				this.dispatchEvent(event);
+			}
+
+			_handleAjaxError(e, {request, error}) {
+				var response = request.xhr.response;
+				
+				// 에러 사운드 재생
+				if (window.SOUND) {
+					window.SOUND.playErrorSound();
+				}
+				
+				if(this.customErrorHandler) {
+					this.dispatchEvent(new CustomEvent('sys-ajax-error', {
+						detail: response
+					}));
+				} else {
+					if(request.xhr.status == 401) {
+						let event = new CustomEvent('sys-unauthorized-session', { 
+							detail: response, 
+							bubbles: true, 
+							composed: true
+						});
+						
+						this.dispatchEvent(event);
+					} else if (response) {
+						if (!response.status && !response.msg) {
+							response = this._transBody(response.body);
+
+							if (!response) {
+								return;
+							}
+						}
+
+						let event = new CustomEvent('sys-ajax-error', {
+							detail: response,
+							bubbles: true,
+							composed: true
+						});
+
+						this.dispatchEvent(event);
+						showToast('error', response.msg ? response.msg : response.message);
+					} else {
+						this.dispatchEvent(new CustomEvent('sys-ajax-error'));
+					}
+				}
+			}
+
+			_loadingChanged(loading) {
+				if(!this.hiddenSpinner) this.toggleSpinner(loading);
+			}
+
+			_transBody(body) {
+				if (!body) {
+					return;
+				}
+
+				var response = {
+					code: body.code,
+					status: body.status,
+					msg: body.msg
+				};
+				return response;
+			}
+
+			toggleSpinner(loading) {
+				document.dispatchEvent(new CustomEvent('toggle-spinner', {
+					detail: {
+						active: loading
+					}
+				}));
+			}
+		}
+
+		customElements.define(SysAjax.is, SysAjax);
+	</script>
+
+</dom-module>

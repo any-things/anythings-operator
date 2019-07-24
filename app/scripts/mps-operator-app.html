@@ -1,0 +1,1049 @@
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+
+<script src="../bower_components/crypto-js/crypto-js.js"></script>
+<script src='../licenses/things/things-lic.js'></script>
+<script src='../bower_components/things-license-checker-min/things-license-checker-without-grid.min.js'></script>
+
+<script src="../locales/ko-KR.js"></script>
+<script src="../locales/en-US.js"></script>
+<script src="../locales/zh-CN.js"></script>
+
+<script src="./units/mixin-builder.js"></script>
+
+<link rel="import" href="./mps-operator-app-import.html">
+
+<link rel="import" href="../styles/mobile-theme.html">
+
+<dom-module id="mps-operator-app">
+  <template>
+    <style>
+      :host {
+        display: block;
+        --things-app-header: {
+          background-color: var(--things-primary-background-color);
+          height:55px;
+          color: #fff;
+        }
+        --things-app-menu-header:{
+          display:block;
+          margin:0;padding:0;
+          height:55px;
+          background-color: var(--things-primary-background-color);
+          color:#fff
+        }
+        --app-drawer-content-container:{
+          background-color:var(--things-primary-background-color)
+        }
+        --operator-default-btn: {
+          background: #7f95bd;
+          background: linear-gradient(to bottom, #7f95bd 0%, #4e638a 100%);
+          border:none;border-top:.06rem solid #96b2e6;border-bottom:.2rem solid #3a4b69;
+          border-radius:12px;
+          margin:0;padding:.3rem 1rem;
+          min-width:100px;
+          color: #fff;
+          text-shadow: 0px .03rem .03rem rgba(0, 0, 0, 0.4);
+          font-size:.8rem;
+          font-family: 'cj-font';
+          outline: none;
+        }
+        --operator-default-btn-active: {
+          background: #7f95bd;
+          background: linear-gradient(to bottom, #4e638a 0%, #7f95bd 100%);
+          text-shadow: .03rem 0rem .03rem rgba(0, 0, 0, 0.4);
+        }
+        --operator-warn-btn: {
+          background: #ff1414;
+          background: linear-gradient(to bottom, #ff7575 0%, #ff1414 100%);
+          border:none;border-top:.06rem solid #ff1414;border-bottom:.2rem solid #c20000;
+          border-radius:12px;
+          margin:0;padding:.3rem 1rem;
+          min-width:100px;
+          color: #fff;
+          text-shadow: 0px .03rem .03rem rgba(0, 0, 0, 0.4);
+          font-size:.8rem;
+          font-family: 'cj-font';
+          outline: none;
+        }
+        --operator-warn-btn-active: {
+          background: #7f95bd;
+          background: linear-gradient(to bottom, #7f95bd 0%, #4e638a 100%);
+          text-shadow: .03rem 0rem .03rem rgba(0, 0, 0, 0.4);
+        }
+      }
+      app-drawer-layout{
+        background-color:var(--things-secondary-background-color);
+      }
+      app-drawer-layout:not([narrow]) [drawer-toggle] {
+        display: none;
+      }
+      app-header-layout{
+        width:100%;
+      }
+      app-drawer app-toolbar{
+        @apply --things-app-menu-header;
+      }
+      app-header {
+        @apply --things-app-header;
+        height:70px
+      }
+      app-header app-toolbar{
+        display: flex;
+        flex-direction: row;
+        height:73px
+      }
+      iron-pages{
+        height:100%
+      }
+      #top-bar {
+        flex: 1;
+        display: flex;
+      }
+      #top-bar span#header {
+        flex: 1;
+        display: grid;
+        grid-template-columns: auto 1fr;
+      }
+      #menu-btn {
+        display: grid;
+        grid-template-columns: auto auto;
+      }
+      #menu-btn img, #menu-btn span {
+        margin: auto;
+        padding: 0 7px 0 0;
+      }
+      span#title {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        margin: auto 0;
+        border-left: 1px dotted rgba(255,255,255,.2);
+        padding: 0 0 0 7px;
+        font-size: .8rem;
+        color: rgba(255,255,255,.8);
+      }
+      #input-container, #buttons {
+        display: grid;
+        grid-auto-flow: column;
+        grid-gap: 7px;
+      }
+      #buttons {
+        margin-left: 7px;
+      }
+      #input-container span {
+        margin: auto;
+        font-size:.8rem;
+      }
+      #buttons iron-icon {
+        height: var(--iron-icon-height, 1rem);
+        margin: auto;
+        fill:#8cc9e7;
+      }
+      #buttons iron-icon:active{
+        background-color:rgba(0,0,0,.3);
+        border-radius:7px;
+        fill:#f9a21f;
+      }
+    </style>
+
+    <iron-localstorage
+      name="setting.deviceType"
+      value="{{deviceType}}"
+      on-iron-localstorage-load-empty="_checkDeviceType">
+    </iron-localstorage>
+
+    <mps-view-loader></mps-view-loader>
+
+    <sys-route
+      id="routing"
+      page="{{page}}"
+      title="{{title}}"
+      route="[[route]]">
+    </sys-route>
+
+    <sys-logout
+      id="sys-logout"
+      on-log-out="_handleLogOut">
+    </sys-logout>
+
+    <mps-locale
+      resources="{{resources}}"
+      language="{{language}}">
+    </mps-locale>
+
+    <mps-dialog id="mps-dialog"></mps-dialog>
+    <mps-alert id="mps-alert"></mps-alert>
+    <mps-toast-msg id="mps-toast-msg"></mps-toast-msg>
+
+    <app-drawer-layout id="drawer-layout" fullbleed force-narrow narrow="{{narrow}}" responsive-width="1000px">
+      <mps-spinner></mps-spinner>
+      <mps-message-spinner></mps-message-spinner>
+      <!-- Drawer content -->
+      <app-drawer id="appDrawer" opened="{{drawerOpened}}" slot="drawer" swipe-open>
+        <!--app-toolbar>SIDEBAR HEADER</app-toolbar-->
+
+        <template is="dom-if" if="[[!isKIOSK]]">
+          <mps-menu-tiles route="{{route}}" device-type="[[deviceType]]"></mps-menu-tiles>
+        </template>
+      </app-drawer>
+
+      <!-- Main content -->
+      <app-header-layout has-scrolling-region>
+        <app-header
+          slot="header"
+          fixed reveals
+          effects="waterfall">
+
+          <app-toolbar>
+            <!--dom-if if="[[isDevMode]]">
+              <template>
+                <iron-icon icon="settings" on-click="toSysSetting"></iron-icon>
+              </template>
+            </dom-if-->
+
+            <div id="top-bar">
+              <span id="header">
+                <div id="menu-btn">
+                  <img src="./images/icon-brand.png" />
+                  <!--span>MPS</span-->
+                  <span>[[currentSite]]</span>
+                </div>
+                <span id="title">[[title]]</span>
+              </span>
+
+              <div id="input-container">
+                <span id="region-name" is-kiosk$="[[isKIOSK]]">[[regionName]]</span>
+                <span id="zone-code">[[zoneCode]]</span>
+                <span id="kiosk-work-loc" is-kiosk$="[[isKIOSK]]" hidden>[[kioskWorkLocLabel]]</span>
+              </div>
+
+              <div id="buttons">
+                <iron-icon id="refresh-btn" icon="refresh" on-click="refresh" hidden></iron-icon>
+                <iron-icon id="mpi-off-btn" icon="lightbulb-outline" on-click="showCodePopup" hidden></iron-icon>
+                <iron-icon id="mpi-on-last-btn" icon="list" on-click="showCodePopup" hidden></iron-icon>
+                <iron-icon id="batch-full-box-btn" icon="move-to-inbox" on-click="showCodePopup" hidden></iron-icon>
+                <iron-icon id="kiosk-setting-btn" icon="settings" on-click="toSetting" hidden></iron-icon>
+                <iron-icon id="logout-btn" icon="power-settings-new" on-click="logout" hidden></iron-icon>
+              </div>
+            </div>
+          </app-toolbar>
+        </app-header>
+
+        <iron-pages
+          id="main"
+          role="main"
+          selected="[[page]]"
+          attr-for-selected="name"
+          selected-attribute="visible">
+
+          <!-- Common Views -->
+          <!--sys-setting
+            id="sys-setting"
+            name="setting"
+            resources="[[resources]]"
+            language="[[language]]"
+            device-type="{{deviceType}}">
+          </sys-setting-->
+
+          <mps-label-re-issue name="mps_label_re_issue" is-pda="[[isPDA]]"></mps-label-re-issue>
+          <mps-region-input-list name="mps_region_input_list" is-pda="[[isPDA]]"></mps-region-input-list>
+          <mps-box-assign name="mps_box_assign" is-pda="[[isPDA]]"></mps-box-assign>
+          <mps-box-list name="mps_box_list" is-kiosk="[[isKIOSK]]"></mps-box-list>
+          <mps-picking-list name="mps_picking_list" is-kiosk="[[isKIOSK]]"></mps-picking-list>
+          <mps-picked-by-location name="mps_picked_by_location" is-pda="[[isPDA]]"></mps-picked-by-location>
+          <!-- Common Views -->
+
+          <!-- Tablet Views -->
+          <tab-das-order-info name="tab_das_ord_info"></tab-das-order-info>
+          <tab-das2-order-info name="tab_das2_ord_info"></tab-das2-order-info>
+          <tab-das-order-list name="tab_das_ord_list"></tab-das-order-list>
+          <tab-dps-order-info name="tab_dps_ord_info"></tab-dps-order-info>
+          <!-- Tablet Views -->
+
+          <!-- PDA Views -->
+          <pda-loc-stock-lookup name="pda_loc_stock_lookup"></pda-loc-stock-lookup>
+          <pda-stock-load name="pda_stock_load"></pda-stock-load>
+          <pda-stock-load-fixed name="pda_stock_load_fixed"></pda-stock-load-fixed>
+          <pda-region-sku-info name="pda_region_sku_info"></pda-region-sku-info>
+          <pda-bucket-assign name="pda_bucket_assign"></pda-bucket-assign>
+          <pda-job-process name="pda_job_process"></pda-job-process>
+          <pda-rtn-process name="pda_rtn_process" region-nm="{{regionName}}" zone-cd="{{zoneCode}}"></pda-rtn-process>
+          <pda-rtn-inspection name="pda_rtn_inspection" region-nm="{{regionName}}" zone-cd="{{zoneCode}}"></pda-rtn-inspection>
+          <pda-rtn-fullbox name="pda_rtn_fullbox" region-nm="{{regionName}}" zone-cd="{{zoneCode}}"></pda-rtn-fullbox>
+          <pda-das2-process name="pda_das2_process" region-nm="{{regionName}}" zone-cd="{{zoneCode}}"></pda-das2-process>
+          <pda-dps2-process name="pda_dps2_process" region-nm="{{regionName}}" zone-cd="{{zoneCode}}"></pda-dps2-process>
+          <pda-one-sku-order name="pda_one_sku_order"></pda-one-sku-order>
+          <!-- PDA Views -->
+
+          <!-- KIOSK View -->
+          <kiosk-das-order-info name="kiosk_das_ord_info"></kiosk-das-order-info>
+          <kiosk-dps-order-info name="kiosk_dps_ord_info"></kiosk-dps-order-info>
+          <kiosk-middle-assort name="kiosk_middle_assort"></kiosk-middle-assort>
+          <kiosk-middle-assort-weight name="kiosk_middle_assort_weight"></kiosk-middle-assort-weight>
+          <kiosk-middle-assort-rtn name="kiosk_middle_assort_rtn"></kiosk-middle-assort-rtn>
+          <kiosk-dps-inspection name="kiosk_dps_inspection"></kiosk-dps-inspection>
+          <kiosk-das-inspection name="kiosk_das_inspection"></kiosk-das-inspection>
+          <kiosk-das-inspection-weight name="kiosk_das_inspection_weight"></kiosk-das-inspection-weight>
+          <kiosk-single-handling name = "kiosk_single_handling"></kiosk-single-handling>
+          <kiosk-packing-check name = "kiosk_packing_check"></kiosk-packing-check>
+          <kiosk-packing-popup name = "kiosk_packing_popup"></kiosk-packing-popup>
+          <!-- KIOSK View -->
+
+          <mps-login
+            name="login"
+            resources="[[resources]]"
+            language="[[language]]"
+            is-dev-mode="[[_computeIsDev()]]"
+            on-login-succeed="_handleLoginSuccess">
+          </mps-login>
+
+          <mps-setting
+            id="mps-setting"
+            name="mps_setting"
+            device-type="[[deviceType]]"
+            is-dev-mode="[[isDevMode]]"
+            is-not-login="[[isNotLogin]]"
+            on-session-responsed="_sessionResponsed"
+            on-session-unauthorized="_sessionUnauthorized">
+          </mps-setting>
+
+          <mps-home
+            name="home">
+          </mps-home>
+        </iron-pages>
+      </app-header-layout>
+    </app-drawer-layout>
+  </template>
+
+  <script>
+    class MpsOperatorApp extends Polymer.Element {
+      static get is() { return 'mps-operator-app'; }
+
+      static get properties() {
+        return {
+          /**
+           * 화면의 타이틀
+           */
+          title: String,
+          /**
+           * 페이지 routing을 위한 Object
+           */
+          route: Object,
+          /**
+           * 현재 page hash
+           */
+          page: {
+            type: String,
+            observer: '_pageChanged'
+          },
+          /**
+           * 현재 장비의 타입
+           */
+          deviceType: {
+            type: String,
+            observer: '_deviceTypeChanged'
+          },
+
+          regionName: {
+            type: String,
+            value: () => JSON.parse(localStorage.getItem('setting.regionName'))
+          },
+
+          zoneCode: {
+            type: String,
+            value: () => JSON.parse(localStorage.getItem('setting.zoneCode'))
+          },
+
+          jobName: {
+            type: String,
+            value: () => JSON.parse(localStorage.getItem('setting.jobName'))
+          },
+
+          isQps:{
+            type: Boolean,
+            value: () => JSON.parse(localStorage.getItem('setting.isQps'))
+          },
+
+          kioskWorkLoc: {
+            type: String,
+            value: () => JSON.parse(localStorage.getItem('setting.workLocation'))
+          },
+
+          /**
+           * KIOSK 환경에서 상단에 표시되는 작업 위치
+           ***************
+           * mps-setting에 의해 workLoc이 결정되면 workLoc을 바탕으로 화면에 표시할
+           * 값을 결정함
+           */
+          kioskWorkLocLabel: {
+            type: String,
+            value: () => JSON.parse(localStorage.getItem('setting.workLocationLabel'))
+          },
+
+          /**
+           * 개발 모드 여부
+           */
+          isDevMode: {
+            type: Boolean,
+            value: () => CONST.IS_DEV_MODE
+          },
+          /**
+           * deviceType이 TABLET일 때 화면 핸들링을 위한 flag
+           */
+          isTABLET: Boolean,
+          /**
+           * deviceType이 PDA일 때 화면 핸들링을 위한 flag
+           */
+          isPDA: Boolean,
+          /**
+           * deviceType이 KIOSK일 때 화면 핸들링을 위한 flag
+           */
+          isKIOSK: Boolean,
+          /**
+           * 로그인 여부를 확인하기 위한 flag
+           */
+          isNotLogin: {
+            type: Boolean
+          },
+          /**
+           * KIOSK 환경에서 QR 코드 버튼이 활성화 되어 있는지 여부를 확인하기 위한 flag
+           */
+          isShowCodeButton: {
+            type: Boolean,
+            value: false
+          },
+
+          /**
+           * 화면 상단에 표시 할 현재 로그인한 사이트 코드
+           */
+          currentSite: {
+            type: String,
+            value: 'MPS'
+          }
+        }
+      }
+      /**
+       * sys-ajax에서 발생시키는 sys-unauthorized-session event handler 등록
+       * mobile 환경에서 fix할 innerHeight 초기화
+       */
+      connectedCallback() {
+        super.connectedCallback();
+        this.addEventListener('sys-unauthorized-session', this._handleUnauthorized);
+        this.screenHeight = window.innerHeight + 'px';
+
+        document.addEventListener('before-page-change', event => {
+          const prevPage = event.detail.prevPage
+          const currentPage = event.detail.currentPage;
+
+          // 설정 화면에서 다른 화면으로 이동할 경우
+          // 기존의 페이지 이동 이벤트를 prevent 하고 설정을 저장함
+          // 설정을 저장하면 최종적으로 location.repload 수행
+          if(prevPage === 'mps_setting') {
+            event.preventDefault();
+            this.$['mps-setting'].saveSetting();
+          }
+        });
+
+        document.addEventListener('page-changed', event => {
+          const prevPage = event.detail.prevPage;
+          const currentPage = event.detail.currentPage;
+
+          // kiosk_das_ord_info, kiosk_dps_ord_info 화면에서 QR 코드 버튼 활성화를 위한
+          // event handler 등록
+          if(currentPage === 'kiosk_das_ord_info') {
+            this.showCodeButton('DAS');
+          } else if (currentPage === 'kiosk_dps_ord_info') {
+            this.showCodeButton('DPS');
+          } else {
+            if(this.isShowCodeButton) {
+              this.hideQRButton();
+            }
+          }
+        });
+      }
+
+      /**
+       * 사이드 메뉴 토글
+       */
+      _toggleSideMenu() {
+        this.drawerOpened = !this.drawerOpened;
+      }
+
+      /**
+       * device type check
+       * 1. const.js의 IS_DEV_MODE가 true라면 localStorage의 값으로 초기화 함
+       *    값이 없을 경우 설정을 통해 초기화
+       *
+       * 2. const.js의 IS_DEV_MODE가 false라면
+       *    const.js의 CONST.MY_DEVICE를 통해 장비를 결정 <apk 빌드시 결정>
+       */
+      _checkDeviceType() {
+        this.deviceType = '';
+        if(CONST.IS_DEV_MODE) { // 개발 모드일 때 localstorage에서 값을 조회 함
+          this.deviceType = JSON.parse(localStorage.getItem('setting.deviceType')) ? JSON.parse(localStorage.getItem('setting.deviceType')) : CONST.MY_DEVICE;
+        } else {
+          this.deviceType = CONST.MY_DEVICE;
+        }
+        return this.deviceType;
+      }
+
+      /**
+       * device type change event handler
+       * deviceType이 변경되면 _setupIcons를 통해 화면을 구성하는 메뉴/버튼 등을 활성/비활성화 함
+       */
+      _deviceTypeChanged(deviceType) {
+        if(!deviceType) {
+          return;
+        }
+        this.isPDA = this.isTABLET = this.isKIOSK = false;
+
+        switch(deviceType) {
+          case 'PDA':
+            this.isPDA = true;
+            this.adjustPDAFontSize();
+            break;
+          case 'TABLET':
+            this.isTABLET = true;
+            break;
+          case 'KIOSK':
+            this.isKIOSK = true;
+            break;
+        }
+
+        this._setupIcons(deviceType);
+      }
+
+      /**
+       * device type이 PDA일 경우 html의 폰트 사이즈를 변경하여
+       * 화면 전체 폰트 사이즈를 변경함
+       */
+       adjustPDAFontSize() {
+        document.querySelector('html').style.fontSize = '20px';
+      }
+
+      /**
+       * device type에 따라 화면의 메뉴/버튼 등을 활성/비활성화 함
+       *
+       * 1. _deviceTypeChanged 의해 호출 되는 경우
+       *    - 앱 재실행, 설정 변경 등의 화면 리프레시 모든 케이스
+       *
+       * 2. _sessionResponsed에 의해 호출 되는 경우
+       *    - 로그인 되어 있지 않던 상태에서 로그인시 리프레시를 하지 않으므로 _sessionResponsed에서 직접 호출
+       */
+      _setupIcons(deviceType) {
+        if(this.isLoginScreen()) {
+          this.showLogoutBtn(false);
+          this.showRefreshBtn(false);
+          this.showRegionName(false);
+          this.showZoneCode(false);
+          this.enableMenuBtn(true);
+          this.showKioskWorkLoc(false);
+
+          if(deviceType === CONST.DEVICE_TYPE.TABLET || deviceType === CONST.DEVICE_TYPE.PDA) {
+            this.fixViewSize(true);
+            this.showKioskSettingBtn(false);
+            this.showSidebar(true);
+            importNativeLibs();
+          } else {
+            this.fixViewSize(false);
+            this.showKioskSettingBtn(true);
+            this.showSidebar(false);
+          }
+        } else {
+          switch(deviceType) {
+            case CONST.DEVICE_TYPE.KIOSK:
+              this.showKioskSettingBtn(true);
+              this.showLogoutBtn(true);
+              this.showRefreshBtn(false);
+              this.showSidebar(false);
+              this.showRegionName(true);
+              this.showZoneCode(false);
+              this.fixViewSize(false);
+              this.enableMenuBtn(false);
+              this.showKioskWorkLoc(true);
+              break;
+
+            case CONST.DEVICE_TYPE.PDA:
+              if(this.isQps){
+                this.showKioskSettingBtn(false);
+                this.showLogoutBtn(true);
+                this.showRefreshBtn(true);
+                this.showSidebar(true);
+                this.showRegionName(false);
+                this.showZoneCode(false);
+                this.fixViewSize(true);
+                importNativeLibs();
+                this.enableMenuBtn(true);
+              }else{
+                this.showKioskSettingBtn(false);
+                this.showLogoutBtn(true);
+                this.showRefreshBtn(false);
+                this.showSidebar(true);
+                this.showRegionName(true);
+                this.showZoneCode(true);
+                this.fixViewSize(true);
+                importNativeLibs();
+                this.enableMenuBtn(true);
+              }
+              break;
+            default:
+              this.showKioskSettingBtn(false);
+              this.showLogoutBtn(true);
+              this.showRefreshBtn(true);
+              this.showSidebar(true);
+              this.showRegionName(true);
+              this.showZoneCode(true);
+              this.fixViewSize(true);
+              importNativeLibs();
+              this.enableMenuBtn(true);
+              break;
+          }
+        }
+      }
+
+      /**
+       * session check request가 정상적으로 도착하면 (로그인 되었다면)
+       * logout 버튼을 활성화 및 _setupIcons를 통해 화면 구성
+       */
+      _sessionResponsed(event) {
+        document.dispatchEvent(new CustomEvent('session-responsed', event));
+        if(this.jobName = 'QPS'){
+          this.currentSite = event.detail.domain.brandName;
+        }else{
+          this.currentSite = event.detail.domain.name;
+        }
+        this.showLogoutBtn(true);
+        this._setupIcons(this.deviceType);
+        this.checkSetting();
+        this.isNotLogin = false;
+      }
+
+      /**
+       * 호기, 존, 작업위치 등의 정보가 설정 되었는지 확인함
+       */
+      checkSetting() {
+        try {
+          switch(this.deviceType) {
+            case CONST.DEVICE_TYPE.KIOSK:
+              if(!JSON.parse(localStorage.getItem('setting.regionCode'))) {
+                throw {
+                  title: t('error.SETTING_ERROR'),
+                  message: t('text.region_code_is_not_set')
+                };
+              } else if (!JSON.parse(localStorage.getItem('setting.workLocation'))) {
+                throw {
+                  title: t('error.SETTING_ERROR'),
+                  message: t('text.side_code_is_not_set')
+                };
+              }
+              break;
+
+            default:
+              if(!JSON.parse(localStorage.getItem('setting.regionCode'))) {
+                throw {
+                  title: t('error.SETTING_ERROR'),
+                  message: t('text.region_code_is_not_set')
+                };
+              } else if (!JSON.parse(localStorage.getItem('setting.zoneCode'))) {
+                throw {
+                  title: t('error.SETTING_ERROR'),
+                  message: t('text.zone_code_is_not_set')
+                };
+              }
+              break;
+          }
+        } catch (error) {
+          openAlert({
+            title: error.title,
+            message: error.message,
+            confirmCallback: this.toSetting.bind(this)
+          });
+        }
+      }
+
+      /**
+       * session check request가 비정상적으로 도착하면 (base url 불량)
+       * setting 화면으로 이동
+       */
+      _sessionError() {
+        this.hideHeaderButtons();
+        this.isNotLogin = true;
+        openAlert({
+          title: t('error.BASEURL_ERROR'),
+          message: t('text.check_baseUrl'),
+          confirmCallback: () => {
+            this.toSetting();
+          }
+        });
+      }
+
+      hideHeaderButtons() {
+        this.showRefreshBtn(false);
+        this.showLogoutBtn(false);
+        this.showRegionName(false);
+        this.showZoneCode(false);
+        this.showKioskWorkLoc(false);
+      }
+
+      /**
+       * session check request가 401 에러 발생시
+       * login 화면으로 이동
+       */
+      _sessionUnauthorized() {
+        document.dispatchEvent(new CustomEvent('session-unauthorized'));
+
+        if(location.hash.indexOf('login') < 0) {
+          openAlert({
+            title: t('error.LOGIN_ERROR'),
+            message: t('error.UNAUTHORIZED'),
+            confirmCallback: this.toLogin.bind(this)
+          });
+        }
+        this.isNotLogin = true;
+      }
+
+      /**
+       * 서버에 대한 모든 요청이 인증 에러 발생시
+       * 로그인 화면으로 라우팅
+       */
+      _handleUnauthorized(e) {
+        this.isNotLogin = true;
+        let route = location.hash.replace('#/', '');
+        if(route === 'login' || route === 'setting') {
+          // do nothing
+        } else {
+          this.toLogin();
+          openAlert({
+            title: t('error.LOGIN_ERROR'),
+            message: t('error.UNAUTHORIZED'),
+          });
+        }
+      }
+
+      /**
+       * login 성공시
+       * 1. 로그아웃 버튼 활성화
+       * 2. 홈 화면으로 이동
+       * 3. mps-setting 화면의 region items 조회
+       * 4. 사용자 정보 reset
+       */
+      _handleLoginSuccess() {
+        this.isNotLogin = false;
+        this.showLogoutBtn();
+        // this.shadowRoot.querySelector('mps-setting')._getRegionItems();
+        this.resetInfo();
+        this._moveToDefaultView();
+
+      }
+
+      _moveToDefaultView() {
+        // 로그인 후 현재 장비가 kiosk라면 설정된 kiosk 화면으로 이동 설정된 화면이 없다면 mps_setting으로 이동
+        if(this.deviceType === CONST.DEVICE_TYPE.KIOSK) {
+          const kioskScreen = JSON.parse(localStorage.getItem('setting.kioskScreen'));
+          this.route = {
+            prefix: '/',
+            path: kioskScreen ? kioskScreen : 'home'
+          };
+        } else {
+          this.toHome();
+        }
+      }
+
+      /**
+       * 사용자 정보 재조회
+       */
+      resetInfo() {
+        // get user
+        this.$['mps-setting'].checkSession();
+      }
+
+      /**
+       * logout
+       */
+      logout() {
+        openConfirm({
+          title: t('button.logout'),
+          message: t('text.Sure to logout'),
+          confirmCallback: () => {
+            const sysLogout = this.$['sys-logout'];
+            sysLogout.logout();
+          }
+        })
+        // this.$['sys-logout'].logout();
+      }
+
+      /**
+       * 로그아웃 성공 후 이벤트 핸들러
+       * 1. 사용자 정보 삭제 (from localstorage)
+       * 2. 로그아웃 버튼 숨기기
+       * 3. 키오스크 설정 버튼 숨기기
+       * 4. 새로고침 버튼 숨기기
+       * 5. 로그인 여부 플래그 변경
+       */
+      _handleLogOut(e) {
+        this.currentSite = 'MPS';
+        this.clearUserInfo();
+        this.showLogoutBtn(false);
+        this.showKioskSettingBtn(this.deviceType === 'KIOSK');
+        this.showRefreshBtn(false);
+        this.isNotLogin = true;
+      }
+
+      /**
+       * 로그아웃 후 사용자 로컬 스토리지의 정보를 삭제함
+       */
+      clearUserInfo() {
+        localStorage.removeItem('setting.user');
+      }
+
+      /**
+       * 현재 화면이 로그인 화면인지 여부를 return
+       */
+      isLoginScreen() {
+        let currentHash = location.hash.replace('#/', '');
+        return currentHash.indexOf('login') === 0;
+      }
+
+      /**
+       * KIOSK 설정 버튼 활성화/비활성화
+       */
+      showKioskSettingBtn(value) {
+        this.$['kiosk-setting-btn'].hidden = !value;
+      }
+
+      /**
+       * 로그아웃 버튼 활성화/비활성화
+       */
+      showLogoutBtn(value) {
+        this.$['logout-btn'].hidden = !value;
+      }
+
+      /**
+       * 새로고침 버튼 활성화/비활성화
+       */
+      showRefreshBtn(value) {
+        this.$['refresh-btn'].hidden = !value;
+      }
+
+      /**
+       * 사이드 메뉴 활성화/비활성화
+       */
+      showSidebar(value) {
+        const drawerLayout = this.$['drawer-layout'];
+        if(value) {
+          drawerLayout.removeAttribute('force-narrow');
+        } else {
+          drawerLayout.setAttribute('force-narrow', '');
+        }
+      }
+
+      /**
+       * 호기명 활성화/비활성화
+       */
+      showRegionName(value) {
+        this.$['region-name'].hidden = !value;
+      }
+
+      /**
+       * 존 코드 활성화/비활성화
+       */
+      showZoneCode(value) {
+        this.$['zone-code'].hidden = !value;
+      }
+
+      /**
+       * CASE: true
+       * 1. PDA, TABLET과 같이 innerHeight 크기를 변경 불가능 할 때 (브라우저 사이즈 변경)
+       *    connectedCallback에서 초기화 한 screenHeight로 fix
+       *
+       * CASE: false
+       * 1. kiosk와 같이 innerHeight 변경 (브라우저 사이즈 변경) 가능  할 때 drawer-layout의 height를 제거
+       */
+      fixViewSize(value) {
+        if(value) {
+          this.$['drawer-layout'].style.height = this.screenHeight;
+        } else {
+          this.$['drawer-layout'].style.height = '';
+        }
+      }
+
+      // /**
+      //  * deviceType이 tablet 혹은 pda일 때 cordova plugin을 임포트 함
+      //  */
+      // importNativeLibs() {
+      //   if(!CONST.IS_DEV_MODE && !document.head.querySelector('#cordova-libs')) {
+      //     const scriptTag = document.createElement('script');
+      //     scriptTag.setAttribute('id', 'cordova-libs');
+      //     scriptTag.setAttribute('src', './cordova.js');
+      //     document.head.appendChild(scriptTag);
+      //   }
+      // }
+
+      /**
+       * menu button 활성화/비활성화
+       */
+      enableMenuBtn(value) {
+        const menuBtn = this.$['menu-btn'];
+
+        if(value) {
+          menuBtn.onclick = this._toggleSideMenu.bind(this);
+        } else {
+          menuBtn.onclick = null;
+        }
+      }
+
+      /**
+       * page 변경시 event handler
+       * page 변경에 따른 버튼 활성/비활성화 작업 등 수행
+       ***********************
+       * @param {Object} page
+       */
+      _pageChanged(page) {
+        if (this.narrow) { // side menu narrow
+          this.drawerOpened = false;
+        }
+
+        // this.page = page || 'home';
+        if (!page) {
+          return;
+        }
+
+        switch(page) {
+          case 'login':
+            if(this.isNotLogin) {
+              this.hideHeaderButtons();
+            } else {
+              this._moveToDefaultView();
+            }
+
+          default:
+            if(this.isNotLogin === undefined) return;
+
+            if (this.isNotLogin && !(page === 'mps_setting' || page === 'login')) {
+              // 로그인 되지 않은 상태에서 setting 화면이나 login 화면이 아닌 다른곳으로 라우팅 시 로그인으로 강제 이동
+              this.toLogin();
+              openAlert({
+                title: t('error.LOGIN_ERROR'),
+                message: t('error.UNAUTHORIZED')
+              });
+            }
+        }
+      }
+
+      /**
+       * home 화면으로 이동
+       */
+      toHome() {
+        this.route = { prefix: '/', path: 'home', title: t('menu.Home')};
+      }
+
+      /**
+       * 로그인 화면으로 이동
+       */
+      toLogin() {
+        this.route = { prefix: '/', path: 'login', title: t('menu.Login') };
+      }
+
+      /**
+       * MPS 설정 화면으로 이동
+       */
+      toSetting() {
+        this.route = { prefix: '/', path: 'mps_setting', title: t('menu.Settings') };
+      }
+
+      /**
+       * system setting 화면으로 이동 (개발용)
+       */
+      toSysSetting() {
+        this.route = { prefix: '/', path: 'setting', title: t('menu.Settings') };
+      }
+
+      /**
+       * 코드 버튼 활성화
+       */
+      showCodeButton(viewType) {
+        this.$['mpi-on-last-btn'].hidden = false;
+        this.$['mpi-off-btn'].hidden = false;
+
+        if(viewType === 'DAS') { // DAS의 경우
+          this.$['batch-full-box-btn'].hidden = false;
+        } else {
+          this.$['batch-full-box-btn'].hidden = true;
+        }
+
+        this.isShowCodeButton = true;
+      }
+
+      /**
+       * 키오스크 작업 위치 정보 활성 / 비활성화
+       */
+      showKioskWorkLoc(value) {
+        this.$['kiosk-work-loc'].hidden = !value;
+      }
+
+      /**
+       * QR 코드 버튼 비활성화
+       */
+      hideQRButton() {
+        this.$['mpi-on-last-btn'].hidden = true;
+        this.$['mpi-off-btn'].hidden = true;
+        this.$['batch-full-box-btn'].hidden = true;
+        this.isShowCodeButton = false;
+      }
+
+      /**
+       * KIOSK 상단 버튼 코드 팝업
+       **********************
+       * @param {Object} event
+       */
+      showCodePopup(event) {
+        let buttonId = event.currentTarget.id;
+        const popup = document.createElement('kiosk-code-popup');
+        let title;
+
+        if(buttonId.indexOf('mpi-off-btn') >= 0) {
+          popup.actionType = 'mpi-off';
+          title = t('title.mpi_off_all');
+
+        } else if(buttonId.indexOf('batch-full-box-btn') >= 0) {
+          popup.actionType = 'batch-full-box';
+          title = t('title.batch_full_box');
+
+        } else if (buttonId.indexOf('mpi-on-last-btn') >= 0) {
+          popup.actionType = 'mpi-on-last';
+          title = t('title.mpi_on_last');
+        }
+
+        document.dispatchEvent(new CustomEvent('open-dialog', {
+          detail:{
+            content: popup,
+            width: 'fit',
+            height: 'fit',
+            title: title,
+            openCallback: popup.initialSetup.bind(popup)
+          }
+        }));
+      }
+
+      /**
+       * 상단의 refresh 버튼을 클릭시 refresh-view 이벤트를 발생시킴
+       */
+      refresh() {
+        let route;
+        if(this.route && this.route.path) {
+          route = this.route.path;
+        } else {
+          route = location.hash.replace('#/', '');
+        }
+        document.dispatchEvent(new CustomEvent('refresh-view-' + route, {
+          detail: route
+        }));
+      }
+    }
+
+    window.customElements.define(MpsOperatorApp.is, MpsOperatorApp);
+  </script>
+</dom-module>

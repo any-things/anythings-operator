@@ -1,0 +1,355 @@
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+
+<link rel="import" href="../../../bower_components/polymer/polymer-element.html">
+
+<!-- 
+  Footer를 통해 메시지를 출력하는 컴퍼넌트
+-->
+
+<dom-module id="mps-toast-msg">
+  <template>
+    <style>
+      :host {
+        --msg-box-heigh: 2rem;
+        --msg-box-margin: 10px;
+        --msg-box-padding: 10px;
+      }
+      #msg-box {
+        display: none;
+        position: absolute;
+        z-index: 1;
+        left: 0; right: 0;
+        bottom: calc((var(--msg-box-heigh) + var(--msg-box-margin) * 2 + var(--msg-box-padding) * 2 ) * -1);
+        height: var(--msg-box-heigh);
+        background-color: #6a7da1;
+        border-radius:var(--things-default-border-radius);
+        margin: var(--msg-box-margin);
+        padding: var(--msg-box-padding);
+        transition: bottom 0.5s;
+      }
+      #msg-box[show] {
+        bottom: 0; left: 0; right: 0;
+        transition: bottom 0.5s;
+      }
+      #msg-box #icon-container {
+        display: flex;
+        margin: auto 0;
+      }
+      #msg-box.info iron-icon {
+        height: var(--iron-icon-height, 1rem);
+        fill: #fff;
+        margin: auto 0;
+      }
+      #msg-box.warn iron-icon {
+        height: var(--iron-icon-height, 1rem);
+        fill: var(--things-chartcolor-type3);
+        margin: auto 0;
+      }
+      #msg-box.error iron-icon {
+        height: var(--iron-icon-height, 1rem);
+        fill: var(--things-chartcolor-type1);
+        margin: auto 0;
+      }
+      #msg-field-container {
+        display: flex;
+        overflow: hidden;
+        margin: auto 0;
+      }
+      #msg-field {
+        position: relative;
+        display: flex;
+        white-space: nowrap;
+        margin: auto 0;
+        font-size: .8rem;
+        font-weight: bold;
+        color: #fff;
+      }
+    </style>
+    <div id="msg-box" on-click="hideMsgBox">
+      <div id="icon-container">
+        <iron-icon id="type-icon" icon="[[icon]]"></iron-icon>
+      </div>
+      <div id="msg-field-container">
+        <span id="msg-field"></span>
+      </div>
+    </div>
+  </template>
+
+  <script>
+    class MpsToastMsg extends Polymer.Element {
+      static get is() { return 'mps-toast-msg' }
+
+      static get properties() {
+        return {
+          /**
+           * @description 화면에 출력될 메시지
+           * @type {String}
+           */
+          message: {
+            type: String
+          },
+
+          /**
+           * @description 화면에 출력되는 메시지 타입으로 타입에 따라 아이콘이 변경됨
+           *              type 1. info
+           *                   2. warn
+           *                   3. error
+           * @type {String}
+           */
+          defaultMsgType: {
+            type: String,
+            value: 'info'
+          },
+
+          /**
+           * @description 토스트 메시지가 출력되는 시간으로 기본 3초 간 화면에 나타남
+           *              메시지 길이가 길어 3초로 모든 메시지를 출력하지 못할 때에는 메시지 길이를 자동으로 계산하여
+           *              모든 메시지가 스크롤 된 뒤 메시지 박스가 사라짐
+           */
+          defaultInterval: {
+            type: Number,
+            value: 10
+          }
+        }
+      }
+
+      connectedCallback() {
+        super.connectedCallback();
+        this.addEventListeners();
+        window.showToast = this.show.bind(this);
+      }
+
+      addEventListeners() {
+        // 메시지 출력 이벤트 리스너 등록
+        document.addEventListener('show-toast', event => {
+          const config = event.detail;
+          this.show(config.type, config.message, config.interval);
+        });
+
+        // 메시지 숨김 이벤트 리스너 등록
+        document.addEventListener('hide-toast', event => {
+          this.hideMsgBox();
+        });
+
+
+        // transitionend 이벤트 핸들러 추가, 메시지 박스가 상단으로 올라온 뒤 발생하는 이벤트 핸들러로
+        // 현재 화면에 출력될 메시지의 길이가 화면 길이 보다 길 때 _startScrolling를 호출하여 스크롤 애니메이션을 적용함
+        const msgBox = this._getMsgBox();        
+        msgBox.addEventListener('transitionend', event => {
+          if(event.currentTarget === msgBox) {
+            if(this._getComputedStyleProp(msgBox, 'bottom') === '0px' && this.isLongMsg && this.isShow) {
+              this._startScrolling();
+            } else if (parseInt(this._getComputedStyleProp(msgBox, 'bottom')) < 0) { // hide 완료
+              msgBox.style.display = 'none';
+            }
+          }
+        });
+
+        // transitionend 이벤트 핸들러 추가, 메시지가 모두 스크롤 된 뒤 발생하는 이벤트 핸들러로
+        // 스크롤이 끝나면 메시지 박스를 숨김
+        const msgField = this._getMsgField();
+        msgField.addEventListener('transitionend', event => {
+          const msgFieldWidth = parseFloat(this._getComputedStyleProp(msgField, 'width'));
+          if(event.currentTarget === msgField) {
+            if(this._getComputedStyleProp(msgField, 'left') === `${-msgFieldWidth}px` && this.isShow) {
+              msgField.style.transition = '';
+              this.hideMsgBox();
+            }
+          }
+        })
+      }
+
+      /**
+       * @description 메시지 출력을 위한 메소드
+       ******************
+       * @param {String} message type @default defaultMsgType
+       * @param {String} message
+       * @param {Integer} 메시지 출력 시간 @default defaultInterval
+       */
+      show(type = this.defaultMsgType, message = '', interval = this.defaultInterval) {
+        // 1. 메시지 박스가 이미 출력된 상태인지 확인
+        if(this.isShow) {
+          // 1. 1) 이미 출력되어 있는 상태라면 hideTimeout을 clear하여 메시지 박스가 닫히지 않도록 함
+          clearTimeout(this.hideTimeout); 
+        }
+
+        // 2. 메시지 타입 초기화를 통해 아이콘 결정
+        this.setMsgType(type);
+        // 3. 메시치 초기화를 통해 스크롤 애니메이션 적용 여부 결정
+        this.setMessage(message);
+        // 4. 메시지 박스 출력
+        this.showMsgBox();
+        // 5. 메시지 박스 출력 여부 플래그 초기화
+        this.isShow = true;
+
+        // 6. 3.을 통해 메시지 길이가 화면 길이 보다 크게 설정 되었다면 interval을 통한 메시지 hide 처리가 되지 않도록 함
+        //    메시지의 길이기 화면 길이보다 작다면 interval을 통해 메시지가 사라지도록 설정
+        if(!this.isLongMsg) {
+          this.hideTimeout = setTimeout(() => {
+            this.hideMsgBox();
+          }, interval * 1000);
+        }
+      }
+
+      /**
+       * @description 메시지 타입을 통해 아이콘을 결정하는 메소드
+       ******************
+       * @param {String} 메시지의 타입 info, warn, error의 세가지 유형을 선택 할 수 있으며 그외의 모든 메시지는 info 메시지처리 함
+       */
+      setMsgType(type) {
+        switch(type.toLowerCase()) {
+          case 'info':
+            this.icon = 'info';
+            break;
+
+          case 'warn':
+            this.icon = 'warning';
+            break;
+
+          case 'error':
+            this.icon = 'error';
+            break;
+
+          default:
+            this.icon = 'info';
+        }
+
+        const msgBox = this._getMsgBox();
+        msgBox.classList = type;
+      }
+
+      /**
+       * @description 화면에 출력할 메시지를 초기화함
+       *              메시지의 길이와 스크린의 길이를 통해 메시지 스크롤 애니메이션 적용 여부를 결정함
+       ******************
+       * @param {String} 화면에 출력할 메시지
+       */
+      setMessage(message) {
+        const msgField = this._getMsgField();
+        if(this.isLongMsg) {
+          this._stopScrolling()
+        }
+        msgField.innerText = message;
+
+        // 메시지가 들어갈 컨테이너의 길이 (화면의 길이)
+        const msgFieldContainerWidth = parseFloat(this._getComputedStyleProp(this._getMsgFieldContainer(), 'width'));
+        // 메시지의 길이
+        const msgFieldWidth = parseFloat(this._getComputedStyleProp(msgField, 'width'));
+
+        // A. 메시지의 길이가 메시지가 들어갈 컨테이너의 길이 보다 크다면 (한번에 모든 메시지를 출력하지 못한다면)
+        if(msgFieldWidth > msgFieldContainerWidth) {
+          // A. 1. 현재 메시지를 컨테이터의 길이 만큼 오른쪽으로 이동 (화면 오른쪽으로 메시지를 밀어냄)
+          msgField.style.left = this._getComputedStyleProp(this._getMsgFieldContainer(), 'width');
+          // A. 2. 메시지 길이가 화면 길이보다 긴지 여부 플래그 true로 초기화
+          this.isLongMsg = true;
+          // A. 3. 현재 메시지 박스가 열려 있는 상태라면
+          if(this.isShow) {
+            // A. 3. 1) 메시지 박스를 다시 show하지 않고 메시지 스크롤 애니메이션 바로 적용함
+            this._startScrolling();
+          }
+        // B. 메시지의 길이가 메시지가 들어갈 컨테이너 길이 보다 작다면 (한번에 모든 메시지를 출력할 수 있다면)
+        } else { 
+          // B. 1. 메시지 길이가 화면 깅리보다 긴지 여부 플래그 false로 초기화
+          this.isLongMsg = false;
+          // B. 2. 메시지 필드을 화면에 바로 나타날 수 있도록 왼쪽으로 붙임
+          msgField.style.left = '';
+        }
+      }
+
+      /**
+       * @description 메시지 박스를 화면에 나타나도록 스타일을 수정하는 메소드
+       */
+      showMsgBox() {
+        const msgBox = this._getMsgBox();
+        msgBox.style.display = 'flex';
+        setTimeout(() => {
+          msgBox.setAttribute('show', '');
+        }, 100);
+        
+      }
+
+      /**
+       * @description 메시지 박스를 화면에서 숨기도록 스타일을 수정하는 메소드
+       */
+      hideMsgBox() {
+        const msgBox = this._getMsgBox();
+        msgBox.removeAttribute('show');
+        this.isShow = false;
+      }
+
+      /**
+       * @description 메시지 필드가 스크롤 되도록 하는 애니메이션을 적용하는 메소드
+       */
+      _startScrolling() {
+        const msgField = this._getMsgField();
+        const msgFieldWidth = parseFloat(this._getComputedStyleProp(msgField, 'width')); // 메시지의 길이
+        const msgFieldContainerWidth = parseFloat(this._getComputedStyleProp(this._getMsgFieldContainer(), 'width')); // 메시지가 들어가는 컨테이너의 길이
+
+        // _computeTransDuration을 통해 스크롤링 되는 시간을 계산함
+        const transDuration = this._computeTransDuration(msgFieldWidth, msgFieldContainerWidth);
+        // 스크롤 애니메이션이 적용되도록 스타일 적용
+        msgField.style.transition = `left ${transDuration}s linear`;
+        // 메시지가 끝 까지 스크롤 될 수 있도록 메시지 길이만큼 화면 왼쪽 밖으로 이동
+        msgField.style.left = `${-msgFieldWidth}px`;
+      }
+
+      _stopScrolling() {
+        const msgField = this._getMsgField();
+        msgField.style.transition = '';
+      }
+
+      /**
+       * @description 메시지 필드가 스크롤 되는 시간을 계산함
+       ******************
+       * @param {String} msgFieldWidth 메시지 길이
+       * @param {String} msgFieldContainerWidth 메시지가 들어가는 컨테이너 길이
+       */
+      _computeTransDuration(msgFieldWidth, msgFieldContainerWidth) {
+        return msgFieldWidth / msgFieldContainerWidth * 3 + 1;
+      }
+
+      /**
+       * @description msg-field element return
+       ******************
+       * @returns {Element} msg-field
+       */
+      _getMsgField() {
+        return this.$['msg-field'];
+      }
+
+      /**
+       * @description msg-box element return
+       ******************
+       * @returns {Element} msg-box
+       */
+      _getMsgBox() {
+        return this.$['msg-box'];
+      }
+
+      /**
+       * @description msg-field-container element return
+       ******************
+       * @returns {Element} msg-field-container
+       */
+      _getMsgFieldContainer() {
+        return this.$['msg-field-container'];
+      }
+
+      /**
+       * @description computed style return
+       ******************
+       * @param {Element} 스타일 추출 대상 엘리먼트
+       * @param {String} 추출 대상 스타일 property 키
+       * @returns {String} 해당 스타일의 value
+       */
+      _getComputedStyleProp(element, property) {
+        return getComputedStyle(element, null).getPropertyValue(property);
+      }
+    }
+
+    customElements.define(MpsToastMsg.is, MpsToastMsg);
+  </script>
+</dom-module>

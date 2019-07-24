@@ -1,0 +1,130 @@
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+
+<link rel="import" href="../../../bower_components/polymer/polymer-element.html">
+
+<dom-module id="mps-home">
+  <template>
+    <style include="shared-styles">
+			:host {
+				display: flex;
+				height: 100%;
+			}
+      #container {
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+        padding: 20px;
+      }
+      #container mps-list {
+        flex: 1;
+      }
+      .button-container {
+        display: grid;
+        justify-content: end;
+      }
+    </style>
+
+    <!--sys-ajax
+      auto
+      id="error-log-ajax"
+      method="GET"
+      on-sys-ajax-response="_errorLogResponsed">
+    </sys-ajax-->
+
+    <div id="container">
+      <!--mps-list
+        header="[[header]]"
+        data="[[modifiedData]]"
+        on-data-list-click="_onDataListClick">
+      </mps-list-->
+    </div>
+  </template>
+
+  <script>
+    class MpsHome extends Polymer.Element {
+      static get is() { return 'mps-home' };
+      static get properties() {
+        return {
+          header: {
+            type: Array,
+            value: () => {
+              return [{
+                display: 'Image',
+                fieldname: 'src',
+                image: {
+                  zoomDialog: true,
+                  style: {
+                    margin: 'auto',
+                    borderRadius: '10px'
+                  }
+                },
+                columnWidth: '220px'
+
+              }/*, {
+                display: 'ID',
+                fieldname: 'id'
+              }, {
+                display: 'Code',
+                fieldname: 'code'
+              }, {
+                display: 'Error Type',
+                fieldname: 'error_type',
+                style: {
+                  textAlign: 'center'
+                }
+              }*/, {
+                display: 'Message',
+                fieldname: 'message'
+              }]
+            }
+          }
+        }
+      }
+
+      connectedCallback() {
+        super.connectedCallback();
+        // this.getErrorLogs();
+      }
+
+      getErrorLogs(page, limit) {
+        const errorLogAjax = this.$['error-log-ajax'];
+        let currentPage = page ? page : 1;
+        let currentLimit = limit ? limit : 50;
+        const sort = JSON.stringify([{
+          field: 'issue_date',
+          ascending: false
+        }]);
+        errorLogAjax.curl = '/error_logs';
+        errorLogAjax.params = {
+          page: currentPage,
+          limit: 20,
+          sort: sort
+        };
+
+        errorLogAjax.generateRequest();
+      }
+
+      _errorLogResponsed(event) {
+        event.detail.items.forEach(item => {
+          item.src = `https://picsum.photos/200/200/?image=${Math.floor((Math.random() * 50) + 1)}`
+        });
+        this.modifiedData = event.detail.items;
+      }
+
+      _pageChanged(event) {
+        let page = event.detail.page;
+        let limit = event.detail.limit;
+        this.getErrorLogs(page, limit);
+      }
+
+      _onDataListClick(event) {
+        console.log(event);
+      }
+    }
+
+    customElements.define(MpsHome.is, MpsHome);
+  </script>
+</dom-module>

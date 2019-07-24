@@ -1,0 +1,389 @@
+<!-- QPS 포장화면 -->
+
+<link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../../kiosk-libraries.html">
+<link rel="import" href="./kiosk-packing-popup.html">
+<dom-module id="kiosk-packing-check">
+    <template>
+        <style include="shared-styles">
+            :host {
+                display: grid;
+                grid-template-rows: 1fr 9fr;
+                padding: 10px;
+                height: calc(100% - 20px);
+            }
+            .label {
+                color: #D5D7DB;
+                font-size: xx-large;
+                margin: 10px;
+                grid-column-start: 2;
+                grid-column-end: 4;
+            }
+            .input{
+                background-color: rgba(0, 0, 0, .25);
+                border: 1px solid rgba(255, 255, 255, .2);
+                height: 60px;
+                color: #fff;
+                grid-column-start: 4;
+                grid-column-end: 11;
+            }
+            #top-container{
+                display: grid;
+                grid-template-columns: 9fr 1fr;
+                align-items: center;
+                text-align: center;
+            }
+            #top-container .left input{
+                width: 15rem;
+            }
+            #top-container .right input{
+                height: 20px;
+            }
+            #bottom-container{
+                display: grid;
+                grid-template-columns: 6.9fr 0.1fr 3fr;
+                margin-top: 20px;
+            }
+            #bottom-container .left{
+                text-align: center;
+                padding-left: 10%;
+                display: grid;
+            }
+            #bottom-container label{
+                color: #D5D7DB;
+                font-size: smaller;
+                align-self: end;
+            }
+            #bottom-container input{
+                background-color: rgba(52,55,66, 0);
+                border: 0px solid;
+                color: #fff;
+            }
+            #bottom-container .right{
+                text-align: center;
+                display: flex;
+            }
+            mps-list{
+                height: 80vh;
+            }
+        </style>
+        
+        <sys-ajax
+            id="box-get-ajax"
+            curl="/kiosk_process/dps/inspection/packing/"
+            method="GET"
+            content-type="application/json"
+            on-sys-ajax-response="_getBoxResult">
+        </sys-ajax>
+
+        <!-- 송장 재발행을 위한 Ajax -->
+        <sys-ajax
+            id="reprint-invoice-ajax"
+            curl="/kiosk_process/dps/packing/print/:box_id"
+            method="PUT"
+            content-type="application/json"
+            on-sys-ajax-response="_reprintSucceed">
+        </sys-ajax>
+        
+        <div id = "top-container">
+            <div class = "left">
+                <span class="label">[[boxIdLabel]]</span>
+                <input class = "input"id="box-id" on-Keyup = "_boxSelected" on-blur="_timeCheck">
+                <span class="label">[[skuQty]]</span>
+                <input class = "input" id="box-in-qty" readonly >
+            </div>
+            <div class = "right">
+                <input id='printCheck'type="checkbox">
+                <span class="label">[[reprintLabel]]</span>
+            </div>
+        </div>
+        <div id = "bottom-container">
+            <div class="left" id = 'img-container'>
+            </div>
+            <label><input id="img-number" type="number" max="6" min="1" value = '6' on-Change = "_imgCntChanged">
+            </label>
+            <div class="right">
+                <mps-list
+                    id="mps-list"
+                    header="[[header]]"
+                    data="[[items]]"
+                    on-configured="_listConfigured">
+                </mps-list>
+            </div>
+        </div>
+    </template>
+    <script>
+        class KioskPackingCheck extends Polymer.Element{
+            static get is() {
+                return 'kiosk-packing-check';
+            }
+            static get properties() {
+                return {
+                    page: {
+                        type: Number,
+                        value: 1
+                    },
+
+                    /**
+                     * Limit 정보
+                     ****************
+                    * @type {Number}
+                    */
+                    limit: {
+                        type: Number,
+                        value: 1000
+                    },
+                    boxIdLabel: {
+                        type: String,
+                        value: function () {
+                            return t('label.box_id');
+                        }
+                    },
+                    skuCdLabel: {
+                        type: String,
+                        value: function () {
+                            return t('label.sku_cd');
+                        }
+                    },
+                    skuQty:{
+                        type: String,
+                        value: function () {
+                            return t('label.sku_qty');
+                        }
+                    },
+                    checkBoxId:{
+                        type: String
+                    },
+                    imgNum:{
+                        type: String,
+                        value: function (){
+                            return t('label.img_number');
+                        }
+                    },
+                    reprintLabel: {
+                        type: String,
+                        value: t('button.print_label')
+                    },
+                    dangerousText: {
+                        type: String,
+                        value: t('text.is_dangerous_item')
+                    },
+                    attachLabelText: {
+                        type: String,
+                        value: t('text.plz_attach_label')
+                    },
+                    flag: {
+                        type: Number,
+                        value: 0
+                    },
+                    items:{
+                        type: Array
+                    },
+                    header:{
+                        type: Array,
+                        value: function() {
+                            return [{
+                                display: t('label.sku_barcd'),
+                                fieldname: 'sku_barcd',
+                                columnWidth: '0.7fr',
+                                style: {
+                                    textAlign: 'center',
+                                }
+                            },{
+                                display: t('label.sku_qty'),
+                                fieldname: 'picked_qty',
+                                columnWidth: '0.3fr',
+                                style: {
+                                    textAlign: 'center',
+                                },
+                            },]
+                        }
+                    }
+                };
+            }
+            connectedCallback() {
+                super.connectedCallback();
+                this.$['box-id'].select();
+            }
+
+            imgRefresh(){
+                var imgContainer = this.$['img-container'];
+                while(imgContainer.hasChildNodes()){
+                    imgContainer.removeChild(imgContainer.firstChild);
+                }
+            }
+
+             //박스 데이터를 호출, 화면에 표시
+            _boxSelected(e){
+                if(e.key == 'Enter'){
+                    document.dispatchEvent(new CustomEvent('close-dialog'));
+                    if(/^[bcdfghiBCDFGHI][0-9]{7}$/.exec(this.$['box-id'].value)){
+                        this.reprint();
+                        var boxId = this.$['box-id'].value
+                        this.page = 1;
+                        this.limit = 1000;
+                        //박스 아이디가 현재입력값과 다르면 박스정보 재 호출
+                        if(this.checkBoxId == '' || this.checkBoxId != this.$['box-id'].value){
+                            this.$['box-get-ajax'].curl = `/kiosk_process/dps/inspection/packing/${boxId}?page=${this.page}&limit=${this.limit}`;
+                            this.$['box-get-ajax'].generateRequest();
+                            this.$['box-id'].select();
+                        }else{ //그냥 엔터누르면 this.data 데이터 변경.
+                            this.imgRefresh();
+                            this.set('items', this.items.slice());
+                            this.$['box-id'].select();
+                        }
+                    }else{
+                        document.dispatchEvent(new CustomEvent('show-toast',{
+                        detail:{
+                            type: t('text.box_form_check'),
+                            message: t('text.box_form_check')
+                            }
+                        }));
+                        this.$['box-id'].select();
+                    }
+                }
+            }
+
+            //박스 데이터 호출.
+            _getBoxResult(e){
+                this.checkBoxId = this.$['box-id'].value;
+                if(e.detail.length > 0){
+                    const content = document.createElement('kiosk-packing-popup');
+                    content.firstRow = this.dangerousText;
+                    content.secondRow = this.attachLabelText;
+                    content.imgSrc = "../../../../images/dangerAttachImg.png";
+                    var packTypeFlag = false;
+                    e.detail.forEach(item=>{
+                        if(item.pack_type.indexOf('12')>=0){
+                            packTypeFlag = true;
+                        }
+                    })
+                    if(packTypeFlag){
+                        document.dispatchEvent(new CustomEvent('open-dialog', {
+                            detail: {
+                                content: content,
+                                width: 'fit',
+                                height: 'fit',
+                            }
+                        }))
+                    }
+                    this.flag = 0;
+                    this.imgRefresh();   //초기화
+                    e.detail.forEach((element,index)=>{
+                        element.showImg = 'unload';
+                    })
+                    this.$['box-in-qty'].value = e.detail.length;
+                    this.items = e.detail;
+                }else{
+                    this.imgRefresh();
+                    this.items ? this.set('items', this.items.slice(this.items.length)):null;
+                    this.$['box-id'].select();
+                    this.$['box-in-qty'].value = '';
+                    document.dispatchEvent(new CustomEvent('show-toast',{
+                        detail:{
+                          type: t('text.wrapping_not_need'),
+                          message: t('text.wrapping_not_need')
+                        }
+                    }));
+                }
+            }
+            //그리드 데이터 변경시 이미지 추가
+            _listConfigured(event){
+                var cnt = 0;
+                var imgContainer = this.$['img-container'];
+                var imgLimit = this.$['img-number'].value;
+                event.detail.contentElements.some((list,index) => {
+                    if(this.items[index].showImg == 'unload' && this.flag <= index){
+                        list.classList.add('selected');
+                        this.items[index].showImg = 'load';
+                        //이미지 박스 속성 추가
+                        var imgBox = document.createElement('div');
+                        //이미지 속성 추가
+                        var img = document.createElement('img');
+                        img.setAttribute('src',this.items[index].front_image_url);
+                        img.setAttribute('class',`img`);
+                        //이미지 설명 속성 추가
+                        var imgCaption = document.createElement('p');
+                        if(this.items[index].pack_type.indexOf('12') >= 0){
+                            imgCaption.setAttribute('style',`color: coral; margin:auto`)
+                        }else{
+                            imgCaption.setAttribute('style',`color: #fff; margin:auto`)
+                        }
+                        imgCaption.innerText = this.items[index].sku_barcd + ' / ' + this.items[index].pick_qty;
+                        imgBox.appendChild(img);
+                        imgBox.appendChild(imgCaption);
+                        cnt++;
+                        imgContainer.appendChild(imgBox);
+                        imgContainer.setAttribute('style',`grid-template-columns: repeat(${cnt > 3? 3:cnt},1fr)`);
+                        if(this.flag+1 >= this.items.length){
+                            this.flag = 0;
+                            this.items.forEach(e=>{
+                                e.showImg = 'unload';
+                            })
+                        }else{
+                            this.flag = index+1;
+                        }
+                    }else{
+                        this.items[index].showImg = 'unload';
+                    }
+                    this.$['mps-list'].shadowRoot.getElementById('data-container').scrollTop = (index-imgLimit+1)*55;
+                    return cnt >= this.$['img-number'].value || cnt >= this.$['box-in-qty'].value;
+                });
+                for(var i=0;i<imgContainer.childElementCount;i++){
+                    if(imgContainer.childElementCount <=1){
+                        imgContainer.children[i].children[0].setAttribute(`style`,`width: 50%`);
+                    }else{
+                        imgContainer.children[i].children[0].setAttribute(`style`,`width: 80%`);
+                    }
+                }
+            }
+            _imgCntChanged(){
+                if(this.$['box-id'].value){
+                    this.imgRefresh();
+                    this.flag = 0;
+                    if(this.items){
+                        this.items.forEach(e=>{
+                            e.showImg = 'unload';
+                        })
+                        this.set('items', this.items.slice());
+                    }
+                    this.$['box-id'].select();
+                }
+            }
+            _pageChanged(event){
+                this.page = event.detail.page;
+                this.limit = event.detail.limit
+                var boxId = this.$['box-id'].value
+                this.$['box-get-ajax'].curl = `/kiosk_process/dps/inspection/packing/${boxId}?page=${this.page}&limit=${this.limit}`;
+                this.$['box-get-ajax'].generateRequest();
+            }
+            _timeCheck(e){
+                setTimeout(()=>{
+                    this._boxIdSelect();
+                },5000);
+            }
+            _boxIdSelect(){
+                this.$['box-id'].select();
+            }
+            reprint() {
+                if(this.$['printCheck'].checked){
+                    var reprintAjax = this.$['reprint-invoice-ajax'];
+                    reprintAjax.curl = '/kiosk_process/dps/packing/print/' + this.$['box-id'].value;
+                    reprintAjax.customParams = {
+                        printer_id: MPS_UTIL.getKioskPrinterId()
+                    };
+                    reprintAjax.generateRequest();
+                }
+            }
+            _reprintSucceed(e) {
+                if(e.detail.result.toLowerCase() === 'ok'){
+                    this.inspectionStatus = '';
+                } else {
+                // 재발행 실패했을 경우
+                  this.showMessage(t('button.confirm'), t('text.reprint_event_listener_error'), this.focusBucketInput.bind(this));
+                }
+            }
+        }
+        window.customElements.define(KioskPackingCheck.is, KioskPackingCheck);
+    </script>
+</dom-module>

@@ -1,0 +1,275 @@
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+
+<link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
+
+<link rel="import" href="../../../pda-libraries.html">
+
+<!--
+  PDA > DAS 작업 처리 화면 > 작업 상세 화면 (작업 취소 / 작업 완료)
+-->
+
+<dom-module id="pda-das2-process-detail">
+  <template>
+    <style include="shared-styles">
+      :host {
+        flex: 1;
+        width: 100%;
+      }
+      #container {
+        display: flex;
+        flex-direction: column;
+        padding: 20px 20px 0 20px;
+      }
+      #btn-container {
+        display: flex;
+        flex-direction: column;
+        padding: 0 20px 20px 20px;
+      }
+      #btn-container button {
+        margin-top: 15px;
+      }
+      #summary {
+        display: flex;
+        flex-direction: column;
+        padding: 15px;
+        margin-bottom: 10px;
+        background-color:var(--things-primary-color) ;
+        border-radius:var(--things-default-border-radius);
+        color:#fff;
+      }
+      #summary span {
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+        font-size: .8rem;
+      }
+      #close-btn {
+        grid-row: 3/4;
+      }
+    </style>
+
+    <sys-ajax
+      id="job-handle-ajax"
+      content-type="application/json">
+    </sys-ajax>
+
+    <div id="container">
+      <div id="summary">
+        <span class="label">[[custNmLabel]]: [[custNm]]</span>
+        <span class="label">[[locationLabel]]: [[locCd]]</span>
+        <span class="label">[[pickQtyLabel]]: [[totalQty]]</span>
+      </div>
+
+      </div>
+
+      <div id="btn-container">
+        <button on-click="adjustQty" hidden$="[[hideAdjustBtn]]">[[adjustQtyLabel]]</button>
+        <button on-click="jobCancel">[[jobCancelLabel]]</button>
+        <button on-click="jobFinish">[[jobFinishLabel]]</button>
+        <button on-click="fullBox">[[fullBoxLabel]]</button>
+        <button id="close-btn" on-click="closeDialog">[[closeDialogLabel]]</button>
+      </div>
+    </div>
+  </template>
+
+  <script>
+    class PdaDas2ProcessDetail extends Polymer.Element {
+      static get is() { return 'pda-das2-process-detail' }
+      static get properties() {
+        return {
+          custNmLabel: {
+            type: String,
+            value: () => t('label.cust_nm')
+          },
+
+          locationLabel: {
+            type: String,
+            value: () => t('label.location')
+          },
+
+          pickQtyLabel: {
+            type: String,
+            value: () => t('label.picked_qty') + '/' + t('label.picking_qty')
+          },
+
+          adjustQtyLabel: {
+            type: String,
+            value: () => t('button.adjust_qty')
+          },
+
+          /**
+           * 작업 취소 라벨
+           ****************
+           * @type {String}
+           */
+          jobCancelLabel: {
+            type: String,
+            value: () => t('button.job_cancel')
+          },
+
+          /**
+           * 작업 완료 라벨
+           ****************
+           * @type {String}
+           */
+          jobFinishLabel: {
+            type: String,
+            value: () => t('button.job_complete')
+          },
+
+          fullBoxLabel: {
+            type: String,
+            value: () => t('button.full_box')
+          },
+
+          /**
+           * 닫기 라벨
+           ****************
+           * @type {String}
+           */
+          closeDialogLabel: {
+            type: String,
+            value: () => t('button.close')
+          },
+
+          /**
+           * 선택한 작업 정보의 id
+           ********************
+           * @type {String}
+           */
+          jobId: String,
+
+          /**
+           * 선택한 작업의 거래처 명칭
+           ********************
+           * @type {String}
+           */
+          custNm: String,
+
+          /**
+           * 선택한 작업의 로케이션 정보
+           ********************
+           * @type {String}
+           */
+          locCd: String,
+
+          pickQty: {
+            type: Number,
+            observer: '_pickQtyChanged'
+          },
+
+          pickedQty: {
+            type: Number
+          },
+
+          /**
+           * 선택한 작업의 처리 수량 정보
+           ********************
+           * @type {String}
+           */
+          totalQty: String
+        }
+      }
+
+      _pickQtyChanged(pickQty) {
+        if(pickQty <= 1) {
+          this.hideAdjustBtn = true;
+        } else {
+          this.hideAdjustBtn = false;
+        }
+      }
+
+      /**
+       * 작업처리 ajax 일괄 처리를 위함 function
+       ********************
+       * @param {Object} ajaxInfo
+       */
+      getJobHandleAjax(ajaxInfo) {
+        const jobHandlerAjax = this.$['job-handle-ajax'];
+        jobHandlerAjax.curl = ajaxInfo.curl;
+        jobHandlerAjax.method = ajaxInfo.method;
+        jobHandlerAjax.addEventListener('sys-ajax-response', ajaxInfo.responseCallback);
+        return jobHandlerAjax;
+      }
+
+      adjustQty() {
+        this.closeDialog({
+          detail: {
+            type: 'adjust-qty',
+            pickQty: this.pickQty,
+            jobId: this.jobId
+          }
+        });
+      }
+
+      /**
+       * 작업 취소
+       */
+      jobCancel() {
+        let jobCancelAjax = this.getJobHandleAjax({
+          curl: `/tablet_process/cancel_job/${this.jobId}`,
+          method: 'PUT',
+          responseCallback: this._jobCancelResponsed.bind(this)
+        });
+
+        jobCancelAjax.generateRequest();
+      }
+
+      /**
+       * 작업 완료
+       */
+      jobFinish() {
+        let jobFinishAjax = this.getJobHandleAjax({
+          curl: `/tablet_process/finish_job/${this.jobId}`,
+          method: 'PUT',
+          responseCallback: this._jobFinishResponsed.bind(this)
+        });
+
+        jobFinishAjax.generateRequest();
+      }
+
+      /**
+       * 풀 박스
+       */
+      fullBox() {
+        let fullboxAjax = this.getJobHandleAjax({
+          curl: `/tablet_process/fullbox/${this.jobId}`,
+          method: 'POST',
+          responseCallback: this.closeDialog.bind(this)
+        });
+
+        fullboxAjax.generateRequest();
+      }
+
+      /**
+       * 작업 취소 reponse event handler
+       ********************
+       * @param {Object} event
+       */
+      _jobCancelResponsed(event) {
+        this.closeDialog();
+      }
+
+      /**
+       * 작업 완료 response event handler
+       ********************
+       * @param {Object} event
+       */
+      _jobFinishResponsed(event) {
+        this.closeDialog();
+      }
+
+      /**
+       * 팝업 닫기
+       */
+      closeDialog(event) {
+        document.dispatchEvent(new CustomEvent('close-dialog', event));
+      }
+    }
+
+    customElements.define(PdaDas2ProcessDetail.is, PdaDas2ProcessDetail);
+  </script>
+</dom-module>

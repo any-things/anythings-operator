@@ -1,0 +1,1020 @@
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+
+<link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
+
+<link rel="import" href="../../../pda-libraries.html">
+
+<link rel="import" href="../../../mixins/mps/mps-message-subscribe-mixin.html">
+
+<link rel="import" href="./pda-job-process-detail.html">
+<link rel="import" href="../mps-adjust-qty-dialog.html">
+<link rel="import" href="./pda-job-process-btn-popup.html">
+
+<!--
+  PDA > DAS 작업 처리 화면
+-->
+<dom-module id="pda-job-process">
+  <template>
+    <style include="shared-styles">
+      :host {
+        display: flex;
+        flex-direction: column;
+        padding: 10px;
+        height: calc(100% - 20px);
+      }
+      #container {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        padding: 5px;
+        background-color: #5A6377;
+        border-radius: var(--things-default-border-radius);
+        color: rgba(255,255,255,.8);
+      }
+      #input-container {
+        display: flex;
+        flex-direction: column;
+      }
+      .input-row {
+        display: flex;
+        flex-direction: row;
+        margin-bottom: 5px;
+      }
+      .input-row .label {
+        font-size:.8rem;
+        margin: 5px 5px auto auto;
+        min-width: 25%;
+        text-align: right;
+      }
+      .input-row input, mps-auto-popup-input {
+        width: 75%;
+      }
+      #button-container {
+        display: flex;
+        margin-top: 5px;
+      }
+      #button-container button#show-btns-popup-btn {
+        margin-right: auto;
+      }
+      #button-container button#clear-view-btn {
+        margin-left: auto;
+      }
+      #button-container button[current-mode=inspection-mode] {
+        @apply --operator-warn-btn;
+        min-width: auto !important;
+        margin: auto;
+      }
+      mps-list{
+        flex: 1;
+      }
+      #total-qty {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        margin-top: 5px;
+        background-color:rgba(204, 5, 5, 0.2);
+        border-radius:var(--things-default-border-radius);
+        font-size: .8rem;
+        padding: 5px 5px 5px 5px
+      }
+      #total-qty span {
+        margin-left: 15px;
+      }
+      #total-qty span.qty {
+        margin: auto !important;
+      }
+    </style>
+
+    <!-- 상품 투입 트랜잭션을 위한 Ajax -->
+    <sys-ajax
+      id="input-sku-ajax"
+      method="POST"
+      content-type="application/json"
+      custom-error-handler
+      last-response="{{jobResult}}"
+      on-sys-ajax-error="_onAjaxErrorHandler">
+    </sys-ajax>
+
+    <!-- 상품 검수 트랜잭션을 위한 Ajax -->
+    <sys-ajax
+      id="inspect-sku-ajax"
+      method="POST"
+      content-type="application/json"
+      custom-error-handler
+      last-response="{{jobResult}}"
+      on-sys-ajax-error="_onAjaxErrorHandler">
+    </sys-ajax>
+
+    <!-- 상품 투입 후 작업 리스트 조회를 위한 Ajax -->
+    <sys-ajax
+      id="search-job-ajax"
+      method="GET"
+      content-type="application/json"
+      last-response="{{jobList}}"
+      on-sys-ajax-response="_initialSetup">
+    </sys-ajax>
+
+    <!-- MPI 점등 Ajax -->
+    <sys-ajax
+      id="mpi-on-ajax"
+      method="PUT"
+      content-type="application/json">
+    </sys-ajax>
+
+    <!-- MPI 소등 Ajax -->
+    <sys-ajax
+      id="mpi-off-ajax"
+      method="PUT"
+      content-type="application/json">
+    </sys-ajax>
+
+    <!-- 화면 컨테이너 -->
+    <div id="container">
+      <div id="input-container">
+
+        <!-- 상품 코드 혹은 상품 바코드 입력 컴포넌트 행 -->
+        <div class="input-row">
+          <span class="label">[[skuBarcdLabel]]</span>
+
+          <!-- SKU 정보 조회 시 복수개가 조회된 경우 실행되는 사용자가 고를 수 있는 팝업이 가미된 SKU Input -->
+          <mps-auto-popup-input
+            hide-keyboard
+            id="sku-barcd"
+            resource-url="[[getSkuAjaxUrl]]"
+            popup-title="[[popupTitleLabel]]"
+            button-txt-callback="[[_skuButtonTxtCallback]]"
+            on-item-selected="inputSku"
+            max-length=13>
+          </mps-auto-popup-input>
+        </div>
+
+        <!-- 상품 바코드 표시 컴포넌트 행 -->
+        <div class="input-row">
+          <span class="label">[[skuCdLabel]]</span>
+          <input id="sku-cd" readonly>
+          <input id="relay-seq" readonly style="max-width: 15% !important; text-align: right;">
+        </div>
+
+        <!-- 상품 명 표시 컴포넌트 행 -->
+        <div class="input-row">
+          <span class="label">[[skuNmLabel]]</span>
+          <input id="sku-nm" readonly>
+        </div>
+
+        <!-- 고객사 코드 정보를 간직하기 위한 컴포넌트 행 -->
+        <input id="com-cd" hidden>
+
+        <!-- 상품의 입수 수량 표시 컴포넌트 행 -->
+        <input id="box-in-qty" hidden>
+      </div>
+
+      <!-- 작업 리스트 표시를 위한 컴포넌트 -->
+      <mps-list
+        id='job-list'
+        header="[[header]]"
+        data="[[items]]"
+        on-data-list-click="_showProcessPopup"
+        on-configured="_addAttributeByStatus">
+      </mps-list>
+
+      <!-- 총 수량 표시를 위한 컴포넌트 -->
+      <div id="total-qty">
+        <span>[[totalQtyLabel]]</span>
+        <span class="qty">[[totalPickedBoxPcsQty]] / [[totalPickBoxPcsQty]]</span>
+      </div>
+
+      <!-- 버튼 표시를 위한 컨테이너 -->
+      <div id="button-container">
+        <!--button id="mode-switch-btn" on-click="_switchMode" current-mode$="[[currentMode]]">[[/*]]</button-->
+        <button id="show-btns-popup-btn" on-click="_showButtonsPopup">[[showBtnsPopup]]</button>
+        <button id="clear-view-btn" on-click="clearView">[[resetBtnLabel]]</button>
+      </div>
+    </div>
+  </template>
+
+  <script>
+    class PdaJobProcess extends MpsMessageSubscribeMixin(Polymer.Element) {
+      static get is() { return 'pda-job-process' }
+
+      static get properties() {
+        return {
+          jobType: {
+            type: String,
+            value: 'DAS'
+          },
+
+          /**
+           * SKU 정보 조회를 위한 URL
+           ****************
+           * @type {String}
+           */
+          getSkuAjaxUrl: {
+            type: String,
+            value: `/pda_process/find_sku/${MPS_UTIL.getRegionCd()}/:inputValue`
+          },
+
+          /**
+           * SKU 정보 조회 시 복수개가 조회된 경우 사용자가 고를 수 있는 팝업이 실행되는데 그 팝업에 표시할 타이틀
+           ****************
+           * @type {String}
+           */
+          popupTitleLabel: {
+            type: String,
+            value: () => t('label.sku')
+          },
+
+          /**
+           * 버튼 리스트 팝업 표시를 위한 버튼 라벨
+           ****************
+           * @type {String}
+           */
+          showBtnsPopup: {
+            type: String,
+            value: () => t('button.show_button')
+          },
+
+          /**
+           * 초기화 버튼 라벨
+           ****************
+           * @type {String}
+           */
+          resetBtnLabel: {
+            type: String,
+            value: () => t('button.reset')
+          },
+
+          /**
+           * 상품 코드 라벨
+           ****************
+           * @type {String}
+           */
+          skuBarcdLabel: {
+            type: String,
+            value: () => t('label.sku_barcd')
+          },
+
+          /**
+           * 상품 코드 라벨
+           ****************
+           * @type {String}
+           */
+          skuCdLabel: {
+            type: String,
+            value: () => t('label.sku_cd')
+          },
+
+          /**
+           * 상품 명 라벨
+           ****************
+           * @type {String}
+           */
+          skuNmLabel: {
+            type: String,
+            value: () => t('label.sku_nm')
+          },
+
+          /**
+           * 고객사 수 라벨
+           ****************
+           * @type {String}
+           */
+          custCntLabel: {
+            type: String,
+            value: () => t('label.cust_cnt')
+          },
+
+          /**
+           * 투입 결과
+           ****************
+           * @type {Object}
+           */
+          jobResult: {
+            type: Object,
+            observer: '_jobResultChanged'
+          },
+
+          /**
+           * 그리드 데이터
+           ****************
+           * @type {Array}
+           */
+          jobList: {
+            type: Array,
+            observer: '_jobListChanged'
+          },
+
+          /**
+           * 그리드 데이터
+           ****************
+           * @type {Array}
+           */
+          items: {
+            type: Array
+          },
+
+          /**
+           * 그리드 헤더
+           ****************
+           * @type {Array}
+           */
+          header: {
+            type: Array,
+            value: function() {
+              return [{
+                display: t('label.cust_nm'),
+                fieldname: 'cust_nm_with_seq',
+                displayCallback: (value, rowData) => {
+                  if(rowData.input_seq) {
+                    return `(${rowData.input_seq}) ${rowData.cust_nm}`;
+                  } else {
+                    return `${rowData.cust_nm}`;
+                  }
+                }
+              }, {
+                display: t('label.location'),
+                fieldname: 'loc_cd',
+                style: {
+                  textAlign: 'center'
+                },
+                columnWidth: '0.33fr',
+                displayCallback: (value, rowData) => {
+                  if(value) {
+                    var values = value.split('-');
+                    return values.length >= 2 ? values[1] : value;
+                  } else {
+                    return value;
+                  }
+                }
+              }, {
+                display: t('label.picked_qty') + '/' + t('label.pick_qty'),
+                fieldname: 'total_qty',
+                style: {
+                  textAlign: 'center'
+                },
+                displayCallback: (value, rowData) => {
+                  return `${rowData.picked_qty} / ${rowData.pick_qty}`;
+                },
+                columnWidth: '0.3fr'
+              }, {
+                fieldname: 'status',
+                hidden: true
+              }, {
+                fieldname: 'id',
+                hidden: true
+              }, {
+                fieldname: 'picked_qty',
+                hidden: true
+              }, {
+                fieldname: 'pick_qty',
+                hidden: true
+              }, {
+                fieldname: 'cust_nm',
+                hidden: true
+              }, {
+                fieldname: 'input_seq',
+                hidden: true
+              }];
+            }
+          },
+
+          /**
+           * 총 수량 라벨
+           ****************
+           * @type {Array}
+           */
+          totalQtyLabel: {
+            type: String,
+            value: () => t('label.total_picked_qty') + '/' + t('label.total_picking_qty')
+          },
+
+          /**
+           * 총 확정 수량 라벨
+           ****************
+           * @type {Array}
+           */
+          totalPickedQty: {
+            type: Number,
+            value: 0
+          },
+
+          /**
+           * 총 예정 수량 라벨
+           ****************
+           * @type {Array}
+           */
+          totalPickQty: {
+            type: Number,
+            value: 0
+          },
+
+          /**
+           * 총 확정 박스 수량 라벨
+           ****************
+           * @type {Array}
+           */
+          totalPickedBoxPcsQty: {
+            type: String
+          },
+
+          /**
+           * 총 예정 박스 수량 라벨
+           ****************
+           * @type {Array}
+           */
+          totalPickBoxPcsQty: {
+            type: String
+          },
+
+          /**
+           * 현재 모드 정보 - 현재 사용 안 함
+           ****************
+           * @type {Array}
+           */
+          /*currentMode: {
+             type: String,
+             value: 'input-mode'
+          },*/
+
+          /**
+           * 현재 모드 라벨 - 현재 사용 안 함
+           ****************
+           * @type {Array}
+           */
+          /*currentModeLabel: {
+            type: String,
+            // computed: '/*(currentMode)'
+            value: () => t('button.input_mode')
+          },*/
+        }
+      }
+
+      /**
+       * @description Life Cycle - connected callback
+       */
+      connectedCallback() {
+        super.connectedCallback();
+
+        document.addEventListener(`alert-closed-at-${location.hash.replace('#/', '')}`, event => {
+          if(!event.detail.hasCallback) {
+            this._initialSetup();
+          }
+        });
+
+        // barcode input - focus on
+        this._initialSetup();
+        document.addEventListener('refresh-view-' + location.hash.replace('#/', ''), this._getCurrentJobList.bind(this));
+      }
+
+      /**
+       * @description 메시징 서버에서 메시지를 받아 refresh
+       *******************
+       * @param {Object} data
+       */
+      refreshByWs(data) {
+        this.refresh();
+      }
+
+      /**
+       * @description refresh button click event handler
+       * 현재 호기, 존 정보를 바탕으로 표시기에 점등 되어 있는 작업 리스트를 화면에 출력함
+       */
+      _getCurrentJobList() {
+        this.refresh();
+      }
+
+      /**
+       * @description mps-list configured event handler
+       * 리스트의 내용을 모두 그리고 난 뒤 호출 되며
+       * status의 값에 따라 각 row에 적절한 class를 추가함
+       * 리스트 아래에 나타나는 총 수량을 계산함
+       *******************
+       * @param {Object} event
+       */
+      _addAttributeByStatus(event) {
+        const list = event.detail.contentElements;
+        let totalPickedQty = 0;
+        let totalPickQty = 0;
+        list.forEach(row => {
+          const data = row.getData();
+          if(data.status && data.status === 'F' || data.status && data.status === 'B') {
+            row.classList.add('complete');
+          } else if (data.status && data.status === 'C') {
+            row.classList.add('canceled');
+          }
+
+          totalPickedQty += parseInt(data.picked_qty);
+          totalPickQty += parseInt(data.pick_qty);
+        });
+
+        this._calcTotalQty(totalPickQty, totalPickedQty);
+      }
+
+      /**
+       * @description 총 수량을 박스 / 낱개 형식으로 표시
+       *******************
+       * @param {Number} totalPickQty
+       * @param {Number} totalPickedQty
+       */
+      _calcTotalQty(totalPickQty, totalPickedQty) {
+        this.totalPickedQty = totalPickedQty;
+        this.totalPickQty = totalPickQty;
+        let boxInQty = this.getBoxInQty();
+
+        if(!boxInQty || boxInQty <= 0) {
+          this.totalPickedBoxPcsQty = '0-' + totalPickQty;
+          this.totalPickBoxPcsQty = '0-' + totalPickedQty;
+
+        } else {
+          this.totalPickBoxPcsQty = this._calcBoxPcsQty(totalPickQty, boxInQty);
+          this.totalPickedBoxPcsQty = this._calcBoxPcsQty(totalPickedQty, boxInQty);
+        }
+      }
+
+      /**
+       * @description 낱개 수량을 박스 / 낱개 형식으로 표현
+       *******************
+       * @param {Number} pcsQty 낱개 수량
+       * @param {Number} boxInQty 박스 입수 수량
+       * @return 박스 - 낱개 값을 문자열로 리턴
+       */
+      _calcBoxPcsQty(pcsQty, boxInQty) {
+        var boxPcsStr = '';
+
+        if(!pcsQty || pcsQty == 0) {
+          boxPcsStr = '0-0';
+
+        } else {
+          boxPcsStr = Math.floor(pcsQty / boxInQty);
+          boxPcsStr += '-';
+          boxPcsStr += (pcsQty % boxInQty).toFixed(0);
+        }
+
+        return boxPcsStr;
+      }
+
+      /**
+       * @description sku-barcd Input Box의 값을 리턴
+       */
+      getSkuBarcode() {
+        return this.$['sku-barcd'].value;
+      }
+
+      /**
+       * @description sku-cd Input Box의 값을 리턴
+       */
+      getSkuCd() {
+        return this.$['sku-cd'].value;
+      }
+
+      /**
+       * @description com-cd Input Box의 값을 리턴
+       */
+      getComCd() {
+        return this.$['com-cd'].value;
+      }
+
+      /**
+       * @description box-in-qty Input Box의 값을 리턴
+       */
+      getBoxInQty() {
+        var boxInQty = this.$['box-in-qty'].value;
+        return boxInQty ? Number(boxInQty) : 0;
+      }
+
+      /**
+       * @description 상품 투입
+       ******************
+       * @param {Object} event
+       */
+      inputSku(event) {
+        let skuInfo = event.detail;
+        const comCd = skuInfo.com_cd;
+        const skuCd = skuInfo.sku_cd;
+        this.$['sku-cd'].value = skuCd;
+        this.$['sku-barcd'].value = skuInfo.sku_barcd;
+        this.$['sku-nm'].value = skuInfo.sku_nm;
+        this.$['com-cd'].value = comCd;
+        this.$['box-in-qty'].value = skuInfo.box_in_qty;
+        const regionCd = MPS_UTIL.getRegionCd();
+        const sideCd = MPS_UTIL.getSideCd();
+        this.doInputTransaction(regionCd, sideCd, comCd, skuCd);
+
+        // if(this.currentMode === 'input-mode') {
+        //   this.doInputTransaction(regionCd, sideCd, comCd, skuCd);
+        // } else if (this.currentMode === 'inspection-mode') {
+        //   this.doInspectTransaction(regionCd, sideCd, comCd, skuCd);
+        // }
+        // this.doTransaction('input-sku-ajax', url);
+      }
+
+      /**
+       * @description 새로 고침
+       ******************
+       * @param {Object} closeParam
+       */
+      refresh(closeParam) {
+        if(closeParam && closeParam.type === 'adjust-qty') {
+          const adjustPopup = document.createElement('mps-adjust-qty-dialog');
+
+          setTimeout(() => {
+            MPS_UTIL.showPopup(t('button.adjust_qty'), adjustPopup, 'fit', 'fit', () => {
+              adjustPopup.setCurrentQty(closeParam.pickQty);
+              adjustPopup.jobId = closeParam.jobId;
+            }, this.refresh.bind(this));
+          }, 100);
+
+        } else {
+          const comCd = this.getComCd();
+          const skuCd = this.getSkuCd();
+
+          if(comCd && skuCd) {
+            const ajax = this.$['search-job-ajax'];
+            const regionCd = MPS_UTIL.getRegionCd();
+            const sideCd = MPS_UTIL.getSideCd();
+            let zoneCd = MPS_UTIL.getZoneCd();
+            ajax.curl = `/pda_process/search_jobs/${regionCd}/${sideCd}/${zoneCd}/${comCd}/${skuCd}`;
+            ajax.generateRequest();
+          }
+        }
+      }
+
+      /**
+       * @description Job List 변경 핸들러
+       ******************
+       * @param {Array} jobList
+       */
+      _jobListChanged(jobList) {
+        if(!jobList || !jobList.length) return;
+
+        // 1차 로케이션으로 소팅
+        jobList.sort(function(a, b) {
+          return a.loc_cd > b.loc_cd ? 1 : -1;
+        });
+
+        // 2차 완료된 항목은 아래로 이동
+        // this.sortJobList(jobList);
+        this.items = jobList;
+      }
+
+      /**
+       * @description 상품 투입 api 호출
+       ******************
+       * @param {String} regionCd
+       * @param {String} sideCd
+       * @param {String} comCd
+       * @param {String} skuCd
+       */
+      doInputTransaction(regionCd, sideCd, comCd, skuCd) {
+        try {
+          this.validateBeforeRequest();
+          const inputAjax = this._getInputAjax();
+          let zoneCd = MPS_UTIL.getZoneCd();
+          inputAjax.curl = `/pda_process/input_sku/${regionCd}/${sideCd}/${zoneCd}/${comCd}/${skuCd}`;
+          inputAjax.generateRequest();
+        } catch (error) {
+          openAlert({
+            title: t('error.VALIDATION_ERROR'),
+            message: error,
+            confirmCallback: () => {
+              this._initialSetup();
+            }
+          });
+        }
+      }
+
+      /**
+       * @description 상품 검수 api 호출
+       ******************
+       * @param {String} regionCd
+       * @param {String} sideCd
+       * @param {String} zoneCd
+       * @param {String} comCd
+       * @param {String} skuCd
+       */
+      doInspectTransaction(regionCd, sideCd, zoneCd, comCd, skuCd) {
+        try {
+          this.validateBeforeRequest();
+          const inspectAjax = this._getInspectAjax();
+          inspectAjax.curl = `/pda_process/inspection_by_mpi/${regionCd}/${sideCd}/${zoneCd}/${comCd}/${skuCd}`
+          inspectAjax.generateRequest();
+        } catch (error) {
+          openAlert({
+            title: t('error.VALIDATION_ERROR'),
+            message: error,
+            confirmCallback: () => {
+              this._initialSetup();
+            }
+          });
+        }
+      }
+
+      /**
+       * @description 상품 투입을 위한 ajax 오브젝트 리턴
+       */
+      _getInputAjax() {
+        return this.$['input-sku-ajax'];
+      }
+
+      /**
+       * @description 검수 투입을 위한 ajax 오브젝트 리턴
+       */
+      _getInspectAjax() {
+        return this.$['inspect-sku-ajax'];
+      }
+
+      /**
+       * @description 상품 정보 조회 전 수행하는 validation
+       */
+      validateBeforeRequest() {
+        let skuCd = this.getSkuCd();
+
+        if(!skuCd || skuCd.length < 4) {
+          throw t('error.sku_barcd_invalid');
+        }
+      }
+
+      /**
+       * @description jobResult가 초기화 되면 해당 상품코드, 상품명, 거래처 수 input에 값을 초기화함
+       *******************
+       * @param {Object} jobResult
+       */
+      _jobResultChanged(jobResult) {
+        if(jobResult) {
+          this.$['relay-seq'].value = jobResult.input_seq;
+          this.jobList = jobResult.items;
+          this._initialSetup();
+        }
+      }
+
+      /**
+       * @description SKU 조회 에러 발생시
+       *******************
+       * @param {Object} event
+       */
+      _onAjaxErrorHandler(event) {
+        var detail = event.detail ? event.detail : event.detail.body;
+
+        if(detail && detail.msg == 'already-input-sku') {
+          openConfirm({
+            title: t('text.checking_inspection'),
+            message: t('text.check_inspection'),
+            confirmCallback: () => {
+              const regionCd = MPS_UTIL.getRegionCd();
+              const sideCd = MPS_UTIL.getSideCd();
+              let zoneCd = MPS_UTIL.getZoneCd();
+              let comCd = this.getComCd();
+              let skuCd = this.getSkuCd();
+              this.doInspectTransaction(regionCd, sideCd, zoneCd, comCd, skuCd);
+              this._initialSetup();
+            },
+            cancelCallback: () => {
+              this.clearView();
+            }
+          });
+        } else {
+          openAlert({
+            title: detail ? detail.code : '',
+            message: detail ? detail.msg : '',
+            confirmCallback: this._initialSetup.bind(this)
+          });
+        }
+      }
+
+       /**
+        * @description 작업 처리를 위한 팝업을 표시
+        *******************
+        * @param {Object} event
+        */
+      _showProcessPopup(event) {
+        const status = event.detail.data.status;
+        if(status === 'P') {
+          const popup = document.createElement('pda-job-process-detail');
+          const data = event.detail.data;
+          popup.jobId = data.id;
+          popup.custNm = data.cust_nm;
+          popup.locCd = data.loc_cd;
+          popup.pickedQty = data.picked_qty;
+          popup.pickQty = data.pick_qty;
+          popup.totalQty = data.total_qty;
+          MPS_UTIL.showPopup(t('title.job_select'), popup, '70%', 'fit', null, this.refresh.bind(this));
+        } else if (status !== 'F' && status !== 'P') {
+          openAlert({
+            title: t('error.VALIDATION_ERROR'),
+            message: t('text.precedence_is_not_finished_yet'),
+            confirmCallback: () => {
+              this.refresh();
+            }
+          })
+        }
+      }
+
+      /**
+       * @description currentMode switching button click event handler
+       */
+      _switchMode() {
+        this.currentMode = this.currentMode === 'input-mode' ? 'inspection-mode' : 'input-mode';
+        this._initialSetup();
+      }
+
+       /**
+        * @description 버튼 표시를 위한 팝업을 표시
+        */
+      _showButtonsPopup() {
+        const buttonPopup = document.createElement('pda-job-process-btn-popup');
+        buttonPopup.addEventListener('btn-click', event => {
+          this._popupButtonClick(event.detail.buttonId);
+        });
+
+        document.dispatchEvent(new CustomEvent('open-dialog', {
+          detail: {
+            title: t('menu.DasJobProcess'),
+            content: buttonPopup,
+            width: 'fit',
+            height: 'fit',
+            closeCallback: () => {
+              this.refresh();
+            }
+          }
+        }))
+      }
+
+       /**
+        * @description 버튼 표시 팝업 버튼을 클릭시
+        *******************
+        * @param {String} buttonId
+        */
+      _popupButtonClick(buttonId) {
+        switch(buttonId) {
+          case 'mpi-on':
+            this._mpiOnRequest();
+            break;
+          case 'mpi-off':
+            this._mpiOffRequest();
+            break;
+          case 'cancel-input':
+            this._cancelInputRequest();
+            break;
+        }
+      }
+
+      /**
+       * @description mpi 점등 버튼 클릭 이벤트 핸들러
+       */
+      _mpiOnRequest() {
+        openConfirm({
+          title: t('button.led_on'),
+          message: t('text.Sure to process'),
+          confirmCallback: () => {
+            const regionCd = MPS_UTIL.getRegionCd();
+            const mpiOnAjax = this._getMpiOnAjax();
+            mpiOnAjax.curl = `/kiosk_process/restore_mpi/${regionCd}`;
+            mpiOnAjax.generateRequest();
+            this._initialSetup();
+          },
+          cancelCallback: () => {
+            this._initialSetup();
+          }
+        })
+      }
+
+      /**
+       * @description mpi 소등 버튼 클릭 이벤트 핸들러
+       */
+      _mpiOffRequest() {
+        openConfirm({
+          title: t('button.led_off'),
+          message: t('text.Sure to process'),
+          confirmCallback: () => {
+            const regionCd = MPS_UTIL.getRegionCd();
+            const mpiOffAjax = this._getMpiOffAjax();
+            mpiOffAjax.curl = `/kiosk_process/mpi_off_all/${regionCd}`;
+            mpiOffAjax.generateRequest();
+            this._initialSetup();
+          },
+          cancelCallback: () => {
+            this._initialSetup();
+          }
+        })
+      }
+
+      /**
+       * @description 투입 취소 버튼 이벤트 핸들러
+       */
+      _cancelInputRequest() {
+        openConfirm({
+          title: t('button.cancel_input'),
+          message: t('text.Sure to process'),
+          confirmCallback: () => {
+            console.log('TODO: Request cancel input');
+            this._initialSetup();
+          },
+          cancelCallback: () => {
+            this._initialSetup();
+          }
+        })
+      }
+
+      /**
+       * @description 표시기 점등을 위한 Ajax 오브젝트 리턴
+       */
+      _getMpiOnAjax() {
+        return this.$['mpi-on-ajax'];
+      }
+
+      /**
+       * @description 표시기 소등을 위한 Ajax 오브젝트 리턴
+       */
+      _getMpiOffAjax() {
+        return this.$['mpi-off-ajax'];
+      }
+
+      /**
+       * @description 화면의 정보를 모두 클리어
+       */
+      clearView() {
+        this.$['sku-barcd'].value = '';
+        this.$['sku-cd'].value = '';
+        this.$['sku-nm'].value = '';
+        this.$['relay-seq'].value = '';
+        this.set('items', []);
+        this._initialSetup();
+      }
+
+      /**
+       * @description SKU 정보 조회 시 복수개가 조회된 경우 사용자가 고를 수 있는 버튼이 실행되는데 그 버튼에 표시할 내용
+       *******************
+       * @param {Object} item
+       */
+      _skuButtonTxtCallback(item) {
+        return `${item.com_cd} : ${item.sku_cd}
+                ${item.sku_nm}`;
+      }
+
+      /**
+       * @description 초기 셋업
+       */
+      _initialSetup() {
+        this.$['sku-barcd']._initialSetup();
+      }
+
+      /**
+       * @description 상품 투입 리스트 중 선택된 상품 투입 상세 데이터 소팅 완료된 항목은 아래로 이동
+       ******************
+       * @param {Array} jobList
+       */
+      /*sortJobList(jobList) {
+        jobList.sort(function(a, b) {
+          if(a.status == b.status) {
+            return 0;
+          } else if(a.status == 'P' && b.status == 'F') {
+            return 1;
+          } else {
+            return -1;
+          }
+        });
+        return jobList;
+      }*/
+
+      /**
+       * @description 모드 라벨 지정
+       *******************
+       * @param {String} currentMode
+       */
+      /*_computeModeLabel(currentMode) {
+        if(currentMode === 'input-mode') {
+          return t('button.input_mode');
+        } else if (currentMode === 'inspection-mode') {
+          return t('button.insp_mode');
+        }
+      }*/
+
+      /**
+       * @description 트랜잭션 실행
+       ****************
+       * @param {String} ajaxId
+       * @param {String} url
+       */
+      /*doTransaction(ajaxId, url) {
+        try {
+          this.validateBeforeRequest();
+          const ajax = this.$[ajaxId];
+          ajax.curl = url;
+          ajax.generateRequest();
+
+        } catch (error) {
+          openAlert({
+            title: t('error.VALIDATION_ERROR'),
+            message: error,
+            confirmCallback: () => {
+              this._initialSetup();
+            }
+          });
+        }
+      }*/
+    }
+
+    customElements.define(PdaJobProcess.is, PdaJobProcess);
+  </script>
+</dom-module>

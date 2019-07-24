@@ -1,0 +1,125 @@
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+
+<!--
+  블루투스 장비 선택 다이얼로그
+-->
+
+<dom-module id="tab-bluetooth-scanner-selector">
+  <template>
+    <style include="shared-styles">
+      :host {
+        width: 100%;
+      }
+
+      #container {
+        width: 100%;
+      }
+
+      select {
+        width: calc(100% - 40px);
+        margin: 20px 20px 0 20px;
+      }
+
+      #button-container {
+        display: grid;
+        grid-auto-flow: column;
+        grid-gap: 15px;
+        justify-content: end;
+        margin: 20px;
+      }
+    </style>
+
+    <div id="container">
+      <select name="device" id="device-select"></select>
+
+      <div id="button-container">
+        <button on-click="_cancelClicked">[[cancelLabel]]</button>
+        <button on-click="_confirmClicked">[[confirmLabel]]</button>
+      </div>
+    </div>
+  </template>
+
+  <script>
+    class TabBluetoothScannerSelector extends Polymer.Element {
+      static get is() { return 'tab-bluetooth-scanner-selector' }
+
+      static get properties() {
+        return {
+          /**
+           * 취소 라벨
+           ****************
+           * @type {String}
+           */
+          cancelLabel: {
+            type: String, value: () => t('button.cancel'),
+          },
+
+          /**
+           * 확인 라벨
+           ****************
+           * @type {String}
+           */
+          confirmLabel: {
+            type: String, value: () => t('button.confirm')
+          },
+
+          /**
+           * 선택 대상 device list
+           ****************
+           * @type {String}
+           */
+          deviceList: {
+            type: Array,
+            observer: '_deviceListChanged'
+          }
+        }
+      }
+
+      clearOptions() {
+        Array.from(this.$['device-select'].options).forEach(option => {
+          option.remove();
+        });
+      }
+
+      appendDevice(device) {
+        if(!this.isDuplicate(device.id) && device.id && device.name) {
+          this.$['device-select'].appendChild(new Option(device.name, device.id));
+        }
+      }
+
+      isDuplicate(deviceId) {
+        const options = Array.from(this.$['device-select'].options);
+        let result = false;
+        for(let i = 0; i < options.length; i++) {
+          if(options[i].value === deviceId) {
+            result = true;
+            break;
+          }
+        }
+
+        return result;
+      }
+
+      appendOption(option) {
+        this.$['device-select'].appendChild(option);
+      }
+
+      _cancelClicked() {
+        this.selectedDeviceId = null;
+        document.dispatchEvent(new CustomEvent('close-dialog'));
+      }
+
+      _confirmClicked() {
+        var devName = this.$['device-select'].selectedOptions[0].label;
+        this.selectedDeviceId = this.$['device-select'].selectedOptions[0].value;
+        this.selectedDeviceName = devName.slice(devName.length-6, devName.length);
+        document.dispatchEvent(new CustomEvent('close-dialog'));
+      }
+    }
+
+    customElements.define(TabBluetoothScannerSelector.is, TabBluetoothScannerSelector);
+  </script>
+</dom-module>

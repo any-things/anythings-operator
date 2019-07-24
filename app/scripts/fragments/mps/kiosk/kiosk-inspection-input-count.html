@@ -1,0 +1,132 @@
+<dom-module id="kiosk-inspection-input-count">
+  <template>
+    <style>
+      #container {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+      }
+      #empty-section {
+        display: grid;
+        flex: 1;
+        margin: 20px 20px 0 20px;
+      }
+      #input-section {
+        display: flex;
+        flex-direction: column;
+        margin-left: 20px; margin-right: 20px;
+      }
+      input {
+        font-size:.7rem;
+        text-align: center;
+      }      
+      #button-section {
+        display: grid;
+        margin: 20px;
+        justify-content: end;
+        grid-template-columns: auto auto;
+        grid-column-gap: 15px;
+      }
+      button {
+        @apply --operator-default-btn;
+      }
+      button:active {
+        @apply --operator-default-btn-active;
+      }
+    </style>
+
+    <div id="container">
+      <div id="empty-section">
+      </div>
+
+      <div id="input-section">
+        <input id="input-count" name="input-cnt" type="number" min="1" on-keypress="_keypressHandler">
+      </div>
+
+      <div id="button-section">
+        <button on-click="closeDialog">[[closeBtnLabel]]</button>
+        <button on-click="doInspection">[[confirmBtnLabel]]</button>
+      </div>
+    </div>
+  </template>
+
+  <script>
+    class KioskInspectionInputCount extends Polymer.Element {
+      static get is() { return 'kiosk-inspection-input-count' }
+
+      static get properties() {
+        return {
+          // locale
+          closeBtnLabel: {type: String, value: () => t('button.close')},
+          confirmBtnLabel: {type: String, value: () => t('button.confirm')},
+
+          item: {
+            type: Object
+          },
+
+          inputQty: {
+            type: Number
+          }
+        }
+      }
+
+      connectedCallback() {
+        super.connectedCallback();
+        document.addEventListener(`alert-closed-at-${location.hash.replace('#/', '')}`, event => {
+          if(!event.detail.hasCallback) {
+            this._initialSetup();
+          }
+        });
+      }
+
+      _keypressHandler(event) {
+        if(event.charCode === 13) {
+          this.doInspection();
+        }
+      }
+
+      doInspection() {
+        try {
+          this.validateBeforeInspection();
+          this.item.confirm_qty = this.item.confirm_qty + this.inputQty;
+          this.closeDialog();
+        } catch (error) {
+          openAlert({
+            title: error.title,
+            message: error.message,
+            confirmCallback: this._initialSetup.bind(this)
+          });
+        }
+      }
+
+      validateBeforeInspection() {
+        this.inputQty = parseInt(this.$['input-count'].value);
+        if(isNaN(this.inputQty) || !this.inputQty || this.inputQty < 0) {
+          throw {
+            title: t('error.VALIDATION_ERROR'),
+            message: t('text.invalid_value')
+          }
+        } else if (this.item.diff_qty < this.inputQty) {
+          throw {
+            title: t('error.VALIDATION_ERROR'),
+            message: t('text.out_of_valid_range')
+          }
+        }        
+      }
+
+      closeDialog() {
+        document.dispatchEvent(new CustomEvent('close-dialog'));
+      }
+
+      /**
+       * focus를 code input으로 이동함
+       * mps-operator-app에 의해 dialog가 나타나고 openCallback에 의해 실행됨
+       */
+      _initialSetup() {
+        this.$['input-count'].select();
+      }
+    }
+
+    customElements.define(KioskInspectionInputCount.is, KioskInspectionInputCount);
+  </script>
+</dom-module>

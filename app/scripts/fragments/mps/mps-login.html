@@ -1,0 +1,366 @@
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+
+<link rel="import" href="../../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../../bower_components/iron-localstorage/iron-localstorage.html">
+<link rel="import" href="../../../bower_components/iron-form/iron-form.html">
+
+<link rel="import" href="../../units/sys-translator.html">
+<link rel="import" href="../../units/things-portal-display.html">
+
+<link rel="import" href="../../mixins/things-encrypt.html">
+
+<link rel="import" href="./mps-site-selector.html">
+
+<dom-module id="mps-login">
+  <template>
+    <style include="shared-styles">
+      #login-form {
+        display: none;
+      }
+      #input-form {
+        padding: 30px;
+        padding-top: 10px;
+      }
+      .input-container {
+        display: grid;
+        grid-template-columns: 30vw 1fr;
+        margin: 15px 0;
+      }
+      .input-container span {
+        margin: auto 10px auto auto;
+      }
+      .label{
+        font-size:.6rem;
+        color:#fff
+      }
+      input {
+        background-color: rgba(0,0,0,.25);
+        border: 1px solid rgba(255,255,255,.2);
+        width:calc(100% - 10px);height:45px;
+        color: #fff;
+        font-size:.7rem;
+        text-align: center;
+      }
+      #button-container {
+        display: grid;
+        justify-content: end;
+      }
+    </style>
+
+    <sys-translator resources="[[resources]]" language="[[language]]" src="label.user" result="{{labelUser}}"></sys-translator>
+    <sys-translator resources="[[resources]]" language="[[language]]" src="label.password" result="{{labelPassword}}"></sys-translator>
+    <sys-translator resources="[[resources]]" language="[[language]]" src="label.login" result="{{labelLogin}}"></sys-translator>
+    <sys-translator resources="[[resources]]" language="[[language]]" src="text.login_failure" result="{{loginFailureLabel}}"></sys-translator>
+    <sys-translator resources="[[resources]]" language="[[language]]" src="text.login_not_typed" result="{{loginNotTypedLabel}}"></sys-translator>
+    <sys-translator resources="[[resources]]" language="[[language]]" src="text.password_not_typed" result="{{passwordNotTypedLabel}}"></sys-translator>
+
+    <iron-localstorage
+      name="setting.mgrSiteUrl"
+      value="{{mgrSiteUrl}}">
+    </iron-localstorage>
+    
+    <sys-ajax
+      id="sign-in-ajax"
+      method="POST"
+      content-type="application/x-www-form-urlencoded"
+      on-sys-ajax-response="_signInResponsed"
+      on-sys-ajax-error="_signInError">
+    </sys-ajax>
+
+    <iron-form id="login-form"
+      on-iron-form-response="_handleResponseSuccess",
+      on-iron-form-error="_handleResponseError"
+      with-credentials>
+
+      <form
+        id="form"
+        action="[[loginUrl]]"
+        enctype="application/x-www-form-urlencoded"
+        method="POST">
+        <input id="email-input" name="email">
+        <input id="password-input" name="password">
+        <input id="requester-id-input" name="requester_id" hidden>
+      </form>
+    </iron-form>
+
+    <things-portal-display 
+      background-url="/images/mobile_brand.png">
+    </things-portal-display>
+
+    <form
+      id="input-form"
+      on-keypress="_handlerKeypress">
+      <div class="input-container">
+        <span class="label">[[labelUser]]</span>
+        <input id="email" label="[[labelUser]]">
+      </div>
+      
+      <div class="input-container">
+        <span class="label">[[labelPassword]]</span>
+        <input id="password" label="[[labelPassword]]" type="password">
+      </div>
+
+      <div id="button-container">
+        <button id="submit-btn" on-click="_handleSubmit">[[labelLogin]]</button>
+      </div>
+    </form>
+  </template>
+
+  <script>
+    class MpsLogin extends mix(Polymer.Element).with(Things.Encrypt) {
+      static get is() { return 'mps-login' }
+
+      static get properties() {
+        return {
+
+          /**
+           * login request url except basic url
+           ******
+           * @type {Object}
+           */
+          loginPath: {
+            type: String,
+            notify: true,
+            value: '/check_user'
+          }
+        }
+      }
+
+      /**
+       * 사용자 신청,활성화,비밀번호 초기화 Popup을 open하기 위한 event
+       *****
+       * @event document.things-open-popup-view
+       * @param {Element} view  :things-signup/things-request-active/things-password-init
+       * @param {Boolean} modal  :true/false
+       * @param {function} openCallback : function
+       */
+
+      /**
+       * mgrSiteUrl + loginPath를 통해 login API를 계산
+       */
+      _computeLoginUrl(mgrSiteUrl, loginPath) {
+        return `${mgrSiteUrl}${loginPath}`;
+      }
+
+      /**
+       * input-form keyPress event handler
+       * enter 입력시 input form submit
+       */
+      _handlerKeypress(event) {
+        if(event.charCode === 13) {
+          this._handleSubmit(event);
+        }
+      }
+
+      getSignInAjax() {
+        return this.$['sign-in-ajax'];
+      }
+
+      getEmailInputValue() {
+        return this.$['email'].value;
+      }
+
+      getPasswordInputValue() {
+        return this.$['password'].value;
+      }
+
+      /**
+       * 입력한 input의 데이터를 validation 수행
+       * validation 성공시 보이지 않는 login-form의 input에 바인딩하고 form submit
+       */
+      _handleSubmit(event) {
+        event.preventDefault();
+        if(this.validateBeforeSubmit()) {
+          this.$['submit-btn'].disabled = true;
+          this.$['email-input'].value = btoa(this.getEmailInputValue());
+          this.$['password-input'].value = this.sha256(this.getPasswordInputValue());
+          this.$['requester-id-input'].value = this._uuidGen();
+          this.$['form'].action = `${JSON.parse(localStorage.getItem('setting.mgrSiteUrl'))}${this.loginPath}`;
+          this.$['login-form'].submit();
+        }
+      }
+
+      /**
+       * login-form submit 이전에 수행하는 validation
+       */
+      validateBeforeSubmit() {
+        let result = true;
+        if(!this.getEmailInputValue()) {
+          openAlert({
+            title: this.loginFailureLabel,
+            message: this.loginNotTypedLabel
+          });
+          result = false;
+        } else if (!this.getPasswordInputValue()) {
+          openAlert({
+            title: this.loginFailureLabel,
+            message: this.passwordNotTypedLabel
+          });
+          result = false;
+        }
+        return result;
+      }
+
+      /**
+       * 로그인이 성공하여 iron-form-response가 발생하면 해당 함수를 부른다.
+       * 사용자 정보의 status를 통해 로그인을 통제한다.
+       * @param  {String} event when iron-form-response fire
+       */
+      _handleResponseSuccess(event) {
+        this.$['submit-btn'].disabled = false;
+        const userInfo = event.currentTarget.request.lastResponse;
+        
+        if(userInfo && userInfo.status && userInfo.status !== 'ok') {
+          this._checkUserStatus(userInfo);
+          return;
+        }
+
+        let siteList = userInfo.site_list;
+        if(siteList && siteList.length > 1) {
+          this._showSiteSelector(siteList);
+        } else if (siteList && siteList.length === 1) {
+          this._reqSignIn(this._computeReqUrl(siteList[0]), siteList[0].id);
+        } else {
+          openAlert({
+            title: t('error.BASEURL_ERROR'),
+            message: t('text.not_mgr_site_ip'),
+            confirmCallback: () => {
+              this._moveToSetting();
+            }
+          })
+        }        
+      }
+
+      /**
+       * @description 사용자 정보를 통해
+       * 비밀번호 변경 유도 및 비밀번호 연장 유도
+       */
+      _checkUserStatus(userInfo) {
+        const status = userInfo.status;
+        let title; let message;
+        switch(status) {
+          case 'password_change':
+            title = t('title.password_need_change');
+            message = t('text.ask_password_change');
+            openAlert({
+              title: title,
+              message: message
+            });
+            break;
+
+          case 'password_expired':
+            title = t('title.password_expired');
+            message = t('text.ask_password_extend');
+            openAlert({
+              title: title,
+              message: message
+            });
+            break;
+        };
+      }
+
+      _computeReqUrl(selectedSite) {
+        const prodMode = selectedSite['production_mode'];
+        const siteUrl = selectedSite.subdomain;
+        return prodMode ? `http://${siteUrl}/rest` : JSON.parse(localStorage.getItem('setting.mgrSiteUrl'));
+      }
+
+      _moveToSetting() {
+        location.hash = '/mps_setting'
+      }
+
+      _showSiteSelector(siteList) {
+        const siteSelector = document.createElement('mps-site-selector');
+        siteSelector.siteList = siteList;
+
+        document.dispatchEvent(new CustomEvent('open-dialog', {
+          detail: {
+            content: siteSelector,
+            title: t('title.select_site'),
+            width: 'fit',
+            height: 'fit',
+            openCallback: () => {
+              siteSelector._getSiteSelectElement().focus();
+            },
+            closeCallback: () => {
+              if(siteSelector.selectedSiteUrl) {
+                this._reqSignIn(siteSelector.selectedSiteUrl, siteSelector.selectedDomainId);
+              }
+            }
+          }
+        }));
+      }
+
+      _reqSignIn(selectedSiteUrl, selectedDomainId) {
+        this.setBaseUrl(selectedSiteUrl);
+        const signInAjax = this.getSignInAjax();
+        signInAjax.curl = '/login';
+        signInAjax.body = {
+          email: btoa(this.getEmailInputValue()),
+          password: this.sha256(this.getPasswordInputValue()),
+          domainId: selectedDomainId
+        };
+        signInAjax.headers['x-domain-id'] = selectedDomainId;
+        signInAjax.generateRequest();
+      }
+
+      _signInResponsed(event) {
+        setTimeout(() => {
+          this._clearForm();
+          this.dispatchEvent(new CustomEvent('login-succeed'));
+        }, 500);
+      }
+
+      _signInError(event) {
+        openAlert({
+          title: this.loginFailureLabel,
+          message: t('error.please_check_site_info')
+        });
+      }
+
+      setBaseUrl(url) {
+        localStorage.setItem('setting.baseUrl', JSON.stringify(url));
+        document.dispatchEvent(new CustomEvent('base-url-changed', {
+          detail: url
+        }));
+      }
+
+      _clearForm() {
+        this.$['email'].value = '';
+        this.$['password'].value = '';
+        this.$['login-form'].reset();
+      }
+
+      /**
+       * After failed sigin in
+       *******
+       * @param {Object} event iron-form-error
+       */
+      _handleResponseError(event) {
+        this.$['submit-btn'].disabled = false;
+        var response = event.detail.request.xhr.response
+        if(response) {
+          openAlert({
+            title: this.loginFailureLabel,
+            message: response.msg ? response.msg : response.message
+          });
+        }
+      }
+
+      _uuidGen() {
+        function s4() {
+          return Math.floor((1 + Math.random()) * 0x10000)
+            .toString(16)
+            .substring(1);
+        };
+
+        return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
+      }
+    }
+
+    customElements.define(MpsLogin.is, MpsLogin);
+  </script>
+</dom-module>

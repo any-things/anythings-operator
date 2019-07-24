@@ -1,0 +1,315 @@
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+
+<link rel="import" href="../../../bower_components/polymer/polymer-element.html">
+
+<!--
+DAS 확정 처리한 작업을 취소하는 화면
+-->
+
+<dom-module id="mps-picking-list">
+  <template>
+    <style include="shared-styles">
+      :host {
+        display: flex;
+        flex-direction: column;
+        padding: 10px;
+        height: calc(100% - 20px);
+      }
+      #search-container {
+        display: flex;
+        background-color: #5A6377;
+        border-radius:var(--things-default-border-radius);
+        margin-bottom: 10px;
+        padding: 10px;
+        flex-direction: column;
+      }
+      #search-container[kiosk] {
+        flex-direction: row;
+      }
+      #search-container .label {
+        margin: auto 0px;
+        text-align: left;
+        font-size: .8rem;
+        color: #D5D7DB;
+      }
+      #search-container[kiosk] .label {
+        margin: auto 15px;
+        text-align: right;
+      }
+      #search-container input {
+        flex: 1;
+        margin: 0 0 10px 0;
+      }
+      #search-container[kiosk] input {
+        margin: auto 10px auto auto;
+      }
+      mps-list {
+        margin-bottom: 10px;
+      }
+      .button-container {
+        display: grid;
+        justify-items: right;
+
+      }
+    </style>
+
+    <sys-ajax
+      auto
+      id="search-ajax"
+      method="GET"
+      last-response="{{lastResponse}}">
+    </sys-ajax>
+
+    <sys-ajax
+      id="cancel-ajax"
+      method="POST"
+      content-type="application/json"
+      on-sys-ajax-response="refresh">
+    </sys-ajax>
+
+    <div id="search-container" kiosk$="[[isKiosk]]">
+      <span class="label">[[locCdLabel]]</span>
+      <input id="loc-cd" />
+
+      <span class="label">[[skuCdLabel]]</span>
+      <input id="sku-cd" />
+
+      <div class="button-container">
+        <button id="refresh-btn" on-click="refresh">[[searchBtnLabel]]</button>
+      </div>
+    </div>
+
+    <mps-list
+      header="[[header]]"
+      page="[[page]]"
+      total="[[total]]"
+      limit="[[limit]]"
+      data="[[items]]"
+      show-paginator
+      on-paginator-changed="_pageChanged"
+      on-data-list-click="_selectItem">
+    </mps-list>
+
+    <div class="button-container">
+      <button id="cancel-confirmation" on-click="cancelConfirmation">[[cancelConfirmBtnLabel]]</button>
+    </div>
+  </template>
+
+  <script>
+    class MpsPickingList extends Polymer.Element {
+      static get is() { return 'mps-picking-list' }
+
+      static get properties() {
+        return {
+          /**
+           * 로케이션 코드 라벨
+           */
+          locCdLabel: {
+            type: String,
+            value: () => t('label.loc_cd')
+          },
+
+          /**
+           * 상품 코드 라벨
+           */
+          skuCdLabel: {
+            type: String,
+            value: () => t('label.sku_cd')
+          },
+
+          /**
+           * 조회 버튼 라벨
+           */
+          searchBtnLabel: {
+            type: String,
+            value: () => t('button.search')
+          },
+
+          /**
+           * 확정 취소 버튼 라벨
+           */
+          cancelConfirmBtnLabel: {
+            type: String,
+            value: () => t('title.cancel_confirmation')
+          },
+
+          /**
+           * 그리드 헤더 정보
+           */
+          header: {
+            type: Array,
+            value: function() {
+              return [{
+                display: t('label.location'),
+                fieldname: 'loc_cd',
+                columnWidth: '0.17fr'
+              }, {
+                display: t('label.sku_cd'),
+                fieldname: 'sku_cd',
+                columnWidth: '0.25fr'
+              }, {
+                display: t('label.sku_nm'),
+                fieldname: 'sku_nm'
+              }, {
+                display: t('label.picked_qty'),
+                fieldname: 'picked_qty',
+                columnWidth: '0.1fr',
+                style: {
+                  textAlign: 'right'
+                }
+              }, {
+                fieldname: 'batch_id',
+                hidden: true
+              }, {
+                fieldname: 'cust_cd',
+                hidden: true
+              }, {
+                fieldname: 'com_cd',
+                hidden: true
+              }]
+            }
+          },
+
+          /**
+           * 페이지 정보
+           */
+          page: {
+            type: Number,
+            value: 1
+          },
+
+          /**
+           * Limit 정보
+           */
+          limit: {
+            type: Number,
+            value: 100
+          },
+
+          /**
+           * 총 아이템 개수
+           */
+          total: {
+            type: Number
+          },
+
+          /**
+           * 조회 결과
+           */
+          lastResponse: {
+            type: Object,
+            observer: '_lastResponseChanged'
+          }
+        }
+      }
+
+      /**
+       * page 전환 및 초기 진입시 리스트 조회
+       */
+      connectedCallback() {
+        super.connectedCallback();
+        document.addEventListener('page-changed', event => {
+          if(event.detail.currentPage === location.hash.replace('#/', '')) {
+            this.refresh();
+          }
+        });
+
+        this.refresh();
+      }
+
+      /**
+       * 검색 조건을 바탕으로 데이터 조회
+       */
+      refresh() {
+        const regionCd = MPS_UTIL.getRegionCd();
+        const locCd = this.$['loc-cd'].value;
+        const skuCd = this.$['sku-cd'].value;
+        const searchAjax = this._getSearchAjax();
+        searchAjax.curl = `/kiosk_process/unboxed_job_list/${regionCd}`;
+        searchAjax.params = {
+          page: this.page,
+          limit: this.limit,
+          loc_cd: locCd,
+          sku_cd: skuCd,
+        }
+      }
+
+      _lastResponseChanged(lastResponse) {
+        if(lastResponse && lastResponse.items) {
+          this.items = lastResponse.items;
+          this.total = lastResponse.total;
+        }
+      }
+
+      /**
+       * mps-list page change event handler
+       */
+      _pageChanged(event) {
+        this.page = event.detail.page;
+        this.limit = event.detail.limit;
+        this.refresh()
+      }
+
+      /**
+       * mps-list item click event handler
+       */
+      _selectItem(event) {
+        if(this.selectedItem) {
+          this.selectedItem.classList.remove('selected')
+        }
+
+        if(this.selectedItem != event.detail.row) {
+          this.selectedItem = event.detail.row;
+          this.selectedItem.classList.add('selected');
+        } else {
+          this.selectedItem = null;
+        }
+
+      }
+
+      /**
+       * cancel confirmation button click handler
+       */
+      cancelConfirmation() {
+        if(!this.selectedItem) {
+          openAlert({
+            title: t('title.info'),
+            message: t('text.NOTHING_SELECTED')
+          })
+          return;
+        }
+
+        openConfirm({
+          title: t('title.cancel_confirmation'),
+          message: t('text.Sure to process'),
+          critical: true,
+          confirmCallback: () => {
+            const selectedData = this.selectedItem.getData();
+            const regionCd =  MPS_UTIL.getRegionCd();
+            const locCd = selectedData.loc_cd;
+            const comCd = selectedData.com_cd;
+            const skuCd = selectedData.sku_cd;
+            const cancelAjax = this._getCancelAjax();
+
+            cancelAjax.curl = `/tablet_process/cancel_picked/${regionCd}/${locCd}/${comCd}/${skuCd}`;
+            cancelAjax.generateRequest();
+            this.selectedItem = null;
+          }
+        });
+      }
+
+      _getSearchAjax() {
+        return this.$['search-ajax']
+      }
+
+      _getCancelAjax() {
+        return this.$['cancel-ajax']
+      }
+    }
+
+    customElements.define(MpsPickingList.is, MpsPickingList)
+  </script>
+</dom-module>

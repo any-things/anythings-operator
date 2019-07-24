@@ -1,0 +1,224 @@
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+
+<link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
+
+<link rel="import" href="../../../kiosk-libraries.html">
+
+<!--
+  KIOSK QR Code 팝업 화면
+ -->
+
+<dom-module id="kiosk-code-popup">
+  <template>
+    <style>
+      #container {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+      }
+      #qr-section {
+        display: grid;
+        flex: 1;
+        margin: 20px;
+      }
+      #qr-section img {
+        max-width: 160px;
+        max-width: 160px;
+        width: 100%;
+        margin: auto;
+      }
+      #input-section {
+        display: flex;
+        flex-direction: column;
+        margin-left: 20px; margin-right: 20px;
+      }
+      #code {
+        font-size: .8rem;
+      }
+      #button-section {
+        display: grid;
+        margin: 20px;
+        justify-content: end;
+      }
+      button {
+        @apply --operator-default-btn;
+      }
+      button:active {
+        @apply --operator-default-btn-active;
+      }
+    </style>
+
+    <sys-ajax
+      id="trx-ajax"
+      method="PUT"
+      content-type="application/json"
+      on-sys-ajax-response="closeDialog">
+    </sys-ajax>
+
+    <div id="container">
+      <div id="qr-section">
+        <img src="[[qrImgSrc]]">
+      </div>
+
+      <div id="input-section">
+        <input type="text" name="code" id="code" on-keypress="_keypressHandler">
+      </div>
+
+      <div id="button-section">
+        <button id="close-btn" on-click="closeDialog">[[closeBtnLabel]]</button>
+      </div>
+    </div>
+  </template>
+
+  <script>
+    class KioskCodePopup extends Polymer.Element {
+      static get is() { return 'kiosk-code-popup' }
+
+      static get properties() {
+        return {
+          // locale 처리
+          closeBtnLabel: { type: String, value: () => t('button.close') },
+
+          actionType: {
+            type: String
+          },
+
+          qrImgSrc: {
+            type: String,
+            computed: '_computeQRImgSrc(actionType)'
+          },
+
+          mpiOffKey: {
+            type: String,
+            value: 'MPI_OFF_ALL'
+          },
+
+          batchFullBoxKey: {
+            type: String,
+            value: 'BATCH_FULL_BOX'
+          },
+
+          mpiOnLastKey: {
+            type: String,
+            value: 'MPI_ON_LAST'
+          }
+        }
+      }
+
+      /**
+       * focus를 code input으로 이동함
+       * mps-operator-app에 의해 dialog가 나타나고 openCallback에 의해 실행됨
+       */
+      initialSetup() {
+        this.$['code'].select();
+      }
+
+      /**
+       * actionType에 따라 QR 코드 이미지의 경로를 계산하여 return
+       **********
+       * @param {String} actionType
+       * @returns {String} qrImgSrc
+       */
+      _computeQRImgSrc(actionType) {
+        const kioskCodeType = MPS_UTIL.getKioskCodeType();
+        const basePath = './static/assets/kiosk_codes/';
+
+        if(actionType === 'mpi-off') {
+          return kioskCodeType == 'barcode' ? `${basePath}mpi_off_all_bar.svg`: `${basePath}mpi_off_all_qr.png`;
+
+        } else if (actionType === 'batch-full-box') {
+          return kioskCodeType == 'barcode' ? `${basePath}batch_full_box_bar.svg`: `${basePath}batch_full_box_qr.png`;
+
+        } else if (actionType === 'mpi-on-last') {
+          return kioskCodeType == 'barcode' ? `${basePath}mpi_on_last_bar.svg`: `${basePath}mpi_on_last_qr.png`;
+        }
+      }
+
+      /**
+       * keypress event handler
+       * 엔터 입력시 doTransaction을 통해 MPI 전체소등/일괄 Full Box를 수행
+       */
+      _keypressHandler(event) {
+        if(event.charCode === 13) {
+          this.doTransaction();
+        }
+      }
+
+      /**
+       * actionType에 의해 transaction을 수행함
+       * 1. actionType이 mpi-off 일 경우
+       *    MPI 전체소등 수행
+       * 2. actionType이 batch-full-box 일 경우
+       *    일괄 풀 박스 수행
+       */
+      doTransaction() {
+        try {
+          this.validateBeforeTrx();
+          openConfirm({
+            title: this.title,
+            message: t('text.Sure to process'),
+            confirmCallback: () => {
+              const trxAjax = this.$['trx-ajax'];
+              let regionCd = MPS_UTIL.getRegionCd();
+              let sideCd = MPS_UTIL.getSideCd();
+
+              if(this.actionType === 'mpi-off') {
+                trxAjax.curl = '/kiosk_process/mpi_off_all/' + regionCd;
+              } else if(this.actionType == 'batch-full-box') {
+                trxAjax.curl = '/kiosk_process/das/fullbox_all/' + regionCd + '/' + sideCd;
+              } else if(this.actionType == 'mpi-on-last') {
+                trxAjax.curl = '/kiosk_process/restore_mpi/' + regionCd;
+              }
+
+              trxAjax.generateRequest();
+            },
+            cancelCallback:() => {
+              this.initialSetup();
+            }
+          })
+
+
+        } catch (error) {
+          openAlert({
+            title: error.title,
+            message: error.message,
+            confirmCallback: this.initialSetup.bind(this)
+          });
+        }
+      }
+
+      /**
+       * transaction 전 수행하는 validtion
+       */
+      validateBeforeTrx() {
+        let code = this.$['code'].value;
+
+        if(!code) {
+          throw {
+            title: t('error.VALIDATION_ERROR'),
+            message: t('error.barcd_is_not_typed')
+          }
+        } else if (this.actionType === 'mpi-off' && code !== this.mpiOffKey
+                || this.actionType === 'batch-full-box' && code !== this.batchFullBoxKey
+                || this.actionType === 'mpi-on-last' && code !== this.mpiOnLastKey) {
+          throw {
+            title: t('error.VALIDATION_ERROR'),
+            message: t('text.invalid_value')
+          }
+        }
+      }
+
+      /**
+       * 다이얼로그 닫기
+       */
+      closeDialog() {
+        document.dispatchEvent(new CustomEvent('close-dialog'));
+      }
+    }
+
+    customElements.define(KioskCodePopup.is, KioskCodePopup);
+  </script>
+</dom-module>

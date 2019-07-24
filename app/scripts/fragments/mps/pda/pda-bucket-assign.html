@@ -1,0 +1,233 @@
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+
+<link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
+
+<!--
+  PDA > 박스 할당 화면
+-->
+<dom-module id="pda-bucket-assign">
+  <template>
+    <style include="shared-styles">
+      :host {
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+        height: calc(100% - 40px);
+      }
+      #container {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+        background-color: #5A6377;
+        border-radius: var(--things-default-border-radius);
+        color: rgba(255,255,255,.8);
+      }
+      #input-container {
+        display: grid;
+        grid-template-columns: 30% calc(70% - 12px);
+        grid-gap:12px;
+      }
+      .list-container {
+        display: flex;
+        flex: 1;
+        margin-top: 12px;
+      }
+      .label {
+        font-size:.8rem;
+        margin: auto 5px auto auto;
+      }
+      .button-container {
+        display: grid;
+        justify-content: end;
+        margin-top: 12px;
+      }
+    </style>
+
+    <sys-ajax
+      id="exec-job-mapping"
+      method="PUT"
+      content-type="application/json"
+      on-sys-ajax-response="_jobMappingResponse">
+    </sys-ajax>
+
+    <div id="container">
+      <div id="input-container">
+        <span class="label">[[locCodeLabel]]</span>
+        <input barcode id="loc-cd" type="text" name="location_cd" on-keypress="_locInputKeypress">
+
+        <span class="label">[[bucketCodeLabel]]</span>
+        <input id="bucket-cd" type="text" name="bucket_cd" on-focus="_hideKeyboard" on-keypress="_bucketInputKeypress">
+      </div>
+
+      <div class="list-container">
+        <mps-list
+          header="[[header]]"
+          data="[[data]]">
+        </mps-list>
+      </div>
+
+      <div class="button-container">
+        <button on-click="_clearView">[[resetBtnLabel]]</button>
+      </div>
+    </div>
+  </template>
+
+  <script>
+    class PdaBucketAssign extends MpsScannerMixin(Polymer.Element) {
+      static get is() { return 'pda-bucket-assign' }
+
+      static get properties() {
+        return {
+          // locale 처리
+          locCodeLabel: {type: String, value: () => t('label.location')},
+          bucketCodeLabel: {type: String, value: () => t('label.bucket_cd')},
+          resetBtnLabel: {type: String, value: () => t('button.reset')},
+
+          header: {
+            type: Array,
+            value: () => {
+              return [{
+                display: t('label.location'),
+                fieldname: 'loc_cd'
+              }, {
+                display: t('label.bucket_cd'),
+                fieldname: 'box_id',
+                style: {
+                  textAlign: 'center'
+                }
+              }/*, {
+                display: t('menu.BucketAssign'),
+                fieldname: 'result',
+                displayCallback: value => {
+                  return t('label.success');
+                },
+                style: {
+                  textAlign: 'center'
+                }
+              }*/]
+            }
+          },
+
+          data: {
+            type: Array,
+            value: () => {
+              return [];
+            }
+          }
+        }
+      }
+
+      connectedCallback() {
+        super.connectedCallback();
+        document.addEventListener(`alert-closed-at-${location.hash.replace('#/', '')}`, event => {
+          if(!event.detail.hasCallback) {
+            this._initialSetup();
+          }
+        });
+      }
+
+      /**
+       * loc-cd input keypress event handler
+       * loc-cd 바코드 스캔시 bucket-cd 필드로 이동
+       */
+      _locInputKeypress(event) {
+        if(event.charCode === 13) { // press enter
+          this.$['bucket-cd'].select();
+        }
+      }
+
+      /**
+       * bucket-cd input keypress event handler
+       * bucket-cd 바코드 스캔시 job mapping trasaction 시도
+       */
+      _bucketInputKeypress(event) {
+        if(event.charCode === 13) {
+          this.executeJobMapping();
+        }
+      }
+
+      /**
+       * validation 진행 후 job mapping transaction 시도
+       */
+      executeJobMapping() {
+        try {
+          this.validateBeforeMapping();
+          const execJobMappingAjax = this.$['exec-job-mapping'];
+          const locCd = this.$['loc-cd'].value;
+          const boxId = this.$['bucket-cd'].value;
+          execJobMappingAjax.curl = `/pda_process/das/loc_box_mapping/${locCd}/${boxId}`;
+          execJobMappingAjax.generateRequest();
+        } catch (error) {
+          openAlert({
+            title: error.title,
+            message: error.message,
+            confirmCallback: error.confirmCallback
+          });
+        }
+      }
+
+      /**
+       * job mapping 시도 이전에 수행하는 유효성 검사
+       */
+      validateBeforeMapping() {
+        let locCd = this.$['loc-cd'].value;
+        let bucketCd = this.$['bucket-cd'].value;
+        if(!locCd) {
+          throw {
+            title: t('error.VALIDATION_ERROR'),
+            message: t('error.loc_cd_invalid'),
+            confirmCallback: this._clearView
+          }
+        } else if(!bucketCd) {
+          throw {
+            title: t('error.VALIDATION_ERROR'),
+            message: t('error.bucket_cd_invalid'),
+            confirmCallback: () => {
+              this.$['bucket-cd'].select();
+            }
+          }
+        }
+      }
+
+      /**
+       * 박스 할당 요청 성공 event handler
+       * 화면을 clear
+       */
+      _jobMappingResponse(event) {
+        this._clearView(); // event.detail
+        this.appendResultToList(event.detail);
+      }
+
+      /**
+       * 박스 할당 요청 완료 후 최근 처리 리스트를 화면에 보여줌
+       */
+      appendResultToList(newItem) {
+        const maxCnt = 20;
+        let tempItems = this.data;
+        tempItems.unshift(newItem);
+        if(tempItems.length > maxCnt) {
+          tempItems.pop();
+        }
+
+        this.data = [];
+        this.data = tempItems;
+      }
+
+      /**
+       * 초기화 버튼을 통해 화면에서 설정한 값들을 초기화 함
+       */
+      _clearView() {
+        this.$['loc-cd'].value = '';
+        this.$['bucket-cd'].value = '';
+        this._initialSetup();
+      }
+    }
+
+
+    customElements.define(PdaBucketAssign.is, PdaBucketAssign);
+  </script>
+</dom-module>

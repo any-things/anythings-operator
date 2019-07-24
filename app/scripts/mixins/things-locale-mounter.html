@@ -1,0 +1,17 @@
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+
+<script>
+	window.Things = window.Things || {};
+
+	Things.LocaleMounter = (superClass) => {
+		return class LocaleMixin extends superClass {
+			constructor() {
+				super();
+				this.t = window.t;
+			}
+		}
+	};
+</script>

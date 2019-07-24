@@ -1,0 +1,68 @@
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+
+
+<dom-module id="things-sound">
+  <template>
+    <style>
+    </style>
+
+    <audio id="info" src="[[infoSrc]]"></audio>
+    <audio id="error" src="[[errorSrc]]"></audio>
+
+  </template>
+
+  <script>
+    class ThingsSound extends Polymer.Element {
+      static get is() { return 'things-sound'; }
+
+      static get properties() {
+        return {
+          infoSrc: {
+            type: String,
+            computed: '_computeInfoSrc()'
+          },
+
+          errorSrc: {
+            type: String,
+            computed: '_computeErrorSrc()'
+          }
+        }
+      }
+
+      connectedCallback() {
+        super.connectedCallback();
+
+        window.SOUND = this;
+      }
+
+      _computeInfoSrc() {
+        return JSON.parse(localStorage.getItem('setting.srcUrl')) + '/static/audio/beep-01.wav';
+      }
+
+      _computeErrorSrc() {
+        return JSON.parse(localStorage.getItem('setting.srcUrl')) + '/static/audio/beep-02.wav';
+      }
+
+      playInfoSound() {
+        this.$.info.play().catch(() => {
+          // do something
+          console.warn('(in promise) DOMException')
+        });
+      }
+
+      playErrorSound() {
+        this.$.error.play().catch(() => {
+          // do something
+          console.warn('(in promise) DOMException')
+        });
+      }
+    }
+
+    customElements.define(ThingsSound.is, ThingsSound);
+  </script>
+</dom-module>

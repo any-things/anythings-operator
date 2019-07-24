@@ -1,0 +1,48 @@
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../../units/mps/mps-form-list-popup.html">
+
+<!-- MPS 공통 팝업 출력을 위한 Mixin -->
+
+<script>
+  MpsCommonPopupMixin = superClass => {
+    return class MpsCommonPopupMixin extends superClass {
+      openFormListPopup(options) {
+        const formListPopup = document.createElement('mps-form-list-popup');
+        formListPopup.formColumnCount = options.formColumnCount ? options.formColumnCount : formListPopup.formColumnCount;
+        formListPopup.formFields = options.formFields;
+        formListPopup.listFields = options.listFields;
+        formListPopup.formData = options.formData ? options.formData : formListPopup.formData;
+        formListPopup.listData = options.listData ? options.listData : formListPopup.listData;
+        formListPopup.formDataReqUrl = options.formDataReqUrl ? options.formDataReqUrl : formListPopup.formDataReqUrl;
+        formListPopup.listDataReqUrl = options.listDataReqUrl ? options.listDataReqUrl : formListPopup.listDataReqUrl;
+        formListPopup.handleFormDataBeforeSet = options.handleFormDataBeforeSet ? options.handleFormDataBeforeSet : formListPopup.handleFormDataBeforeSet;
+        formListPopup.handleListDataBeforeSet = options.handleListDataBeforeSet ? options.handleListDataBeforeSet : formListPopup.handleListDataBeforeSet;
+        formListPopup.handleFormDataAfterSet = options.handleFormDataAfterSet ? options.handleFormDataAfterSet : formListPopup.handleFormDataAfterSet;
+        formListPopup.handleListDataAfterSet = options.handleListDataAfterSet ? options.handleListDataAfterSet : formListPopup.handleListDataAfterSet;
+        formListPopup.dataListClickHandler = options.dataListClickHandler ? options.dataListClickHandler : formListPopup.dataListClickHandler;
+
+        const openCallback = options.openCallback && typeof options.openCallback === 'function' ? options.openCallback.bind(this) : null;
+        const closeCallback = options.closeCallback && typeof options.closeCallback === 'function' ? options.closeCallback.bind(this) : null;
+
+        document.dispatchEvent(new CustomEvent('open-dialog', {
+          detail: {
+            title: options.title ? options.title : null,
+            content: formListPopup,
+            openCallback: openCallback,
+            closeCallback: closeCallback
+          }
+        }));
+      }
+
+      throwException(errorMessage) {
+        throw new Error(errorMessage);
+      }
+    }
+  }
+</script>

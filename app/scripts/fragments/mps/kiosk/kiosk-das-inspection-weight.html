@@ -1,0 +1,897 @@
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+
+<link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
+
+<link rel="import" href="../../../kiosk-libraries.html">
+
+<!--
+  KIOSK > DAS 중량 검수 화면
+-->
+<dom-module id="kiosk-das-inspection-weight">
+  <template>
+    <style>
+      .container {
+        display: flex;
+        flex-direction: row;
+        padding: 20px;
+        height: calc(100% - 40px);
+      }
+      .flex {
+        flex: 1;
+      }
+      #left-section {
+        display: flex;
+        flex-direction: column;
+        background-color:#5a6378;
+        border-radius:var(--things-default-border-radius);
+        margin-right: 20px;
+      }
+      #left-section div {
+        color: #fff;
+      }
+      #right-section {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+      }
+      .cust-info {
+        text-align:center;
+      }
+      span.smalltitle{
+        display:inline-block !important;
+        margin-top:20px;
+        border-bottom:3px solid var(--things-secondary-color);
+        font-size:.7rem;
+      }
+      span.proc{
+        font-size:.9rem;
+        color:rgb(173, 203, 235);
+      }
+      span.proc b{
+        display:block;
+        margin-top:15px;
+        font-size:1.2rem;
+        color:#fff;
+        text-shadow: 1px 3px 3px rgba(0,0,0,.3);
+      }
+      span.weighttitle{
+        text-align:left;
+        opacity:.7;
+        font-size:.7rem;
+        margin-bottom: 20px;
+      }
+      span.weighttitle iron-icon{
+        position:relative;
+        top:-3px;
+        margin-right:5px;
+      }
+      span.weight{
+        text-align: right;
+        font-size: 15vh;
+        margin: auto 0;
+      }
+      .left-section-block {
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+        border-bottom:1px dashed rgba(0,0,0,.2);
+      }
+      .input-container {
+        display: flex;
+        flex-direction: row;
+        background-color:#fff;
+        border-radius:var(--things-default-border-radius);
+        padding:10px 20px;
+      }
+      .input-container .label{
+        color:#006699;
+        font-size:.9rem;
+        line-height:52px;
+        margin-right: 20px;
+      }
+      .input-container input{
+        background-color: #efefef;
+        border: 1px solid rgba(0,0,0,.1);
+        color: #333;
+        font-size:1.1rem;
+        flex: 1;
+      }
+      .weight-button-section, .error-button-section {
+        display: flex;
+        flex-direction: row;
+        padding:10px 20px;
+        background-color:rgba(0, 0, 0, 0.1);
+        border-radius:var(--things-default-border-radius);
+        color: #fff;
+        margin-top: 15px;
+      }
+      span.smalltitle{
+        display:inline-block !important;
+        margin-top:20px;
+        border-bottom:3px solid var(--things-secondary-color);
+        font-size:.7rem;
+      }
+      .weight-button-section .smalltitle, .error-button-section .smalltitle{
+        display:block !important;
+        margin-top:0;
+        border-bottom:none;
+        font-size: .6rem;
+      }
+      .weight-button-section .smalltitle {
+        color:#e6ccab;
+      }
+      .error-button-section .smalltitle {
+        color:#f1a5af;
+      }
+      .display-section {
+        width: 10vw;
+      }
+      .button-section {
+        flex: 1;
+        display: grid;
+        grid-auto-flow: column;
+        grid-gap: 15px;
+      }
+      .button-section input {
+        justify-self: end;
+        width: 10vw;
+      }
+      .weight-button-section button{
+        background: #867b6c;
+        background: linear-gradient(to bottom, #867b6c 0%, #635b50 100%);
+        border:none;border-top:.06rem solid #9e9383;border-bottom:.2rem solid #524b41;
+        font-size:.8rem
+      }
+      .weight-button-section button:active{
+        background: #867b6c;
+        background: linear-gradient(to bottom, #635b50 0%, #867b6c 100%);
+      }
+      .error-button-section button{
+        background: #bb626e;
+        background: linear-gradient(to bottom, #bb626e 0%, #8f444e 100%);
+        border:none;border-top:.06rem solid #e27786;border-bottom:.2rem solid #70333b;
+        font-size:.8rem
+      }
+      .error-button-section button:active{
+        background: #bb626e;
+        background: linear-gradient(to bottom, #8f444e 0%, #bb626e 100%);
+      }
+      .bottom-button-container {
+        display: grid;
+        grid-gap: 15px;
+        grid-auto-flow: column;
+        justify-content: end;
+        margin-top: 15px;
+      }
+      input:focus,button:focus{
+        outline:none;
+      }
+      input {
+        background-color: #474E5E;
+        border: 1px solid #748094;
+        color: #fff;
+        font-size: 25pt;
+        text-align: center;
+      }
+      button {
+        @apply --operator-default-btn;
+      }
+      button:active {
+        @apply --operator-default-btn-active;
+      }
+      mps-list {
+        margin-top: 15px;
+      }
+    </style>
+
+    <!-- 송장 번호로 검수에 필요한 정보(오차범위, 박스중량, 내품내역 리스트)를 조회 -->
+    <sys-ajax
+      id="inspection-info-ajax"
+      curl="/kiosk_process/das/inspection/by_weight/ready/:invoice_id"
+      method="GET"
+      content-type="application/json"
+      last-response="{{inspectionInfo}}">
+    </sys-ajax>
+
+    <!-- 거래명세서 재발행 -->
+    <sys-ajax
+      id="inspection-print-ajax"
+      curl="/kiosk_process/das/inspection/print/:invoice_id"
+      method="PUT"
+      content-type="application/json"
+      last-response="{{printingResult}}">
+    </sys-ajax>
+
+    <!-- 출고 확정 -->
+    <sys-ajax
+      id="inspection-complete-ajax"
+      curl="/kiosk_process/das/inspection/by_weight/finish/:invoice_id"
+      method="PUT"
+      custom-params="[[weightParams]]"
+      content-type="application/json"
+      last-response="{{completeResult}}">
+    </sys-ajax>
+
+    <div class="container">
+      <div id="left-section">
+        <div class="cust-info">
+          <span class="smalltitle">[[custNameLabel]]</span>
+          <span class="proc">
+            <b>[[custNameValue]]</b>
+            ( [[custCdValue]] )
+          </span>
+        </div>
+
+        <div class="real-weight left-section-block">
+          <span class="weighttitle"><iron-icon icon="icons:offline-pin"></iron-icon>[[currentWeightLabel]]</span>
+          <input id="current-weight-input" on-keypress="_currentWeightEnter">
+        </div>
+
+        <div class="expect-weight left-section-block flex">
+          <span class="weighttitle"><iron-icon icon="icons:swap-vertical-circle"></iron-icon>[[expectWeightLabel]]</span>
+          <span class="weight">[[currentExpectWeightValue]]</span>
+        </div>
+
+        <div class="diff-wieght left-section-block flex">
+          <span class="weighttitle"><iron-icon icon="icons:remove-circle"></iron-icon>[[diffWeightLabel]]</span>
+          <span class="weight">[[diffWeightValue]]</span>
+        </div>
+      </div>
+
+      <div id="right-section">
+        <div class="input-container">
+          <span class="label">[[invoiceCdLabel]]</span>
+          <input id="label-cd" on-keypress="_onInvoiceCdScan">
+        </div>
+
+        <div class="weight-button-section">
+          <div class="display-section">
+            <span class="smalltitle">[[boxWeightLabel]]</span>
+            <b>[[boxWeightValue]]</b>
+          </div>
+
+          <div class="button-section">
+            <template is="dom-repeat" items="[[boxWeightList]]" as="item">
+              <button id="box-[[item]]" value="[[item]]" on-click="_boxWeightClick">
+                <span>[[item]]</span>
+              </button>
+            </template>
+          </div>
+        </div>
+
+        <div class="error-button-section">
+          <div class="display-section">
+            <span class="smalltitle">[[errorRangeLabel]]</span>
+            <b>[[errorRangeValue]]</b>
+          </div>
+
+          <div class="button-section">
+            <template is="dom-repeat" items="[[errorRangeList]]" as="item">
+              <button id="error-[[item]]" value="[[item]]" on-click="_errorRangeClick">
+                <span>[[item]]</span>
+              </button>
+            </template>
+
+            <input id="error-range-input" on-keypress="_onErrorRangeInput">
+          </div>
+        </div>
+
+        <mps-list
+          header="[[header]]"
+          data="[[items]]">
+        </mps-list>
+
+        <div class="bottom-button-container">
+          <button id="reset-btn" on-click="_reset">
+            <span>[[resetLabel]]</span>
+          </button>
+          <button id="reprint-btn" on-click="_reprint">
+            <span>[[reprintLabel]]</span>
+          </button>
+          <button id="complete-btn" on-click="_inspectionComplete">
+            <span>[[outConfirmLabel]]</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!--div class="container">
+        <div class="error-button-section">
+          <span class="smalltitle">[[errorRangeLabel]]<b>[[errorRangeValue]]</b></span>
+          <div class="button-section">
+            <dom-repeat items="[[errorRangeList]]" as="item">
+              <template>
+                <button id="error-[[item]]" value="[[item]]" on-click="_errorRangeClick">
+                  <span>[[item]]</span>
+                </button>
+              </template>
+            </dom-repeat>
+            <input id="error-range-input" on-keypress="_onErrorRangeInput">
+          </div>
+        </div>
+
+
+
+        <div class="bottom-button">
+          <button id="reset-btn" on-click="_reset">
+            <span>[[resetLabel]]</span>
+          </button>
+          <button id="reprint-btn" on-click="_reprint">
+            <span>[[reprintLabel]]</span>
+          </button>
+          <button id="complete-btn" on-click="_inspectionComplete">
+            <span>[[outConfirmLabel]]</span>
+          </button>
+        </div>
+      </div>
+    </div-->
+  </template>
+
+  <script>
+    class KioskDasInspectionWeight extends Polymer.Element {
+      static get is() { return 'kiosk-das-inspection-weight' }
+
+      static get properties() {
+        return {
+          /**
+           * 송장 번호 라벨
+           ****************
+           * @type {String}
+           */
+          invoiceCdLabel: {
+            type: String,
+            value: t('label.label_cd')
+          },
+
+          /**
+           * 거래처 명 라벨
+           ****************
+           * @type {String}
+           */
+          custNameLabel: {
+            type: String,
+            value: t('label.cust_nm')
+          },
+
+          /**
+           * 실제 중량 라벨
+           ****************
+           * @type {String}
+           */
+          currentWeightLabel: {
+            type: String,
+            value: t('label.current_weight')
+          },
+
+          /**
+           * popup title 라벨
+           ****************
+           * @type {String}
+           */
+           popupTitleLabel: {
+            type: String,
+            value: t('menu.DasInspectionWeight')
+          },
+
+          /**
+           * 예상 중량 라벨
+           ****************
+           * @type {String}
+           */
+          expectWeightLabel: {
+            type: String,
+            value: t('label.expect_weight')
+          },
+
+          /**
+           * 차이 중량 라벨
+           ****************
+           * @type {String}
+           */
+          diffWeightLabel: {
+            type: String,
+            value: t('label.diff_weight')
+          },
+
+          /**
+           * 박스 중량 라벨
+           ****************
+           * @type {String}
+           */
+          boxWeightLabel: {
+            type: String,
+            value: t('label.box_weight')
+          },
+
+          /**
+           * 오차 범위 라벨
+           ****************
+           * @type {String}
+           */
+          errorRangeLabel: {
+            type: String,
+            value: t('label.error_range')
+          },
+
+          /**
+           * 초기화 라벨
+           ****************
+           * @type {String}
+           */
+          resetLabel: {
+            type: String,
+            value: t('button.reset')
+          },
+
+          /**
+           * 재발행 라벨
+           ****************
+           * @type {String}
+           */
+          reprintLabel: {
+            type: String,
+            value: t('button.reprint')
+          },
+
+          /**
+           * 출고 확정 라벨
+           ****************
+           * @type {String}
+           */
+          outConfirmLabel: {
+            type: String,
+            value: t('button.out_confirm')
+          },
+
+          /**
+           * 검수 상태 (B: 박싱 완료(검수 대기), E: 검수 완료, R: 실적 전송 완료)
+           ****************
+           * @type {String}
+           */
+          inspectionStatus: {
+            type: String
+          },
+
+          /**
+           * 스캔한 송장 번호
+           ****************
+           * @type {String}
+           */
+          invoiceCode: {
+            type: String
+          },
+
+          /**
+           * 거래처 명
+           ****************
+           * @type {String}
+           */
+          custNameValue: {
+            type: String
+          },
+
+          /**
+           * 거래처 코드
+           ****************
+           * @type {String}
+           */
+          custCdValue: {
+            type: String
+          },
+
+          /**
+           * 출고 확정 트랜잭션 파라미터
+           ****************
+           * @type {String}
+           */
+          weightParams: {
+            type: Object
+          },
+
+          /**
+           * 실제 중량
+           ****************
+           * @type {Number}
+           */
+          currentWeightValue: {
+            type: Number,
+            value: 0
+          },
+
+          /**
+           * 기본 예상 중량
+           ****************
+           * @type {Number}
+           */
+          defaultExpectWeightValue: {
+            type: Number,
+            value: 0
+          },
+
+          /**
+           * 실제 예상 중량
+           ****************
+           * @type {Number}
+           */
+          currentExpectWeightValue: {
+            type: Number,
+            value: 0
+          },
+
+          /**
+           * 차이 중량
+           ****************
+           * @type {Number}
+           */
+          diffWeightValue: {
+            type: Number,
+            value: 0
+          },
+
+          /**
+           * 박스 중량 값
+           ****************
+           * @type {Number}
+           */
+          boxWeightValue: {
+            type: Number,
+            value: 0
+          },
+
+          /**
+           * 오차 범위 값
+           ****************
+           * @type {Number}
+           */
+          errorRangeValue: {
+            type: Number,
+            value: 0
+          },
+
+          /**
+           * 내품 내역 리스트
+           ****************
+           * @type {Array}
+           */
+          items: {
+            type: Array
+          },
+
+          /**
+           * 박스 중량 리스트
+           ****************
+           * @type {Array}
+           */
+          boxWeightList: {
+            type: Array
+          },
+
+          /**
+           * 오차 범위 리스트
+           ****************
+           * @type {Array}
+           */
+          errorRangeList: {
+            type: Array
+          },
+
+          /**
+           * 검수 정보
+           ****************
+           * @type {Object}
+           */
+          inspectionInfo: {
+            type: Object,
+            observer: '_inspectionInfoChanged'
+          },
+
+          /**
+           * 거래명세서 발행 결과 정보
+           ****************
+           * @type {Object}
+           */
+          printingResult: {
+            type: Object,
+            observer: '_printingResultChanged'
+          },
+
+          /**
+           * 검수 완료 결과 정보
+           ****************
+           * @type {Object}
+           */
+          completeResult: {
+            type: Object,
+            observer: '_completeResultChanged'
+          },
+
+          /**
+           * 그리드 헤더
+           ****************
+           * @type {Array}
+           */
+          header: {
+            type: Array,
+            value: function() {
+              return [{
+                display: t('label.sku_cd'),
+                fieldname: 'sku_cd',
+                style: {
+                  color: '#fff',
+                  textAlign: 'left'
+                },
+                columnWidth: '200px'
+              }, {
+                display: t('label.sku_nm'),
+                fieldname: 'sku_nm',
+                style: {
+                  color: '#ADCBEB',
+                  textAlign: 'left'
+                },
+                columnWidth: '350px'
+              }, {
+                display: t('label.sku_barcd'),
+                fieldname: 'sku_barcd',
+                style: {
+                  textAlign: 'left'
+                },
+                columnWidth: '200px'
+              }, {
+                display: t('label.qty'),
+                fieldname: 'item_qty',
+                style: {
+                  textAlign: 'right'
+                },
+                displayCallback: value => {
+                  return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+                }
+              }, {
+                display: t('label.default_weight'),
+                fieldname: 'weight',
+                style: {
+                  textAlign: 'right'
+                },
+                displayCallback: value => {
+                  return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+                }
+              }, {
+                display: t('label.total_weight'),
+                fieldname: 'total_weight',
+                style: {
+                  textAlign: 'right'
+                },
+                displayCallback: value => {
+                  return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+                }
+              }]
+            }
+          }
+        }
+      }
+
+      connectedCallback() {
+        super.connectedCallback();
+        document.addEventListener('page-changed', event => {
+          if(event.detail.currentPage === location.hash.replace('#/', '')) {
+            this._focusLabelInput();
+          }
+        });
+
+        document.addEventListener(`alert-closed-at-${location.hash.replace('#/', '')}`, event => {
+          if(!event.detail.hasCallback) {
+            this._focusLabelInput();
+          }
+        });
+
+        this._focusLabelInput();
+      }
+
+      _focusLabelInput() {
+        this.$['label-cd'].select();
+      }
+
+      /**
+       * 송장 번호 스캔 핸들러
+       ***********************
+       * @param {Object} e
+       */
+      _onInvoiceCdScan(e) {
+        if (e.key != 'Enter' || !e.currentTarget || !e.currentTarget.value) return;
+
+        this.invoiceCode = e.currentTarget.value;
+        var inspectionInfoAjax = this.$['inspection-info-ajax'];
+        inspectionInfoAjax.curl = '/kiosk_process/das/inspection/by_weight/ready/' + this.invoiceCode;
+
+        var self = this;
+        new Promise((resolve, reject) => {
+          resolve();
+        }).then(() => {
+          inspectionInfoAjax.generateRequest();
+        });
+      }
+
+      /**
+       * 검수 정보 변경 핸들러
+       ***********************
+       * @param {Object} inspectionInfo
+       */
+      _inspectionInfoChanged(inspectionInfo) {
+        if(!inspectionInfo) return;
+
+        this.boxWeightList = inspectionInfo.box_weight_list;
+        this.errorRangeList = inspectionInfo.error_range_list;
+        this.items = inspectionInfo.items;
+
+        this.custNameValue = inspectionInfo.cust_nm;
+        this.custCdValue = inspectionInfo.cust_cd;
+        this.defaultExpectWeightValue = inspectionInfo.expected_weight;
+        this.currentExpectWeightValue = inspectionInfo.expected_weight;
+        this.diffWeightValue = 0;
+
+        this.inspectionStatus = inspectionInfo.status;
+        let alreadyEndFlag = (this.inspectionStatus === 'E');
+        this.$['complete-btn'].hidden = alreadyEndFlag;
+
+        if(alreadyEndFlag) {
+          MPS_UTIL.showMessage(t('text.already_done'), t('text.available_reprint'));
+        }
+      }
+
+      /**
+       * 인쇄 결과 변경 핸들러
+       ***********************
+       * @param {Object} printingResult
+       */
+      _printingResultChanged(printingResult) {
+        if(!printingResult) return;
+
+        MPS_UTIL.showMessage(t('text.in_printing'), t('text.invoice_printing'));
+      }
+
+      /**
+       * 출고 확정 결과 변경 핸들러
+       ***********************
+       * @param {Object} completeResult
+       */
+      _completeResultChanged(completeResult) {
+        if(!completeResult) return;
+
+        this._reset();
+      }
+
+      /**
+       * 실제 중량 값 변경 핸들러
+       ***********************
+       * @param {Object} e
+       */
+      _currentWeightEnter(e) {
+        if (e.key != 'Enter' || !e.currentTarget || !e.currentTarget.value) return;
+        this.currentWeightValue = parseInt(e.currentTarget.value);
+        this.diffWeightValue = this.currentExpectWeightValue - this.currentWeightValue;
+      }
+
+      /**
+       * 초기화
+       */
+      _reset() {
+        this.set('items', []);
+
+        this.custNameValue = '';
+        this.currentWeightValue = 0;
+        this.defaultExpectWeightValue = 0;
+        this.currentExpectWeightValue = 0;
+        this.diffWeightValue = 0;
+
+        this.$['current-weight-input'].value = '';
+
+        this.$['label-cd'].value = '';
+        this.$['label-cd'].focus();
+      }
+
+      /**
+       * 거래 명세서 재발행
+       */
+      _reprint() {
+        if(this.invoiceCode) {
+          var reprintAjax = this.$['inspection-print-ajax'];
+          reprintAjax.curl = '/kiosk_process/das/inspection/print/' + this.invoiceCode;
+          reprintAjax.customParams = {
+            printer_id: MPS_UTIL.getKioskPrinterId()
+          }
+          var self = this;
+
+          new Promise((resolve, reject) => {
+            resolve();
+          }).then(() => {
+            reprintAjax.generateRequest();
+          });
+        } else {
+          MPS_UTIL.showMessage(t('text.input_invoice_number'), t('text.scan_invoice_number'));
+        }
+      }
+
+      /**
+       * 출고 확정
+       */
+      _inspectionComplete() {
+        if(this.currentExpectWeightValue == 0 || this.currentWeightValue == 0) {
+          MPS_UTIL.showMessage(t('text.ok'), t('text.inspection_no_complete'));
+          return;
+        }
+
+        if(this.boxWeightValue <= 0 || this.errorRangeValue < 0) {
+          MPS_UTIL.showMessage(t('text.ok'), t('text.select_range_boxweight'));
+          return;
+        }
+
+        var maxWeight = this.currentWeightValue + this.errorRangeValue;
+        var minWeight = this.currentWeightValue - this.errorRangeValue;
+
+        if(this.currentExpectWeightValue >= minWeight && this.currentExpectWeightValue <= maxWeight) {
+          var completeAjax = this.$['inspection-complete-ajax'];
+          completeAjax.curl = '/kiosk_process/das/inspection/by_weight/finish/' + this.invoiceCode;
+          completeAjax.customParams = {
+            printer_id: MPS_UTIL.getKioskPrinterId()
+          };
+
+          var self = this;
+          new Promise((resolve, reject) => {
+            self.weightParams = { box_weight: self.currentWeightValue };
+            resolve();
+          }).then(() => {
+            completeAjax.generateRequest();
+          });
+        } else {
+          MPS_UTIL.showMessage(t('text.checking_weight'), t('text.out_of_range'));
+        }
+      }
+
+      /**
+       * 박스 중량 값 설정 핸들러
+       ***********************
+       * @param {Object} e
+       */
+      _boxWeightClick(e) {
+        this.boxWeightValue = parseInt(e.currentTarget.value);
+        this.currentExpectWeightValue = this.defaultExpectWeightValue + this.boxWeightValue;
+
+        if(this.currentExpectWeightValue > 0 && this.currentWeightValue > 0) {
+          this.diffWeightValue = this.currentExpectWeightValue - this.currentWeightValue;
+        }
+      }
+
+      /**
+       * 오차 범위 값 설정 핸들러
+       ***********************
+       * @param {Object} e
+       */
+      _errorRangeClick(e) {
+        this.errorRangeValue = parseInt(e.currentTarget.value);
+      }
+
+      /**
+       * 오차 범위 수작업 변경시
+       ***********************
+       * @param {Object} e
+       */
+      _onErrorRangeInput(e) {
+        if (e.key != 'Enter' || !e.currentTarget || !e.currentTarget.value) return;
+
+        // 입력값이 숫자인지 체크
+        var num = isNaN(parseInt(e.currentTarget.value)) ? -1 : parseInt(e.currentTarget.value)
+
+        if(num >= 0) {
+          this.errorRangeValue = num;
+        } else {
+          MPS_UTIL.showMessage(t('text.ok'), t('text.not_number'));
+        }
+      }
+    }
+
+    customElements.define(KioskDasInspectionWeight.is, KioskDasInspectionWeight);
+  </script>
+
+</dom-module>

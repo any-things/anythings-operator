@@ -1,0 +1,1059 @@
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+
+<link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="./kiosk-sku-selection.html">
+<link rel="import" href="../../../kiosk-libraries.html">
+<link rel="import" href="../../../units/things-sound.html">
+
+<!--
+  KIOSK 중량 업데이트 중분류 화면
+ -->
+
+<dom-module id="kiosk-middle-assort-weight">
+  <template>
+    <style include="shared-styles">
+      #container {
+        display: flex;
+        flex-direction: column;
+        padding: 10px;
+        height: calc(100% - 20px);
+      }
+      #top-container {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 10px;
+      }
+      #date-picker span {
+        margin: auto 10px auto auto;
+        color: #D5D7DB;
+        font-size: .8rem;
+      }
+      #date-picker input {
+        font-size: .8rem;
+        height: 1rem;
+      }
+      #summary-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+      }
+      #summary-container span {
+        color: #D5D7DB;
+        font-size: 25pt;
+        margin: auto 15px;
+      }
+      #middle-container {
+        display: grid;
+        background-color: #5A6377;
+        grid-template-columns: 1fr 2fr;
+        grid-gap:20px;
+        padding: 10px 20px;
+        border-radius:var(--things-default-border-radius);
+        margin-bottom:20px;
+      }
+      .label {
+        text-align: right;
+        color: #D5D7DB;
+        font-size: 25pt;
+        margin: auto 15px auto 0;
+      }
+      label{
+        line-height:54px;
+      }
+      input#sku-barcode {
+        margin: auto;
+      }
+      #bottom-container {
+        display: flex;
+      }
+      .input-container {
+        flex: 1;
+        margin-right: 15px;
+        display: grid;
+        grid-template-columns: max-content 1fr;
+        color:#fff;
+      }
+      .input-container span {
+        margin: auto;
+      }
+      .region-container {
+        overflow: auto;
+        flex: 1;
+        grid-gap:15px;
+        margin-bottom:20px;
+      }
+      .region {
+        flex: 1;
+        margin: 0 10px;
+        display: flex;
+        flex-direction: column;
+        border:1px solid rgba(0,0,0,.3);
+        border-radius:4px;
+        background: rgba(0,0,0,.3);
+        background: linear-gradient(to bottom, rgba(255,255,255,.1) 0%, rgba(0,0,0,.3) 100%);
+        overflow:hidden;
+        min-height: 28vh;
+      }
+      .region div{
+        border-bottom:1px solid rgba(0,0,0,.2);
+        color:#fff;
+        font-size:1.1rem;
+      }
+      .region .title{
+        background-color:#3f91cc;
+        border-bottom: 2px solid rgba(0,0,0,.5);
+        padding:5px 0 3px 0;
+        color:#fff;
+        text-align:center !important;
+        font-size:2rem;
+      }
+      .tile-container {
+        flex: 1;
+        display: grid;
+        justify-content: center;
+        align-content: center;
+      }
+      .region div span.tile {
+        color:#fff;
+        font-size: 2rem;
+      }
+      /* .region div span{
+        display:inline-block;
+        float:left;
+        padding:8px 10px 0 15px;
+        width:30%;
+        color:#ccc;
+        font-size:.7rem;
+        text-align:left;
+      } */
+      .region.sum div{
+        color:#fffbd7
+      }
+      .region.sum .title{
+        background-color:#ee6e30;
+      }
+      .weight-section{
+        background-color:#fff;
+        border-radius:10px;
+        padding:0 10px 10px 10px;
+        display:block;
+      }
+      .weight-section::before{
+        content:"";
+        display:block;
+        width:60px;height:60px;
+        margin:10px 0 0 5px;
+        float:left;
+        background:url('../../../../images/icon-weight.png') no-repeat;
+      }
+      .weight-section span{
+        position:relative;
+        top:10px;
+        color:#006699;
+        font-size:.8rem
+      }
+      .weight-section label,.weight-section input{
+        width:50%;height:60px;
+        background-color:transparent;
+        float:right;
+        position:relative;
+        top:10px;
+        padding:0;
+        text-align:right;
+        color:#333;
+        font-size:1.4rem;
+        font-weight:bold;
+        line-height:63px;
+      }
+    </style>
+
+    <!--
+      * description : 저울 I/F 후 중량 적용
+      * params : skuBarcode
+      * response : ex) {result : true/false}
+     -->
+    <sys-ajax
+      id="weight-update-ajax"
+      curl="[[updateUrl]]"
+      method="PUT"
+      content-type="application/json"
+      custom-params="[[weightParams]]"
+      last-response="{{updateWeightResult}}">
+    </sys-ajax>
+
+    <sys-ajax
+      id="scale-weight-ajax"
+      curl="[[scaleUrl]]"
+      method="GET"
+      content-type="application/json"
+      last-response="{{scaleWeightResult}}">
+    </sys-ajax>
+
+
+    <sys-ajax
+      id="scale-data-clear-ajax"
+      curl="[[scaleDataClearUrl]]"
+      method="GET"
+      content-type="application/json"
+      last-response="{{clearStableDataResult}}">
+    </sys-ajax>
+
+    <sys-ajax
+      id="scale-stable-data-ajax"
+      curl="[[scaleStableDataUrl]]"
+      method="GET"
+      content-type="application/json"
+      last-response="{{getStableDataResult}}">
+    </sys-ajax>
+
+    <sys-ajax
+      id="middle-assort-weight-ajax"
+      on-sys-ajax-response="_middleAssortWeightResponsed">
+    </sys-ajax>
+
+    <div id="container">
+      <div id="top-container">
+        <div id="date-picker">
+          <span>[[jobDateLabel]]</span>
+          <input type="date" required value="[[_jobDateDefaultValue]]" on-change="_jobDateChanged">
+        </div>
+
+        <mps-selector
+          info-column-cnt="[[selectorInfoFields.length]]"
+          value-fields="[[selectorValueFields]]"
+          info-fields="[[selectorInfoFields]]"
+          header="[[selectorColumns]]"
+          resource-url="[[selectorResourceUrl]]"
+          params="[[selectorParams]]"
+          on-value-changed="_batchCodeChanged">
+        </mps-selector>
+
+        <div id="summary-container">
+          <span>Pallet: [[totalPallet]]</span>
+          <span>BOX: [[totalBox]]</span>
+          <span>PCS: [[totalPcs]]</span>
+        </div>
+      </div>
+
+      <div id="middle-container">
+        <div class="input-container">
+          <label class="label">[[skuBarcdLabel]]</label>
+
+          <mps-auto-popup-input
+            id="sku-barcode"
+            popup-title="[[popupTitleLabel]]"
+            button-txt-callback="[[_skuButtonTxtCallback]]"
+            on-before-request="_customAjaxHandler"
+            on-item-selected="itemSelected">
+          </mps-auto-popup-input>
+
+        </div>
+        <div class="input-container">
+          <label class="label">[[skuNmLabel]]</label>
+          <span>([[boxInQtyLabel]] : [[boxInQty]]) [[skuNm]]</span>
+        </div>
+      </div>
+
+      <div id="regions" class="region-container">
+        <dom-repeat id="region-dom-repeat" items="[[regionList]]" as="item">
+          <template>
+            <div class="region">
+              <div class="title">[[item.region_nm]]</div>
+              <template is="dom-if" if="[[item.pcs_qty]]">
+                <div class="tile-container"><span class="tile">[[_calcRegionDisplay(item)]]</span></div>
+              </template>
+            </div>
+          </template>
+        </dom-repeat>
+      </div>
+
+      <div id="bottom-container">
+        <div class="input-container weight-section">
+          <span class="label">[[defaultWeight]]</span>
+          <label id="master-weight"></label>
+        </div>
+        <div class="input-container weight-section">
+          <span class="label">[[currentWeight]]</span>
+          <input id="current-weight" on-keypress="_currentWeightEnter">
+        </div>
+
+        <button on-click="_scaleWeight">[[scaleWeightLabel]]</button>
+        <div style="width:5px"></div>
+        <button on-click="_updateWeight">[[applyWeightLabel]]</button>
+      </div>
+    </div>
+  </template>
+
+  <script>
+    class KioskMiddleAssortWeight extends Polymer.Element {
+      static get is() {
+        return 'kiosk-middle-assort-weight'
+      }
+
+      static get properties() {
+        return {
+          /**
+           * 배치 라벨
+           ****************
+           * @type {String}
+           */
+          batchLabel: {
+            type: String,
+            value: t('label.job_batch')
+          },
+
+          /**
+           * 상품 코드 라벨
+           ****************
+           * @type {String}
+           */
+          skuBarcdLabel: {
+            type: String,
+            value: t('label.sku_barcd')
+          },
+
+          /**
+           * 입수 라벨
+           ****************
+           * @type {String}
+           */
+          boxInQtyLabel: {
+            type: String,
+            value: t('label.box_in_qty')
+          },
+
+          /**
+           * 작업 배치 값 선택시 Keep할 값 필드 리스트
+           ****************
+           * @type {Array}
+           */
+          selectorValueFields: {
+            type: Array,
+            value: () => {
+              return ['job_id', 'batch_group_id']
+            }
+          },
+
+          /**
+           * 작업 배치 선택 화면에 표시할 필드
+           ****************
+           * @type {Array}
+           */
+          selectorInfoFields: {
+             type: Array,
+             value: () => {
+               return [{
+                 display: t('label.dc_cd'),
+                 fieldname: 'dc_cd'
+               }, {
+                 display: t('label.com_cd'),
+                 fieldname: 'com_cd'
+               }, {
+                 display: t('label.job_batch_seq'),
+                 fieldname: 'job_batch_seq'
+               }, /*{
+                 display: t('label.job_id'),
+                 fieldname: 'job_id'
+               },*/ {
+                 display: t('label.batch_group_id'),
+                 fieldname: 'batch_group_id'
+               }];
+             }
+          },
+
+          /**
+           * 작업 배치 선택 화면의 컬럼 정보
+           ****************
+           * @type {Array}
+           */
+          selectorColumns: {
+             type: Array,
+             value: () => {
+               return [{
+                 display: t('label.dc_cd'),
+                 fieldname: 'dc_cd'
+               }, {
+                 display: t('label.com_cd'),
+                 fieldname: 'com_cd'
+               },{
+                 display: t('label.job_batch_seq'),
+                 fieldname: 'job_batch_seq'
+               }, /*{
+                 display: t('label.job_id'),
+                 fieldname: 'job_id'
+               },*/ {
+                 display: t('label.batch_group_id'),
+                 fieldname: 'batch_group_id'
+               }]
+             }
+          },
+
+          /**
+           * 작업 배치 선택 화면이 호출할 URL
+           ****************
+           * @type {String}
+           */
+          selectorResourceUrl: {
+            type: String,
+            value: '/job_batch/search/middle_class'
+          },
+
+          /**
+           * 작업 배치 선택 화면이 호출할 파라미터
+           ****************
+           * @type {Object}
+           */
+          selectorParams: {
+             type: Object,
+             value: () => {
+               return {
+                 sort: [{
+                   field: 'job_id',
+                   ascending: false
+                 }],
+                 query: [{
+                   name: 'job_date',
+                   value: (() => {
+                     let today = new Date();
+                     return today.toISOString().slice(0, 10);
+                   })()
+                 }]
+               }
+             }
+          },
+
+          /**
+           * 작업일자 라벨
+           ****************
+           * @type {String}
+           */
+          jobDateLabel: {
+            type: String,
+            value: () => {
+              return t('label.job_date')
+            }
+          },
+
+          /**
+           * 작업일자 기본 값
+           ****************
+           * @type {String}
+           */
+          _jobDateDefaultValue: {
+            type: String,
+            value: () => {
+              let today = new Date();
+              return today.toISOString().slice(0, 10);
+            }
+          },
+
+          /**
+           * 상품 명 라벨
+           ****************
+           * @type {String}
+           */
+          skuNmLabel: {
+            type: String,
+            value: t('label.sku_nm')
+          },
+
+          /**
+           * 중량 적용 라벨
+           ****************
+           * @type {String}
+           */
+          applyWeightLabel: {
+            type: String,
+            value: t('button.apply_weight')
+          },
+
+          /**
+           * 중량 계측 라벨
+           ****************
+           * @type {String}
+           */
+           scaleWeightLabel: {
+            type: String,
+            value: t('button.scale_weight')
+          },
+
+          /**
+           * 상품 명
+           ****************
+           * @type {String}
+           */
+          skuNm: {
+            type: String
+          },
+
+          /**
+           * 고객사 코드
+           ****************
+           * @type {String}
+           */
+           comCd: {
+            type: String
+          },
+
+          /**
+           * 상품 코드
+           ****************
+           * @type {String}
+           */
+           skuCd: {
+            type: String
+          },
+
+          /**
+           * 박스 입수
+           ****************
+           * @type {Number}
+           */
+          boxInQty: {
+            type: Number
+          },
+
+
+          /**
+           * 중량 가져오기 backgroud
+           ****************
+           * @type {Object}
+           */
+           stableScaleDataId: {
+            type: Object
+          },
+
+          /**
+           * 기준 중량
+           ****************
+           * @type {String}
+           */
+          defaultWeight: {
+            type: String,
+            value: t('label.default_weight')
+          },
+
+          /**
+           * 실제 중량
+           ****************
+           * @type {String}
+           */
+          currentWeight: {
+            type: String,
+            value: t('label.current_weight')
+          },
+
+          /**
+           * 호기별 분류 정보 리스트
+           ****************
+           * @type {Array}
+           */
+          regionList: {
+            type: Array
+          },
+
+          /**
+           * 배치 리스트 파라미터
+           ****************
+           * @type {String}
+           */
+          batchListParams: {
+            type: String
+          },
+
+          /**
+           * 중량 업데이트 URL
+           ****************
+           * @type {String}
+           */
+          updateUrl: {
+            type: String
+          },
+
+          /**
+           * 중량 I/F URL
+           ****************
+           * @type {String}
+           */
+           scaleUrl: {
+            type: String
+          },
+
+          /**
+           * 중량 I/F 기존 안정값 삭제 URL
+           ****************
+           * @type {String}
+           */
+           scaleDataClearUrl: {
+            type: String
+          },
+
+          /**
+           * 중량 I/F 안정값 가져오기 URL
+           ****************
+           * @type {String}
+           */
+           scaleStableDataUrl: {
+            type: String
+          },
+
+          /**
+           * 중량 업데이트 Ajax 파라미터
+           ****************
+           * @type {Object}
+           */
+          weightParams: {
+            type: Object
+          },
+
+          /**
+           * 중량 업데이트 Ajax 파라미터
+           ****************
+           * @type {Object}
+           */
+          weightListParams: {
+            type: Object
+          },
+
+          /**
+           * 상품 중량 적용 결과
+           ****************
+           * @type {Object}
+           */
+           updateWeightResult: {
+            type: Object,
+            observer: '_updateWeightResultChanged'
+          },
+
+          /**
+           * 상품 중량 계측 결과
+           ****************
+           * @type {Object}
+           */
+           scaleWeightResult: {
+            type: Object,
+            observer: '_scaleWeightResultChanged'
+          },
+
+          /**
+           * 기존 안정값 삭제 결과
+           ****************
+           * @type {Object}
+           */
+           clearStableDataResult: {
+            type: Object,
+            observer: '_clearStableDataResponsed'
+          },
+
+          /**
+           * 저울 안정값 가져오기 결과
+           ****************
+           * @type {Object}
+           */
+           getStableDataResult: {
+            type: Object,
+            observer: '_getStableDataResponsed'
+          },
+
+          /**
+           * 상품 선택 팝업 타이틀
+           ****************
+           * @type {String}
+           */
+          popupTitleLabel: {
+            type: String,
+            value: () => t('label.sku')
+          },
+
+          /**
+           * 중량 계측 trigger 상수
+           ****************
+           * @type {String}
+           */
+          MEASURE_WEIGHT: {
+            type: String,
+            value: 'MEASURE-WEIGHT'
+          }
+        }
+      }
+
+      connectedCallback() {
+        super.connectedCallback();
+
+        // dom-repeat을 통해 regions list가 그려지고 뒤 dom-change event handler
+        // this.$['region-dom-repeat'].addEventListener('dom-change', event => {
+        //   // regions div 내부의 region div를 모두 추출
+        //   let regions = this.$['regions'].querySelectorAll('div.region');
+        //   // 마지막 region에는 sum class를 추가 나머지는 sum class를 제거
+        //   regions.forEach((region, idx) => {
+        //     if(regions.length - 1 === idx) {
+        //       region.classList.add('sum');
+        //     } else {
+        //       region.classList.remove('sum');
+        //     }
+        //   });
+        // });
+
+        document.addEventListener(`alert-closed-at-${location.hash.replace('#/', '')}`, event => {
+          if(!event.detail.hasCallback) {
+            this.focusSkuInput();
+          }
+        });
+      }
+
+      /**
+       * @description 실제 중량 업데이트 핸들러
+       ***********************
+       * @param {Object} e
+       */
+      _currentWeightEnter(e) {
+        if (e.key != 'Enter') return;
+        this._updateWeight();
+      }
+
+      /**
+       * @description 실제 중량 업데이트
+       ***********************
+       */
+      _updateWeight() {
+        var currentWeight = this.$['current-weight'].value;
+        var skuBarcode = this.$['sku-barcode'].value;
+
+        try {
+          this.validateUpdWeight(currentWeight, skuBarcode);
+          this.updateUrl = '/kiosk_process/middle_assort/apply_weight/' + this.batchListParams;
+          this.weightParams = { sku_real_wt: currentWeight, sku_cd: this.skuCd, com_cd : this.comCd };
+          var ajaxWeight = this.$['weight-update-ajax'];
+          ajaxWeight.body = this.weightParams;
+          ajaxWeight.generateRequest();
+        } catch (error) {
+          MPS_UTIL.showMessage(error.title, error.message);
+        }
+      }
+
+      /**
+       * @description 중량 계측 값 저울 if
+       */
+      _scaleWeight() {
+        try {
+          this.scaleUrl = 'http://localhost:9033/rest/scale/getData';
+          var ajaxScale = this.$['scale-weight-ajax'];
+          ajaxScale.generateRequest();
+        } catch (error) {
+          MPS_UTIL.showMessage(error.title, error.message);
+        }
+      }
+
+      /**
+       * @description 중량 업데이트 이전에 수행하는 validator
+       ***********************
+       * @param {Number} currentWeight
+       * @param {String} skuBarcode
+       */
+      validateUpdWeight(currentWeight, skuBarcode) {
+        if (!skuBarcode) {
+          throw {
+            title: t('error.VALIDATION_ERROR'),
+            message: t('error.barcd_is_not_typed')
+          }
+        } else if(!currentWeight || isNaN(parseInt(currentWeight))) {
+          throw {
+            title: t('label.current_weight'),
+            message: t('text.invalid_value')
+          }
+        }
+      }
+
+      /**
+       * @description 배치 코드 변경 핸들러
+       ***********************
+       * @param {Object} e
+       */
+      _batchCodeChanged(e) {
+        // selector에서 선택한 batch_group_id를 batchListParams로 초기화
+        this.focusSkuInput()
+        this.batchListParams = e.detail.value.batch_group_id;
+      }
+
+      /**
+       * @description SKU 바코드 Input에 포커스 온
+       ***********************
+       * @param {Object} e
+       */
+      focusSkuInput() {
+        this.$['sku-barcode'].select();
+      }
+
+      /**
+       * @description 상품 선택 팝업에 나타날 아이템 텍스트 구성을 위한 콜백
+       ***********************
+       * @param {Object} item
+       */
+      _skuButtonTxtCallback(item) {
+        return `(${item.com_cd}) : ${item.sku_cd}
+                ${item.sku_nm}`;
+      }
+
+      /**
+       * @description mps-auto-popup-input before-request event handler
+       * 상품 코드 및 바코드 입력시 => 상품 선택을 위한 조회
+       * 중량 계측 trigger 상수 입력시 (MEASURE_WEIGHT) => 중량 계측 시작
+       ***********************
+       * @param {Object} event
+       */
+      _customAjaxHandler(event) {
+        event.preventDefault();
+        const input = event.detail.input;
+        const ajax = event.detail.ajax;
+
+        if(input.value.endsWith(this.MEASURE_WEIGHT)) {
+          input.value = input.value.replace(this.MEASURE_WEIGHT, '');
+          this._startGetScaleStableData();
+        } else {
+          if(this.batchListParams) {
+            const skuCd = input.value;
+            ajax.curl = `/kiosk_process/middle_assort/find_sku/${this.batchListParams}/${skuCd}`;
+          } else {
+            MPS_UTIL.showMessage(t('button.confirm'), t('text.select_operation_batch'));
+          }
+
+          ajax.generateRequest();
+        }
+      }
+
+      /**
+       * @description 상품 선택 팝업을 통해 상품이 선택되었을 때
+       ***********************
+       * @param {Object} event
+       */
+      itemSelected(event) {
+        const selectedSku = event.detail;
+        this.comCd = selectedSku.com_cd;
+        this.skuCd = selectedSku.sku_cd;
+
+        const middleAssortWeightAjax = this.$['middle-assort-weight-ajax'];
+        middleAssortWeightAjax.curl = `/kiosk_process/DAS/middle_assort/${this.batchListParams}/${selectedSku.com_cd}/${selectedSku.sku_cd}`;
+        middleAssortWeightAjax.customParams = { weight: true };
+        middleAssortWeightAjax.generateRequest();
+      }
+
+      /**
+       * @description 중분류 ajax response event handler
+       ***********************
+       * @param {Object} event
+       */
+      _middleAssortWeightResponsed(event) {
+        const middleClass = event.detail;
+        this.skuNm = middleClass.sku_nm;
+        this.boxInQty = middleClass.box_in_qty;
+        this.regionList = middleClass.items;
+        this.adjustRegionSectionStyle(this.regionList.length); // 호기 수량에 따라 컨테이너의 스타일을 수정함
+        this.computeTotal(this.regionList);
+        this.$['master-weight'].textContent = middleClass.sku_wt;
+        this.$['current-weight'].value = '';
+
+        // 저울 데이터 가져오기 백그라운 작업 시작 점
+        // 상품 중분류 정보 조회 이후가 아닌 trigger를 통한 계측 작업 시작으로 변경하여 주석 처리
+        // this._startGetScaleStableData();
+      }
+
+      /**
+       * @description 저울 데이터 가져오기 백그라운 작업 시작 점
+       * 1. 기존 데이터 삭제  ( http://localhost:9033/rest/scale/clearStableData )
+       * 2. 저울 안정값 데이터 가져오기 ( 2초 반복 ) ( http://localhost:9033/rest/scale/getStableData )
+       * 3. 안정값을 가져오면 자동 update ( this._updateWeight() )
+       ************************
+       **/
+      _startGetScaleStableData() {
+        if(this.stableScaleDataId) clearTimeout(this.stableScaleDataId);
+        this.stableScaleDataId = undefined;
+        this._clearStableData();
+      }
+
+      /**
+       * @description 계측한 저울 중량 데이터 클리어 요청
+       ************************
+       **/
+      _clearStableData() {
+        try {
+          this.scaleDataClearUrl = 'http://localhost:9033/rest/scale/clearStableData';
+          var ajaxClear = this.$['scale-data-clear-ajax'];
+          ajaxClear.generateRequest();
+        } catch (error) {
+          MPS_UTIL.showMessage(error.title, error.message);
+        }
+      }
+
+      /**
+       * @description 계측한 저울 중량 데이터 클리어 요청에 대한 응답을 받은 후 ...
+       ************************
+       * @param {Object} event
+       */
+      _clearStableDataResponsed(event) {
+        this._getStableData();
+      }
+
+      /**
+       * @description 계측한 저울 중량 데이터 요청
+       ************************
+       */
+      _getStableData() {
+        var root = this;
+        this.stableScaleDataId = setTimeout(function() {
+          try {
+            root.scaleStableDataUrl = 'http://localhost:9033/rest/scale/getStableData';
+            var ajaxStableData = root.$['scale-stable-data-ajax'];
+            ajaxStableData.generateRequest();
+          } catch (error) {
+            MPS_UTIL.showMessage(error.title, error.message);
+          }
+        }, 2000);
+      }
+
+      /**
+       * @description 요청한 저울 중량 계측 데이터 응답 후 ...
+       ************************
+       * @param {Object} item
+       */
+      _getStableDataResponsed(event) {
+        const scaleData = event;
+
+        if(scaleData.result == 'fail') {
+          this._getStableData();
+        } else {
+          this.$['current-weight'].value = scaleData.data.data;
+          this._updateWeight();
+        }
+      }
+
+      /**
+       * @description 호기 수량 정보 표시
+       ***********************
+       * @param {Object} item
+       */
+      _calcRegionDisplay(item) {
+        if(!this.boxInQty || this.boxInQty == 0) {
+          return `${item.pcs_qty}`
+        } else {
+          return `${Math.floor(item.pcs_qty / this.boxInQty)}/${item.pcs_qty % this.boxInQty}`
+        }
+      }
+
+      /**
+       * @description 총 수량 계산
+       ***********************
+       * @param {Array} regionList
+       */
+      computeTotal(regionList) {
+        this.totalPallet = 0;
+        this.totalBox = 0;
+        this.totalPcs = 0;
+
+        regionList.forEach(region => {
+          this.totalPallet = this.totalPallet + region.pallet_qty;
+          this.totalBox = this.totalBox + region.box_qty;
+          this.totalPcs = this.totalPcs + region.pcs_qty;
+        });
+      }
+
+      /**
+       * @description 호기 수량에 따라 컨테이너의 스타일을 수정함
+       ************************
+       */
+      adjustRegionSectionStyle(regionCount) {
+        if(regionCount <= 0) {
+          return;
+        } else if(regionCount < 5) { // 호기 수량이 5개 미만일 경우
+          this._flexColumnStyle(); // flex 스타일 적용 (한개의 로우가 전체 화면을 커버함)
+        } else { // 호기 수량이 5개 이상일 경우
+          this._setFiveColumnStyle(); // grid 스타일 적용 (5개의 컬럼으로 로우가 증가함)
+        }
+      }
+
+      /**
+       * @description 호기 5개씩 한 로우에 표시하는 스타일을 컨테이너에 적용
+       ************************
+       */
+      _setFiveColumnStyle() {
+        const regionContainer = this._getRegionContainer();
+        regionContainer.style.display = 'grid';
+        regionContainer.style.gridTemplateColumns = 'repeat(5, 1fr)';
+      }
+
+      /**
+       * @description 단일 로우에 호기들을 flex 스타일로 표현함
+       ************************
+       */
+      _flexColumnStyle() {
+        const regionContainer = this._getRegionContainer();
+        regionContainer.style.display = 'flex';
+      }
+
+      /**
+       * @description 호기 정보 표시 컨테이너 뷰
+       ************************
+       */
+      _getRegionContainer() {
+        return this.$['regions'];
+      }
+
+      /**
+       * @description 중분류 정보 변경 핸들러
+       ***********************
+       * @param {Object} response
+       */
+      _updateWeightResultChanged(response) {
+        if(!response) return;
+
+        if(response.sku_real_wt) {
+          MPS_UTIL.showMessage(t('text.weight_(') + response.sku_real_wt + t('text.)_complete'), '', this.focusSkuInput());
+
+          setTimeout(function() {
+            mpsAlert.close();
+            this.focusSkuInput();
+          }.bind(this), 3000);
+        } else {
+          MPS_UTIL.showMessage(t('text.error'), '');
+        }
+      }
+
+      /**
+       * @description 중분류 정보 변경 핸들러
+       ***********************
+       * @param {Object} response
+       */
+       _scaleWeightResultChanged(response) {
+        if(!response) return;
+
+        if(response.result == 'fail') {
+          MPS_UTIL.showMessage(t('text.no_scan_data'));
+        } else {
+          this.$['current-weight'].value = response.data.data;
+        }
+      }
+
+      /**
+       * @description 작업일자 변경 핸들러
+       ***********************
+       * @param {Object} event
+       */
+      _jobDateChanged(event) {
+        this.jobDate = event.currentTarget.value;
+        this.selectorParams = {
+          sort: [{
+            field: 'job_id',
+            ascending: false
+          }],
+          query: [{
+            name: 'job_date',
+            value: this.jobDate
+          }]
+        };
+      }
+    }
+
+    customElements.define(KioskMiddleAssortWeight.is, KioskMiddleAssortWeight);
+  </script>
+</dom-module>

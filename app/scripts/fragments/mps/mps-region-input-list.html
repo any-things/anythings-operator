@@ -1,0 +1,224 @@
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+
+<link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
+
+<link rel="import" href="../../pda-libraries.html">
+
+<link rel="import" href="./mps-region-input-list-detail.html">
+
+<!--
+  공통 > 호기별 상품 정보
+-->
+
+<dom-module id="mps-region-input-list">
+  <template>
+    <style include="shared-styles">
+      :host {
+        display: flex;
+        flex-direction: column;
+        height: calc(100% - 10px);
+        padding: 10px;
+      }
+      #container {
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+      }
+      mps-list {
+        flex: 1;
+      }
+      #button-container {
+        display: grid;
+        margin-top: 5px;
+        justify-content: end;
+      }
+    </style>
+
+    <!-- 호기별 상품 투입 리스트 Ajax -->
+    <sys-ajax
+      auto
+      id="input-list-ajax"
+      method="GET"
+      content-type="application/json"
+      last-response="{{items}}">
+    </sys-ajax>
+
+    <div id="container">
+      <!-- 호기별 투입 상품 투입 리스트 표시 영역 -->
+      <mps-list
+        id="sku-list"
+        header="[[header]]"
+        data="[[items]]"
+        on-configured="_addCompleteAttribute"
+        on-data-list-click="_skuSelected">
+      </mps-list>
+
+      <!-- 버튼 표시 영역 -->
+      <div id="button-container">
+        <button on-click="refresh">[[refreshBtnLabel]]</button>
+      </div>
+    </div>
+  </template>
+
+  <script>
+    class MpsRegionInputList extends Polymer.Element {
+      static get is() { return 'mps-region-input-list' }
+
+      static get properties() {
+        return {
+          /**
+           * @description 새로고침 버튼 라벨
+           ****************
+           * @type {Array}
+           */
+          refreshBtnLabel: {
+            type: String,
+            value: () => t('button.refresh')
+          },
+
+          /**
+           * @description 그리드 헤더 정보
+           ****************
+           * @type {Array}
+           */
+          header: {
+            type: Array,
+            value: function() {
+              return [{
+                display: t('label.sku_cd'),
+                fieldname: 'sku_cd_widt_seq',
+                displayCallback: (value, rowData) => {
+                  return `(${rowData['input_seq']}) ${rowData['sku_nm']}`
+                }
+              }, {
+                display: t('label.customer'),
+                fieldname: 'cust_cnt',
+                columnWidth: '0.3fr',
+                style: {
+                  textAlign: 'center'
+                }
+              }, {
+                display: t('label.picked_qty') + ' / ' + t('label.picking_qty'),
+                fieldname: 'total_pick_qty',
+                columnWidth: '0.4fr',
+                style: {
+                  textAlign: 'center'
+                },
+                displayCallback: (value, rowData) => {
+                  return rowData['picked_qty'] + '/' + rowData['pick_qty'];
+                }
+              }, {
+                fieldname: 'com_cd',
+                hidden: true
+              }, {
+                fieldname: 'sku_cd',
+                hidden: true
+              }, {
+                fieldname: 'sku_nm',
+                hidden: true
+              }, {
+                fieldname: 'input_seq',
+                hidden: true
+              }, {
+                fieldname: 'picked_qty',
+                hidden: true
+              }, {
+                fieldname: 'pick_qty',
+                hidden: true
+              }, {
+                fieldname: 'status',
+                hidden: true
+              }]
+            }
+          },
+
+          /**
+           * @description 그리드 표시를 위한 데이터
+           ****************
+           * @type {Array}
+           */
+          items: {
+            type: Array
+          }
+        }
+      }
+
+      /**
+       * @description Life Cycle - connected callback
+       */
+      connectedCallback() {
+        super.connectedCallback();
+        this.refresh();
+
+        // 현재 페이지로 라우팅 변경시 데이터 다시 조회하도록
+        document.addEventListener('page-changed', event => {
+          if(event.detail.currentPage === 'mps-region-input-list') {
+            this.refresh();
+          }
+        });
+      }
+
+      /**
+       * @description 데이터가 완료되었는지 체크
+       ****************
+       * @type {Object} data
+       */
+      isComplete(data) {
+        return data.picked_qty >= data.pick_qty;
+      }
+
+      /**
+       * @description 설정을 통해 선택한 호기와 존 영역내의 상품 리스트 조회
+       */
+      refresh() {
+        let regionCd = MPS_UTIL.getRegionCd();
+        let zoneCd = MPS_UTIL.getZoneCd();
+        const inputListAjax = this.$['input-list-ajax'];
+        inputListAjax.curl = `/tablet_process/input_status/${regionCd}/${zoneCd}/ALL`;
+        inputListAjax.generateRequest();
+      }
+
+      /**
+       * @description 리스트의 데이터 상태에 따라 행의 색상을 변경
+       * R: Running 진행중, F: Finished 완료, U: Unfinished 미완료 (취소 건이 포함되어 있어서 완료되지 않은 상태)
+       ****************
+       * @type {Object} event
+       */
+      _addCompleteAttribute(event) {
+        const rows = event.detail.contentElements;
+        rows.forEach(row => {
+          const status = row.getData().status;
+          if(status === 'F') { // 완료 상태
+            row.classList.add('complete');
+          } else if(status === 'U') { // 미완료 상태
+            row.classList.add('canceled');
+          }
+        });
+      }
+
+      /**
+       * @description 리스트에서 선택한 상품 정보를 조회하는 다이어로그를 출력
+       ****************
+       * @type {Object} event
+       */
+      _skuSelected(event) {
+        const content = document.createElement('mps-region-input-list-detail');
+        content.data = event.detail.data;
+
+        document.dispatchEvent(new CustomEvent('open-dialog', {
+          detail: {
+            content: content,
+            closeCallback: () => {
+              //this.refresh();
+            }
+          }
+        }))
+      }
+    }
+
+    customElements.define(MpsRegionInputList.is, MpsRegionInputList);
+  </script>
+</dom-module>

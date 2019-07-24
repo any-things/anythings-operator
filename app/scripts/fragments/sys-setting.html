@@ -1,0 +1,180 @@
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/iron-localstorage/iron-localstorage.html">
+<link rel="import" href="../../bower_components/vaadin-combo-box/vaadin-combo-box.html">
+
+<link rel="import" href="../fragments/sys-logout.html">
+
+<link rel="import" href="../units/sys-ajax.html">
+
+<dom-module id="sys-setting">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+      .copyright div a {
+        text-decoration:underline;
+        color:#4caf50;
+        font-weight:bold;
+        cursor:pointer;
+      }
+      #setting-container {
+        display: grid;
+        padding: 15px;
+      }
+      footer{
+        padding:0 15px;
+        color:#ccc;
+        font-size:.4rem;
+        line-height:1.5
+      }
+      footer a{
+        color:var(--things-secondary-color);
+      }
+    </style>
+
+    <sys-ajax
+      auto
+      id="ajax-session"
+      curl="[[sessionUrl]]"
+      method="GET"
+      last-response="{{user}}"
+      on-sys-ajax-response="_sessionResponsed"
+      on-sys-ajax-error="_sessionError"
+      on-sys-unauthorized-session="_sessionUnauthorized">
+    </sys-ajax>
+
+    <iron-localstorage 
+      name="setting.user"
+      value="{{user}}">
+    </iron-localstorage>
+
+    <!-- Base URL -->
+    <div id="setting-container">
+      <vaadin-combo-box
+        style="display: block; width:90%; font-size:22px;"
+        items="[[deviceTypeItems]]"
+        value="{{deviceType}}"
+        on-change="_deviceTypeSelected">
+        <span>[[item]]</span>
+      </vaadin-combo-box>
+    </div>
+
+    <!-- License Report -->
+    <footer>
+      © <strong>HatioLab Inc.</strong>
+      <div>
+        Things system is built on several 
+        <a href="[[licenseRefUrl]]" target='_blank'>open source software</a>
+      </div>
+    </footer>
+  </template>
+
+  <script>
+    class SysSetting extends Polymer.Element {
+      static get is() { return 'sys-setting'; }
+
+      static get properties() {
+        return {
+          /**
+           * license reference URL
+           * ******
+           * @type {String}
+           */
+          licenseRefUrl: {
+            type: String,
+            value: 'http://license.hatiolab.com/references/things-factory/'
+          },
+
+          baseUrl: String,
+
+          user: {
+            type: Object
+          },
+
+          sessionUrl: {
+            type: String,
+            value: '/session_info'
+          },
+
+          domainObj: Object,
+
+          deviceTypeItems: {
+            type: Array,
+            value: function() {
+              return [ 'TABLET', 'PDA', 'KIOSK']
+            }
+          },
+
+          deviceType: {
+            type: String,
+            notify: true
+          },
+
+          isDevMode: {
+            type: Boolean
+          },
+
+          loginSuccess: {
+            type: Boolean,
+            notify: true,
+            value: false
+          }
+        };
+      }
+
+      /**
+       * sys-setting load 완료 후 userInfo를 조회하여
+       * 로그인 여부를 확인함
+       */
+      connectedCallback() {
+        super.connectedCallback();
+        this.getUserInfo();
+      }
+
+      /**
+       * user info 조회 호출
+       */
+      getUserInfo() {
+        this.$['ajax-session'].generateRequest();
+      }
+
+      /**
+       * session이 response되면 device type을 체크
+       */
+      _sessionResponsed() {
+        this.loginSuccess = true;
+        this.dispatchEvent(new CustomEvent('sys-session-responsed'));
+      }
+
+      /**
+       * session check 실패시 이벤트 발생 
+       */
+      _sessionError() {
+        this.dispatchEvent(new CustomEvent('sys-session-error'));
+      }
+
+      /**
+       * sessin check시 로그인 이전이라면 이벤트 발생
+       */
+      _sessionUnauthorized() {
+        this.dispatchEvent(new CustomEvent('sys-session-unauthorized'));
+      }
+
+      /**
+       * 개발용도
+       * deviceType 콤보 박스 변경시 화면 리프레시
+       */
+      _deviceTypeSelected() {
+        location.reload(true);
+      }
+    }
+
+    window.customElements.define(SysSetting.is, SysSetting);
+  </script>
+</dom-module>

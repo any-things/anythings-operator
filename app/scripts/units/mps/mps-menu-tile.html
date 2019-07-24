@@ -1,0 +1,28 @@
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+
+<link rel="import" href="../../../bower_components/polymer/polymer-element.html">
+
+<dom-module id="mps-menu-tile">
+  <template>
+    <style>
+    </style>
+    <slot></slot>
+  </template>
+
+  <script>
+    class MpsMenuTile extends Polymer.Element {
+      static get is() { return 'mps-menu-tile' };
+
+      static get properties() {
+        return {
+          page: String
+        }
+      }
+    }
+
+    customElements.define(MpsMenuTile.is, MpsMenuTile);
+  </script>
+</dom-module>

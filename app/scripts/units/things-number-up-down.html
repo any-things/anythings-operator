@@ -1,0 +1,84 @@
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+
+<link rel="import" href="../../../bower_components/polymer/polymer-element.html">
+
+<!--
+  작업 처리 중 수량 조정 팝업
+-->
+
+<dom-module id="things-number-up-down">
+  <template>
+    <style include="shared-styles">
+      :host {
+        --button-color: #777;
+        /* --button-font-size: ; */
+        /* --input-field-height: 24px; */
+        /* --border-color: rgb(160, 209, 218); */
+        --total-width: 70%;
+
+        width: var(--total-width);
+      }
+
+      .container {
+        display: grid;
+        grid-template-columns: 50px 1fr 50px;
+      }
+
+      button {
+        min-width: 50px;
+      }
+
+      input {
+        min-width: 50px;
+      }
+    </style>
+
+    <div class="container">
+      <button on-click="_tapPlus">+</button>
+      <input type="number" value$="{{value}}" max$="[[max]]" min$="[[min]]" style="text-align: right;" readonly>
+      <button on-click="_tapMinus">-</button>
+    </div>
+  </template>
+
+  <script>
+    class ThingsNumberUpDown extends Polymer.Element {
+      static get is() { return 'things-number-up-down' }
+
+      static get properties() {
+        return {
+          value: {
+            type: Number,
+            notify: true,
+            value: 1
+          },
+
+          max: {
+            type: Number
+          },
+
+          min: {
+            type: Number,
+            value: 1
+          }
+        }
+      }
+
+      _tapPlus(e) {
+        if (!this.max || this.value < this.max) {
+          this.value += 1;
+        }
+      }
+
+      _tapMinus(e) {
+        if (!this.min || this.value > this.min) {
+          this.value -= 1;
+        }
+      }
+    }
+
+    customElements.define(ThingsNumberUpDown.is, ThingsNumberUpDown);
+  </script>
+</dom-module>

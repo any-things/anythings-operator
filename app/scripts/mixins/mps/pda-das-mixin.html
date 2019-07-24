@@ -1,0 +1,401 @@
+<link rel="import" href="../../../bower_components/polymer/polymer-element.html">
+
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+
+<!--
+  태블릿 작업 화면 공통 믹스 인
+-->
+<script>
+  PdaDasMixin = superClass => {
+    return class PdaDasMixin extends superClass {
+      static get properties() {
+        return {
+          /**
+           * @description 주문 수량
+           ****************
+           * @type {Number}
+           */
+          totalPickQty: {
+            type: Number,
+            value: 0
+          },
+
+          /**
+           * @description 확정 수량
+           ****************
+           * @type {Number}
+           */
+          pickedQty: {
+            type: Number,
+            value: 0
+          },
+
+          /**
+           * @description 확정 퍼센트
+           ****************
+           * @type {Number}
+           */
+          pickedPercent: {
+            type: Number,
+            value: 0
+          },
+
+          /**
+           * @description 투입된 상품 중 선택된 상품
+           ****************
+           * @type {Object}
+           */
+          selectedInput: {
+            type: Object
+          },
+
+          /**
+           * @description 투입된 상품 중 선택된 상품의 상세 정보
+           ****************
+           * @type {Array}
+           */
+          inputDetails: {
+            type: Array,
+            observer: '_inputDetailsChanged'
+          }
+        }
+      }
+
+      /**
+       * @description connectedCallback lifecycle
+       * 1. 화면 구성에 필요한 라벨을 초기화
+       * 2. 처음 로드할 때를 위해 작업 사이드 적용
+       * 3. 해더의 refresh button 클릭시 발생하는 refresh-view-[route] event handler
+       * 4. 호기 선택 체크
+       */
+      connectedCallback() {
+        super.connectedCallback();
+      }
+
+      /**
+       * @description 투입 상품 리스트 조회
+       */
+      refreshInputList(event) {
+        // 버튼 클릭으로 인한 refresh의 경우 event의 type을 click으로 받는다
+        // 버튼 클릭의 경우 현재 inputList가 response 되었을 때 현재 inputList와 조회 결과를 비교하지 않고 반드시
+        // this.inputList에 값을 초기화 하도록 forceRefresh flag를 true로 변환한다.
+        if (event && event.type === 'click') {
+          this.forceRefresh = true;
+        }
+
+        let inputListAjax = this.$['input-list-ajax'];
+        let regionCd = MPS_UTIL.getRegionCd();
+        let zoneCd = MPS_UTIL.getZoneCd();
+        let sideCd = MPS_UTIL.getSideCd();
+        let showOthersOrder = MPS_UTIL.getShowOthersOrder();
+
+        inputListAjax.curl =
+          `/tablet_process/input_list/${regionCd}/${zoneCd}/${sideCd}`;
+        // 대상 외 작업 조회 여부 param setting
+        inputListAjax.customParams = {
+          show_others_order: showOthersOrder
+        };
+      }
+
+      /**
+       * @description 상품 리스트 중 선택된 상품 정보 상세 조회
+       *********************
+       * @param {Boolean} mpiOnFlag 표시기 점등 여부 DPS의 경우 존재
+       */
+      refreshInputDetails(mpiOnFlag) {
+        this.setListHeaderColor(this.selectedInput.mpi_color);
+        let inputSeqId = this.selectedInput.id;
+        let regionCd = MPS_UTIL.getRegionCd();
+        let zoneCd = MPS_UTIL.getZoneCd();
+        let sideCd = MPS_UTIL.getSideCd();
+        try {
+          this.validationBeforeRefreshDetail(zoneCd, sideCd);
+          let detailAjax = this.$['input-job-details-ajax'];
+
+          if (this.jobType === 'DAS') {
+            detailAjax.curl =
+              `/tablet_process/input_details/${regionCd}/${inputSeqId}/${sideCd}/${zoneCd}`;
+          } else if (this.jobType === 'DPS') {
+            detailAjax.curl =
+              `/tablet_process/${this.jobType.toLowerCase()}/input_details/${inputSeqId}/${regionCd}/${zoneCd}/${sideCd}`;
+            detailAjax.customParams = {
+              mpi_on_flag: mpiOnFlag
+            };
+          }
+
+          detailAjax.generateRequest();
+        } catch (error) {
+          MPS_UTIL.showMessage(error.title, error.message, error.callback);
+        }
+      }
+
+      /**
+       * @description 상품 정보 상세 정보 리프레쉬 전 Validation Check
+       *********************
+       * @param {Boolean} zoneCd 표시기 점등 여부
+       * @param {Boolean} sideCd 호기 사이드 코드
+       */
+      validationBeforeRefreshDetail(zoneCd, sideCd) {
+        if (!zoneCd) {
+          throw {
+            title: t('error.SETTING_ERROR'),
+            message: t('text.zone_code_is_not_set'),
+            callback: this.moveToSetting
+          }
+        }
+
+        if (!sideCd) {
+          throw {
+            title: t('error.SETTING_ERROR'),
+            message: t('text.side_code_is_not_set'),
+            callback: this.moveToSetting
+          }
+        }
+      }
+
+      /**
+       * @description 상품 투입 리스트 조회 response event handler
+       * 1. this.inputList가 없다면 (최초 조회라면) lastResponse를 this.inputList에 초기화
+       * 2. this.inputList가 있다면 (최초 조회가 아님)
+       *   2. 1) lastResponse의 각 요소별 id와 status를 추출하여 string으로 join
+       *   2. 2) this.inputList의 각 요소별 id와 status를 추출하여 string으로 join
+       *   2. 3) 두 join된 string이 일치한다면 데이터 변화 없음 + this.forceRefresh가 false 데이터 변화 없으며 새로고침 버튼으로 인한 조회가 아님 => this.inputList 초기화 x
+       *   2. 4) 두 join된 string이 일치하지 않는다면 데이터 변화 있음 또는 this.forceRefresh가 true이면 새로고침 버튼으로 인한 조회 => this.inputLit 초기화 o
+       ******************
+       * @param {Object} event
+       */
+      _inputListResponsed(event) {
+        let inputList = event.currentTarget.lastResponse;
+        if (this.inputList && inputList && inputList.length > 0) {
+          let newIdList = inputList.map(input => input.id + input.status);
+          let newIdStr = newIdList.join('');
+
+          let currentIdList = this.inputList.map(input => input.id + input.status);
+          let currentIdStr = currentIdList.join('');
+
+          if (newIdStr === currentIdStr && !this.forceRefresh) { // 데이터 변화 없고 forceRefresh가 false일 때 (새로고침 버튼으로 인한 refresh가 아닐때)
+            return;
+          } else { // 데이터 변화 없거나 새로고침 버튼 클릭으로 인한 refresh일 때 => this.inputList에 초기화
+            this.inputList = inputList;
+            this.forceRefresh = false;
+          }
+        } else {
+          this.inputList = inputList ? inputList : [];
+        }
+
+        this.playSound();
+      }
+
+      /**
+       * @description 상품 투입 리스트 선택 변경시
+       ******************
+       * @param {Object} event
+       */
+      _selectedInputChanged(event) {
+        let selectedInput = event.detail;
+
+        if (selectedInput) {
+          this.skuCd = selectedInput.sku_cd;
+          this.skuNm = selectedInput.sku_nm;
+          this.orderId = selectedInput.order_id;
+
+          if (this.jobType === 'DAS') {
+            /**
+             * 이미지 경로 생성 테스트용 임시 코드 -- 시작
+             */
+            let prodImsSrcList = [
+              './images/products/product1.png',
+              './images/products/product2.png',
+              './images/products/product3.png',
+              './images/products/product4.png',
+              './images/products/product5.png'
+            ];
+            let randomImgIdx = Math.floor(Math.random() * prodImsSrcList.length);
+            this.prodImgSrc = prodImsSrcList[randomImgIdx];
+            /**
+             * 이미지 경로 생성 테스트용 임시 코드 -- 끝
+             */
+          }
+
+          // 사용자의 클릭으로 인해 selectedInput이 변경 되었을 경우
+          // mps-job-indicator가 자동피킹 되지 않도록 holdIndicator flag를 on
+          if (event.type === 'item-selected-by-click') {
+            this.holdIndicator = true;
+          }
+
+          this.refreshInputDetails(this.jobType === 'DPS');
+        }
+      }
+
+      /**
+       * @description 상품 투입 리스트 중 선택된 상품 투입 상세 데이터 변경시
+       ******************
+       * @param {Array} inputDetails
+       */
+      _inputDetailsChanged(inputDetails) {
+        if (inputDetails == null) return;
+        let sideCd = MPS_UTIL.getSideCd();
+
+        if (sideCd === 'F') {
+          this._updateStatus(inputDetails[sideCd]);
+          this.frontDetailList = MPS_UTIL.sortByLeftQty(inputDetails[sideCd]);
+
+        } else if (sideCd === 'R') {
+          this._updateStatus(inputDetails[sideCd]);
+          this.rearDetailList = MPS_UTIL.sortByLeftQty(inputDetails[sideCd]);
+
+        } else if (sideCd === 'ALL') {
+          if (inputDetails['F']) {
+            // FIXME: 제품 코드가 처음 입력될때 클라이언트 에러발생, inputDetails['F']가 undefined
+            this._updateStatus(inputDetails['F'].concat(inputDetails['R']));
+            this.frontDetailList = MPS_UTIL.sortByLeftQty(inputDetails['F']);
+          } else if (inputDetails['R']) {
+            this._updateStatus(inputDetails['R']);
+          }
+
+          if (inputDetails['R']) {
+            this.rearDetailList = MPS_UTIL.sortByLeftQty(inputDetails['R']);
+          }
+
+        } else if (sideCd === 'T') {
+          // TODO
+
+        } else {
+          MPS_UTIL.showMessage(t('error.SETTING_ERROR'), t('text.invalid_sidecode'), this.moveToSetting);
+        }
+
+        this.playSound();
+      }
+
+      /**
+       * @description _updateBlockChart를 통해 상품 투입 상세 정보 업데이트하는 과정 중
+       * job indicator의 progress bar의 값을 업데이트함
+       ******************
+       * @param {Number} 진행률
+       */
+      _updateBlockChart(rate) {
+        const jobBlock = this._getJobIndicator().getBlockById(this.selectedInput.id);
+        const progressBar = jobBlock.getProgressBar();
+        progressBar.style.width = rate + '%';
+      }
+
+      /**
+       * @description 작업 유형에 따라 job indicator element를 return
+       ******************
+       * @return {Object} mps-job-indicator element
+       */
+      _getJobIndicator() {
+        if (this.jobType === 'DAS') {
+          return this.$['das-job-indicator'];
+        } else {
+          return this.$['dps-job-indicator'];
+        }
+      }
+
+      /**
+       * @description mps-job-indicator configured event handler
+       * mps-job-indicator 구성이 완료 되면 status 데이터를 바탕으로 attribute를 추가함
+       ***********************
+       * @param {Object} event
+       */
+      _addJobStatusAttr(event) {
+        let contents = event.detail.contentElements;
+        contents.forEach(content => {
+          let data = content.getData();
+          let status = data.status;
+          let mpiColor = data.mpi_color;
+          let relatedMyZone = data.has_my_jobs; // 내 작업존과 관계 여부
+          let lastZone = data.is_my_zone_is_last; // 마지막 작업 처리 존 여부
+          let progressBar = content.getProgressBar();
+
+          this.addBarStatusTypeClass(status, content); // indicator의 상태에 따른 아이콘 적용
+          this.addMpiColorClass(mpiColor, progressBar); // 프로그레스 바에 mpi 색상 적용
+          this.addOthersZoneAttr(relatedMyZone, content); // 나와 관계 없는 작업 attribute 추가
+          this.addLastZoneClass(lastZone, content); // 마지막 작업존 여부에 따른 class 추가
+        });
+      }
+
+      /**
+       * @description 작업 상태에 따른 아이콘 적용
+       ***********************
+       * @param {Object} status W: 작업대기, R: 작업중 F: 작업 완료
+       * @param {Object} content
+       */
+      addBarStatusTypeClass(status, content) {
+        switch (status) {
+          case 'W':
+            content.classList.add('barstatus-type1');
+            break;
+
+          case 'R':
+            content.classList.add('barstatus-type2');
+            break;
+
+          case 'F':
+            content.classList.add('barstatus-type3');
+            break;
+        }
+      }
+
+      /**
+       * @description 프로그레스 바에 mpi 색상 적용
+       ***********************
+       * @param {String} mpiColor R: red, G: green, B: blue, Y: yellow
+       * @param {String} progressBar
+       */
+      addMpiColorClass(mpiColor, progressBar) {
+        progressBar.classList.add('color' + mpiColor);
+      }
+
+      /**
+       * @description 내 작업존과의 관계 여부
+       * 무관: others 추가
+       ******************************
+       * @param {String} relatedMyZone
+       * @param {String} content
+       */
+      addOthersZoneAttr(relatedMyZone, content) {
+        if (!relatedMyZone) {
+          content.setAttribute('others', '');
+        }
+      }
+
+      /**
+       * @description 마지막 작업존 여부
+       * 마지막: last-job 클래스 추가
+       ***********************
+       * @param {String} lastZone
+       * @param {String} content
+       */
+      addLastZoneClass(lastZone, content) {
+        if (lastZone) {
+          content.classList.add('last-job');
+        }
+      }
+
+      /**
+       * @description input list pagination 조회 response event handler
+       * 조회 결과가 있다면 inputList에 초기화
+       ********************
+       * @param {Object} event
+       */
+      _inputListPageResponsed(event) {
+        let inputList = event.currentTarget.lastResponse;
+        if (inputList && inputList.length > 0) {
+          this.inputList = inputList;
+          this.holdIndicator = true;
+        }
+      }
+
+      /**
+       * @description 설정 화면으로 이동
+       */
+      moveToSetting() {
+        location.hash = '/mps_setting';
+      }
+    }
+  }
+</script>

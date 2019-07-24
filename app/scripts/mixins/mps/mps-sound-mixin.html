@@ -1,0 +1,74 @@
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+
+<!--
+  사운드 처리 mixin
+-->
+<script>
+  MpsSoundMixin = superClass => {
+    return class MpsSoundMixin extends superClass {
+      static get properties() {
+        return {
+          /**
+           * @description 성공 사운드 소스 
+           *******************
+           * @type {String}
+           */
+          playSoundSrc: {
+            type: String,
+            value: './static/audio/beep-01.wav',
+            observer: '_soundSrcChanged'
+          },
+
+          /**
+           * @description 실패 사운드 소스 
+           *******************
+           * @type {String}
+           */
+          failSoundSrc: {
+            type: String,
+            value: './static/audio/beep-02.wav'
+          },
+
+          /**
+           * @description audio 오브젝트 
+           *******************
+           * @type {Object}
+           */
+          audioElement: {
+            type: Object,
+            value: function() {
+              return document.createElement('audio');
+            }
+          }
+        }
+      }
+
+      /**
+       * @description 사운드 소스 변경시 ...
+       *******************
+       * @param {String} playSoundSrc
+       */
+      _soundSrcChanged(playSoundSrc) {
+        this.audioElement.src = playSoundSrc;
+      }
+
+      /**
+       * @description 사운드 실행 
+       *******************
+       * @param {String} type
+       */
+      playSound(type) {
+        if(type && (type === 'error' || type === 'fail')) {
+          this.audioElement.src = this.failSoundSrc;
+        } else {
+          this.audioElement.src = this.playSoundSrc;
+        }
+
+        this.audioElement.play();
+      }
+    }
+  }
+</script>

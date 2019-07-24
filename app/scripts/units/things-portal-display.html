@@ -1,0 +1,71 @@
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+
+<dom-module id="things-portal-display">
+  <template>
+    <style>
+      :host{
+        display:block;
+        background-color:#f1f1f1;
+        color:#666;
+        font-weight:normal;
+        font-size:24px;
+        text-transform:uppercase;
+        text-align:center;
+      }
+
+      .slogan {
+				content: '';
+				display: block;
+				position: relative;
+				margin: auto;
+				width: 100%;
+				height: 150px;
+				background: url(../../images/mobile-brand.png) 50% 50% no-repeat;
+				background-size:cover;
+        animation: fadeshow 0.5s linear;
+			}
+
+      /* :host([animate]) .slogan {
+        animation: fadeshow 0.5s linear;
+      } */
+
+      @keyframes fadeshow {
+        0% {
+          opacity:0;
+          top:-15px
+        }
+        100% {
+          opacity:1;
+          top:0px
+        }
+      }
+    </style>
+
+    <div class="slogan">[[slogan]]</div>
+  </template>
+
+  <script>
+    class ThingsPortalDisplay extends Polymer.Element {
+      static get is() {
+        return 'things-portal-display'
+      }
+
+      static get properties() {
+        return {
+          slogan: String,
+          backgroundUrl: String,
+          animate: {
+            type: Boolean,
+            value: true
+          }
+        };
+      }
+    }
+
+    window.customElements.define(ThingsPortalDisplay.is, ThingsPortalDisplay);
+  </script>
+</dom-module>

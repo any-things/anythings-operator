@@ -1,0 +1,61 @@
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+
+<link rel="import" href="../../../bower_components/polymer/polymer-element.html">
+
+<dom-module id="mps-message-queue">
+  <template>
+    <style>
+    </style>
+
+    <!-- TODO -->
+    <!-- <things-message-queue></things-message-queue> -->
+  </template>
+
+  <script>
+    class MpsMessageQueue extends Polymer.Element {
+      static get is() { return 'mps-message-queue' }
+      static get properties() {
+        return {
+          mqtt: Object,
+          address: String,
+          path: String,
+          port: String,
+          topic: String
+        }
+      }
+
+      connectedCallback() {
+
+      }
+
+      disconnectedCallback() {
+
+      }
+
+      queueInit() {
+
+      }
+
+      connect() {
+
+      }
+
+      close() {
+
+      }
+
+      sendMessage() {
+
+      }
+
+      reset() {
+
+      }
+    }
+
+    customElements.define(MpsMessageQueue.is, MpsMessageQueue);
+  </script>
+</dom-module>

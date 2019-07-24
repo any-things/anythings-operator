@@ -1,0 +1,349 @@
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+
+<link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
+
+<link rel="import" href="../../../pda-libraries.html">
+
+<!--
+  PDA > 호기별 상품 정보
+-->
+
+<dom-module id="pda-region-sku-info">
+  <template>
+    <style include="shared-styles">
+      :host {
+        display: flex;
+        flex-direction: column;
+        height: calc(100% - 20px);
+        padding: 10px;
+      }
+      #container {
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+      }
+      mps-list {
+        flex: 1;
+      }
+      #button-container {
+        display: grid;
+        margin-top: 5px;
+        justify-content: end;
+      }
+    </style>
+
+    <!-- 호기별 상품 투입 리스트 Ajax -->
+    <sys-ajax
+      auto
+      id="input-list-ajax"
+      method="GET"
+      content-type="application/json"
+      last-response="{{items}}">
+    </sys-ajax>
+
+    <div id="container">
+      <!-- 호기별 투입 상품 투입 리스트 표시 영역 -->
+      <mps-list
+        id="sku-list"
+        header="[[header]]"
+        data="[[items]]"
+        on-configured="_addCompleteAttribute"
+        on-data-list-click="_skuSelected">
+      </mps-list>
+
+      <!-- 버튼 표시 영역 -->
+      <div id="button-container">
+        <button on-click="refresh">[[refreshBtnLabel]]</button>
+      </div>
+    </div>
+  </template>
+
+  <script>
+    class PdaRegionSkuInfo extends Polymer.Element {
+      static get is() { return 'pda-region-sku-info' }
+
+      static get properties() {
+        return {
+          /**
+           * @description 작업 유형
+           ****************
+           * @type {Array}
+           */
+          jobType: {
+            type: String,
+            value: () => MPS_UTIL.getJobName('setting.jobName')
+          },
+
+          /**
+           * @description 새로고침 버튼 라벨
+           ****************
+           * @type {Array}
+           */
+          refreshBtnLabel: {
+            type: String,
+            value: () => t('button.refresh')
+          },
+
+          /**
+           * @description 그리드 헤더 정보
+           ****************
+           * @type {Array}
+           */
+          header: {
+            type: Array,
+            value: function() {
+              return [{
+                display: t('label.sku'),
+                fieldname: 'sku_cd_widt_seq',
+                displayCallback: (value, rowData) => {
+                  // 작업 유형에 따라 가변, 반품 작업일 때 투입 순서 없음
+                  return MPS_UTIL.getJobName() === 'RTN' ?
+                    `${rowData['sku_nm']}` :
+                    `(${rowData['input_seq']}) ${rowData['sku_nm']}`
+                }
+              }, (() => {
+                // 작업 유형에 따라 가변
+                // 반품 작업일 때 거래처 대신 로케이션 표시
+                return MPS_UTIL.getJobName() === 'RTN' ?
+                {
+                  display: t('label.location'),
+                  fieldname: 'loc_cd',
+                  columnWidth: '0.33fr',
+                  style: {
+                    textAlign: 'center'
+                  },
+                  displayCallback: (value, rowData) => {
+                    if(value) {
+                      var values = value.split('-');
+                      return values.length >= 2 ? values[1] : value;
+                    } else {
+                      return value;
+                    }
+                  }
+                } : {
+                  display: t('label.customer'),
+                  fieldname: 'cust_cnt',
+                  columnWidth: '0.2fr',
+                  style: {
+                    textAlign: 'center'
+                  }
+                }
+              })(), {
+                display: t('label.picked_qty') + '/' + t('label.pick_qty'),
+                fieldname: 'total_pick_qty',
+                columnWidth: '0.3fr',
+                style: {
+                  textAlign: 'right'
+                },
+                displayCallback: (value, rowData) => {
+                  return rowData['picked_qty'] + '/' + rowData['pick_qty'];
+                }
+              }, {
+                fieldname: 'com_cd',
+                hidden: true
+              }, {
+                fieldname: 'sku_cd',
+                hidden: true
+              }, {
+                fieldname: 'sku_nm',
+                hidden: true
+              }, {
+                fieldname: 'input_seq',
+                hidden: true
+              }, {
+                fieldname: 'picked_qty',
+                hidden: true
+              }, {
+                fieldname: 'pick_qty',
+                hidden: true
+              }, {
+                fieldname: 'status',
+                hidden: true
+              }]
+            }
+          },
+
+          /**
+           * @description 그리드 표시를 위한 데이터
+           ****************
+           * @type {Array}
+           */
+          items: {
+            type: Array
+          },
+
+          /**
+           * @description 상세 팝업에 출력되는 폼 필드 리스트
+           ****************
+           * @type {Array}
+           */
+          detailFormFields: {
+            type: Array,
+            value: () => [{
+              name: 'sku_nm',
+              display: t('label.sku_nm'),
+              styles: {
+                textAlign: 'right'
+              }
+            }, {
+              name: 'total_pick_qty',
+              display: t('label.picked_qty') + '/' + t('label.pick_qty'),
+              styles: {
+                textAlign: 'right'
+              }
+            }]
+          },
+
+          /**
+           * @description 상세 팝업에 출력되는 리스트 컬럼 리스트
+           ****************
+           * @type {Array}
+           */
+          detailListFields: {
+            type: Array,
+            value: () => {
+              return [{
+                display: t('label.location'),
+                fieldname: 'loc_cd',
+                columnWidth: '0.33fr',
+                displayCallback: (value, rowData) => {
+                  if(value) {
+                    var values = value.split('-');
+                    return values.length >= 2 ? values[1] : value;
+                  } else {
+                    return value;
+                  }
+                }
+              }, {
+                display: t('label.cust_nm'),
+                fieldname: 'cust_nm'
+              }, {
+                display: t('label.picked_qty') + '/' + t('label.pick_qty'),
+                fieldname: 'display_qty',
+                columnWidth: '0.375fr',
+                style: {
+                  textAlign: 'right'
+                },
+                displayCallback: (value, rowData) => {
+                  return `${rowData['picked_qty']}/${rowData['pick_qty']}`;
+                }
+              }, {
+                fieldname: 'status',
+                hidden: true
+              }];
+            }
+          }
+        }
+      }
+
+      /**
+       * @description Life Cycle - connected callback
+       */
+      connectedCallback() {
+        super.connectedCallback();
+        this.refresh();
+
+        // 현재 페이지로 라우팅 변경시 데이터 다시 조회하도록
+        document.addEventListener('page-changed', event => {
+          if(event.detail.currentPage === 'pda_region_sku_info') {
+            this.refresh();
+          }
+        });
+      }
+
+      /**
+       * @description 데이터가 완료되었는지 체크
+       ****************
+       * @type {Object} data
+       */
+      isComplete(data) {
+        return data.picked_qty >= data.pick_qty;
+      }
+
+      /**
+       * @description 설정을 통해 선택한 호기와 존 영역내의 상품 리스트 조회
+       */
+      refresh() {
+        let regionCd = MPS_UTIL.getRegionCd();
+        let zoneCd = MPS_UTIL.getZoneCd();
+        const inputListAjax = this.$['input-list-ajax'];
+        inputListAjax.curl = `/tablet_process/input_status/${regionCd}/${zoneCd}/ALL`;
+        inputListAjax.generateRequest();
+      }
+
+      /**
+       * @description list의 데이터 상태에 따라 행의 색상을 변경
+       * R: Running 진행중, F: Finished 완료, U: Unfinished 미완료 (취소건이 포함되어 있어서 완료되지 않은 상태)
+       ****************
+       * @type {Object} event
+       */
+      _addCompleteAttribute(event) {
+        const rows = event.detail.contentElements;
+        rows.forEach(row => {
+          const status = row.getData().status;
+          if(status === 'F') { // 완료 상태
+            row.classList.add('complete');
+          } else if(status === 'U') { // 미완료 상태
+            row.classList.add('canceled');
+          }
+        });
+      }
+
+      /**
+       * @description 리스트에서 선택한 상품 정보를 조회하는 다이어로그를 출력
+       ****************
+       * @type {Object} event
+       */
+      _skuSelected(event) {
+        // 반품 작업일 때 상세 화면 없음
+        if (MPS_UTIL.getJobName() === 'RTN') return;
+
+        const inputSeq = event.detail.data.input_seq;
+        const regionCd = MPS_UTIL.getRegionCd();
+        const zoneCd = MPS_UTIL.getZoneCd();
+
+        document.dispatchEvent(new CustomEvent('open-form-list-dialog', {
+          detail: {
+            formFields: this.detailFormFields,
+            listFields: this.detailListFields,
+            formData: event.detail.data,
+            listDataReqUrl: `/tablet_process/${this.jobType.toLowerCase()}/input_status_details/${regionCd}/${zoneCd}/ALL/${inputSeq}`,
+            handleListDataAfterSet: params => {
+              const items = params.listData;
+              const popupElement = params.popupElement;
+              params.formData.total_pick_qty = '';
+
+              if(items && items.length > 0) {
+                let totalPlan = 0, totalPicked = 0;
+
+                items.forEach(item => {
+                  totalPlan += (item.pick_qty ? item.pick_qty : 0);
+                  totalPicked += (item.picked_qty ? item.picked_qty : 0);
+                });
+
+                params.formData.total_pick_qty = `${totalPicked} / ${totalPlan}`;
+              }
+
+              popupElement.setFormData(params.formData);
+
+              const rows = params.listElement.getRows();
+              rows.forEach(row => {
+                const status = row.getData().status;
+                if(status === 'F') {                // 완료 상태
+                  row.classList.add('complete');
+                } else if(status === 'U') {         // 미완료 상태
+                  row.classList.add('canceled');
+                }
+              });
+            }
+          }
+        }));
+      }
+    }
+
+    customElements.define(PdaRegionSkuInfo.is, PdaRegionSkuInfo);
+  </script>
+</dom-module>

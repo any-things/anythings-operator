@@ -1,0 +1,206 @@
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+
+<link rel="import" href="../../../bower_components/polymer/polymer-element.html">
+
+<link rel="import" href="../../tablet-libraries.html">
+
+<link rel="import" href="./mps-label-re-issue-detail.html">
+
+<!--
+  Tablet > DAS 라벨 재발행
+  PDA > DAS 라벨 재발행 공통 화면
+-->
+
+<dom-module id="mps-label-re-issue">
+  <template>
+    <style include="shared-styles">
+      :host {
+        display: grid;
+        grid-template-rows: 1fr;
+        padding: 10px;
+        height: calc(100% - 20px);
+      }
+      #button-container {
+        display: grid;
+        grid-template-columns: auto auto;
+        justify-content: end;
+        margin-top: 10px;
+      }
+    </style>
+
+    <!-- 박싱 리스트 -->
+    <sys-ajax
+      auto
+      id="box-list-ajax"
+      method="GET"
+      content-type="application/json"
+      last-response="{{boxList}}">
+    </sys-ajax>
+
+    <mps-list
+      id="cust-list"
+      header="[[header]]"
+      data="[[boxList]]"
+      on-data-list-click="_showReprintPopup">
+    </mps-list>
+
+    <div id="button-container">
+      <button is-pda$="[[isPda]]"on-click="searchBoxList">[[refreshBtnLabel]]</button>
+    </div>
+  </template>
+
+  <script>
+    class MpsLabelReIssue extends Polymer.Element {
+      static get is() { return 'mps-label-re-issue' }
+
+      static get properties() {
+        return {
+          isPda: {
+            type: Boolean
+          },
+
+          /**
+           * 새로고침 라벨
+           ****************
+           * @type {Array}
+           */
+          refreshBtnLabel: {
+            type: String,
+            value: () => t('button.refresh')
+          },
+
+          /**
+           * 그리드 헤더
+           ****************
+           * @type {Array}
+           */
+          header: {
+            type: Array,
+            value: function() {
+              return [{
+                display: t('label.customer'),
+                fieldname: 'cust_nm',
+                columnWidth: '0.5fr',
+                displayCallback: (value, rowData) => {
+                  return `(${rowData.box_seq}) ${value}`;
+                }
+              }, {
+                display: t('label.location'),
+                fieldname: 'loc_cd',
+                columnWidth: '0.175fr',
+                style: {
+                  textAlign: 'center'
+                },
+                displayCallback: (value, rowData) => {
+                  return `${value.split('-')[1]}`;
+                }
+              }, {
+                display: t('label.label_cd'),
+                fieldname: 'invoice_id',
+                columnWidth: '0.325fr',
+                style: {
+                  textAlign: 'center'
+                },
+                displayCallback: (value, rowData) => {
+                  var val = value ? value : rowData.box_id;
+                  return val.substring(MPS_UTIL.getInvoiceFieldSubstr());
+                }
+              }, {
+                fieldname: 'id',
+                hidden: true
+              }, {
+                fieldname: 'box_seq',
+                hidden: true
+              }, {
+                fieldname: 'box_id',
+                hidden: true
+              }]
+            }
+          },
+
+          /**
+           * 그리드 데이터
+           ****************
+           * @type {Array}
+           */
+          boxList: {
+            type: Array,
+            value: function() {
+              return [/*{
+                box_seq: '1',
+                cust_nm: '거래처 1',
+                loc_cd: 'M01-001',
+                invoice_id: 'BCD10492850'
+              }, {
+                box_seq: '2',
+                cust_nm: '거래처 1',
+                loc_cd: 'M01-001',
+                invoice_id: 'BCD10492850'
+              }, {
+                box_seq: '3',
+                cust_nm: '거래처 1',
+                loc_cd: 'M01-001',
+                invoice_id: 'BCD10492850'
+              }*/];
+            }
+          }
+        }
+      }
+
+      /**
+       * connectedCallback
+       */
+      connectedCallback() {
+        super.connectedCallback();
+
+        // 해더의 refresh button 클릭시 발생하는 refres-view-[route] event handler
+        document.addEventListener('refresh-view-' + location.hash.replace('#/', ''), event => {
+          this.searchBoxList();
+        });
+
+        this.searchBoxList();
+      }
+
+      /**
+       * 송장 번호가 발행된 박스 리스트 조회
+       */
+      searchBoxList() {
+        var ajax = this.$['box-list-ajax'];
+        ajax.curl = '/tablet_process/boxed_list/' + MPS_UTIL.getRegionCd() + '/' + MPS_UTIL.getZoneCd() + '/' + MPS_UTIL.getSideCd();
+
+        // 최초 조회 이후 baseUrl이 초기화 되었다면 명시적으로 generateRequest를 호출함
+        if(ajax.baseUrl) {
+          ajax.generateRequest();
+        }
+      }
+
+      /**
+       * 리스트에서 선택한 로우를 활성화 함
+       */
+      _showReprintPopup(event) {
+        const labelReIssueDetail = document.createElement('mps-label-re-issue-detail');
+        labelReIssueDetail.boxResultId = event.detail.data.id;
+        labelReIssueDetail.custName = event.detail.data.cust_nm;
+        labelReIssueDetail.invoiceId = event.detail.data.invoice_id ? event.detail.data.invoice_id : event.detail.data.box_id;
+        labelReIssueDetail.locCd = event.detail.data.loc_cd;
+
+        document.dispatchEvent(new CustomEvent('open-dialog', {
+          detail: {
+            title: t('button.print_label'),
+            content: labelReIssueDetail,
+            width: 'fit',
+            height: 'fit',
+            closeCallback: () => {
+              this.searchBoxList();
+            }
+          }
+        }))
+      }
+    }
+
+    customElements.define(MpsLabelReIssue.is, MpsLabelReIssue);
+  </script>
+</dom-module>

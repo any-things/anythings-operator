@@ -1,0 +1,172 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<!doctype html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="generator" content="Polymer Starter Kit">
+    <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
+
+    <title>CJ MPS Operator</title>
+    <meta name="description" content="MES App description">
+
+    <!--
+      If deploying to a non-root path, replace href="/" with the full path to the project root.
+      For example: href="/polymer-starter-kit/relative-path-example/"
+    -->
+    <base href="./">
+
+    <link rel="icon" href="images/cj.ico">
+    <link rel="shortcut icon" href="images/cj.ico">
+
+    <!-- See https://goo.gl/OOhYW5 -->
+    <link rel="manifest" href="manifest.json">
+
+    <!-- See https://goo.gl/qRE0vM -->
+    <meta name="theme-color" content="#3f51b5">
+
+    <!-- Add to homescreen for Chrome on Android. Fallback for manifest.json -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="Things-MES">
+
+    <!-- Add to homescreen for Safari on iOS -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="CJ MPS Moblie">
+
+    <!-- Homescreen icons -->
+    <link rel="apple-touch-icon" sizes="192x192" href="images/manifest/icon-192x192.png">
+
+    <!-- Tile icon for Windows 8 (144x144 + tile color) -->
+    <meta name="msapplication-TileImage" content="images/manifest/icon-144x144.png">
+    <meta name="msapplication-TileColor" content="#3f51b5">
+    <meta name="msapplication-tap-highlight" content="no">
+
+    <style>
+      @font-face {
+        font-family: 'cj-font';
+        src: url('./static/font/cj_onlyone_new_body_light_2350.woff');
+      }
+      html {
+        font-size: 35px;
+      }
+      body {
+        font-family:'cj-font','Noto','Helvetica',Verdana,Tahoma,sans-serif !important;
+      }
+    </style>
+    <script src="./bower_components/webcomponentsjs/webcomponents-lite.js"></script>
+    <script src="./static/const.js"></script>
+    
+    <!-- Load your application shell -->
+    <!-- <link rel="import" href="http://192.168.0.5:5678/scripts/mps-operator-app.html"> -->    
+
+    <script>
+      const baseHref = document.querySelector('base').href;
+      // Load and register pre-caching Service Worker
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+          navigator.serviceWorker.register(baseHref + 'service-worker.js').then((registration) => {
+            // Registration was successful
+            console.log('ServiceWorker registration successful with scope: ', registration.scope);
+          }, (err) => {
+            // registration failed
+            console.log('ServiceWorker registration failed: ', err);
+          });
+        });
+      }
+
+      /**
+       * @description mps-operator-app을 로드함
+       * 1. 개발 모드 (IS_DEV_MODE = true)
+       *    ./script/mps-operator-app.html을 로드 함
+       * 
+       * 2. 운영 모드 (IS_DEV_MODE = false)
+       *    2. 1) 로컬스토리지 (setting.srcUrl)에 설정된 주소를 통해 main app을 로드함 로컬스토리지에 값이 없을 경우 (최초 설치) CONST.SRC_URL을 통해 srcUrl을 초기화함
+       *       2) 로드 실패시 prompt를 통해 입력 srcUrl을 입력 받고 해당 값을 로컬스토리지에 저장하고 페이지 리로드
+       */
+      function importMainApp() {
+        const linkTag = document.createElement('link');
+        linkTag.setAttribute('rel', 'import');
+
+        if(CONST.IS_DEV_MODE) {
+          linkTag.setAttribute('href', `./scripts/mps-operator-app.html`);
+          document.head.appendChild(linkTag);
+        } else {
+          let srcUrl = JSON.parse(localStorage.getItem('setting.srcUrl'));
+          if(!srcUrl) {
+            srcUrl = CONST.SRC_URL;
+            localStorage.setItem('setting.srcUrl', JSON.stringify(srcUrl));
+          }
+  
+          checkSrcExist(srcUrl)
+          .then(srcUrl => {
+            linkTag.setAttribute('href', `${srcUrl}/scripts/mps-operator-app.html`);
+            document.head.appendChild(linkTag);
+          })
+          .catch(() => {
+            localStorage.setItem('setting.srcUrl', JSON.stringify(prompt('Type MPS operator application source URL. (ex: http://127.0.0.1:8080)', "http://128.10.1.143:8080")));
+            location.reload(true);
+          });
+        }
+      }
+
+      /**
+       * @description main app (mps-operator-app.html)을 로드하기 전에
+       * 입력한 srcUrl을 통해 소스를 가지고 올 수 있는지 먼저 확인함
+       ************************
+       * @param {String} 소스 존재를 확인하려고 하는 서버 url
+       * @returns {Promise}
+       */
+      function checkSrcExist(srcUrl) {
+        return new Promise((resolve, reject) => {
+          if(!srcUrl) {
+            reject();
+          } else {
+            const xhr = new XMLHttpRequest();
+            xhr.timeout = 10000;
+            xhr.open('GET', `${srcUrl}/scripts/mps-operator-app.html`, true);
+            xhr.onreadystatechange = function() {
+              if(this.readyState === 4 && this.status === 200) {
+                resolve(srcUrl);
+              } else if(this.readyState === 4 && this.status !== 200) {
+                reject();
+              }
+            };
+  
+            xhr.send();
+          }
+        })
+      }
+
+      /**
+       * deviceType이 tablet 혹은 pda일 때 cordova plugin을 임포트 함
+       */
+      function importNativeLibs() {
+        if(!CONST.IS_DEV_MODE && !document.head.querySelector('#cordova-libs')) {
+          const scriptTag = document.createElement('script');
+          scriptTag.setAttribute('id', 'cordova-libs');
+          scriptTag.setAttribute('src', './cordova.js');
+          document.head.appendChild(scriptTag);
+        }
+      }
+
+      importMainApp();
+    </script>    
+  </head>
+  <body>
+    <mps-operator-app></mps-operator-app>
+    <noscript>
+      Please enable JavaScript to view this website.
+    </noscript>
+    <!-- Built with love using Polymer Starter Kit -->
+  </body>
+</html>

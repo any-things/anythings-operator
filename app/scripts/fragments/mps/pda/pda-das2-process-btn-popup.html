@@ -1,0 +1,92 @@
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+
+<dom-module id="pda-das2-process-btn-popup">
+  <template>
+    <style include="shared-styles">
+      :host {
+        display: flex;
+        flex: 1;
+      }
+      #container {
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+      }
+      #content {
+        flex: 1;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        grid-gap: 20px;
+      }
+      #content button.action-button {
+        @apply --operator-warn-btn;
+      }
+      #button-container {
+        margin-top: 20px;
+        display: grid;
+        justify-content: flex-end;
+      }
+    </style>
+
+    <div id="container">
+      <div id="content">
+        <template is="dom-repeat" items="[[buttons]]">
+          <button class="action-button" id="[[item.id]]" on-click="_clickHandler">[[item.label]]</button>
+        </template>
+      </div>
+
+      <div id="button-container">
+        <button on-click="_closeDialog">[[closeBtnLabel]]</button>
+      </div>
+    </div>
+  </template>
+
+  <script>
+    class PdaDas2ProcessBtnPopup extends Polymer.Element {
+      static get is() { return 'pda-das2-process-btn-popup' }
+
+      static get properties() {
+        return {
+          closeBtnLabel: {
+            type: String,
+            value: () => t('button.close')
+          },
+
+          buttons: {
+            type: Array,
+            value: () => [{
+              id: 'mpi-on',
+              label: t('button.start_job')
+            }, {
+              id: 'mpi-off',
+              label: t('button.end_inspection')
+            }
+            // , {
+            //   id: 'cancel-input',
+            //   label: t('button.cancel_input')
+            // }
+            ]
+          }
+        }
+      }
+
+      _clickHandler(event) {
+        this._closeDialog();
+        this.dispatchEvent(new CustomEvent('btn-click', {
+          detail: {
+            buttonId: event.currentTarget.id
+          }
+        }));
+      }
+
+      _closeDialog() {
+        document.dispatchEvent(new CustomEvent('close-dialog'));
+      }
+    }
+
+    customElements.define(PdaDas2ProcessBtnPopup.is, PdaDas2ProcessBtnPopup);
+  </script>
+</dom-module>
