@@ -659,7 +659,7 @@ Copyright © HatioLab Inc. All rights reserved.
           this._showAdjustFullboxQty(item, locCd, pickedQty);
           this.message = t('text.process_cell_[') + locCd + t('text.adjust_sku_count');
         } else {
-          this._setErrorMessage('스캔한 셀[' + locCd + ']에 분류한 상품이 없습니다.');
+          this._setErrorMessage(t('title.no_items_1') + locCd + t('title.no_items_2'));
         }
 
         // 2. 포커스 리셋
@@ -673,9 +673,9 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _locInfoError(event) {
         if(event && event.detail && event.detail.msg) {
-          this.message = '에러-' + event.detail.msg;
+          this.message = t('text.error-') + event.detail.msg;
         } else {
-          this.message = '에러 - 로케이션을 다시 스캔해주세요.';
+          this.message = t('text.error-msg');
         }
       }
 
@@ -706,11 +706,11 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       validateBeforeRequest() {
         if(!this.boxId) {
-          throw '박스 ID가 비어있습니다.';
+          throw t('text.box_id_empty');
         }
 
         if(!this.data || this.data.length == 0) {
-          throw '처리할 로케이션이 없습니다.';
+          throw t('text.no_process_location');
         }
       }
 
@@ -775,7 +775,7 @@ Copyright © HatioLab Inc. All rights reserved.
         this.inputValue = '';
         this.boxId = '';
         this.locCd = '';
-        this.message = '잔량 처리할 박스 ID를 스캔하세요';
+        this.message = t('text.scan_box_id_1');
         this.set('data', []);
         this._initFocus();
       }
@@ -841,9 +841,9 @@ Copyright © HatioLab Inc. All rights reserved.
         this._showFullboxButton();
 
         if(data.length >= 5) {
-          this.message = '[풀 박스] 버튼을 눌러서 잔량 처리하세요';
+          this.message = t('text.[fullbox]_process_rest');
         } else {
-          this.message = '다음 처리할 로케이션을 스캔하세요';
+          this.message = t('text.scan_next_location');
         }
       }
 
@@ -866,7 +866,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} event
        */
       _fullboxRemainsResponse(event) {
-        this.message = '잔량 처리 완료되었습니다.';
+        this.message = t('text.process_rest_complete');
         this._reset();
         this._hideFullboxButton();
       }

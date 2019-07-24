@@ -530,15 +530,15 @@ Copyright © HatioLab Inc. All rights reserved.
             this.skuCd = boxInfo.sku_cd;
             if(this.boxQty && this.boxQty > 0) {
               if(this.boxId) {
-                this.msg = `[상품] Full 처리할 수량 : ${this.boxQty}개`;
+                this.msg = t('text.[sku]_full_count') + `${this.boxQty}` + t('text.each');
                 this.$['btn-fullbox'].hidden = false;
               } else {
-                this.msg = '[상품] 박스 ID를 스캔하여 박스 매핑하세요.';
+                this.msg = t('text.[sku]_box_mapping');
                 this.$['btn-fullbox'].hidden = true;
               }
 
             } else {
-              this.msg = '[상품] Full 처리할 수량 없음';
+              this.msg = t('');
               this.$['btn-fullbox'].hidden = true;
             }
 
