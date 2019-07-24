@@ -557,7 +557,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _checkBoxId(boxId) {
         if(this.boxId) {
-          this._setErrorMessage('박스ID는 이미 스캔했습니다. 박스를 교체하시려면 초기화한 후에 교체하세요.');
+          this._setErrorMessage(t('text.already_scan'));
         } else {
           this.boxId = boxId;
           var ajax = this.$['box-info-ajax'];
@@ -573,7 +573,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _boxInfoResponse(event) {
         this.mappingCodeType = 'BOX_ID';
-        this.message = '로케이션 코드 혹은 표시기 코드를 스캔하세요.';
+        this.message = t('text.scan_location_mpi');
       }
 
       /**
@@ -583,7 +583,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _boxInfoError(event) {
         this.boxId = '';
-        this.message = '이미 사용된 박스입니다.';
+        this.message = t('text.already_used');
       }
 
       /**
@@ -593,17 +593,17 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _checkLocCd(locCd) {
         if(!this.boxId) {
-          this._setErrorMessage('박스 ID를 먼저 스캔하세요.');
+          this._setErrorMessage(t('text.scan_first'));
         } else {
           if(this.data.length >= 5) {
-            this._setErrorMessage('로케이션 다섯개까지만 처리 가능합니다.');
+            this._setErrorMessage(t('text.location_upto_5'));
           } else {
             var found = this.data.find(function(item) {
               return item.loc_cd === locCd;
             });
 
             if(found) {
-              this._setErrorMessage('로케이션은 이미 추가되었습니다.');
+              this._setErrorMessage(t('text.location_already_add'));
             } else {
               this.locCd = locCd;
               var ajax = this.$['loc-info-ajax'];
@@ -621,17 +621,17 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _checkMpiCd(mpiCd) {
         if(!this.boxId) {
-          this._setErrorMessage('박스 ID를 먼저 스캔하세요.');
+          this._setErrorMessage(t('text.scan_first'));
         } else {
           if(this.data.length >= 5) {
-            this._setErrorMessage('로케이션 다섯개까지만 처리 가능합니다.');
+            this._setErrorMessage(t('text.location_upto_5'));
           } else {
             var found = this.data.find(function(item) {
               return item.mpi_cd === mpiCd;
             });
 
             if(found) {
-              this._setErrorMessage('스캔한 로케이션은 이미 추가되었습니다.');
+              this._setErrorMessage(t('text.location_already_add'));
             } else {
               this.mpiCd = mpiCd;
               var ajax = this.$['loc-info-ajax'];
@@ -657,7 +657,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
         if (pickedQty > 0) {
           this._showAdjustFullboxQty(item, locCd, pickedQty);
-          this.message = '처리할 셀[' + locCd + ']의 상품 수량을 조정하세요.';
+          this.message = t('text.process_cell_[') + locCd + t('text.adjust_sku_count');
         } else {
           this._setErrorMessage('스캔한 셀[' + locCd + ']에 분류한 상품이 없습니다.');
         }

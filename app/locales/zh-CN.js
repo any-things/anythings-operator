@@ -280,7 +280,7 @@ window.locales['zh-CN'] = {
   'text.not_comp_exis_box_id': '[mps]기존과 다른 박스ID입니다',
   'text.order_not_exist': '[mps]주문 정보가 없습니다.',
   'text.already_done': '스캔하신 송장 번호는 이미 처리되었습니다',
-  'text.available_reprint': '거래명세서 재발행은 가능합니다.',
+  'text.able_reprint': '거래명세서 재발행은 가능합니다.',
   'text.in_printing': '인쇄 중',
   'text.invoice_printing': '거래명세서 재발행 중입니다.',
   'text.input_invoice_number':'송장 번호 입력',
@@ -301,6 +301,14 @@ window.locales['zh-CN'] = {
   'text.)_complete': ') 적용완료',
   'text.error': '오류',
   'text.no_scan_data': '계측 데이터가 없습니다.',
+  'text.already_scan': '박스ID는 이미 스캔했습니다. 박스를 교체하시려면 초기화한 후에 교체하세요.',
+  'text.scan_location_mpi': '로케이션 코드 혹은 표시기 코드를 스캔하세요.',
+  'text.already_used': '이미 사용된 박스입니다.',
+  'text.scan_first': '박스 ID를 먼저 스캔하세요.',
+  'text.location_upto_5': '로케이션 다섯개까지만 처리 가능합니다.',
+  'text.location_already_add': '로케이션은 이미 추가되었습니다.',
+  'text.process_cell_[': '처리할 셀[',
+  'text.adjust_sku_count': ']의 상품 수량을 조정하세요.',
 
   // title list
   'title.info': '[mps]info',

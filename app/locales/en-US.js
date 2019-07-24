@@ -280,7 +280,7 @@ window.locales['en-US'] = {
   'text.not_comp_exis_box_id': '[mps]기존과 다른 박스ID입니다',
   'text.order_not_exist': '[mps]주문 정보가 없습니다.',
   'text.already_done': 'The number you scanned has been already done.',
-  'text.available_reprint': 'It is available to reprint an invoice.',
+  'text.able_reprint': 'It is able to reprint an invoice.',
   'text.in_printing': 'The operation is in the middle of printing',
   'text.invoice_printing': 'The invoice is being printed',
   'text.input_invoice_number':'Invoice number',
@@ -302,6 +302,14 @@ window.locales['en-US'] = {
   'text.error': 'Error',
   'text.no_scan_data': 'There is no scanned data.',
   'text.invalid_input_data': 'This input data is invalid.',
+  'text.already_scan': 'The box ID was already scanned. If you want to replace another one, you have to initialize.',
+  'text.scan_location_mpi': 'Scan location code or mpi code.',
+  'text.already_used': 'This box has already been used.',
+  'text.scan_first': 'Scan box ID first.',
+  'text.location_upto_5': 'You can take the locations up to 5.',
+  'text.location_already_add': 'The location has already been added.',
+  'text.process_cell_[': 'Adjust the number of items of the cell [',
+  'text.adjust_sku_count': '] you are going to process.',
 
   // title list
   'title.info': 'Info',
