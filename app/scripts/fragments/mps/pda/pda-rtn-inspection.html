@@ -538,7 +538,7 @@ Copyright © HatioLab Inc. All rights reserved.
               }
 
             } else {
-              this.msg = t('');
+              this.msg = t('text.[sku]_no_full_item');
               this.$['btn-fullbox'].hidden = true;
             }
 
@@ -547,7 +547,7 @@ Copyright © HatioLab Inc. All rights reserved.
             this.skuCnt = boxInfo.box_sku_cnt;
             this.skuCd = boxInfo.pack_type;
             this.skuNm = boxInfo.order_group;
-            this.msg = '[박스] 정상 처리 된 박스';
+            this.msg = t('text.[box]_normally_process_box');
             this.$['btn-fullbox'].hidden = true;
           }
         }
@@ -565,7 +565,7 @@ Copyright © HatioLab Inc. All rights reserved.
           if(value) {
             // 스캔한 값이 유효한 지 체크
             if(value.trim().length <= 4) {
-              showToast('error', '유효하지 않은 바코드입니다.');
+              showToast('error', t('text.invalid_barcode'));
             // 스캔한 값이 어떤 유형인지 체크
             } else {
               var ajax = this.$['find-scan-type-ajax'];
@@ -597,7 +597,7 @@ Copyright © HatioLab Inc. All rights reserved.
           this.boxId = response.box_id;
           this.boxQty = response.max_stock_qty;
           this.$['btn-fullbox'].hidden = false;
-          this.msg = '로케이션-박스 매핑 완료. 풀박스 처리하세요.';
+          this.msg = t('text.link_location_box');
         }
       }
 
@@ -634,7 +634,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
         // 3. 그 외라면
         } else {
-          this.msg = '유효하지 않은 바코드입니다.';
+          this.msg = t('text.invalid_barcode');
           showToast('error', this.msg);
         }
       }

@@ -303,8 +303,8 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       cancelBox(event) {
         openConfirm({
-          title: '풀 박스 취소', //t('title.cancel_confirmation'),
-          message: '풀 박스 취소하시겠습니까?', //t('text.Sure to process'),
+          title: t('text.cancel_full_box'), //t('title.cancel_confirmation'),
+          message: t('text.cancel_full_box?'), //t('text.Sure to process'),
           critical: true,
           confirmCallback: () => {
             var ajax = this.$['cancel-box-ajax'];

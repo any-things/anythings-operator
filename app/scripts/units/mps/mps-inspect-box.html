@@ -90,7 +90,7 @@ Copyright © HatioLab Inc. All rights reserved.
         if (response) {
           var status = response.status;
           var boxId = response.box_id;
-          window.showToast('info', '박스 [' + boxId + '] : 정상 처리됨');
+          window.showToast('info', t('text.box_[') + boxId + t('text.]_process'));
         }
       }
 
@@ -101,8 +101,8 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _handleBoxInfoError(event) {
         this.boxId = null;
-        var title = '박스 체크';
-        var message = '박스 처리 안 됨!';
+        var title = t('text.box_check');
+        var message = t('text.box_no_process');
         var critical = true;
         window.mpsAlert.webAlert({ title, message, critical });
         window.SOUND.playErrorSound();

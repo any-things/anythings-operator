@@ -341,6 +341,15 @@ window.locales['ko-KR'] = {
   'text.each': '개',
   'text.[sku]_box_mapping': '[상품] 박스 ID를 스캔하여 박스 매핑하세요.',
   'text.[sku]_no_full_item': '[상품] Full 처리할 수량 없음',
+  'text.[box]_normally_process_box': '[박스] 정상 처리 된 박스',
+  'text.invalid_barcode': '유효하지 않은 바코드입니다.',
+  'text.link_location_box': '로케이션-박스 매핑 완료. 풀박스 처리하세요.',
+  'text.cancel_full_box': '풀 박스 취소',
+  'text.cancel_full_box?': '풀 박스 취소하시겠습니까?',
+  'text.box_[': '박스 [',
+  'text.]_process': '] 체크 - 박스가 정상 처리되었습니다.',
+  'text.box_check': '박스 체크',
+  'text.box_no_process': '박스 처리 안 됨!',
 
   // title list
   'title.confirm_inspect': '검수 확인',

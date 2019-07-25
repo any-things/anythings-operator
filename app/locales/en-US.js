@@ -296,7 +296,7 @@ window.locales['en-US'] = {
   'text.select_region': 'Selecting region',
   'text.select_region': 'Select a region',
   'text.checking_inspection': 'Checking inspection',
-  'text.check_inspection': 'Do you want to inpect?',
+  'text.check_inspection': 'Do you want to inspect?',
   'text.weight_(': 'Weight (',
   'text.)_complete': ') Completed',
   'text.error': 'Error',
@@ -324,6 +324,16 @@ window.locales['en-US'] = {
   'text.each': 'EA',
   'text.[sku]_box_mapping': '[SKU] Scan box ID to link a box.',
   'text.[sku]_no_full_item': '[SKU] There are no items to process fulling.',
+  'text.[box]_normally_process_box': '[Box] The box processed normally',
+  'text.invalid_barcode': 'This barcode is invalid.',
+  'text.link_location_box': 'The location and the box are linked. You can do fulling.',
+  'text.cancel_full_box': 'Cancelling full box',
+  'text.cancel_full_box?': 'Do you want to cancel the full box?',
+  'text.box_[': 'Checking the box [',
+  'text.]_process': '] - The box is processed normally.',
+  'text.box_check': 'Box check',
+  'text.box_no_process': 'The box has not been processed!',
+
 
   // title list
   'title.info': 'Info',

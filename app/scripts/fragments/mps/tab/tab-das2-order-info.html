@@ -1132,7 +1132,7 @@ Copyright © HatioLab Inc. All rights reserved.
       _fullboxInspectionSuccess(event) {
         let status = event.detail.status;
         let boxId = event.detail.box_id;
-        window.showToast('info', '박스 [' + boxId + '] 체크 - 박스가 정상 처리되었습니다.');
+        window.showToast('info', t('text.box_[') + boxId + t('text.]_process'));
       }
 
       /**
@@ -1141,8 +1141,8 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} event
        */
        _fullboxInspectionFailure(event) {
-        let title = '박스 체크';
-        let message = '박스 처리 안 됨!';
+        let title = t('text.box_check');
+        let message = t('text.box_no_process');
         let critical = true;
         mpsAlert.webAlert({ title, message, critical });
         SOUND.playErrorSound();
