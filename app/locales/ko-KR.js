@@ -125,7 +125,7 @@ window.locales['ko-KR'] = {
   'label.job_type_rtn3': '무오더 반품',
   'label.chute_no': '슈트 번호',
   'label.com_qty': '완료 수량',
-  'label.pcs_qty': 'PCS 수량',
+  'label.pcs_qty': 'PCS',
   'label.order_cnt': '주문 건수',
   'label.com_cnt': '완료 건수',
   'label.redo': '재 작업',
@@ -172,7 +172,6 @@ window.locales['ko-KR'] = {
   'menu.PickedByLocation': '반품 셀 별현황',
   'menu.RtnFullbox': '반품 잔량처리',
   'menu.StockLoadFixed': '고정로케이션 적치',
-  
 
   // button list
   'button.logout': '로그아웃',
@@ -247,13 +246,10 @@ window.locales['ko-KR'] = {
   'text.cant_find_result_by_input': '주문하지 않은 상품입니다.',
   'text.location_is_not_set': '먼저 로케이션을 설정하십시오.',
   'text.bluetooth_scanner_connected': '블루투스 스캐너가 연결 되었습니다.',
-  'text.bluetooth_scanner_disconnected':
-    '블루투스 스캐너 연결이 해제 되었습니다.',
+  'text.bluetooth_scanner_disconnected': '블루투스 스캐너 연결이 해제 되었습니다.',
   'text.bluetooth_is_not_on': '블루투스가 켜져 있지 않습니다.',
-  'text.location_service_is_not_on':
-    '블루투스 장비 연결을 위해 위치 서비스 사용을 켜주세요.',
-  'text.check_wifi_setting':
-    '무선랜이 연결되지 않았습니다. Wi-Fi를 연결하십시오',
+  'text.location_service_is_not_on': '블루투스 장비 연결을 위해 위치 서비스 사용을 켜주세요.',
+  'text.check_wifi_setting': '무선랜이 연결되지 않았습니다. Wi-Fi를 연결하십시오',
   'text.not_mgr_site_ip': 'MPS 서버 주소가 잘못 입력되었습니다.',
   'text.select_operation_batch': '작업 배치를 선택하세요',
   'text.adjust_value_invalid': '조정 수량은 계획 수량을 초과 할 수 없습니다.',
@@ -270,15 +266,11 @@ window.locales['ko-KR'] = {
   'text.please_scan_box': '로케이션에 매핑할 박스를 스캔해주세요.',
   'text.processed': '처리되었습니다.',
   'text.box_type_check': '박스타입이 잘못되었습니다',
-  'text.ask_password_change':
-    '비밀번호를 변경해야 합니다. 관리자에게 문의하세요.',
-  'text.ask_password_extend':
-    '비밀번호가 만료 되었습니다. 관리자에게 문의하세요.',
+  'text.ask_password_change': '비밀번호를 변경해야 합니다. 관리자에게 문의하세요.',
+  'text.ask_password_extend': '비밀번호가 만료 되었습니다. 관리자에게 문의하세요.',
   'text.wrapping_not_need': '특수포장이 필요한 상품이 없습니다',
-  'text.reprint_error_msg_1':
-    '박스를 조회할 수 없거나 검수가 완료되지 않았습니다.',
-  'text.reprint_event_listener_error':
-    '재발행을 할 수 없습니다. 다시 재발행을 하십시오.',
+  'text.reprint_error_msg_1': '박스를 조회할 수 없거나 검수가 완료되지 않았습니다.',
+  'text.reprint_event_listener_error': '재발행을 할 수 없습니다. 다시 재발행을 하십시오.',
   'text.input_qty_none': '입력수량을 입력해 주세요.',
   'text.cannot_inspection_now': '피킹처리가 되지 않은 박스입니다.',
   'text.do_product_inspect?': '검수 하시겠습니까?',
