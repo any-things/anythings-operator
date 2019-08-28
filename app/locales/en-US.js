@@ -147,8 +147,8 @@ window.locales['en-US'] = {
   'menu.DasOrderList': 'DAS Order List',
   'menu.TabletLabelReIssue': 'Label Re-Issue',
   'menu.PdaLabelReIssue': 'Label Re-Issue',
-  'menu.LocStockLookup': 'Cell Stock Lookup',
-  'menu.StockLoad': 'Stock Load',
+  'menu.LocStockLookup': 'Cell Stock Status',
+  'menu.StockLoad': 'Load Stock',
   'menu.RegionSkuInfo': 'SKU Input List',
   'menu.TabletRegionInputList': 'SKU Input List',
   'menu.MiddleAssort': 'Middle Assort',
@@ -159,7 +159,7 @@ window.locales['en-US'] = {
   'menu.DasStoreOutInspection': 'DAS Store out Inspection',
   'menu.DasInspectionWeight': 'DAS Weight Inspection',
   'menu.BucketAssign': 'Box Assignment',
-  'menu.SingleHandling': 'QPS SignleHandling',
+  'menu.SingleHandling': 'QPS SingleHandling',
   'menu.PackingCheck': 'QPS Packing',
   'menu.TabletBoxAssign': 'Box Assign',
   'menu.TabletBoxList': 'Box List',
@@ -171,7 +171,7 @@ window.locales['en-US'] = {
   'menu.PdaOneSkuOrder': 'One SKU Order',
   'menu.PickedByLocation': 'Cell Status',
   'menu.RtnFullbox': 'Fullbox Remains',
-  'menu.StockLoadFixed': 'Fixed Cell Load Stock',
+  'menu.StockLoadFixed': 'Load Stock To Fixed',
 
   // button list
   'button.logout': 'Logout',

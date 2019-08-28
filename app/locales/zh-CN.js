@@ -138,7 +138,7 @@ window.locales['zh-CN'] = {
   'menu.QpsOrderInfo':'QPS作业',
   'menu.KioskDasOrderInfo':'DAS作业信息',
   'menu.KioskDpsOrderInfo':'DPS作业信息',
-  'menu.KioskQpsOrderInfo':'QPS作业',
+  'menu.KioskQpsOrderInfo':'QPS作业信息',
   'menu.DasJobProcess':'DAS作业处理',
   'menu.Das2JobProcess':'DAS2作业处理',
   'menu.Dps2JobProcess':'B2C处理',
@@ -363,7 +363,7 @@ window.locales['zh-CN'] = {
   'title.password_expired':'密码已过期',
   'title.cancel_confirmation':'取消',
   'title.selecting_region':'选择机组',
-  
+
   // error list
   'error.VALIDATION_ERROR':'验证错误！',
   'error.barcd_is_not_typed':'请输入条形码。',

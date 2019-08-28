@@ -147,7 +147,7 @@ window.locales['ko-KR'] = {
   'menu.DasOrderList': 'DAS작업목록',
   'menu.TabletLabelReIssue': '라벨재발행',
   'menu.PdaLabelReIssue': '라벨재발행',
-  'menu.LocStockLookup': '셀재고조회',
+  'menu.LocStockLookup': '셀 재고조회',
   'menu.StockLoad': '재고적치',
   'menu.RegionSkuInfo': '호기상품정보',
   'menu.TabletRegionInputList': '호기상품정보',
