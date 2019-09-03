@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="com.hatiolab.cjmps" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
-    <name>CJ MPS</name>
+<widget id="com.hatiolab.anythings" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <name>Anythings Operator</name>
     <content src="index.html" />
     <access origin="*" />
     <allow-intent href="http://*/*" />
