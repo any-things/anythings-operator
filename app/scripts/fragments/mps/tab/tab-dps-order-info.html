@@ -15,6 +15,8 @@ Copyright © HatioLab Inc. All rights reserved.
 
 <link rel="import" href="../../../../styles/tab-order-info-styles.html">
 
+<link rel="import" href="../mps-adjust-qty-dialog.html">
+
 <!--
   DPS 작업 정보 화면
 -->
@@ -68,7 +70,7 @@ Copyright © HatioLab Inc. All rights reserved.
         display: none;
       }
     </style>
-    
+
     <!-- MPI 리스트 -->
     <sys-ajax
       id="mpi-get-ajax"
@@ -76,7 +78,7 @@ Copyright © HatioLab Inc. All rights reserved.
       content-type="application/json"
       on-sys-ajax-response="_mpiCodeSetting">
     </sys-ajax>
-    
+
     <!-- 상품 정보 스캔 투입 리스트 -->
     <sys-ajax
       auto
@@ -126,7 +128,7 @@ Copyright © HatioLab Inc. All rights reserved.
       curl="/tablet_process/dps/insp_with_pick/:region_cd/:zone_cd/:sideCd/:input_seq/:skuCd"
       content-type="application/json"
       on-sys-ajax-response="_inspWithPickResponsed"
-      on-sys-ajax-error = "_inspEror">
+      on-sys-ajax-error = "_inspWithPickError">
     </sys-ajax>
 
     <!-- DPS출발   -->
@@ -169,7 +171,7 @@ Copyright © HatioLab Inc. All rights reserved.
           resource-url="[[getSkuAjaxUrl]]"
           popup-title="[[popupTitleLabel]]"
           button-txt-callback="[[_skuButtonTxtCallback]]"
-          on-item-selected="seleted">
+          on-item-selected="skuSelected">
       </mps-auto-popup-input>
       <!-- 개발 모드일때만 인풋 박스 표시 -->
       <dom-if if="[[isDevMode]]">
@@ -278,42 +280,64 @@ Copyright © HatioLab Inc. All rights reserved.
 
           /**
            * 완료 버튼 라벨
+           ****************
+           * @type {String}
            */
           finishLabel: {
             type: String,
             value: () => t('label.finished')
           },
 
-          /**
-          * 모드 설정 정보
+         /**
+          * 개발 모드 여부
           ****************
-          * @type Boolean
+          * @type {Boolean}
           */
           isDevMode: {
             type: Boolean,
             value: window.CONST.IS_DEV_MODE
           },
-          /**
+
+         /**
           * 개발 모드에서 사용하는 버킷 코드의 라벨
           ****************
-          * @type String
+          * @type {String}
           */
           bucketCdLabel: {
             type: String,
             value: () => t('label.bucket')
           },
-          locLeftLabel:{
-            type:String,
+
+         /**
+          * 왼쪽 로케이션 라벨
+          ****************
+          * @type {String}
+          */
+          locLeftLabel: {
+            type: String,
             value: () => t('label.left')
           },
-          locRightLabel:{
+
+         /**
+          * 오른쪽 로케이션 라벨
+          ****************
+          * @type {String}
+          */
+          locRightLabel: {
             type:String,
             value: () => t('label.right')
           },
-          mpiCd:{
-            type:String,
+
+          /**
+           * 표시기 코드
+           ****************
+           * @type {String}
+           */
+          mpiCd: {
+            type: String,
             value: 'NaN'
           },
+
           /**
            * 데이트 그리드 헤더
            ****************
@@ -341,11 +365,12 @@ Copyright © HatioLab Inc. All rights reserved.
                 columnWidth: 'auto',
                 displayCallback: (value, rowData) => {
                   var processValue = 0;
-                  if(rowData.picking_qty>0){
+                  if(rowData.picking_qty > 0) {
                     processValue = rowData.picking_qty
-                  }else{
+                  } else {
                     processValue = rowData.picked_qty
                   }
+
                   return `${processValue}/${rowData.pick_qty}`;
                 },
                 style: {
@@ -379,8 +404,9 @@ Copyright © HatioLab Inc. All rights reserved.
             }
           },
 
-          /**
-           * 화면에서 완료 버튼 아콘
+         /**
+           * 화면에서 완료 버튼 아이콘
+           ****************
            * @type {String}
            */
           doneIcon: {
@@ -388,24 +414,34 @@ Copyright © HatioLab Inc. All rights reserved.
             value: 'icons:done'
           },
 
-          /**
-           * 스캔한 바코드 저장용
-           */
+         /**
+          * 스캔한 바코드 저장용
+          ****************
+          * @type {String}
+          */
           scannedBarcode: {
             type: String
           },
 
           /**
            * 스캔한 바코드 처리후 유형이 input-added이면 scannedBarcode를 boxId에 저장
+           ****************
+           * @type {String}
            */
           boxId: {
             type: String
           },
 
+          /**
+           * 작업 유형
+           ****************
+           * @type {String}
+           */
           jobType: {
             type: String,
             value: 'DPS'
           },
+
           /**
            * SKU 정보 조회를 위한 URL
            ****************
@@ -415,6 +451,7 @@ Copyright © HatioLab Inc. All rights reserved.
             type: String,
             value : `/pda_process/find_sku/${MPS_UTIL.getRegionCd()}/:inputValue`
           },
+
           /**
            * SKU 정보 조회 후 복수개가 조회된 경우 사용자가 고를 수 있는 팝업이 실행되는데 그 팝업에 표시할 타이틀
            ****************
@@ -424,23 +461,51 @@ Copyright © HatioLab Inc. All rights reserved.
             type: String,
             value: () => t('label.sku')
           },
+
+          /**
+           * 블루투스 ID
+           ****************
+           * @type {String}
+           */
           bluetoothId: {
             type: String
           },
+
+          /**
+           * QPS 여부
+           ****************
+           * @type {Boolean}
+           */
           isQps: {
             value : JSON.parse(localStorage.getItem('setting.isQps'))
           },
-          needMpiScanCode:{
+
+          /**
+           * ?
+           ****************
+           * @type {Array}
+           */
+          needMpiScanCode: {
             type: Array,
             value: []
           }
         }
       }
+
+      /**
+       * @description lifecycle
+       ******************
+       */
       connectedCallback() {
         super.connectedCallback();
         this._getMpiCd();
       }
-      _getMpiCd(){
+
+      /**
+       * @description 표시기 리스트 조회
+       ******************
+       */
+      _getMpiCd() {
         const mpiGetAjax = this.$['mpi-get-ajax'];
         mpiGetAjax.baseUrl = JSON.parse(localStorage.getItem('setting.baseUrl'));
         mpiGetAjax.customParams = {
@@ -452,17 +517,26 @@ Copyright © HatioLab Inc. All rights reserved.
           page: 1,
           limit: 10000
         };
+
         mpiGetAjax.curl = `/location`;
-        mpiGetAjax.generateRequest(); 
+        mpiGetAjax.generateRequest();
       }
-      _mpiCodeSetting(event){
+
+      /**
+       * @description 표시기 리스트 설정
+       ******************
+       * @param {Object} event
+       */
+      _mpiCodeSetting(event) {
         this.mpiList = [];
-        event.detail.items.forEach(item=>{
+
+        event.detail.items.forEach(item => {
           this.mpiList.push(item.mpi_cd);
         });
       }
+
       /**
-       * 상품 투입 상세 정보로 현황 정보 리프레쉬
+       * @description 상품 투입 상세 정보로 현황 정보 리프레쉬
        ******************
        * @param {Array} inputDetails
        */
@@ -513,10 +587,10 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 이미 처리한 작업에 대해서 확인을 위해서 다시 한 번 표시기에 점등
+       * @description 이미 처리한 작업에 대해서 확인을 위해서 다시 한 번 표시기에 점등
        * toggle 버튼이기 때문에 active attribute를 추가/제거 함
-       * @param {Object} event
        *********************
+       * @param {Object} event
        */
       mpiOnDoneJobs(event) {
         const mpiOnDoneJobsBtn = event.currentTarget;
@@ -535,10 +609,10 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 선택된 버킷 즉 주문의 상품 중에서 아직 처리가 안 된 상품 및 개수를 표시기로 표시
+       * @description 선택된 버킷 즉 주문의 상품 중에서 아직 처리가 안 된 상품 및 개수를 표시기로 표시
        * toggle 버튼이기 때문에 active attribute를 추가/제거 함
-       * @param {Object} event
        *********************
+       * @param {Object} event
        */
       mpiOnTodoJobs(event) {
         const mpiOnTodoJobsBtn = event.currentTarget;
@@ -557,7 +631,8 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 태블릿 작업 존에 해당하는 표시기 리스트를 소등한다.
+       * @description 태블릿 작업 존에 해당하는 표시기 리스트를 소등한다.
+       ******************
        */
       mpiOffByTabletZone() {
         const mpiOffAjax = this.$['mpi-off-my-zone-ajax'];
@@ -569,9 +644,9 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * mode에 따라 태블릿의 작업 존에 현재 선택된 버킷 (즉 주문) 중에 처리 안 된 혹은 처리 완료된 작업 리스트에 대한 표시기 점등
+       * @description mode에 따라 태블릿의 작업 존에 현재 선택된 버킷 (즉 주문) 중에 처리 안 된 혹은 처리 완료된 작업 리스트에 대한 표시기 점등
+       ******************
        * @param {String} mode
-       **************************
        */
       mpiOnByTabletZone(mode) {
         const mpiOnAjax = this.$['mpi-on-jobs-ajax'];
@@ -584,7 +659,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 작업 팝업 정보 표시
+       * @description 작업 팝업 정보 표시
        ******************
        * @param {Object} event
        */
@@ -592,20 +667,40 @@ Copyright © HatioLab Inc. All rights reserved.
         // status가 'F'면 완료된 작업
         let status = event.detail.data.status;
         this.selectedBarCode = event.detail.data.sku_barcd;
+        var pickQty = event.detail.data.pick_qty;
+
         if(status === 'I' || status === 'P') {
           const popup = document.createElement('tab-order-info-detail');
           popup.skuCd = event.detail.data.sku_barcd
           popup.jobType= this.jobType;
           popup.jobId = event.detail.data.id;
+          popup.pickQty = pickQty;
+          popup.pickedQty = event.detail.data.picked_qty;
           popup.isFinished = (status === 'F');
-          MPS_UTIL.showPopup(t('title.job_select'), popup, 'fit', '100%', null, function() {
-            this.refreshInputDetails(false);
-          }.bind(this));
+          var self = this;
+
+          MPS_UTIL.showPopup(t('title.job_select'), popup, 'fit', 'fit', null, closeParam => {
+            if(closeParam && typeof closeParam === 'object' && closeParam.type === 'adjust-qty') {
+              const adjustPopup = document.createElement('mps-adjust-qty-dialog');
+
+              setTimeout(() => {
+                MPS_UTIL.showPopup(t('button.adjust_qty'), adjustPopup, 'fit', 'fit', () => {
+                  adjustPopup.setCurrentQty(closeParam.pickQty);
+                  adjustPopup.jobId = closeParam.jobId;
+                }, () => {
+                  self.refreshInputDetails(false);
+                });
+              }, 100);
+
+            } else {
+              self.refreshInputDetails(false);
+            }
+          });
         }
       }
 
       /**
-       * 웹 소켓으로 부터 데이터 리프레쉬
+       * @description 웹 소켓으로 부터 데이터 리프레쉬
        ******************
        * @param {Object} data
        */
@@ -627,7 +722,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * list configured event handler
+       * @description list configured event handler
        * list 구성이 완료 되면 status 데이터를 바탕으로 status attribute를 추가함
        ******************
        * @param {Object} event
@@ -635,41 +730,48 @@ Copyright © HatioLab Inc. All rights reserved.
       _addOrderStatusAttr(event) {
         let list = event.detail.contentElements;
         var selectedBCd = this.selectedBarCode;
+
         list.forEach(row => {
           let data = row.getData();
-          if(data.div_cd=='L'){
+
+          if(data.div_cd=='L') {
             row.getElementsByClassName("data-item")[0].innerText = '('+this.locLeftLabel + ')';
             row.getElementsByClassName("data-item")[2].innerText = '';
-          }else if(data.div_cd=='R'){
+
+          } else if(data.div_cd=='R') {
             row.getElementsByClassName("data-item")[0].innerText = '('+this.locRightLabel + ')';
             row.getElementsByClassName("data-item")[2].innerText = '';
           }
+
           if(parseInt(data.picked_qty) >= parseInt(data.pick_qty)) {
               row.classList.add('complete'); // 완료된 데이터에 complete class를 추가
               var dataList = [];
               dataList = dataList.concat(this.inputDetails.F,this.inputDetails.R);
+
               dataList.forEach(item=>{
-                if(item.mpi_cd== this.mpiCd && item.picked_qty>=item.pick_qty){
-                  this.mpiCd = "NaN";
-                  this.needMpiScanCode=[];
+                if(item.mpi_cd == this.mpiCd && item.picked_qty >= item.pick_qty) {
+                  this.mpiCd = 'NaN';
+                  this.needMpiScanCode = [];
                 }
               })
               if(selectedBCd == data.sku_barcd){
                 document.dispatchEvent(new CustomEvent('close-dialog'));
             }
-          }else{
-            if(data.div_cd=='L'){
+          } else {
+            if(data.div_cd == 'L') {
               row.style.color = 'yellow';
-            }else if(data.div_cd=='R'){
+            } else if(data.div_cd == 'R') {
               row.style.color = 'aqua';
             }
           }
         });
-        for(var i=0;i<list.length;i++){
+
+        for(var i = 0 ; i < list.length ; i++) {
           var iData = list[i].getData();
-          for(var j=i+1;j<list.length;j++){
+          for(var j = i+1 ; j < list.length ; j++) {
             var jData = list[j].getData();
-              if(iData.status =='P'&& jData.status =='P' && iData.sku_barcd == jData.sku_barcd){
+
+              if(iData.status =='P' && jData.status =='P' && iData.sku_barcd == jData.sku_barcd) {
                 this.needMpiScanCode.push(iData.sku_barcd);
               }
           }
@@ -677,7 +779,9 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 왼쪽으로 Swipe
+       * @description 왼쪽으로 Swipe
+       ******************
+       * @param {Object} event
        */
       swipeLeft(event) {
         if(!this.inputList || this.inputList.length == 0) return;
@@ -692,7 +796,9 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 오른쪽으로 Swipe
+       * @description 오른쪽으로 Swipe
+       ******************
+       * @param {Object} event
        */
       swipeRight(event) {
         if(!this.inputList || this.inputList.length == 0) return;
@@ -705,6 +811,11 @@ Copyright © HatioLab Inc. All rights reserved.
         pageAjax.generateRequest();
       }
 
+      /**
+       * @description [완료] 버튼 클릭
+       ******************
+       * @param {Object} event
+       */
       doneIconClicked(event) {
         const inspWithPickAjax = this.$['depart-ajax'];
         let scannedBarcode = this.selectedInput.bucket_cd;
@@ -718,6 +829,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description 버킷 또는 박스가 스캔되면 scannded 호출하는 테스트 기능
+       ******************
        * @return {[type]} [description]
        */
       _onBucketCodeChanged(event){
@@ -728,6 +840,7 @@ Copyright © HatioLab Inc. All rights reserved.
           SOUND.playInfoSound();
         }
       }
+
       /**
        * @description 블루투스 subscribe callback
        * 연결된 블루투스 장비에 의해 호출 됨
@@ -737,15 +850,17 @@ Copyright © HatioLab Inc. All rights reserved.
       scanned(scannedBarcode) {
         this.isMpiCd = this.mpiList.indexOf(scannedBarcode) >=0;
         var needMpiCd = this.needMpiScanCode.indexOf(scannedBarcode) >=0;
-        //mpi코드 => MPI코드가 필요한지 && 필요한 mpi코드인지 체크 => 
-        //mpi코드가 필요한 상품일 경우 => 
-        if(needMpiCd || this.isMpiCd){
-          if(this.isMpiCd){
+
+        //mpi코드 => MPI코드가 필요한지 && 필요한 mpi코드인지 체크 =>
+        //mpi코드가 필요한 상품일 경우 =>
+        if(needMpiCd || this.isMpiCd) {
+          if(this.isMpiCd) {
             this.mpiCd = scannedBarcode;
             this.drawDecoLine(this.mpiCd);
             return;
-          }else if(this.mpiCd == "NaN"){
-            document.dispatchEvent(new CustomEvent('show-toast',{
+
+          } else if(this.mpiCd == 'NaN') {
+            document.dispatchEvent(new CustomEvent('show-toast', {
               detail:{
                   type: t('error.no_scan_mpi_code'),
                   message: t('error.no_scan_mpi_code')
@@ -753,39 +868,50 @@ Copyright © HatioLab Inc. All rights reserved.
               }));
             return;
           }
-        }else{
+
+        } else {
           if(scannedBarcode.indexOf('DONE_BY_QR') === 0) {
             this.doneIconClicked();
             return;
-          }else if(/^[bcdfghiBCDFGHI][0-9]{7}$/.test(scannedBarcode)){
+
+          } else if(/^[bcdfghiBCDFGHI][0-9]{7}$/.test(scannedBarcode)) {
             var event = {};
             event.detail = {};
             event.detail.sku_cd = scannedBarcode;
-            this.seleted(event);
+            this.skuSelected(event);
             return;
           }
         }
+
         this.drawDecoLine(this.mpiCd);
         this.$['sku-barcd'].value = scannedBarcode;
         this.$['sku-barcd']._triggerAjax();
       }
+
       /**
-       * @description decoration라인 추가 
+       * @description decoration라인 추가
+       ******************
        * @param {String} searchItem decoration라인추가할 아이템
        */
-      drawDecoLine(searchItem){
+      drawDecoLine(searchItem) {
         var mpsList = this.$['content'].getElementsByTagName('mps-list');
         var allRows = [];
         allRows = allRows.concat(mpsList[0].getRows(),mpsList[1].getRows())
         allRows.forEach(row=>{
           if(row.getData().mpi_cd == searchItem && row.getData().status == 'P'){
             if(row.classList.value.indexOf('complete')<0){
-              row.classList.add('underline'); 
+              row.classList.add('underline');
             }
           }
         })
       }
-      seleted(event){
+
+      /**
+       * @description 스캔한 상품 바코드로 여러 개의 상품이 검색된 이후 하나의 상품을 선택시
+       ******************
+       * @param {Object} event
+       */
+      skuSelected(event) {
         const inspWithPickAjax = this.$['insp-with-pick-ajax'];
         let scannedBarcode = this.scannedBarcode = event.detail.sku_cd;
         let inputSeqId = this.selectedInput ? this.selectedInput.id : 'none';
@@ -795,13 +921,19 @@ Copyright © HatioLab Inc. All rights reserved.
         inspWithPickAjax.curl = `/tablet_process/dps/insp_with_pick/${regionCd}/${sideCd}/${zoneCd}/${inputSeqId}/${scannedBarcode}/${this.mpiCd}`;
         inspWithPickAjax.generateRequest();
       }
-      _inspEror(event){
+
+      /**
+       * @description 웨어러블 검수 실패시
+       ******************
+       * @param {Object} event
+       */
+      _inspWithPickError(event) {
         this.mpiCd = 'NaN';
         var allRows = [];
         var mpsList = this.$['content'].getElementsByTagName('mps-list');
         allRows = allRows.concat(mpsList[0].getRows(),mpsList[1].getRows())
-        allRows.forEach(row=>{
-          row.classList.remove('underline'); 
+        allRows.forEach(row => {
+          row.classList.remove('underline');
         })
       }
 
@@ -815,8 +947,10 @@ Copyright © HatioLab Inc. All rights reserved.
           this.boxId = this.scannedBarcode;
           this.scannedBarcode = '';
         }
+
         this.refreshByWs(event.detail.refresh_type);
       }
+
       /**
        * SKU 정보 조회 시 복수개가 조회된 경우 사용자가 고를 수 있는 버튼이 실행되는데 그 버튼에 표시할 내용
        *******************

@@ -9,48 +9,55 @@ Copyright © HatioLab Inc. All rights reserved.
       :host {
         flex: 1;
       }
+
       #container {
         display: grid;
         height: calc(100% - 40px);
         padding: 20px;
         text-align: -webkit-center;
       }
+
       button {
         @apply --operator-default-btn;
         margin-top: 15px;
       }
+
       button:active {
         @apply --operator-default-btn-active;
       }
+
       #close-btn {
         background: #737373;
         background: linear-gradient(to bottom, #737373 0%, #585858 100%);
-        border-top:.06rem solid #999;border-bottom:.2rem solid #333;
-        border-left:none;border-right:none;
-        border-radius:12px;
-        margin:15px 0;padding:.3rem;
+        border-top: .06rem solid #999;
+        border-bottom: .2rem solid #333;
+        border-left: none;
+        border-right: none;
+        border-radius: 12px;
+        margin: 15px 0;
+        padding: .3rem;
         color: #fff;
         text-shadow: 0px .03rem .03rem rgba(0, 0, 0, 0.4);
-        font-size:1rem;
+        font-size: 1rem;
       }
-      #close-btn:active{
+
+      #close-btn:active {
         background: #737373;
         background: linear-gradient(to bottom, #585858 0%, #737373 100%);
         text-shadow: .03rem 0rem .03rem rgba(0, 0, 0, 0.4);
       }
     </style>
 
-    <sys-ajax
-      id="job-handle-ajax"
-      content-type="application/json">
+    <sys-ajax id="job-handle-ajax" content-type="application/json">
     </sys-ajax>
 
     <div id="container">
-      <button on-click="adjustQty" hidden$="[[hideAdjustBtn]]">[[adjustQtyLabel]]</button>
 
       <template is="dom-if" if="[[showQrCode]]">
-        <tab-sku-qrcode data = [[skuCd]]></tab-sku-qrcode>
+        <tab-sku-qrcode data=[[skuCd]]></tab-sku-qrcode>
       </template>
+
+      <button on-click="adjustQty" hidden$="[[hideAdjustBtn]]">[[adjustQtyLabel]]</button>
 
       <template is="dom-if" if="[[showFullBoxBtn]]">
         <button on-click="labelPrint">[[fullBoxLabel]]</button>
@@ -74,11 +81,11 @@ Copyright © HatioLab Inc. All rights reserved.
       static get properties() {
         return {
           //label locale 처리
-          adjustQtyLabel: {type: String, value: () => t('button.adjust_qty')},
-          fullBoxLabel: {type: String, value: () => t('button.full_box')},
-          jobCancelLabel: {type: String, value: () => t('button.job_cancel')},
-          jobFinishLabel: {type: String, value: () => t('button.job_complete')},
-          closeDialogLabel: {type: String, value: () => t('button.close')},
+          adjustQtyLabel: { type: String, value: () => t('button.adjust_qty') },
+          fullBoxLabel: { type: String, value: () => t('button.full_box') },
+          jobCancelLabel: { type: String, value: () => t('button.job_cancel') },
+          jobFinishLabel: { type: String, value: () => t('button.job_complete') },
+          closeDialogLabel: { type: String, value: () => t('button.close') },
 
           /**
            * 선택한 작업 정보의 id
@@ -177,7 +184,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       _pickingQtyChanged(pickingQty) {
-        if(pickingQty <= 1) {
+        if (pickingQty <= 1) {
           this.hideAdjustBtn = true;
         } else {
           this.hideAdjustBtn = false;
@@ -229,33 +236,55 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Boolean} isFinished
        */
       _buttonActivate(isFinished) {
-        if(!this.jobType) {
+        if (!this.jobType) {
           throw new Error('jobType is not defiend');
         }
-        if(this.jobType === 'DAS' || this.jobType === 'DAS2') {
-          if(isFinished) {
+
+        if (this.jobType === 'DAS') {
+          if (isFinished) {
             this.showFullBoxBtn = true;
             this.showJobCancelBtn = false;
             this.showJobFinishBtn = false;
             this.showQrCode = false;
             this.hideAdjustBtn = true;
           } else {
+            this.hideAdjustBtn = (!this.pickQty || this.pickQty <= 1);
             this.showFullBoxBtn = true;
             this.showJobCancelBtn = true;
             this.showJobFinishBtn = true;
             this.showQrCode = false;
           }
-        } else if (this.jobType === 'DPS') {
-          if(isFinished){
-            this.showJobFinishBtn = true;
-            this.hideAdjustBtn = true;
-            this.showQrCode = true;
+
+        } else if (this.jobType === 'DAS2') {
+          if (isFinished) {
+            this.showFullBoxBtn = true;
             this.showJobCancelBtn = false;
-          }else{
-            this.hideAdjustBtn = false;
+            this.showJobFinishBtn = false;
+            this.showQrCode = false;
+            this.hideAdjustBtn = true;
+          } else {
+            this.hideAdjustBtn = (!this.pickingQty || this.pickingQty <= 1);
+            this.showFullBoxBtn = true;
+            this.showJobCancelBtn = true;
+            this.showJobFinishBtn = true;
+            this.showQrCode = false;
+          }
+
+        } else if (this.jobType === 'DPS') {
+          if (isFinished) {
+            this.hideAdjustBtn = true;
+            this.showJobCancelBtn = false;
+            this.showJobFinishBtn = false;
+            this.showQrCode = false;
+          } else {
+            this.hideAdjustBtn = (!this.pickQty || this.pickQty <= 1);
+            this.showJobCancelBtn = true;
+            this.showJobFinishBtn = true;
+            this.showQrCode = false;
           }
         }
-        if(JSON.parse(localStorage.getItem('setting.isQps'))){
+
+        if (JSON.parse(localStorage.getItem('setting.isQps'))) {
           this.showJobFinishBtn = true;
           this.hideAdjustBtn = true;
           this.showQrCode = true;

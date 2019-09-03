@@ -128,16 +128,20 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       setCurrentQty(qty) {
+        qty = parseInt(qty);
         const currentQtyInput = this._getCurrentQtyInput();
-        currentQtyInput.value = parseInt(qty);
+        currentQtyInput.value = qty;
         const adjustQtyInput = this._getAdjustQtyInput();
-        adjustQtyInput.setAttribute('max', parseInt(qty) - 1);
+        var maxQty = qty - 1;
+        if(maxQty <= 0) { maxQty = 1; }
+        adjustQtyInput.setAttribute('max', maxQty);
+
         if (this.isNumberUpDown) {
           adjustQtyInput.value = qty;
-          adjustQtyInput.setAttribute('max', parseInt(qty));
+          adjustQtyInput.setAttribute('max', qty);
         } else {
-          adjustQtyInput.value = 1;
-          adjustQtyInput.setAttribute('max', parseInt(qty) - 1);
+          adjustQtyInput.value = qty;
+          adjustQtyInput.setAttribute('max', maxQty);
         }
       }
 
@@ -152,7 +156,7 @@ Copyright © HatioLab Inc. All rights reserved.
       adjustQty() {
         const adjustQty = parseInt(this._getAdjustQtyInput().value);
         const currentQty = parseInt(this._getCurrentQtyInput().value);
-        if(adjustQty > currentQty) {
+        if(adjustQty >= currentQty) {
           openAlert({
             title: t('text.invalid_value'),
             message: t('text.adjust_value_invalid')
