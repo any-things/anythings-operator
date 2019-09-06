@@ -6,7 +6,6 @@ Copyright © HatioLab Inc. All rights reserved.
 <link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
 
 <link rel="import" href="../../../kiosk-libraries.html">
-<link rel="import" href="./kiosk-order-info-detail.html">
 
 <!--
   KIOSK > DPS 작업 화면
@@ -198,7 +197,6 @@ Copyright © HatioLab Inc. All rights reserved.
 
     <!-- 주문 정보 표시를 위한 Ajax -->
     <sys-ajax
-      auto
       id="batch-summary-ajax"
       method="GET"
       content-type="application/json"
@@ -542,7 +540,9 @@ Copyright © HatioLab Inc. All rights reserved.
                 display: t('label.bucket_cd'),
                 fieldname: 'bucket_cd',
                 classCallback: (data) => {
-                  let boxColor = data['mpi_color'].toLowerCase();
+                  let boxColor = data['mpi_color'];
+                  boxColor = boxColor ? boxColor.toLowerCase() : 'n';
+
                   if(boxColor === 'r') {
                     return 'red';
                   } else if (boxColor === 'g') {
@@ -551,6 +551,8 @@ Copyright © HatioLab Inc. All rights reserved.
                     return 'blue';
                   } else if (boxColor === 'y') {
                     return 'yellow'
+                  } else {
+                    return 'gray';
                   }
                 }
               }, {
@@ -592,7 +594,12 @@ Copyright © HatioLab Inc. All rights reserved.
               }]
             }
           },
-          
+
+          /**
+           * 그리드 필드 정보
+           ****************
+           * @type {Array}
+           */
           detailListFields: {
             type: Array,
             value: () => [{
@@ -632,14 +639,9 @@ Copyright © HatioLab Inc. All rights reserved.
         }
       }
 
-      static get listeners() {
-        return {
-          'page-changed-to-kiosk_dps_ord_info' : '_routingChanged'
-        }
-      }
-
       /**
        * ready
+       *******************
        */
       connectedCallback() {
         super.connectedCallback();
@@ -648,25 +650,14 @@ Copyright © HatioLab Inc. All rights reserved.
         var chartAjax = this.$['chart-scene-ajax'];
         chartAjax.curl = location.origin + '/scripts/fragments/mps/kiosk/json/job-progress-chart.json';
 
-        // 2. 새로고침
-        this.enableAutoRefresh = true;
-        this.startAutoRefresh();
-
-        // 3. 페이지 변경 이벤트 핸들러
+        // 2. 페이지 변경 이벤트 핸들러
         document.addEventListener('page-changed', (e) => {
           this._routingChanged(e);
         });
 
-        // 4. 호기 선택 체크
-        if(!MPS_UTIL.getRegionCd()) {
-          MPS_UTIL.showMessage('호기 선택', '호기를 선택하세요');
-        }
-
-        document.addEventListener(`alert-closed-at-${location.hash.replace('#/', '')}`, event => {
-          if(!event.detail.hasCallback) {
-            this._initialSetup();
-          }
-        });
+        // 3. 페이지 리프레쉬
+        this.enableAutoRefresh = true;
+        this.startAutoRefresh();
       }
 
       /**
@@ -685,6 +676,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * 초기 셋업
+       *******************
        */
       _initialSetup() {
         this.$['input-bucket-cd'].select();
@@ -692,21 +684,31 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * 자동 리프레쉬 시작
+       *******************
        */
       startAutoRefresh() {
         if(this.enableAutoRefresh) {
-          this.refresh();
+          try {
+            this.refresh();
+          } catch (e) {
+          }
+        }
+
+        let interval = 20 * 1000;
+        try {
+          interval = MPS_UTIL.getRefreshInterval();
+        } catch (e) {
         }
 
         setTimeout(function() {
           this.startAutoRefresh();
-        }.bind(this), MPS_UTIL.getRefreshInterval());
+        }.bind(this), interval);
       }
 
       /**
        * 데이터 변경 시
        *******************
-       * @param {Object} e
+       * @param {Array} items
        */
       _itemsChanged(items) {
         this._barcodeInputReset();
@@ -715,15 +717,14 @@ Copyright © HatioLab Inc. All rights reserved.
       /**
        * 바코드 인풋 박스 리셋
        *******************
-       * @param {Object} e
        */
       _barcodeInputReset() {
+        var inputBucketCd = this.$['input-bucket-cd'];
         if(this._scannedFlag) {
-          this.$['input-bucket-cd'].value = '';
+          inputBucketCd.value = '';
           this._scannedFlag = false;
         }
-
-        this.$['input-bucket-cd'].focus();
+        inputBucketCd.focus();
       }
 
       /**
@@ -759,7 +760,6 @@ Copyright © HatioLab Inc. All rights reserved.
 
         if(orderDataSet) {
           this.total = orderDataSet.total;
-          this.items = orderDataSet.items ? orderDataSet.items : [];
           this.inputableBuckets = orderDataSet.inputable_buckets;
           this.orderPicking = orderDataSet.order_picking_qty;
           this.orderPicked = orderDataSet.order_picked_qty;
@@ -774,6 +774,8 @@ Copyright © HatioLab Inc. All rights reserved.
             progressRate : this.progressRate,
             gaugeRate : this.gaugeRate
           };
+
+          this.items = orderDataSet.items ? orderDataSet.items : [];
         }
       }
 
@@ -784,19 +786,21 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _onBucketCdScan(event) {
         if (event.key === 'Enter') {
-          var value = event.currentTarget.value;
-          if(/^[bcdfghiBCDFGHI][0-9]{7}$/.exec(value)){
+          var boxCd = event.currentTarget.value;
+
+          if(/^[bcdfghiBCDFGHI][0-9]{7}$/.exec(boxCd)) {
             event.currentTarget.value = '';
-            if(MPS_UTIL.getKioskInputType()=='box'){
-              var boxId = value; 
-              this.inputBox(boxId);
-            }else{
-              var bucketCd = value;
-              this.inputBucket(bucketCd);
+
+            if(MPS_UTIL.getKioskInputType() === 'box') {
+              this.inputBox(boxCd);
+            } else {
+              this.inputBucket(boxCd);
             }
+
             SOUND.playInfoSound();
             this._scannedFlag = true;
-          }else{
+
+          } else {
             document.dispatchEvent(new CustomEvent('show-toast',{
               detail:{
                 type: t('text.box_form_check'),
@@ -815,16 +819,19 @@ Copyright © HatioLab Inc. All rights reserved.
       refresh(event) {
         this._barcodeInputReset();
         var regionCd = MPS_UTIL.getRegionCd();
+
         if(regionCd) {
           var showOrderAjax = this.$['batch-summary-ajax'];
           var url = '/kiosk_process/dps/batch_summary/' + regionCd;
           url = url + '?page=' + this.page + '&limit=' + this.limit;
           showOrderAjax.curl = url;
           showOrderAjax.generateRequest();
+        } else {
+          MPS_UTIL.showMessage(t('title.selecting_region'), t('text.select_region'));
         }
       }
 
-      /**
+     /**
       * mps-list paginator-changed event handler
       * mps-list의 page, limit, total property가 변경 되면 호출 됨
       * event.detail을 통해 현재 리스트의 page, limit을 초기화 하고
@@ -834,7 +841,6 @@ Copyright © HatioLab Inc. All rights reserved.
       _pageChanged(event) {
         this.page = event.detail.page;
         this.limit = event.detail.limit;
-        this.refresh(event);
       }
 
       /**
@@ -856,6 +862,7 @@ Copyright © HatioLab Inc. All rights reserved.
       inputBucket(bucketCd) {
         if(bucketCd && bucketCd.length >= 4) {
           var regionCd = MPS_UTIL.getRegionCd();
+
           if(regionCd) {
             var inputBucketAjax = this.$['input-ajax'];
             var url = '/kiosk_process/dps/input_bucket/' + regionCd + '/' + bucketCd;
@@ -871,12 +878,14 @@ Copyright © HatioLab Inc. All rights reserved.
       /**
        * 박스 투입 트랜잭션
        ******************
-       * @param {String} bucketCd
+       * @param {String} boxId
        */
       inputBox(boxId) {
         if(boxId && boxId.length >= 4) {
           var regionCd = MPS_UTIL.getRegionCd();
+
           if(regionCd) {
+            // 박스 ID의 첫 번째 글자가 박스 타입
             var boxType = boxId.substring(0, 1);
             var inputBucketAjax = this.$['input-ajax'];
             var url = '/kiosk_process/dps/input_box/' + regionCd + '/' + boxId + '/' + boxType;
@@ -891,7 +900,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * 버킷 코드 스캔 에러시
-       * 자동 리프레쉬 되지 않도록 enableAutoRefresh flag false로 초기화
+       * 자동 리프레쉬 되지 않도록 enableAutoRefresh flag를 false로 초기화
        *******************
        * @param {Object} e
        */
