@@ -3,35 +3,34 @@
 Copyright © HatioLab Inc. All rights reserved.
 -->
 
-<link rel="import" href="../../bower_components/polymer/polymer-element.html">
-
+<link rel="import" href="../../bower_components/polymer/polymer-element.html" />
 
 <dom-module id="things-sound">
   <template>
-    <style>
-    </style>
+    <style></style>
 
     <audio id="info" src="[[infoSrc]]"></audio>
     <audio id="error" src="[[errorSrc]]"></audio>
-
   </template>
 
   <script>
     class ThingsSound extends Polymer.Element {
-      static get is() { return 'things-sound'; }
+      static get is() {
+        return "things-sound";
+      }
 
       static get properties() {
         return {
           infoSrc: {
             type: String,
-            computed: '_computeInfoSrc()'
+            computed: "_computeInfoSrc()"
           },
 
           errorSrc: {
             type: String,
-            computed: '_computeErrorSrc()'
+            computed: "_computeErrorSrc()"
           }
-        }
+        };
       }
 
       connectedCallback() {
@@ -41,24 +40,24 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       _computeInfoSrc() {
-        return JSON.parse(localStorage.getItem('setting.srcUrl')) + '/static/audio/beep-01.wav';
+        return "/static/audio/beep-01.wav";
       }
 
       _computeErrorSrc() {
-        return JSON.parse(localStorage.getItem('setting.srcUrl')) + '/static/audio/beep-02.wav';
+        return "/static/audio/beep-02.wav";
       }
 
       playInfoSound() {
         this.$.info.play().catch(() => {
           // do something
-          console.warn('(in promise) DOMException')
+          console.warn("(in promise) DOMException");
         });
       }
 
       playErrorSound() {
         this.$.error.play().catch(() => {
           // do something
-          console.warn('(in promise) DOMException')
+          console.warn("(in promise) DOMException");
         });
       }
     }
