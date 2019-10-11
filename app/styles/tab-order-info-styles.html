@@ -218,6 +218,36 @@ Copyright © HatioLab Inc. All rights reserved.
         background: var(--things-chartcolor-type3);
         background: linear-gradient(to bottom, #e0ac02 0%, #fcd603 100%);
       }
+
+      .bar-chart {
+        display: flex;
+        flex-direction: row;
+        margin-bottom: 15px;
+      }
+
+      .bar-chart .label {
+        width: 6vw;
+        font-size: .7rem;
+        margin: auto 10px auto auto;
+      }
+
+      .bar-chart .bar {
+        display: inline-block;
+        flex: 1;
+        background-color: rgba(0, 0, 0, .2);
+        border-radius: var(--things-default-border-radius);
+      }
+
+      .bar-chart .chart-value {
+        display: inline-block;
+        border-radius: var(--things-default-border-radius);
+        margin: 5px;
+        text-align: right;
+      }
+
+      .bar-chart #progress-bar {
+        background-color: #01c9c6
+      }
     </style>
   </template>
 </dom-module>
