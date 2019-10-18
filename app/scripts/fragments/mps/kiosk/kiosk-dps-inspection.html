@@ -5,7 +5,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
 <link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
 
-<link rel="import" href="../../../kiosk-libraries.html">
+<link rel="import" href="../../../logis/logis-kiosk-libs.html">
 
 <link rel="import" href="./kiosk-inspection-input-count.html">
 
@@ -134,10 +134,10 @@ Copyright © HatioLab Inc. All rights reserved.
         font-size: .8rem;
         text-align: center;
       }
-      mps-auto-popup-input {
+      auto-popup-input {
         display: none
       }
-      mps-list {
+      item-list {
         height: 100%;
       }
     </style>
@@ -206,14 +206,14 @@ Copyright © HatioLab Inc. All rights reserved.
             <span class="label">[[skuBarcdLabel]]</span>
             <input id="sku-barcode" on-keypress="_onBarcodeScan">
             <!-- SKU 정보 조회 시 복수개가 조회된 경우 실행되는 사용자가 고를 수 있는 팝업이 가미된 SKU Input -->
-            <mps-auto-popup-input
+            <auto-popup-input
               id="sku-bcd"
               resource-url="[[getSkuAjaxUrl]]"
               popup-title="[[popupTitleLabel]]"
               button-txt-callback="[[_skuButtonTxtCallback]]"
               allowed-focus-out
               on-item-selected="_onSkuBarcodeScan">
-            </mps-auto-popup-input>
+            </auto-popup-input>
         </div>
 
         <div class="sku-info">
@@ -242,11 +242,11 @@ Copyright © HatioLab Inc. All rights reserved.
       </div>
 
       <div id="bottom-container">
-        <mps-list
+        <item-list
           header="[[header]]"
           data="[[items]]"
           on-configured="_addCompleteClass">
-        </mps-list>
+        </item-list>
         <div class="right-section">
           <div class="radio-section">
               <input type="radio" on-click="_handleInspectionMethodClick" name="chk_info" value="each" checked="checked" id="each">
@@ -1030,7 +1030,7 @@ Copyright © HatioLab Inc. All rights reserved.
       /**
        * 검수 리스트가 configured 될 때 호출 되며
        * diff_qty가 0이면 complete 클래스를 로우에 추가함
-       * mps-list의 header 설정에 의해 결정된 color를 제거함
+       * item-list의 header 설정에 의해 결정된 color를 제거함
        */
       _addCompleteClass(event) {
         let list = event.detail.contentElements;

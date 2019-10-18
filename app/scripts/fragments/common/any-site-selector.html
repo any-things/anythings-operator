@@ -3,12 +3,11 @@
 Copyright © HatioLab Inc. All rights reserved.
 -->
 
-<!-- 
-  통합 로그인 사이트 선택 팝업
- -->
-
 <link rel="import" href="../../../bower_components/polymer/polymer-element.html">
 
+<!--
+  통합 로그인 사이트 선택 팝업
+ -->
 <dom-module id="any-site-selector">
   <template>
     <style include="shared-styles">
@@ -54,7 +53,7 @@ Copyright © HatioLab Inc. All rights reserved.
             type: Array,
             observer: '_renderSiteList'
           },
-          
+
           closeBtnLabel: {
             type: String,
             value: () => { return t('button.close') }
@@ -71,7 +70,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @description siteList가 변경시 콤보 박스를 출력함
        */
       _renderSiteList(siteList) {
-        const siteSelectElement = this._getSiteSelectElement();        
+        const siteSelectElement = this._getSiteSelectElement();
         siteList.forEach(site => {
           const siteOption = new Option(site.brand_name, site.subdomain);
           siteOption.setAttribute('domain-id', site.id);
@@ -115,7 +114,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _getSiteSelectElement() {
         return this.$['site-select'];
-      }      
+      }
     }
 
     customElements.define(AnySiteSelector.is, AnySiteSelector);

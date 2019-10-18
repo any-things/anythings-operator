@@ -1,7 +1,7 @@
 <!-- QPS 단포 -->
 
 <link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
-<link rel="import" href="../../../kiosk-libraries.html">
+<link rel="import" href="../../../logis/logis-kiosk-libs.html">
 <link rel="import" href="./kiosk-sku-selection.html">
 
 <link rel="import" href="../../../../styles/shared-styles.html">
@@ -53,7 +53,7 @@
                 align-self: center;
                 width: 80%;
             }
-            mps-auto-popup-input{
+            auto-popup-input{
                 align-self: center;
                 width: 81.5%;
             }
@@ -103,7 +103,7 @@
             #input-container input{
                 height: 20px;
             }
-            mps-list{
+            item-list{
                 height: 80%;
                 margin: 10px;
             }
@@ -156,12 +156,12 @@
                         <span class="proc"><b>[[boxPicked]]</b></span>
                     </div>
                 </div>
-                <mps-list
-                    id="mps-list"
+                <item-list
+                    id="item-list"
                     header="[[header]]"
                     data="[[items]]"
                     on-configured="_addOrderStatusAttr">
-                </mps-list>
+                </item-list>
             </div>
             <div id="right-container">
                 <div id = "top-container">
@@ -170,7 +170,7 @@
                     <!-- SKU 정보 조회 시 복수개가 조회된 경우 실행되는 사용자가 고를 수 있는 팝업이 가미된 SKU Input -->
 
 
-                    <mps-auto-popup-input
+                    <auto-popup-input
                         hide-keyboard
                         id="sku-code"
                         resource-url="[[getSkuAjaxUrl]]"
@@ -179,7 +179,7 @@
                         allowed-focus-out
                         on-item-selected="skuChange"
                         on-sys-ajax-error="_findSkuError">
-                    </mps-auto-popup-input>
+                    </auto-popup-input>
     
                     <span class="label">[[skuNmLabel]]</span>
                     <input id="sku-name" readonly>

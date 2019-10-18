@@ -4,7 +4,7 @@ Copyright © HatioLab Inc. All rights reserved.
 -->
 
 <link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
-<link rel="import" href="../../../kiosk-libraries.html">
+<link rel="import" href="../../../logis/logis-kiosk-libs.html">
 <link rel="import" href="./kiosk-sku-selection.html">
 
 <!--
@@ -94,7 +94,7 @@ Copyright © HatioLab Inc. All rights reserved.
       #middle-container .label#sku-barcd {
         width: 15vw;
       }
-      #middle-container mps-auto-popup-input {
+      #middle-container auto-popup-input {
         flex: 1;
         margin: auto 10px auto auto;
       }
@@ -260,13 +260,13 @@ Copyright © HatioLab Inc. All rights reserved.
 
         <span class="label">[[skuBarcdLabel]]</span>
 
-        <mps-auto-popup-input
+        <auto-popup-input
           id="sku-barcode"
           popup-title="[[popupTitleLabel]]"
           button-txt-callback="[[_skuButtonTxtCallback]]"
           on-before-request="_customAjaxHandler"
           on-item-selected="itemSelected">
-        </mps-auto-popup-input>
+        </auto-popup-input>
 
         <span class="label">[[unfinishedLabel]]</span>
         <input type="checkbox" id="unfinished-only">
@@ -278,7 +278,7 @@ Copyright © HatioLab Inc. All rights reserved.
       </div>
 
       <!-- 투입 리스트 -->
-      <mps-list
+      <item-list
         header="[[header]]"
         page="[[page]]"
         total="[[total]]"
@@ -287,7 +287,7 @@ Copyright © HatioLab Inc. All rights reserved.
         on-data-list-click="showDetailList"
         show-paginator
         on-paginator-changed="_pageChanged">
-      </mps-list>
+      </item-list>
     </div>
   </template>
 
@@ -807,8 +807,8 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * @description mps-list paginator-changed event handler
-       * mps-list의 page, limit, total property가 변경 되면 호출 됨
+       * @description item-list paginator-changed event handler
+       * item-list의 page, limit, total property가 변경 되면 호출 됨
        * event.detail을 통해 현재 리스트의 page, limit을 초기화 하고
        * batch summary 조회를 요청
        ***********************
@@ -952,7 +952,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * @description mps-auto-popup-input before-request event handler
+       * @description auto-popup-input before-request event handler
        ***********************
        * @param {Object} event
        */

@@ -5,7 +5,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
 <link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
 
-<link rel="import" href="../../../pda-libraries.html">
+<link rel="import" href="../../../logis/logis-pda-libs.html">
 
 <!--
   PDA > 호기별 상품 정보
@@ -25,7 +25,7 @@ Copyright © HatioLab Inc. All rights reserved.
         flex: 1;
         flex-direction: column;
       }
-      mps-list {
+      item-list {
         flex: 1;
       }
       #button-container {
@@ -46,13 +46,13 @@ Copyright © HatioLab Inc. All rights reserved.
 
     <div id="container">
       <!-- 호기별 투입 상품 투입 리스트 표시 영역 -->
-      <mps-list
+      <item-list
         id="sku-list"
         header="[[header]]"
         data="[[items]]"
         on-configured="_addCompleteAttribute"
         on-data-list-click="_skuSelected">
-      </mps-list>
+      </item-list>
 
       <!-- 버튼 표시 영역 -->
       <div id="button-container">

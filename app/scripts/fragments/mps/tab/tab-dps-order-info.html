@@ -5,7 +5,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
 <link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
 
-<link rel="import" href="../../../tablet-libraries.html">
+<link rel="import" href="../../../logis/logis-tablet-libs.html">
 <link rel="import" href="./tab-order-info-detail.html">
 <link rel="import" href="./tab-bluetooth-scanner-selector.html">
 
@@ -75,7 +75,7 @@ Copyright © HatioLab Inc. All rights reserved.
         flex-direction: column;
       }
 
-      mps-auto-popup-input {
+      auto-popup-input {
         display: none;
       }
     </style>
@@ -146,9 +146,9 @@ Copyright © HatioLab Inc. All rights reserved.
         <span class="prodname">[[orderId]]</span>
       </div>
       <!-- SKU 정보 조회 시 복수개가 조회된 경우 실행되는 사용자가 고를 수 있는 팝업이 가미된 SKU Input -->
-      <mps-auto-popup-input id="sku-barcd" resource-url="[[getSkuAjaxUrl]]" popup-title="[[popupTitleLabel]]"
+      <auto-popup-input id="sku-barcd" resource-url="[[getSkuAjaxUrl]]" popup-title="[[popupTitleLabel]]"
         button-txt-callback="[[_skuButtonTxtCallback]]" on-item-selected="skuSelected">
-      </mps-auto-popup-input>
+      </auto-popup-input>
       <!-- 개발 모드일때만 인풋 박스 표시 -->
       <dom-if if="[[isDevMode]]">
         <template>
@@ -178,26 +178,26 @@ Copyright © HatioLab Inc. All rights reserved.
           <div id="left-section">
             <button class="list-header-btn" disabled>[[frontBtnLabel]]</button>
 
-            <mps-list id="front-list" hide-header header="[[header]]" data="[[frontDetailList]]"
+            <item-list id="front-list" hide-header header="[[header]]" data="[[frontDetailList]]"
               on-data-list-click="showProcessPopup" on-configured="_addOrderStatusAttr">
-            </mps-list>
+            </item-list>
           </div>
         </template>
       </dom-if>
 
-      <mps-job-indicator id="dps-job-indicator" job-type="[[jobType]]" selected-input="{{selectedInput}}"
+      <job-progress-bar id="dps-job-indicator" job-type="[[jobType]]" selected-input="{{selectedInput}}"
         on-item-selected="_selectedInputChanged" on-item-selected-by-click="_selectedInputChanged"
         input-list="[[inputList]]" on-configured="_addJobStatusAttr">
-      </mps-job-indicator>
+      </job-progress-bar>
 
       <dom-if if="[[showRear]]">
         <template>
           <div id="right-section">
             <button class="list-header-btn" disabled>[[rearBtnLabel]]</button>
 
-            <mps-list id="rear-list" hide-header header="[[header]]" data="[[rearDetailList]]"
+            <item-list id="rear-list" hide-header header="[[header]]" data="[[rearDetailList]]"
               on-data-list-click="showProcessPopup" on-configured="_addOrderStatusAttr">
-            </mps-list>
+            </item-list>
           </div>
         </template>
       </dom-if>
@@ -207,18 +207,18 @@ Copyright © HatioLab Inc. All rights reserved.
           <div id="total-section">
             <button class="list-header-btn" disabled>[[totalBtnLabel]]</button>
 
-            <mps-list id="total-list" hide-header header="[[header]]" data="[[totalDetailList]]"
+            <item-list id="total-list" hide-header header="[[header]]" data="[[totalDetailList]]"
               on-data-list-click="showProcessPopup" on-configured="_addOrderStatusAttr">
-            </mps-list>
+            </item-list>
           </div>
         </template>
       </dom-if>
     </div>
 
-    <!-- <mps-job-indicator id="dps-job-indicator" job-type="[[jobType]]" selected-input="{{selectedInput}}"
+    <!-- <job-progress-bar id="dps-job-indicator" job-type="[[jobType]]" selected-input="{{selectedInput}}"
       on-item-selected="_selectedInputChanged" on-item-selected-by-click="_selectedInputChanged"
       input-list="[[inputList]]" on-configured="_addJobStatusAttr">
-    </mps-job-indicator> -->
+    </job-progress-bar> -->
   </template>
 
   <script>
@@ -855,7 +855,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {String} searchItem decoration라인추가할 아이템
        */
       drawDecoLine(searchItem) {
-        var mpsList = this.$['content'].getElementsByTagName('mps-list');
+        var mpsList = this.$['content'].getElementsByTagName('item-list');
         var allRows = [];
         allRows = allRows.concat(mpsList[0].getRows(), mpsList[1].getRows())
         allRows.forEach(row => {
@@ -891,7 +891,7 @@ Copyright © HatioLab Inc. All rights reserved.
       _inspWithPickError(event) {
         this.mpiCd = 'NaN';
         var allRows = [];
-        var mpsList = this.$['content'].getElementsByTagName('mps-list');
+        var mpsList = this.$['content'].getElementsByTagName('item-list');
         allRows = allRows.concat(mpsList[0].getRows(), mpsList[1].getRows())
         allRows.forEach(row => {
           row.classList.remove('underline');

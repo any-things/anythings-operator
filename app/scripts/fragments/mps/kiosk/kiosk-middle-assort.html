@@ -5,7 +5,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
 <link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
 <link rel="import" href="./kiosk-sku-selection.html">
-<link rel="import" href="../../../kiosk-libraries.html">
+<link rel="import" href="../../../logis/logis-kiosk-libs.html">
 
 <!--
   KIOSK 중분류 화면
@@ -168,7 +168,7 @@ Copyright © HatioLab Inc. All rights reserved.
           </div>
         </div>
 
-        <mps-selector
+        <item-selector
           info-column-cnt="[[selectorInfoFields.length]]"
           value-fields="[[selectorValueFields]]"
           info-fields="[[selectorInfoFields]]"
@@ -176,7 +176,7 @@ Copyright © HatioLab Inc. All rights reserved.
           resource-url="[[selectorResourceUrl]]"
           params="[[selectorParams]]"
           on-value-changed="_batchCodeChanged">
-        </mps-selector>
+        </item-selector>
 
         <div id="summary-container">
           <span>Total: [[totalPcsQty]]</span>
@@ -190,14 +190,14 @@ Copyright © HatioLab Inc. All rights reserved.
         <div class="input-container">
           <span class="label">[[skuBarcdLabel]]</span>
 
-          <mps-auto-popup-input
+          <auto-popup-input
             id="sku-barcode"
             popup-title="[[popupTitleLabel]]"
             button-txt-callback="[[_skuButtonTxtCallback]]"
             on-before-request="_customAjaxHandler"
             on-item-selected="itemSelected"
             max-length=13>
-          </mps-auto-popup-input>
+          </auto-popup-input>
         </div>
         <div class="input-container">
           <span class="label">[[skuNmLabel]]</span>
@@ -512,7 +512,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * mps-auto-popup-input before-request event handler
+       * auto-popup-input before-request event handler
        ***********************
        * @param {Object} event
        */

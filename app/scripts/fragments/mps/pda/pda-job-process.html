@@ -5,7 +5,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
 <link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
 
-<link rel="import" href="../../../pda-libraries.html">
+<link rel="import" href="../../../logis/logis-pda-libs.html">
 
 <link rel="import" href="../../../mixins/mps/mps-message-subscribe-mixin.html">
 
@@ -49,7 +49,7 @@ Copyright © HatioLab Inc. All rights reserved.
         min-width: 25%;
         text-align: right;
       }
-      .input-row input, mps-auto-popup-input {
+      .input-row input, auto-popup-input {
         width: 75%;
       }
       #button-container {
@@ -67,7 +67,7 @@ Copyright © HatioLab Inc. All rights reserved.
         min-width: auto !important;
         margin: auto;
       }
-      mps-list{
+      item-list{
         flex: 1;
       }
       #total-qty {
@@ -139,7 +139,7 @@ Copyright © HatioLab Inc. All rights reserved.
           <span class="label">[[skuBarcdLabel]]</span>
 
           <!-- SKU 정보 조회 시 복수개가 조회된 경우 실행되는 사용자가 고를 수 있는 팝업이 가미된 SKU Input -->
-          <mps-auto-popup-input
+          <auto-popup-input
             hide-keyboard
             id="sku-barcd"
             resource-url="[[getSkuAjaxUrl]]"
@@ -147,7 +147,7 @@ Copyright © HatioLab Inc. All rights reserved.
             button-txt-callback="[[_skuButtonTxtCallback]]"
             on-item-selected="inputSku"
             max-length=13>
-          </mps-auto-popup-input>
+          </auto-popup-input>
         </div>
 
         <!-- 상품 바코드 표시 컴포넌트 행 -->
@@ -171,13 +171,13 @@ Copyright © HatioLab Inc. All rights reserved.
       </div>
 
       <!-- 작업 리스트 표시를 위한 컴포넌트 -->
-      <mps-list
+      <item-list
         id='job-list'
         header="[[header]]"
         data="[[items]]"
         on-data-list-click="_showProcessPopup"
         on-configured="_addAttributeByStatus">
-      </mps-list>
+      </item-list>
 
       <!-- 총 수량 표시를 위한 컴포넌트 -->
       <div id="total-qty">
@@ -485,7 +485,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * @description mps-list configured event handler
+       * @description item-list configured event handler
        * 리스트의 내용을 모두 그리고 난 뒤 호출 되며
        * status의 값에 따라 각 row에 적절한 class를 추가함
        * 리스트 아래에 나타나는 총 수량을 계산함

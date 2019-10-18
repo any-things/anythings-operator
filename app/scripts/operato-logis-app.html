@@ -155,7 +155,7 @@ Copyright © HatioLab Inc. All rights reserved.
       on-iron-localstorage-load-empty="_checkDeviceType">
     </iron-localstorage>
 
-    <mps-view-loader></mps-view-loader>
+    <logis-view-loader></logis-view-loader>
 
     <sys-route
       id="routing"
@@ -169,24 +169,24 @@ Copyright © HatioLab Inc. All rights reserved.
       on-log-out="_handleLogOut">
     </sys-logout>
 
-    <mps-locale
+    <common-locale
       resources="{{resources}}"
       language="{{language}}">
-    </mps-locale>
+    </common-locale>
 
-    <mps-dialog id="mps-dialog"></mps-dialog>
+    <common-dialog id="common-dialog"></common-dialog>
     <msg-alert id="msg-alert"></msg-alert>
-    <mps-toast-msg id="mps-toast-msg"></mps-toast-msg>
+    <toast-msg id="toast-msg"></toast-msg>
 
     <app-drawer-layout id="drawer-layout" fullbleed force-narrow narrow="{{narrow}}" responsive-width="1000px">
-      <mps-spinner></mps-spinner>
-      <mps-message-spinner></mps-message-spinner>
+      <circle-spinner></circle-spinner>
+      <msg-spinner></msg-spinner>
       <!-- Drawer content -->
       <app-drawer id="appDrawer" opened="{{drawerOpened}}" slot="drawer" swipe-open>
         <!--app-toolbar>SIDEBAR HEADER</app-toolbar-->
 
         <template is="dom-if" if="[[!isKIOSK]]">
-          <mps-menu-tiles route="{{route}}" device-type="[[deviceType]]"></mps-menu-tiles>
+          <menu-tiles route="{{route}}" device-type="[[deviceType]]"></menu-tiles>
         </template>
       </app-drawer>
 
@@ -319,7 +319,7 @@ Copyright © HatioLab Inc. All rights reserved.
   </template>
 
   <script>
-    class AnythingsOperatorApp extends Polymer.Element {
+    class OperatoLogisApp extends Polymer.Element {
       static get is() { return 'operato-logis-app'; }
 
       static get properties() {
@@ -390,24 +390,29 @@ Copyright © HatioLab Inc. All rights reserved.
             type: Boolean,
             value: () => CONST.IS_DEV_MODE
           },
+
           /**
            * deviceType이 TABLET일 때 화면 핸들링을 위한 flag
            */
           isTABLET: Boolean,
+
           /**
            * deviceType이 PDA일 때 화면 핸들링을 위한 flag
            */
           isPDA: Boolean,
+
           /**
            * deviceType이 KIOSK일 때 화면 핸들링을 위한 flag
            */
           isKIOSK: Boolean,
+
           /**
            * 로그인 여부를 확인하기 위한 flag
            */
           isNotLogin: {
             type: Boolean
           },
+
           /**
            * KIOSK 환경에서 QR 코드 버튼이 활성화 되어 있는지 여부를 확인하기 위한 flag
            */
@@ -425,6 +430,7 @@ Copyright © HatioLab Inc. All rights reserved.
           }
         }
       }
+
       /**
        * sys-ajax에서 발생시키는 sys-unauthorized-session event handler 등록
        * mobile 환경에서 fix할 innerHeight 초기화
@@ -498,6 +504,7 @@ Copyright © HatioLab Inc. All rights reserved.
         if(!deviceType) {
           return;
         }
+
         this.isPDA = this.isTABLET = this.isKIOSK = false;
 
         switch(deviceType) {
@@ -610,11 +617,13 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _sessionResponsed(event) {
         document.dispatchEvent(new CustomEvent('session-responsed', event));
-        if(this.jobName = 'QPS'){
+
+        if(this.jobName = 'QPS') {
           this.currentSite = event.detail.domain.brandName;
-        }else{
+        } else {
           this.currentSite = event.detail.domain.name;
         }
+
         this.showLogoutBtn(true);
         this._setupIcons(this.deviceType);
         this.checkSetting();
@@ -702,6 +711,7 @@ Copyright © HatioLab Inc. All rights reserved.
             confirmCallback: this.toLogin.bind(this)
           });
         }
+
         this.isNotLogin = true;
       }
 
@@ -712,6 +722,7 @@ Copyright © HatioLab Inc. All rights reserved.
       _handleUnauthorized(e) {
         this.isNotLogin = true;
         let route = location.hash.replace('#/', '');
+
         if(route === 'login' || route === 'setting') {
           // do nothing
         } else {
@@ -772,7 +783,6 @@ Copyright © HatioLab Inc. All rights reserved.
             sysLogout.logout();
           }
         })
-        // this.$['sys-logout'].logout();
       }
 
       /**
@@ -948,7 +958,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * MPS 설정 화면으로 이동
+       * 물류 설정 화면으로 이동
        */
       toSetting() {
         this.route = { prefix: '/', path: 'logis_setting', title: t('menu.Settings') };
@@ -1044,6 +1054,6 @@ Copyright © HatioLab Inc. All rights reserved.
       }
     }
 
-    window.customElements.define(AnythingsOperatorApp.is, AnythingsOperatorApp);
+    window.customElements.define(OperatoLogisApp.is, OperatoLogisApp);
   </script>
 </dom-module>

@@ -1,0 +1,161 @@
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+
+<link rel="import" href="../../../bower_components/polymer/polymer-element.html">
+
+<link rel="import" href="../../mixins/common/common-popup-mixin.html">
+
+<!--
+  공통 다이얼로그
+-->
+<dom-module id="common-dialog">
+  <template>
+    <style include="shared-styles">
+      #modal {
+        display: none;
+        position: fixed;
+        z-index: 4;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, .5);
+      }
+      #dialog {
+        display: flex;
+        flex-direction: column;
+        margin: auto;
+        border-radius:var(--things-default-border-radius);
+        border:3px solid rgba(0,0,0,.3);
+        overflow:hidden;
+        max-width: 80vw;
+        max-height: 80vh;
+      }
+      #title {
+        background-color: #5a6378;
+        padding:5px 15px 2px 15px;
+        color:#fff;
+        font-size:.8rem
+      }
+      #container {
+        display: flex;
+        flex: 1;
+        overflow-y: auto;
+        background-color:#fff;
+        margin: auto;
+        width: 100%;
+        height: 100%;
+      }
+      button {
+        font-size: .7rem;
+      }
+    </style>
+
+    <div id="modal" on-click="onModalClick">
+      <div id="dialog">
+        <div id="title">
+          <span>[[title]]</span>
+        </div>
+        <div id="container" dialog></div>
+      </div>
+    </div>
+  </template>
+
+  <script>
+    class CommonDialog extends CommonPopupMixin(Polymer.Element) {
+      static get is() { return 'common-dialog' }
+
+      static get properties() {
+        return {
+          basicWidth: {
+            type: String,
+            value: '80%'
+          },
+
+          basicHeight: {
+            type: String,
+            value: '80%'
+          }
+        }
+      }
+
+      connectedCallback() {
+        super.connectedCallback();
+        document.addEventListener('open-dialog', event => {
+          this.closeByModalClick = event.detail.closeByModalClick;
+          let content = event.detail.content;
+          let title = event.detail.title ? event.detail.title : '';
+          let width = event.detail.width ? event.detail.width : this.basicWidth;
+          let height = event.detail.height ? event.detail.height : this.basicHeight;
+          let openCallback = event.detail.openCallback ? event.detail.openCallback : null;
+          let closeCallback = event.detail.closeCallback ? event.detail.closeCallback : null;
+
+          this.openDialog(content, title, width, height, openCallback, closeCallback);
+        });
+
+        document.addEventListener('open-form-list-dialog', event => {
+          const options = event.detail;
+          this.openFormListPopup(options);
+        });
+
+        document.addEventListener('close-dialog', event => {
+          this.closeDialog(event.detail);
+        });
+      }
+
+      openDialog(content, title, width, height, openCallback, closeCallback) {
+        this.title = title;
+        if(!this.title) { // 타이틀이 없다면 title section을 hidden 처리
+          this.$['title'].hidden = true;
+        } else {
+          this.$['title'].hidden = false;
+        }
+        const container = this.$['container'];
+        const dialog = this.$['dialog'];
+        const modal = this.$['modal'];
+        this.removeContent(container);
+        container.appendChild(content);
+        dialog.style.width = width === 'fit' ? '' : width; // 길이 값을 fit으로 주면 다이얼로그 내부의 화면 넓이를 다이얼로그에 적용함
+        dialog.style.height = height === 'fit' ? '' : width; // 높이 값을 fit으로 주면 다이얼로그 내부의 화면 높이를 다이얼로그에 적용함
+        modal.style.display = 'flex';
+
+        document.dispatchEvent(new CustomEvent('dialog-opened', {
+          detail: {
+            content: content
+          }
+        }));
+
+        if(openCallback && typeof openCallback === 'function') openCallback();
+        if(closeCallback) this.closeCallback = closeCallback;
+      }
+
+      closeDialog(closeParam) {
+        const container = this.$['container'];
+        const modal = this.$['modal'];
+        this.removeContent(container);
+        modal.style.display = 'none';
+
+        if(this.closeCallback && typeof this.closeCallback === 'function') {
+          this.closeCallback(closeParam);
+          this.closeCallback = null;
+        }
+      }
+
+      removeContent(container) {
+        while(container.children.length) {
+          container.removeChild(container.firstChild);
+        }
+      }
+
+      onModalClick() {
+        if(this.closeByModalClick) {
+          this.closeDialog();
+        }
+      }
+    }
+
+    customElements.define(CommonDialog.is, CommonDialog);
+  </script>
+</dom-module>

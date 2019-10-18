@@ -1,0 +1,145 @@
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+
+<link rel="import" href="../../../bower_components/polymer/polymer-element.html">
+
+<!--
+  총 예정 / 총 확정 수량 표시를 위한 컴포넌트
+-->
+<dom-module id="plan-actual-display">
+  <template>
+    <style>
+      :host {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        /* margin-top: 5px; */
+        column-gap: 0px;
+        background-color: rgba(204, 5, 5, 0.2);
+        /* border-radius: var(--things-default-border-radius); */
+        font-size: .8rem;
+        padding: 5px 5px 5px 5px
+      }
+
+      span.qty {
+        /* margin: auto !important; */
+        float: right;
+      }
+
+      .item {
+        padding: 0px 10px 0px 10px;
+        border: dashed 1px rgba(204, 5, 225, 0.2);
+      }
+    </style>
+
+    <div class="item" style="padding: 0px 5px 0px 0px">
+      <span>[[labelCustCnt]]</span>
+      <span class="qty">[[custCdQty]]</span>
+    </div>
+
+    <div class="item" style="padding: 0px 0px 0px 5px">
+      <dom-if if="[[!isOneQty]]">
+        <template>
+          <span>[[labelPickedQty]]/[[labelPickQty]]</span>
+          <span class="qty">[[pickedQty]] / [[pickQty]]</span>
+        </template>
+      </dom-if>
+
+      <dom-if if="[[isOneQty]]">
+        <template>
+          <span>[[labelPickedQty]]</span>
+          <span class="qty">[[pickedQty]]</span>
+        </template>
+      </dom-if>
+    </div>
+  </template>
+
+  <script>
+    class PlanActualDisplay extends Polymer.Element {
+      static get is() { return 'plan-actual-display' }
+      static get properties() {
+        return {
+          data: {
+            type: Object,
+            observer: '_dataChanged'
+          },
+
+          skuCd: {
+            type: String,
+            observer: '_skuCdChanged'
+          },
+
+          labelCustCnt: {
+            value: () => { return t('label.cust_cnt'); }
+          },
+
+          labelPickedQty: {
+            value: () => { return t('label.picked_qty'); }
+          },
+
+          labelPickQty: {
+            value: () => { return t('label.pick_qty'); }
+          },
+
+          isOneQty: {
+            type: Boolean,
+            value: false
+          },
+
+          custCdQty: {
+            type: Number,
+            value: 0
+          },
+
+          pickedQty: {
+            type: String,
+            value: '0-0'
+          },
+
+          pickQty: {
+            type: String,
+            value: '0-0'
+          },
+
+          lastResponse: {
+            type: Object,
+            observer: '_lastResponseChanged'
+          }
+        }
+      }
+
+      /**
+       * 컴퍼넌트 로드 완료 후
+       * window 객체에 openAlert, openConfirm 등록
+       */
+      connectedCallback() {
+        super.connectedCallback();
+      }
+
+      _skuCdChanged(skuCd) {
+        if (!skuCd) {
+          this._reset();
+        }
+      }
+
+      _dataChanged(data) {
+        Object.assign(this, data);
+      }
+
+      _lastResponseChanged(lastResponse) {
+        if (!lastResponse) {
+          this._reset();
+        }
+      }
+
+      _reset() {
+        this.pickQty = 0;
+        this.pickedQty = 0;
+        this.custCd = 0;
+      }
+    }
+
+    customElements.define(PlanActualDisplay.is, PlanActualDisplay);
+  </script>
+</dom-module>

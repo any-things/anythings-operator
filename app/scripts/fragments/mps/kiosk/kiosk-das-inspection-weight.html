@@ -5,7 +5,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
 <link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
 
-<link rel="import" href="../../../kiosk-libraries.html">
+<link rel="import" href="../../../logis/logis-kiosk-libs.html">
 
 <!--
   KIOSK > DAS 중량 검수 화면
@@ -182,7 +182,7 @@ Copyright © HatioLab Inc. All rights reserved.
       button:active {
         @apply --operator-default-btn-active;
       }
-      mps-list {
+      item-list {
         margin-top: 15px;
       }
     </style>
@@ -279,10 +279,10 @@ Copyright © HatioLab Inc. All rights reserved.
           </div>
         </div>
 
-        <mps-list
+        <item-list
           header="[[header]]"
           data="[[items]]">
-        </mps-list>
+        </item-list>
 
         <div class="bottom-button-container">
           <button id="reset-btn" on-click="_reset">

@@ -1,0 +1,202 @@
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+
+<link rel='import' href='../../bower_components/polymer/polymer-element.html'>
+
+<!--
+  물류 > 화면 로더
+-->
+<dom-module id='logis-view-loader'>
+  <script>
+    class LogisViewLoader extends Polymer.Element {
+      static get is() { return 'logis-view-loader' }
+
+      static get properties() {
+        return {
+          commonElements: {
+            type: Array,
+            value: () => [{
+              src: './scripts/components/sys/sys-route.html'
+            }, {
+              src: './scripts/fragments/sys/sys-setting.html'
+            }, {
+              src: './scripts/fragments/common/any-home.html'
+            }, {
+              src: './scripts/fragments/common/any-login.html'
+            }, {
+              src: './scripts/fragments/logis/logis-setting.html'
+            }, {
+              src: './scripts/fragments/mps/kiosk/kiosk-code-popup.html'
+            }]
+          },
+
+          viewElements: {
+            type: Array,
+            value: () => [{
+              route: 'home',
+              src: './scripts/fragments/common/any-home.html'
+            }, {
+              route: 'tab_das_ord_info',
+              src: './scripts/fragments/mps/tab/tab-das-order-info.html'
+            }, {
+              route: 'tab_das2_ord_info',
+              src: './scripts/fragments/mps/tab/tab-das2-order-info.html'
+            }, {
+              route: 'tab_dps_ord_info',
+              src: './scripts/fragments/mps/tab/tab-dps-order-info.html'
+            }, {
+              route: 'tab_das_ord_list',
+              src: './scripts/fragments/mps/tab/tab-das-order-list.html'
+            }, {
+              route: 'pda_loc_stock_lookup',
+              src: './scripts/fragments/mps/pda/pda-loc-stock-lookup.html'
+            }, {
+              route: 'pda_stock_load',
+              src: './scripts/fragments/mps/pda/pda-stock-load.html'
+            }, {
+              route: 'pda_stock_load_fixed',
+              src: './scripts/fragments/mps/pda/pda-stock-load-fixed.html'
+            }, {
+              route: 'pda_region_sku_info',
+              src: './scripts/fragments/mps/pda/pda-region-sku-info.html'
+            }, {
+              route: 'pda_job_process',
+              src: './scripts/fragments/mps/pda/pda-job-process.html'
+            }, {
+              route: 'pda_das2_process',
+              src: './scripts/fragments/mps/pda/pda-das2-process.html'
+            }, {
+              route: 'pda_dps2_process',
+              src: './scripts/fragments/mps/pda/pda-dps2-process.html'
+            }, {
+              route: 'pda_rtn_process',
+              src: './scripts/fragments/mps/pda/pda-rtn-process.html'
+            }, {
+              route: 'pda_rtn_inspection',
+              src: './scripts/fragments/mps/pda/pda-rtn-inspection.html'
+            }, {
+              route: 'pda_bucket_assign',
+              src: './scripts/fragments/mps/pda/pda-bucket-assign.html'
+            }, {
+              route: 'pda_one_sku_order',
+              src: './scripts/fragments/mps/pda/pda-one-sku-order.html'
+            }, {
+              route: 'kiosk_das_ord_info',
+              src: './scripts/fragments/mps/kiosk/kiosk-das-order-info.html'
+            }, {
+              route: 'kiosk_dps_ord_info',
+              src: './scripts/fragments/mps/kiosk/kiosk-dps-order-info.html'
+            }, {
+              route: 'kiosk_middle_assort',
+              src: './scripts/fragments/mps/kiosk/kiosk-middle-assort.html'
+            }, {
+              route: 'kiosk_middle_assort_weight',
+              src: './scripts/fragments/mps/kiosk/kiosk-middle-assort-weight.html'
+            }, {
+              route: 'kiosk_middle_assort_rtn',
+              src: './scripts/fragments/mps/kiosk/kiosk-middle-assort-rtn.html'
+            }, {
+              route: 'kiosk_dps_inspection',
+              src: './scripts/fragments/mps/kiosk/kiosk-dps-inspection.html'
+            }, {
+              route: 'kiosk_das_inspection',
+              src: './scripts/fragments/mps/kiosk/kiosk-das-inspection.html'
+            }, {
+              route: 'kiosk_das_inspection_weight',
+              src: './scripts/fragments/mps/kiosk/kiosk-das-inspection-weight.html'
+            }, {
+              route: 'kiosk_single_handling',
+              src: './scripts/fragments/mps/kiosk/kiosk-single-handling.html'
+            },{
+              route: 'kiosk_packing_check',
+              src: './scripts/fragments/mps/kiosk/kiosk-packing-check.html'
+            },{
+              route: 'kiosk_packing_popup',
+              src: './scripts/fragments/mps/kiosk/kiosk-packing-popup.html'
+            },{
+              route: 'mps_label_re_issue',
+              src: './scripts/fragments/mps/mps-label-re-issue.html'
+            }, {
+              route: 'mps_region_input_list',
+              src: './scripts/fragments/mps/mps-region-input-list.html'
+            }, {
+              route: 'mps_box_assign',
+              src: './scripts/fragments/mps/mps-box-assign.html'
+            }, {
+              route: 'mps_box_list',
+              src: './scripts/fragments/mps/mps-box-list.html'
+            }, {
+              route: 'mps_picking_list',
+              src: './scripts/fragments/mps/mps-picking-list.html'
+            }, {
+              route: 'mps_picked_by_location',
+              src: './scripts/fragments/mps/mps-picked-by-location.html'
+            }, {
+              route: 'pda_rtn_fullbox',
+              src: './scripts/fragments/mps/pda/pda-rtn-fullbox.html'
+            }]
+          }
+        }
+      }
+
+      connectedCallback() {
+        super.connectedCallback();
+
+        // 공통 컴퍼넌트 로드
+        this.loadViews(this.commonElements);
+
+        // 페이지 변경 이벤트 리스너 등록
+        document.addEventListener('page-changed', event => {
+          let targetElement = [];
+          let targetIndex;
+
+          this.viewElements.forEach((element, index) => {
+            // viewElements 중 현재 라우팅의 src를 찾아서
+            // targetElement와 targetIndex를 초기화
+            if(element.route === event.detail.currentPage) {
+              targetIndex = index;
+              targetElement.push(element);
+            }
+          });
+
+          // 임포트 대상 엘리먼트가 있다면
+          if(targetElement && targetElement.length > 0) {
+            // 대상 엘리먼트를 임포트
+            this.loadViews(targetElement);
+            // viewElements리스트에서 임포트 엘리먼트를 제거
+            this.viewElements.splice(targetIndex, 1);
+          }
+        });
+      }
+
+      /**
+       * 전달받은 elements.src의 경로를 통해 element를 임포트
+       */
+      loadViews(elements) {
+        elements.forEach(element => {
+
+          /**
+           * @description 개발 / 프로덕션 모드에 따라 컴퍼넌트 임포트 방식을 변경함
+           * 1. 개발 모드일 경우
+           *    1) 모든 컴퍼넌트를 로컬에서 찾아 임포트 함
+           *
+           * 2. 프로덕션 모드일 경우
+           *    1) CONST.SRC_URL을 통해 컴퍼넌트를 임포트 함
+           */
+          if(!CONST.IS_DEV_MODE) {
+            const srcUrl = JSON.parse(localStorage.getItem('setting.srcUrl'));
+            element.src = element.src.replace('./', `${srcUrl}/`);
+          }
+
+          Polymer.importHref(element.src, null, error => {
+            throw `Failed to view importing. Error: ${error}`;
+          }, true);
+        })
+      }
+    }
+
+    customElements.define(LogisViewLoader.is, LogisViewLoader);
+  </script>
+</dom-module>

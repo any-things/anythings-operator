@@ -5,16 +5,16 @@ Copyright © HatioLab Inc. All rights reserved.
 
 <link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
 
-<link rel="import" href="../../../pda-libraries.html">
+<link rel="import" href="../../../logis/logis-pda-libs.html">
 <link rel="import" href="../mps-adjust-qty-dialog.html">
 
 <link rel="import" href="../../../mixins/mps/mps-message-subscribe-mixin.html">
-<link rel="import" href="../../../units/mps/mps-inspect-box.html">
-<link rel="import" href="../../../units/mps/mps-barcode-field.html">
-<link rel="import" href="../../../units/mps/job-process-summary.html">
-<link rel="import" href="../../../units/mps/mps-order-list.html">
-<link rel="import" href="../../../units/mps/mps-box-inspect-mpi-on-off.html">
-<link rel="import" href="../../../units/mps/mps-box-assign-popup.html">
+<link rel="import" href="../../../components/logis/box-process-checker.html">
+<link rel="import" href="../../../components/common/barcode-field.html">
+<link rel="import" href="../../../components/logis/plan-actual-display.html">
+<link rel="import" href="../../../components/logis/job-list.html">
+<link rel="import" href="../../../components/logis/indicator-inspector.html">
+<link rel="import" href="../../../components/logis/cell-box-mapper-popup.html">
 
 <!--
   PDA > DPS 2차 분류 작업 처리 화면
@@ -61,11 +61,11 @@ Copyright © HatioLab Inc. All rights reserved.
         min-width: 25%;
         text-align: right;
       }
-      .input-row input, mps-auto-popup-input {
+      .input-row input, auto-popup-input {
         width: 75%;
       }
 
-      mps-list{
+      item-list{
         flex: 1;
       }
       #total-qty {
@@ -166,10 +166,10 @@ Copyright © HatioLab Inc. All rights reserved.
 
       <div id="input-container">
         <!-- 상품 코드 혹은 상품 바코드 입력 컴포넌트 행 -->
-        <mps-barcode-field id="input" timeout="2000" value="{{skuBarCd}}"
+        <barcode-field id="input" timeout="2000" value="{{skuBarCd}}"
           button-text-callback="[[_skuButtonTextCallback]]" selected-item="{{findSkuResponse}}"
           on-keypress="_handleBarcodeKeypress">
-        </mps-barcode-field>
+        </barcode-field>
 
         <!-- 상품 코드 표시 컴포넌트 행 -->
         <div class="input-row">
@@ -191,19 +191,19 @@ Copyright © HatioLab Inc. All rights reserved.
       </div>
 
       <!-- 작업 리스트 표시를 위한 컴포넌트 -->
-      <mps-order-list
+      <job-list
         header="[[header]]"
         items="[[items]]"
         job-type="DAS"
         is-data-polution="{{isDataPolution}}">
-      </mps-order-list>
+      </job-list>
 
       <!-- 총 수량 표시를 위한 컴포넌트 -->
-      <job-process-summary
+      <plan-actual-display
         cust-cd-qty="[[custCdQty]]"
         picked-qty="[[_computeSkuPickedQty(totalPickedQty)]]"
         pick-qty="[[_computeSkuPickQty(totalPickQty)]]">
-      </job-process-summary>
+      </plan-actual-display>
     </div>
 
     <div class="col2">
@@ -214,25 +214,25 @@ Copyright © HatioLab Inc. All rights reserved.
     </div>
 
     <!-- 박스 검수 컴포넌트 -->
-    <mps-inspect-box
+    <box-process-checker
       id="inspect-box"
       region-cd="[[regionCd]]">
-    </mps-inspect-box>
+    </box-process-checker>
 
     <!-- 로케이션 - 박스 매핑 컴포넌트 -->
-    <mps-box-assign-popup
+    <cell-box-mapper-popup
       region-cd="[[regionCd]]"
       input-value="{{inputValue}}"
       on-need-inspect-box="_handleNeedInspectBox">
-    </mps-box-assign-popup>
+    </cell-box-mapper-popup>
 
     <!-- 검수 On/Off 버튼 컴포넌트 -->
-    <mps-box-inspect-mpi-on-off
+    <indicator-inspector
       is-on-todo="[[todoBtnActive]]"
       is-inspect-mode="[[inspectBtnActive]]"
       com-code="[[comCd]]"
       sku-code="[[skuCd]]">
-    </mps-box-inspect-mpi-on-off>
+    </indicator-inspector>
 
   </template>
 
@@ -806,7 +806,7 @@ Copyright © HatioLab Inc. All rights reserved.
         if (!inputList || inputList.length === 0) {
           this.selectedInput = JSON.parse(JSON.stringify({}));
         } else {
-          /* 아래 로직은 mps-job-indicator를 주석처리하면서 추가된 코드임: 첫 진입시 데이터 조회 */
+          /* 아래 로직은 job-progress-bar를 주석처리하면서 추가된 코드임: 첫 진입시 데이터 조회 */
           this.selectedInput = JSON.parse(JSON.stringify(inputList[0]));
           this.refreshInputDetails();
         }

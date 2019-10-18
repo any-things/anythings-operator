@@ -5,7 +5,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
 <link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
 
-<link rel="import" href="../../../tablet-libraries.html">
+<link rel="import" href="../../../logis/logis-tablet-libs.html">
 
 <link rel="import" href="../../../mixins/mps/mps-ble-scanner-mixin.html">
 <link rel="import" href="../../../mixins/mps/tab-ord-info-common-mixin.html">
@@ -143,9 +143,9 @@ Copyright © HatioLab Inc. All rights reserved.
           <div id="left-section" class="list-container">
             <button class="list-header-btn" disabled>[[frontBtnLabel]]</button>
 
-            <mps-list id="front-list" hide-header header="[[header]]" data="[[frontDetailList]]"
+            <item-list id="front-list" hide-header header="[[header]]" data="[[frontDetailList]]"
               on-data-list-click="showProcessPopup" on-configured="_addOrderStatusAttr">
-            </mps-list>
+            </item-list>
           </div>
         </template>
       </dom-if>
@@ -156,9 +156,9 @@ Copyright © HatioLab Inc. All rights reserved.
           <div id="right-section" class="list-container">
             <button class="list-header-btn" disabled>[[rearBtnLabel]]</button>
 
-            <mps-list id="rear-list" hide-header header="[[header]]" data="[[rearDetailList]]"
+            <item-list id="rear-list" hide-header header="[[header]]" data="[[rearDetailList]]"
               on-data-list-click="showProcessPopup" on-configured="_addOrderStatusAttr">
-            </mps-list>
+            </item-list>
           </div>
         </template>
       </dom-if>
@@ -169,26 +169,26 @@ Copyright © HatioLab Inc. All rights reserved.
           <div id="total-section" class="list-container">
             <button class="list-header-btn" disabled>[[totalBtnLabel]]</button>
 
-            <mps-list id="total-list" hide-header header="[[header]]" data="[[totalDetailList]]"
+            <item-list id="total-list" hide-header header="[[header]]" data="[[totalDetailList]]"
               on-data-list-click="showProcessPopup" on-configured="_addOrderStatusAttr">
-            </mps-list>
+            </item-list>
           </div>
         </template>
       </dom-if>
     </div>
 
     <!-- 작업 진도율 표시기 -->
-    <mps-job-indicator id="das-job-indicator" job-type="[[jobType]]" selected-input="{{selectedInput}}"
+    <job-progress-bar id="das-job-indicator" job-type="[[jobType]]" selected-input="{{selectedInput}}"
       on-item-selected="_selectedInputChanged" on-item-selected-by-click="_selectedInputChanged"
       show-full-code$="[[showFullCode]]" input-list="[[inputList]]" on-swipe-left="swipeLeft"
       on-swipe-right="swipeRight" on-configured="_addJobStatusAttr">
-    </mps-job-indicator>
+    </job-progress-bar>
 
     <!-- SKU 정보 조회 시 복수개가 조회된 경우 실행되는 사용자가 고를 수 있는 팝업이 가미된 SKU Input -->
-    <mps-auto-popup-input hidden hide-keyboard id="sku-barcd" resource-url="[[getSkuAjaxUrl]]"
+    <auto-popup-input hidden hide-keyboard id="sku-barcd" resource-url="[[getSkuAjaxUrl]]"
       popup-title="[[popupTitleLabel]]" button-txt-callback="[[_skuButtonTxtCallback]]" on-item-selected="inputSku"
       max-length=13>
-    </mps-auto-popup-input>
+    </auto-popup-input>
   </template>
 
   <script>

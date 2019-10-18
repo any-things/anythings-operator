@@ -5,8 +5,8 @@ Copyright © HatioLab Inc. All rights reserved.
 
 <link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
 
-<link rel="import" href="../../../pda-libraries.html">
-<link rel="import" href="../../../units/mps/mps-auto-popup-input.html">
+<link rel="import" href="../../../logis/logis-pda-libs.html">
+<link rel="import" href="../../../components/common/auto-popup-input.html">
 
 <!--
   PDA > 재고 조회 화면
@@ -106,7 +106,7 @@ Copyright © HatioLab Inc. All rights reserved.
       <div class="input-container">
 
         <span class="label">[[barcodeLabel]]</span>
-        <mps-auto-popup-input
+        <auto-popup-input
         hide-keyboard
         id="barcode"
         on-before-request = "_customAjaxHandler"
@@ -114,7 +114,7 @@ Copyright © HatioLab Inc. All rights reserved.
         popup-title="[[popupTitleLabel]]"
         button-txt-callback="[[_skuButtonTxtCallback]]"
         on-item-selected="_searchRecommendLocations">
-      </mps-auto-popup-input>
+      </auto-popup-input>
         <!-- <input barcode id="barcode" type="text" name="barcode" on-keypress="_checkBarcode"> -->
 
         <span class="label">[[skuCdLabel]]</span>
@@ -295,8 +295,8 @@ Copyright © HatioLab Inc. All rights reserved.
             const locInfoAjax = this.$['location-ajax'];
             let regionCd = JSON.parse(localStorage.getItem('setting.regionCode'));
             locInfoAjax.curl = `/pda_process/dps/load_locs/${regionCd}/${this.skuCd}/${this.comCd}`;
-            locInfoAjax.generateRequest(); 
-          }  
+            locInfoAjax.generateRequest();
+          }
       }
 
       _renderLocationCombo(response) {
@@ -371,7 +371,7 @@ Copyright © HatioLab Inc. All rights reserved.
         this._clearCombobox(this.$['location']);
         this._initialSetup();
       }
-      
+
       _getComCd(){
         const companyGetAjax = this.$['company-get-ajax'];
         companyGetAjax.baseUrl = JSON.parse(localStorage.getItem('setting.baseUrl'));
@@ -389,7 +389,7 @@ Copyright © HatioLab Inc. All rights reserved.
           belongs_to_domain: true
         };
         companyGetAjax.curl = `/company`;
-        companyGetAjax.generateRequest();        
+        companyGetAjax.generateRequest();
       }
 
       _locationSelected() {
@@ -400,7 +400,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       _companycSetting(event){
-        this.comCd = event.detail.items[0].com_cd;  
+        this.comCd = event.detail.items[0].com_cd;
       }
 
       _clearCombobox(combobox) {

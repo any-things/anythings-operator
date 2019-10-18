@@ -5,7 +5,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
 <link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
 
-<link rel="import" href="../../../kiosk-libraries.html">
+<link rel="import" href="../../../logis/logis-kiosk-libs.html">
 <link rel="import" href="../../../components/common/sound-player.html">
 <link rel="import" href="./kiosk-sku-selection.html">
 
@@ -221,7 +221,7 @@ Copyright © HatioLab Inc. All rights reserved.
           <input type="date" required value="[[_jobDateDefaultValue]]" on-change="_jobDateChanged">
         </div>
 
-        <mps-selector
+        <item-selector
           info-column-cnt="[[selectorInfoFields.length]]"
           value-fields="[[selectorValueFields]]"
           info-fields="[[selectorInfoFields]]"
@@ -229,7 +229,7 @@ Copyright © HatioLab Inc. All rights reserved.
           resource-url="[[selectorResourceUrl]]"
           params="[[selectorParams]]"
           on-value-changed="_batchCodeChanged">
-        </mps-selector>
+        </item-selector>
 
         <div id="summary-container">
           <span>Pallet: [[totalPallet]]</span>
@@ -242,13 +242,13 @@ Copyright © HatioLab Inc. All rights reserved.
         <div class="input-container">
           <label class="label">[[skuBarcdLabel]]</label>
 
-          <mps-auto-popup-input
+          <auto-popup-input
             id="sku-barcode"
             popup-title="[[popupTitleLabel]]"
             button-txt-callback="[[_skuButtonTxtCallback]]"
             on-before-request="_customAjaxHandler"
             on-item-selected="itemSelected">
-          </mps-auto-popup-input>
+          </auto-popup-input>
 
         </div>
         <div class="input-container">
@@ -798,7 +798,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * @description mps-auto-popup-input before-request event handler
+       * @description auto-popup-input before-request event handler
        * 상품 코드 및 바코드 입력시 => 상품 선택을 위한 조회
        * 중량 계측 trigger 상수 입력시 (MEASURE_WEIGHT) => 중량 계측 시작
        ***********************

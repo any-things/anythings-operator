@@ -1,0 +1,118 @@
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+
+<link rel="import" href="../../../bower_components/polymer/polymer-element.html">
+
+<link rel="import" href="../../components/common/permanent-focus-input.html">
+<link rel="import" href="../../components/common/auto-list-popup.html">
+
+<!--
+  바코드 필드
+-->
+<dom-module id="barcode-field">
+  <template>
+    <style>
+    </style>
+
+    <permanent-focus-input id="input" timeout="2000" value="{{value}}">
+    </permanent-focus-input>
+
+    <auto-list-popup id="popup"
+      button-txt-callback="[[buttonTextCallback]]" hidden>
+    </auto-list-popup>
+  </template>
+
+  <script>
+    class BarcodeField extends Polymer.Element {
+      static get is() { return 'barcode-field'; }
+
+      static get properties() {
+        return {
+          value: {
+            type: String,
+            notify: true
+          },
+
+          exceptCallAjaxRule: {
+            type: Object
+          },
+
+          items: {
+            type: Object,
+            notify: true
+            // observer: '_itemsChanged'
+          },
+
+          buttonTextCallback: {
+            type: Object
+          },
+
+          selectedItem: {
+            type: Object,
+            notify: true
+          }
+        };
+      }
+
+      connectedCallback() {
+        super.connectedCallback();
+      }
+
+      getValue() {
+        return this.$.input.getValue();
+      }
+
+      select() {
+        this.$.input.select();
+      }
+
+      focus() {
+        this.$.input.focus();
+      }
+
+      reset() {
+        this.value = null;
+      }
+
+      openPopup(items) {
+        var popup = this.$.popup;
+        popup.items = items;
+        popup.hidden = false;
+        var input = this.$.input;
+        
+        document.dispatchEvent(new CustomEvent('open-dialog', {
+          detail: {
+            content: popup,
+            width: 'fit',
+            height: 'fit',
+            title: this.popupTitle,
+            closeCallback: () => {
+              if (popup.selectedItem) {
+                this.selectedItem = [ popup.selectedItem ];
+              } else {
+                input.select();
+              }
+
+              popup.items = null;
+              this._resetPopupContainer();
+            }
+          }
+        }))
+      }
+
+      _resetPopupContainer() {
+        var popup = this.$.popup;
+
+        var container = popup.$.container;
+        while (container.firstChild) {
+          container.removeChild(container.firstChild);
+        }
+      }
+    }
+
+    customElements.define(BarcodeField.is, BarcodeField);
+  </script>
+
+</dom-module>

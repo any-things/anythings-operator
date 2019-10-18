@@ -12,7 +12,7 @@ Copyright © HatioLab Inc. All rights reserved.
         grid-template-rows: 1fr auto;
         height: 100%;
       }
-      mps-list {
+      item-list {
         margin: 20px;
       }
       #button-container {
@@ -28,12 +28,12 @@ Copyright © HatioLab Inc. All rights reserved.
         @apply --operator-default-btn-active;
       }
     </style>
-    <mps-list
+    <item-list
       header="[[header]]"
       data="[[skuList]]"
       on-data-list-click="_skuSelected"
       dialog>
-    </mps-list>
+    </item-list>
     
     <div id="button-container">
       <button id="back-btn" on-click="closeDialog">[[confirmLabel]]</button>    

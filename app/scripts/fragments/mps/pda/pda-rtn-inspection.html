@@ -6,9 +6,9 @@ Copyright © HatioLab Inc. All rights reserved.
 <link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
 
 <link rel="import" href="../mps-adjust-qty-dialog.html">
-<link rel="import" href="../../../units/mps/mps-barcode-field.html">
-<link rel="import" href="../../../units/mps/mps-order-list.html">
-<link rel="import" href="../../../units/mps/job-process-summary.html">
+<link rel="import" href="../../../components/common/barcode-field.html">
+<link rel="import" href="../../../components/logis/job-list.html">
+<link rel="import" href="../../../components/logis/plan-actual-display.html">
 
 <!--
   PDA > 반품 검수 화면
@@ -56,10 +56,10 @@ Copyright © HatioLab Inc. All rights reserved.
         min-width: 25%;
         text-align: right;
       }
-      .input-row input, mps-auto-popup-input {
+      .input-row input, auto-popup-input {
         width: 75%;
       }
-      mps-list{
+      item-list{
         flex: 1;
       }
       #total-qty {
@@ -147,10 +147,10 @@ Copyright © HatioLab Inc. All rights reserved.
     <div id="container">
       <div id="input-container">
         <!-- 상품 코드 혹은 상품 바코드 입력 컴포넌트 행 -->
-        <mps-barcode-field id="input" timeout="2000" value="{{skuBarCd}}"
+        <barcode-field id="input" timeout="2000" value="{{skuBarCd}}"
           button-text-callback="[[_skuButtonTextCallback]]" selected-item="{{findSkuResponse}}"
           on-keypress="_handleBarcodeKeypress">
-        </mps-barcode-field>
+        </barcode-field>
 
         <!-- 배치 ID 표시 컴포넌트 행 -->
         <div class="input-row">

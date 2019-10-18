@@ -1,0 +1,89 @@
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+
+<link rel="import" href="../../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../../bower_components/paper-spinner/paper-spinner-lite.html">
+
+<!--
+  메시지 스피너
+-->
+<dom-module id="msg-spinner">
+  <template>
+    <style>
+      div#modal {
+        display: grid;
+        position: absolute;
+        height: 100%;
+        width: 100%;
+      }
+      div#modal[active] {
+        z-index: 100;
+        background-color: rgba(0, 0, 0, 0.5);
+      }
+      #spinner-container {
+        margin: auto;
+        text-align: center;
+      }
+      #spinner-container p {
+        font-size: 1rem;
+        color: white;
+      }
+      paper-spinner-lite {
+        margin: auto;
+      }
+    </style>
+
+    <div id="modal">
+      <div id="spinner-container">
+        <paper-spinner-lite id="msg-spinner"></paper-spinner-lite>
+        <p>[[message]]</p>
+      </div>
+    </div>
+  </template>
+
+  <script>
+    class MsgSpinner extends Polymer.Element {
+      static get is() { return 'msg-spinner' }
+
+      connectedCallback() {
+        super.connectedCallback();
+        document.addEventListener('toggle-msg-spinner', event => {
+          const active = event.detail.active;
+          if(active) {
+            this._openMsgSpinner(event.detail.message);
+          } else {
+            this._closeMsgSpinner();
+          }
+        });
+
+        document.addEventListener('open-msg-spinner', event => {
+          this._openMsgSpinner(event.detail.message);
+        });
+
+        document.addEventListener('close-msg-spinner', event => {
+          this._closeMsgSpinner();
+        });
+      }
+
+      _openMsgSpinner(message = '') {
+        this.message = message;
+        this.$['msg-spinner'].active = true;
+        this._getModal().setAttribute('active', '');
+      }
+
+      _closeMsgSpinner() {
+        this.$['msg-spinner'].active = false;
+        this._getModal().removeAttribute('active');
+        this.message = '';
+      }
+
+      _getModal() {
+        return this.$['modal'];
+      }
+    }
+
+    customElements.define(MsgSpinner.is, MsgSpinner);
+  </script>
+</dom-module>

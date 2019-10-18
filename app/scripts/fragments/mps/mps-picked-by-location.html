@@ -5,7 +5,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
 <link rel="import" href="../../../bower_components/polymer/polymer-element.html">
 
-<link rel="import" href="../../tablet-libraries.html">
+<link rel="import" href="../../logis/logis-tablet-libs.html">
 
 <!--
   공통 > 로케이션 별 확정 수량 화면
@@ -65,12 +65,12 @@ Copyright © HatioLab Inc. All rights reserved.
 
       <!-- 로케이션 별 확정 수량 정보 리스트 -->
       <div class="list-container">
-        <mps-list
+        <item-list
           header="[[header]]"
           data="[[items]]"
           on-btn-click="_cellButtonClicked"
           on-data-list-click="_onItemClick">
-        </mps-list>
+        </item-list>
       </div>
 
       <!-- 버튼 -->

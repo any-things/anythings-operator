@@ -1,0 +1,61 @@
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+
+<link rel="import" href="../../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../../bower_components/paper-spinner/paper-spinner-lite.html">
+
+<!--
+  스피너
+-->
+<dom-module id="circle-spinner">
+  <template>
+    <style>
+      div#modal {
+        display: grid;
+        position: absolute;
+        height: 100%;
+        width: 100%;
+      }
+      div#modal[active] {
+        z-index: 100;
+      }
+      paper-spinner-lite {
+        margin: auto;
+      }
+    </style>
+
+    <div id="modal">
+      <paper-spinner-lite id="spinner"></paper-spinner-lite>
+    </div>
+  </template>
+
+  <script>
+    class CircleSpinner extends Polymer.Element {
+      static get is() { return 'circle-spinner' }
+
+      connectedCallback() {
+        super.connectedCallback();
+        window.circleSpinner = this.$['spinner'];
+
+        document.addEventListener('toggle-spinner', event => {
+          let active = event.detail.active;
+          this.$['spinner'].active = active;
+          
+          if(active) {
+            this.getModal().setAttribute('active', '');
+          } else {
+            this.getModal().removeAttribute('active');
+          }
+        });
+      }
+
+      getModal() {
+        return this.$['modal'];
+      }
+    }
+
+    customElements.define(CircleSpinner.is, CircleSpinner);
+  </script>
+</dom-module>

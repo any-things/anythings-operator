@@ -112,7 +112,7 @@ Copyright © HatioLab Inc. All rights reserved.
   </template>
 
   <script>
-    class AnySettingKiosk extends AnySettingMixin(Polymer.Element) {
+    class LogisSettingKiosk extends LoigsSettingMixin(Polymer.Element) {
       static get is() { return 'logis-setting-kiosk' }
 
       static get properties() {
@@ -457,7 +457,7 @@ Copyright © HatioLab Inc. All rights reserved.
           updateSettingAjax.addEventListener('sys-ajax-error', event => {
             reject(event);
           });
-          updateSettingAjax.generateRequest();
+          //updateSettingAjax.generateRequest();
         })
       }
 
@@ -490,6 +490,6 @@ Copyright © HatioLab Inc. All rights reserved.
       }
     }
 
-    customElements.define(AnySettingKiosk.is, AnySettingKiosk);
+    customElements.define(LogisSettingKiosk.is, LogisSettingKiosk);
   </script>
 </dom-module>

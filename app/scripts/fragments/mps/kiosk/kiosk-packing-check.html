@@ -1,7 +1,7 @@
 <!-- QPS 포장화면 -->
 
 <link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
-<link rel="import" href="../../../kiosk-libraries.html">
+<link rel="import" href="../../../logis/logis-kiosk-libs.html">
 <link rel="import" href="./kiosk-packing-popup.html">
 <dom-module id="kiosk-packing-check">
     <template>
@@ -63,7 +63,7 @@
                 text-align: center;
                 display: flex;
             }
-            mps-list{
+            item-list{
                 height: 80vh;
             }
         </style>
@@ -103,12 +103,12 @@
             <label><input id="img-number" type="number" max="6" min="1" value = '6' on-Change = "_imgCntChanged">
             </label>
             <div class="right">
-                <mps-list
-                    id="mps-list"
+                <item-list
+                    id="item-list"
                     header="[[header]]"
                     data="[[items]]"
                     on-configured="_listConfigured">
-                </mps-list>
+                </item-list>
             </div>
         </div>
     </template>
@@ -326,7 +326,7 @@
                     }else{
                         this.items[index].showImg = 'unload';
                     }
-                    this.$['mps-list'].shadowRoot.getElementById('data-container').scrollTop = (index-imgLimit+1)*55;
+                    this.$['item-list'].shadowRoot.getElementById('data-container').scrollTop = (index-imgLimit+1)*55;
                     return cnt >= this.$['img-number'].value || cnt >= this.$['box-in-qty'].value;
                 });
                 for(var i=0;i<imgContainer.childElementCount;i++){

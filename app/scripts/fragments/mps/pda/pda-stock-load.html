@@ -5,7 +5,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
 <link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
 
-<link rel="import" href="../../../pda-libraries.html">
+<link rel="import" href="../../../logis/logis-pda-libs.html">
 
 <!--
   PDA > 재고 적치 화면
@@ -104,7 +104,7 @@ Copyright © HatioLab Inc. All rights reserved.
       <div class="input-container">
         <span class="label">[[skuBarcdLabel]]</span>
         <!-- SKU 정보 조회 시 복수개가 조회된 경우 실행되는 사용자가 고를 수 있는 팝업이 가미된 SKU Input -->
-        <mps-auto-popup-input
+        <auto-popup-input
           hide-keyboard
           id="sku-barcd"
           resource-url="[[getSkuAjaxUrl]]"
@@ -112,7 +112,7 @@ Copyright © HatioLab Inc. All rights reserved.
           allowed-focus-out
           button-txt-callback="[[_skuButtonTxtCallback]]"
           on-item-selected="_searchRecommendLocations">
-        </mps-auto-popup-input>
+        </auto-popup-input>
 
         <span class="label">[[skuNameLabel]]</span>
         <input id="sku-nm" readonly>

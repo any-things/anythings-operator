@@ -8,17 +8,17 @@ Copyright © HatioLab Inc. All rights reserved.
 <link rel="import" href="../../../mixins/mps/mps-scanner-mixin.html">
 <link rel="import" href="../../../mixins/mps/mps-mpi-on-off-mixin.html">
 <link rel="import" href="../../../mixins/mps/mps-message-subscribe-mixin.html">
-<link rel="import" href="../../../pda-libraries.html">
+<link rel="import" href="../../../logis/logis-pda-libs.html">
 
 <link rel="import" href="./pda-rtn-process-detail.html">
 <link rel="import" href="./pda-job-process-btn-popup.html">
 <link rel="import" href="../mps-adjust-qty-dialog.html">
 
-<link rel="import" href="../../../units/mps/mps-inspect-box.html">
-<link rel="import" href="../../../units/mps/mps-barcode-field.html">
-<link rel="import" href="../../../units/mps/mps-order-list.html">
-<link rel="import" href="../../../units/mps/mps-box-inspect-mpi-on-off.html">
-<link rel="import" href="../../../units/mps/mps-box-assign-popup.html">
+<link rel="import" href="../../../components/logis/box-process-checker.html">
+<link rel="import" href="../../../components/common/barcode-field.html">
+<link rel="import" href="../../../components/logis/job-list.html">
+<link rel="import" href="../../../components/logis/indicator-inspector.html">
+<link rel="import" href="../../../components/logis/cell-box-mapper-popup.html">
 
 <!--
   PDA > 반품 잔량 풀박스 처리 화면
@@ -72,7 +72,7 @@ Copyright © HatioLab Inc. All rights reserved.
         min-width: 25%;
         text-align: right;
       }
-      .input-row input, mps-auto-popup-input {
+      .input-row input, auto-popup-input {
         width: 70%;
       }
       .col2 {
@@ -129,7 +129,7 @@ Copyright © HatioLab Inc. All rights reserved.
         margin: auto;
       }
 
-      mps-order-list{
+      job-list{
         min-height: 100px;
         flex: 1;
       }
@@ -185,12 +185,12 @@ Copyright © HatioLab Inc. All rights reserved.
 
       <div id="input-container">
         <!-- SKU 정보 조회 시 복수개가 조회된 경우 실행되는 사용자가 고를 수 있는 팝업이 가미된 SKU Input -->
-        <mps-barcode-field
+        <barcode-field
           id="input"
           timeout="2000"
           value="{{inputValue}}"
           on-keypress="_handleBarcodeKeypress">
-        </mps-barcode-field>
+        </barcode-field>
 
         <!-- 박스 ID 표시 컴포넌트 행 -->
         <div class="input-row">
@@ -206,8 +206,8 @@ Copyright © HatioLab Inc. All rights reserved.
         </div>
 
         <!-- 작업 리스트 표시를 위한 컴포넌트 -->
-        <mps-list header="[[header]]" data="[[data]]" job-type="DAS">
-        </mps-list>
+        <item-list header="[[header]]" data="[[data]]" job-type="DAS">
+        </item-list>
       </div>
     </div>
 

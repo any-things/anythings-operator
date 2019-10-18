@@ -1,5 +1,5 @@
 <link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
-<link rel="import" href="../../../pda-libraries.html">
+<link rel="import" href="../../../logis/logis-pda-libs.html">
 <!-- PDA 고정로케이션 재고적치 화면 -->
 <dom-module id="pda-stock-load-fixed">
     <template>
@@ -79,7 +79,7 @@
             <div class="input-container">
                 <span class="label">[[skuCdLabel]]</span>
                 
-                <mps-auto-popup-input
+                <auto-popup-input
                     hide-keyboard
                     id="sku-cd"
                     resource-url="[[getSkuAjaxUrl]]"
@@ -87,7 +87,7 @@
                     button-txt-callback="[[_skuButtonTxtCallback]]"
                     allowed-focus-out
                     on-item-selected="_searchRecommendLocations">
-                </mps-auto-popup-input>
+                </auto-popup-input>
 
                 <span hidden class="label">[[skuBarcdLabel]]</span>
                 <input hidden id="sku-barcd" type="text" name="sku_barcd" readonly>

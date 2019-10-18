@@ -5,7 +5,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
 <link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
 
-<link rel="import" href="../../../kiosk-libraries.html">
+<link rel="import" href="../../../logis/logis-kiosk-libs.html">
 
 <link rel="import" href="./kiosk-inspection-input-count.html">
 
@@ -187,8 +187,8 @@ Copyright © HatioLab Inc. All rights reserved.
 
       <div id="bottom-container">
         <!-- 검수할 박스 내품 리스트 -->
-        <mps-list header="[[header]]" data="[[items]]" on-configured="_addCompleteClass">
-        </mps-list>
+        <item-list header="[[header]]" data="[[items]]" on-configured="_addCompleteClass">
+        </item-list>
 
         <div class="right-section">
           <!-- 처리 옵션 라디오 버튼 -->
@@ -808,7 +808,7 @@ Copyright © HatioLab Inc. All rights reserved.
       /**
        * @description 검수 리스트가 configured 될 때 호출 되며
        * diff_qty가 0이면 complete 클래스를 로우에 추가함
-       * mps-list의 header 설정에 의해 결정된 color를 제거함
+       * item-list의 header 설정에 의해 결정된 color를 제거함
        **********************
        * @param {Object} event
        */

@@ -1,0 +1,299 @@
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+
+<script>
+  LoigsSettingMixin = superClass => {
+    return class LoigsSettingMixin extends superClass {
+      static get properties() {
+        return {
+          regionLabel: { type: String, value: () => t('label.region_nm')},
+          jobLabel: { type: String, value: () => t('label.job_nm')},
+          zoneLabel: { type: String, value: () => t('label.zone_cd')},
+          workLocLabel: {type: String, value: () => t('label.work_location')},
+          leftLabel: { type: String, value: () => t('label.left') },
+          rightLabel: { type: String, value: () => t('label.right') },
+          frontLabel: { type: String, value: () => t('label.front')},
+          rearLabel: { type: String, value: () => t('label.rear')},
+          allLabel: { type: String, value: () => t('label.all')},
+
+          regionCode: {
+            type: String,
+            value: () => JSON.parse(localStorage.getItem('setting.regionCode'))
+          },
+
+          regionCodeLSKey: {
+            type: String,
+            value: 'setting.regionCode'
+          },
+
+          regionName: {
+            type: String
+          },
+
+          regionNameLSKey: {
+            type: String,
+            value: 'setting.regionName'
+          },
+
+          zoneCode: {
+            type: String,
+            value: () => JSON.parse(localStorage.getItem('setting.zoneCode'))
+          },
+
+          zoneCodeLSKey: {
+            type: String,
+            value: 'setting.zoneCode'
+          },
+
+          jobName: {
+            type: String,
+            value: () => JSON.parse(localStorage.getItem('setting.jobName'))
+          },
+
+          jobNameLSKey: {
+            type: String,
+            value: 'setting.jobName'
+          },
+
+          workLoc: {
+            type: String,
+            value: () => JSON.parse(localStorage.getItem('setting.workLocation'))
+          },
+
+          workLocLSKey: {
+            type: String,
+            value: 'setting.workLocation'
+          },
+
+          workLocName: {
+            type: String
+          },
+
+          workLocNameLSKey: {
+            type: String,
+            value: 'setting.workLocationLabel'
+          },
+
+        }
+      }
+
+      /**
+       * @description broker address를 조회
+       */
+      _getBrokerAddress(){
+        let brokerAddrsAjax = this._getBrokerAddrsAjax();
+        brokerAddrsAjax.curl = '/settings/show_by_name?name=mps.broker.address';
+        brokerAddrsAjax.baseUrl = this._getLocalStorage('setting.baseUrl');
+        brokerAddrsAjax.generateRequest();
+      }
+
+      /**
+       * @description broker port를 조회
+       */
+      _getBrokerPort() {
+        let brokerPortAjax = this._getBrokerPortAjax();
+        brokerPortAjax.curl = '/settings/show_by_name?name=mps.broker.port';
+        brokerPortAjax.baseUrl = this._getLocalStorage('setting.baseUrl');
+        brokerPortAjax.generateRequest();
+      }
+
+      /**
+       * @description broker site를 조회
+       */
+      _getBrokerSite(){
+        let brokerSiteAjax = this._getBrokerSiteAjax();
+        brokerSiteAjax.curl = '/settings/show_by_name?name=mps.broker.site.code';
+        brokerSiteAjax.baseUrl = this._getLocalStorage('setting.baseUrl');
+        brokerSiteAjax.generateRequest();
+      }
+
+      /**
+       * @description return broker-addrs-ajax
+       */
+      _getBrokerAddrsAjax() {
+        return this.$['broker-addrs-ajax'];
+      }
+
+      /**
+       * @description return broker-port-ajax
+       */
+      _getBrokerPortAjax() {
+        return this.$['broker-port-ajax'];
+      }
+
+      /**
+       * @description return broker-site-ajax
+       */
+      _getBrokerSiteAjax() {
+        return this.$['broker-site-ajax'];
+      }
+
+      /**
+       * @description 조회한 broker address를 localStorage에 저장함
+       */
+      _setBrokerAddress(response){
+        if(response && response.detail) {
+          localStorage.setItem('setting.brokerAddress', response.detail.value);
+        }
+      }
+
+      /**
+       * @description 조회한 broker port를 localStorage에 저장함
+       */
+      _setBrokerPort(response) {
+        if (response && response.detail) {
+          localStorage.setItem('setting.brokerPort', response.detail.value);
+        }
+      }
+
+      /**
+       * @description 조회한 broker site를 localStorage에 저장함
+       */
+      _setBrokerSite(response){
+        if(response && response.detail) {
+          localStorage.setItem('setting.brokerSite', response.detail.value);
+        }
+      }
+
+      _getRegionItems() {
+        const regionItemAjax = this._getRegionItemAjax();
+        regionItemAjax.curl = `/racks?limit=1000`;
+        regionItemAjax.baseUrl = this._getLocalStorage('setting.baseUrl');
+        regionItemAjax.generateRequest();
+      }
+
+      _getZoneItems() {
+        const selectedOption = this._getRegionCombo().selectedOptions[0];
+        if(selectedOption && selectedOption.value) {
+          const regionCode = selectedOption.value;
+          const zoneItemAjax = this._getZoneItemAjax();
+          zoneItemAjax.curl = `/racks/${regionCode}/stations`;
+          zoneItemAjax.baseUrl = this._getLocalStorage('setting.baseUrl');
+          zoneItemAjax.generateRequest();
+        }
+      }
+
+      _getJobItems() {
+        const jobItemAjax = this._getJobItemAjax();
+        jobItemAjax.curl = `/common_codes/show_by_name?name=JOB_TYPE`;
+        jobItemAjax.baseUrl = this._getLocalStorage('setting.baseUrl');
+        jobItemAjax.generateRequest();
+      }
+
+      _clearCombo(combo) {
+        while(combo.childElementCount) {
+          combo.removeChild(combo.firstElementChild);
+        }
+      }
+
+      _getLocalStorage(key) {
+        return JSON.parse(localStorage.getItem(key));
+      }
+
+      _setLocalStorage(key, value) {
+        localStorage.setItem(key, JSON.stringify(value));
+      }
+
+      _getSelectedOpt(options) {
+        return options.filter(option => {
+          return option.checked
+        })[0];
+      }
+
+      _getRegionItemAjax() {
+        return this.$['region-items-ajax'];
+      }
+
+      _getJobItemAjax() {
+        return this.$['job-combo-ajax'];
+      }
+
+      _getZoneItemAjax() {
+        return this.$['zone-items-ajax'];
+      }
+
+      _getUpdateSettingAjax() {
+        return this.$['update-setting-ajax'];
+      }
+
+      _getRegionCombo() {
+        return this.$['region-combo'];
+      }
+
+      _getZoneCombo() {
+        return this.$['zone-combo'];
+      }
+
+      _getJobCombo() {
+        return this.$['job-combo'];
+      }
+
+      _getWorkLocationOpts() {
+        return Array.from(this.$['work-loc'].querySelectorAll('input[name=work-location]'));
+      }
+
+      _setWorkLocDefaultValue() {
+        const workLocationOpts = this._getWorkLocationOpts();
+        workLocationOpts.forEach(workLocationOpt => {
+          if(this.workLoc === workLocationOpt.value) {
+            workLocationOpt.checked = true;
+          }
+        });
+      }
+
+      _renderRegionCombo(event) {
+        const regionCombo = this._getRegionCombo();
+        this._clearCombo(regionCombo);
+
+        if(event && event.detail) {
+          event.detail.items.forEach(region => {
+            const option = new Option(region.rack_nm, region.rack_cd);
+            if(this.regionCode === region.rack_cd) {
+              option.selected = true;
+              this.regionName = region.rack_nm;
+            }
+
+            regionCombo.appendChild(option);
+          });
+        }
+
+        if(this.deviceType !== 'KIOSK') {
+          this._getZoneItems();
+        }
+      }
+
+      _renderZoneCombo(event) {
+        const zoneCombo = this._getZoneCombo();
+        this._clearCombo(zoneCombo);
+
+        if(event && event.detail) {
+          event.detail.forEach(zone => {
+            const option = new Option(zone, zone);
+            if(this.zoneCode === zone) {
+              option.selected = true;
+            }
+
+            zoneCombo.appendChild(option);
+          })
+        }
+      }
+
+      _renderJobCombo(event) {
+        const jobCombo = this._getJobCombo();
+        this._clearCombo(jobCombo);
+
+        event.detail.items.forEach(job => {
+          const option = new Option(job.description, job.name);
+          if(this.jobName === job.name) {
+            option.selected = true;
+            this.jobName = job.name;
+          }
+
+          jobCombo.appendChild(option);
+        })
+      }
+    }
+  }
+</script>

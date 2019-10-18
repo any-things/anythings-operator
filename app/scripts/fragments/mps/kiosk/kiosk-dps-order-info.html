@@ -5,7 +5,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
 <link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
 
-<link rel="import" href="../../../kiosk-libraries.html">
+<link rel="import" href="../../../logis/logis-kiosk-libs.html">
 
 <!--
   KIOSK > DPS 작업 화면
@@ -267,8 +267,8 @@ Copyright © HatioLab Inc. All rights reserved.
         </button>
       </div>
 
-      <mps-list
-        id="mps-list"
+      <item-list
+        id="item-list"
         header="[[header]]"
         page="[[page]]"
         total="[[total]]"
@@ -277,7 +277,7 @@ Copyright © HatioLab Inc. All rights reserved.
         show-paginator
         on-data-list-click="showOrderItems"
         on-paginator-changed="_pageChanged">
-      </mps-list>
+      </item-list>
     </div>
   </template>
 
@@ -832,8 +832,8 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
      /**
-      * mps-list paginator-changed event handler
-      * mps-list의 page, limit, total property가 변경 되면 호출 됨
+      * item-list paginator-changed event handler
+      * item-list의 page, limit, total property가 변경 되면 호출 됨
       * event.detail을 통해 현재 리스트의 page, limit을 초기화 하고
       ***********************
       * @param {Object} event

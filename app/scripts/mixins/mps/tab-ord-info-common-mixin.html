@@ -296,7 +296,7 @@ Copyright © HatioLab Inc. All rights reserved.
           }
 
           // 사용자의 클릭으로 인해 selectedInput이 변경 되었을 경우
-          // mps-job-indicator가 자동피킹 되지 않도록 holdIndicator flag를 on
+          // job-progress-bar가 자동피킹 되지 않도록 holdIndicator flag를 on
           if (event.type === 'item-selected-by-click') {
             this.holdIndicator = true;
           }
@@ -360,7 +360,7 @@ Copyright © HatioLab Inc. All rights reserved.
       /**
        * @description 작업 유형에 따라 job indicator element를 return
        ******************
-       * @return {Object} mps-job-indicator element
+       * @return {Object} job-progress-bar element
        */
       _getJobIndicator() {
         if (this.jobType === 'DAS') {
@@ -371,8 +371,8 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * @description mps-job-indicator configured event handler
-       * mps-job-indicator 구성이 완료 되면 status 데이터를 바탕으로 attribute를 추가함
+       * @description job-progress-bar configured event handler
+       * job-progress-bar 구성이 완료 되면 status 데이터를 바탕으로 attribute를 추가함
        ***********************
        * @param {Object} event
        */

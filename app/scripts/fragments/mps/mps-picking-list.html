@@ -46,7 +46,7 @@ DAS 확정 처리한 작업을 취소하는 화면
       #search-container[kiosk] input {
         margin: auto 10px auto auto;
       }
-      mps-list {
+      item-list {
         margin-bottom: 10px;
       }
       .button-container {
@@ -82,7 +82,7 @@ DAS 확정 처리한 작업을 취소하는 화면
       </div>
     </div>
 
-    <mps-list
+    <item-list
       header="[[header]]"
       page="[[page]]"
       total="[[total]]"
@@ -91,7 +91,7 @@ DAS 확정 처리한 작업을 취소하는 화면
       show-paginator
       on-paginator-changed="_pageChanged"
       on-data-list-click="_selectItem">
-    </mps-list>
+    </item-list>
 
     <div class="button-container">
       <button id="cancel-confirmation" on-click="cancelConfirmation">[[cancelConfirmBtnLabel]]</button>
@@ -245,7 +245,7 @@ DAS 확정 처리한 작업을 취소하는 화면
       }
 
       /**
-       * mps-list page change event handler
+       * item-list page change event handler
        */
       _pageChanged(event) {
         this.page = event.detail.page;
@@ -254,7 +254,7 @@ DAS 확정 처리한 작업을 취소하는 화면
       }
 
       /**
-       * mps-list item click event handler
+       * item-list item click event handler
        */
       _selectItem(event) {
         if(this.selectedItem) {

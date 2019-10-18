@@ -1,0 +1,117 @@
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+
+<link rel="import" href="../../../bower_components/polymer/polymer-element.html">
+
+<!--
+  자동 리스트 팝업
+-->
+<dom-module id="auto-list-popup">
+  <template>
+    <style>
+      #container {
+        display: grid;
+        grid-template-columns: 1fr;
+        margin: 15px;
+        grid-gap: 15px;
+      }
+      button:focus{
+        outline:0;
+      }
+      button {
+        background: #90cc5d;
+        background: linear-gradient(to bottom, #90cc5d 0%, #5a9802 100%);
+        border-top:.06rem solid #cdff9a;border-bottom:.2rem solid #2e7b00;
+        border-left:none;border-right:none;
+        border-radius:12px;
+        padding:.3rem;
+        color: #fff;
+        text-shadow: 0px .03rem .03rem rgba(0, 0, 0, 0.4);
+        font-size:1rem;
+        outline:0;
+      }
+      button:active{
+        background: #90cc5d;
+        background: linear-gradient(to bottom, #5a9802 0%, #90cc5d 100%);
+        text-shadow: .03rem 0rem .03rem rgba(0, 0, 0, 0.4);
+      }
+      div#btn-container {
+        display: grid;
+        margin: 15px;
+        justify-content: end;
+      }
+      div#btn-container button#close-btn {
+        @apply --operator-default-btn;
+      }
+    </style>
+
+    <div id="container"></div>
+
+    <div id="btn-container">
+      <button id="close-btn" on-click="_closeDialog">[[closeBtnLabel]]</button>
+    </div>
+  </template>
+
+  <script>
+    class AutoListPopup extends Polymer.Element {
+      static get is() { return 'auto-list-popup' }
+
+      static get properties() {
+        return {
+          /**
+           * 화면에 출력될 대상 아이템 리스트
+           */
+          items: {
+            type: Array,
+            observer: '_itemsChanged'
+          },
+
+          /**
+           * 화면에 출력될 대상 아이템의 텍스트
+           */
+          displayKey: {
+            type: String,
+          },
+
+          /**
+           * 닫기 버튼 라벨
+           */
+          closeBtnLabel: {
+            type: String,
+            value: () => t('button.close')
+          }
+        }
+      }
+
+      /**
+       * items의 값이 변경되면 화면에 출력 대상들을 생성함
+       */
+      _itemsChanged(items) {
+        if (!items) {
+          return;
+        }
+
+        const container = this.$['container'];
+        items.forEach(item => {
+          const button = document.createElement('button');
+          button.innerText = this.buttonTxtCallback && typeof this.buttonTxtCallback === 'function' ? this.buttonTxtCallback(item) : item[this.displayKey];
+
+          button.onclick = event => {
+            this.selectedItem = item;
+            this._closeDialog();
+          }
+
+          container.append(button);
+        })
+      }
+
+      _closeDialog() {
+        document.dispatchEvent(new CustomEvent('close-dialog'));
+      }
+    }
+
+    customElements.define(AutoListPopup.is, AutoListPopup);
+  </script>
+</dom-module>

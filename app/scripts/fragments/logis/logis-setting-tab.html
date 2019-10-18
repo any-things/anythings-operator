@@ -38,9 +38,9 @@ Copyright © HatioLab Inc. All rights reserved.
     <sys-ajax
       auto
       method="GET"
-      curl="/settings/show_by_name?name=mps.chute.side.set"
+      curl="/settings/show_by_name?name=operator.side.set"
       content-type="application/json"
-      last-response="{{chuteSideSetResponse}}">
+      last-response="{{sideSetResponse}}">
     </sys-ajax>
 
     <sys-ajax
@@ -156,7 +156,7 @@ Copyright © HatioLab Inc. All rights reserved.
   </template>
 
   <script>
-    class AnySettingTab extends AnySettingMixin(NetworkInfoMixin(Polymer.Element)) {
+    class LogisSettingTab extends LoigsSettingMixin(NetworkInfoMixin(Polymer.Element)) {
       static get is() { return 'logis-setting-tab' }
 
       static get properties() {
@@ -201,14 +201,20 @@ Copyright © HatioLab Inc. All rights reserved.
             value: () => t('label.show_full_code')
           },
 
+          /**
+           * @description 좌/우 사이드 사용 여부
+           */
           isLeftRight: {
             type: String,
             value: false
           },
 
-          chuteSideSetResponse: {
+          /**
+           * @description
+           */
+          sideSetResponse: {
             type: Object,
-            observer: '_chuteSideSetResponseChanged'
+            observer: '_sideSetResponseChanged'
           },
 
           /**
@@ -280,6 +286,10 @@ Copyright © HatioLab Inc. All rights reserved.
             type: String,
             value: 'setting.autoPicking'
           },
+
+          /**
+           * @description 화면 소스 URL
+           */
           srcUrl: {
             type: String,
             value: JSON.parse(localStorage.getItem('setting.srcUrl'))
@@ -296,15 +306,13 @@ Copyright © HatioLab Inc. All rights reserved.
         this._hiddenDiv();
       }
 
-      _chuteSideSetResponseChanged(chuteSideSetResponse) {
-        if (!chuteSideSetResponse) {
-          return;
-        }
-
-        if (chuteSideSetResponse.value === 'LEFT_RIGHT') {
-          this.isLeftRight = true;
-        } else {
-          this.isLeftRight = false;
+      _sideSetResponseChanged(sideSetResponse) {
+        if (sideSetResponse) {
+          if (sideSetResponse.value === 'LEFT_RIGHT') {
+            this.isLeftRight = true;
+          } else {
+            this.isLeftRight = false;
+          }
         }
       }
 
@@ -402,7 +410,8 @@ Copyright © HatioLab Inc. All rights reserved.
           const zoneCombo = this._getZoneCombo()
           const zoneCode = zoneCombo.selectedOptions.length === 1 ? zoneCombo.selectedOptions[0].value : null;
 
-          if(!regionCode || !zoneCode) {
+          //if(!regionCode || !zoneCode) {
+          if(!regionCode) {
             throw {
               detail: {
                 code: t('error.SETTING_ERROR'),
@@ -425,7 +434,7 @@ Copyright © HatioLab Inc. All rights reserved.
             reject(error);
           });
 
-          updateSettingAjax.generateRequest();
+          //updateSettingAjax.generateRequest();
         });
       }
 
@@ -450,14 +459,14 @@ Copyright © HatioLab Inc. All rights reserved.
         return this.$['auto-pick-input'];
       }
 
-      _hiddenDiv(){
-        if(this.$['job-combo'].value == 'QPS' || this.jobName == 'QPS'){
+      _hiddenDiv() {
+        if(this.$['job-combo'].value == 'QPS' || this.jobName == 'QPS') {
           this._setLocalStorage('setting.isQps', true);
           this.$['other-order'].setAttribute('style',`display: none`);
           this.$['auto-pick'].setAttribute('style',`display: none`);
           this.$['ble-mode'].setAttribute('style',`display: flex;`);
           this.$['ble-img'].setAttribute('src',this.srcUrl+'/images/ble-mode.png');
-        }else{
+        } else {
           this._setLocalStorage('setting.isQps', false);
           this.$['other-order'].setAttribute('style',`display: flex`);
           this.$['auto-pick'].setAttribute('style',`display: flex`);
@@ -466,6 +475,6 @@ Copyright © HatioLab Inc. All rights reserved.
       }
     }
 
-    customElements.define(AnySettingTab.is, AnySettingTab);
+    customElements.define(LogisSettingTab.is, LogisSettingTab);
   </script>
 </dom-module>

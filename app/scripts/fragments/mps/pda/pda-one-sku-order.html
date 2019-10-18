@@ -47,7 +47,7 @@ Copyright © HatioLab Inc. All rights reserved.
         min-width: 25%;
         text-align: right;
       }
-      .input-row input, .input-row mps-auto-popup-input, .input-row select {
+      .input-row input, .input-row auto-popup-input, .input-row select {
         width: 75%;
       }
       #box-type-container {
@@ -122,7 +122,7 @@ Copyright © HatioLab Inc. All rights reserved.
         <div class="input-row">
           <span class="label">[[skuCdLabel]]</span>
 
-          <mps-auto-popup-input
+          <auto-popup-input
             barcode
             hide-keyboard
             id="sku-cd"
@@ -131,7 +131,7 @@ Copyright © HatioLab Inc. All rights reserved.
             button-txt-callback="[[_skuButtonTxtCallback]]"
             allowed-focus-out
             on-item-selected="_requestBoxType">
-          </mps-auto-popup-input>
+          </auto-popup-input>
         </div>
 
         <div class="input-row">
@@ -250,7 +250,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * mps-auto-popup-input 팝업 출력시 팝업 타이틀 라벨
+           * auto-popup-input 팝업 출력시 팝업 타이틀 라벨
            */
           popupTitleLabel: {
             type: String,
@@ -341,7 +341,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * mps-auto-popup-input 팝업 버튼 구성을 위한 콜백
+       * auto-popup-input 팝업 버튼 구성을 위한 콜백
        */
       _skuButtonTxtCallback(item) {
         return `${item.com_cd} : ${item.sku_cd}
@@ -468,11 +468,11 @@ Copyright © HatioLab Inc. All rights reserved.
       /**
        * SKU, Box 간 맵핑 요청
        * 1. 맵핑 요청을 수행하고 스피너를 토글
-       * 2. 토글 된 스피너는 명시적으로 close 해야만 사라지는 mps-message-spinner
+       * 2. 토글 된 스피너는 명시적으로 close 해야만 사라지는 msg-spinner
        */
       _requestSkuMapping(boxId) {
         const skuMappingAjax = this._getSkuMappingAjax();
-        if(!this.mapId){
+        if(!this.mapId) {
           this.mapId='NaN';
         }
         skuMappingAjax.curl = `/pda_process/qps/one_sku_order/scan_box/${this.mapId}/${boxId}`;
@@ -485,15 +485,18 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _handleSkuMappingResponse(event) {
         var item  = event.detail;
-        if(item.status =='MAPPING'){
+
+        if(item.status == 'MAPPING') {
           this.mapId = item.id;
-          this._toggleMessageSpinner(t('label.please_wait'))
-          this._requestStatusCheck()
-        } else if(item.status =='PICKING'){
-          this._getOrderQtyInput().value = item.picking_qty+'/'+item.order_qty;
+          this._toggleMessageSpinner(t('label.please_wait'));
+          this._requestStatusCheck();
+
+        } else if(item.status == 'PICKING') {
+          this._getOrderQtyInput().value = item.picking_qty + '/' + item.order_qty;
           this._getSkuCdInput().select();
-        } else if(item.status =='CANCEL'){
-         document.dispatchEvent(new CustomEvent('show-toast',{
+
+        } else if(item.status == 'CANCEL') {
+         document.dispatchEvent(new CustomEvent('show-toast', {
               detail:{
                 type: t('text.sku_canceled'),
                 message: t('text.sku_canceled'),
@@ -522,7 +525,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * 맵핑 요청에 대한 error handler
-       * 에러 발생시 화면에 나타난 mps-message-spinner를 close
+       * 에러 발생시 화면에 나타난 msg-spinner를 close
        */
       _handleSkuMappingError(e) {
         if(e.detail.success == false){
@@ -545,7 +548,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * 상태가 MAPPING일 경우 맵핑 대기중인 상태
        * 상태가 END일 경우 맵핑이 완료된 상태
        * 맵핑 상태가 END가 나올때 까지 상태 확인 요청을 수행함
-       * 맵핑이 완료 되어 서버로 부터 END 상태를 전달 받으면 mps-message-spinner를 close
+       * 맵핑이 완료 되어 서버로 부터 END 상태를 전달 받으면 msg-spinner를 close
        *
        * 맵핑 상태
        * MAPPING : 재고 맵핑 대기
@@ -581,7 +584,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * 맵핑 상태가 비정상일 경우 에러를 발생시킴
-       * 에러 발생시 mps-message-spinner를 close함
+       * 에러 발생시 msg-spinner를 close함
        *
        * 맵핑 에러 상태
 	     * LOC : location 에 상품 없음
