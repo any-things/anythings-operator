@@ -181,8 +181,8 @@ ANY_UTIL.showConfirm = function(title, message, cancelCallback, confirmCallback)
  * 설정이 비어있는 경우 핸들러
  */
 ANY_UTIL.handleRequiredSettingEmpty = function() {
-  ANY_UTIL.showMessage('호기 선택', '호기를 선택하세요', function() {
-    location.hash = '/mps_setting';
+  ANY_UTIL.showMessage(t('text.selecting_region'), t('text.select_region'), function() {
+    location.hash = '/any_setting';
   });
 };
 

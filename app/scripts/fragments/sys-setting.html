@@ -11,6 +11,9 @@ Copyright © HatioLab Inc. All rights reserved.
 
 <link rel="import" href="../units/sys-ajax.html">
 
+<!--
+  공통 설정 기능 
+-->
 <dom-module id="sys-setting">
   <template>
     <style>
@@ -49,7 +52,7 @@ Copyright © HatioLab Inc. All rights reserved.
       on-sys-unauthorized-session="_sessionUnauthorized">
     </sys-ajax>
 
-    <iron-localstorage 
+    <iron-localstorage
       name="setting.user"
       value="{{user}}">
     </iron-localstorage>
@@ -69,7 +72,7 @@ Copyright © HatioLab Inc. All rights reserved.
     <footer>
       © <strong>HatioLab Inc.</strong>
       <div>
-        Things system is built on several 
+        Things system is built on several
         <a href="[[licenseRefUrl]]" target='_blank'>open source software</a>
       </div>
     </footer>
@@ -153,7 +156,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * session check 실패시 이벤트 발생 
+       * session check 실패시 이벤트 발생
        */
       _sessionError() {
         this.dispatchEvent(new CustomEvent('sys-session-error'));

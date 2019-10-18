@@ -5,7 +5,10 @@ Copyright © HatioLab Inc. All rights reserved.
 
 <link rel="import" href="../../../bower_components/polymer/polymer-element.html">
 
-<dom-module id="mps-home">
+<!--
+  홈 화면
+-->
+<dom-module id="any-home">
   <template>
     <style include="shared-styles">
       @media (min-width: 0px) and (max-width: 600px) {
@@ -148,8 +151,8 @@ Copyright © HatioLab Inc. All rights reserved.
   </template>
 
   <script>
-    class MpsHome extends Polymer.Element {
-      static get is() { return 'mps-home' };
+    class AnyHome extends Polymer.Element {
+      static get is() { return 'any-home' };
       static get properties() {
         return {
           header: {
@@ -229,6 +232,6 @@ Copyright © HatioLab Inc. All rights reserved.
       }
     }
 
-    customElements.define(MpsHome.is, MpsHome);
+    customElements.define(AnyHome.is, AnyHome);
   </script>
 </dom-module>

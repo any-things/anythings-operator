@@ -5,11 +5,11 @@ Copyright © HatioLab Inc. All rights reserved.
 
 <link rel="import" href="../../../bower_components/polymer/polymer-element.html">
 
-<!-- 
-  MPS Operator KIOSK 설정 화면
+<!--
+  KIOSK > 설정 화면
  -->
 
-<dom-module id="mps-setting-kiosk">
+<dom-module id="any-setting-kiosk">
   <template>
     <style include="shared-styles mps-setting-styles">
       .button-container {
@@ -94,7 +94,7 @@ Copyright © HatioLab Inc. All rights reserved.
     <div id="input-type" class="input-container">
       <label for="input_type">[[inputTypeLabel]]</label>
       <select id="input-type-combo"></select>
-    </div> 
+    </div>
 
     <div id="work-loc" class="radio-btn-container">
       <label>[[workLocLabel]]</label>
@@ -112,8 +112,8 @@ Copyright © HatioLab Inc. All rights reserved.
   </template>
 
   <script>
-    class MpsSettingKiosk extends MpsSettingMixin(Polymer.Element) {
-      static get is() { return 'mps-setting-kiosk' }
+    class AnySettingKiosk extends AnySettingMixin(Polymer.Element) {
+      static get is() { return 'any-setting-kiosk' }
 
       static get properties() {
         return {
@@ -289,7 +289,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
       _getPrinters() {
         const printersAjax = this._getPrintersAjax();
-        printersAjax.curl = '/printer';
+        printersAjax.curl = '/printers';
         printersAjax.baseUrl = this._getLocalStorage('setting.baseUrl');
         printersAjax.generateRequest();
       }
@@ -320,7 +320,7 @@ Copyright © HatioLab Inc. All rights reserved.
         if(event && event.detail) {
           event.detail.items.forEach(printer => {
             const option = new Option(printer.printer_nm, printer.id);
-            
+
             if(this.kioskPrinterId === printer.id) {
               option.selected = true;
             }
@@ -410,7 +410,7 @@ Copyright © HatioLab Inc. All rights reserved.
           this.updateSetting().then(() => {
             this._setLocalStorage(this.regionCodeLSKey, this._getRegionCombo().selectedOptions[0].value)
             this._setLocalStorage(this.regionNameLSKey, this._getRegionCombo().selectedOptions[0].innerText);
-            this._setLocalStorage(this.kioskScreenLSKey, this._getScreenCombo().selectedOptions[0] ? this._getScreenCombo().selectedOptions[0].value : 'mps_setting');
+            this._setLocalStorage(this.kioskScreenLSKey, this._getScreenCombo().selectedOptions[0] ? this._getScreenCombo().selectedOptions[0].value : 'any_setting');
             this._setLocalStorage(this.kioskPrinterIdLSKey, this._getPrintersCombo().selectedOptions[0] ? this._getPrintersCombo().selectedOptions[0].value : null);
             const kioskInterval = parseInt(this._getKioskIntervalInput().value);
             this._setLocalStorage(this.kioskIntervalLSKey,  kioskInterval >= 30 ? kioskInterval : 30);
@@ -490,6 +490,6 @@ Copyright © HatioLab Inc. All rights reserved.
       }
     }
 
-    customElements.define(MpsSettingKiosk.is, MpsSettingKiosk);
+    customElements.define(AnySettingKiosk.is, AnySettingKiosk);
   </script>
 </dom-module>

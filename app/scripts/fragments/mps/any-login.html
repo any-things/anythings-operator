@@ -14,7 +14,10 @@ Copyright © HatioLab Inc. All rights reserved.
 
 <link rel="import" href="./mps-site-selector.html">
 
-<dom-module id="mps-login">
+<!--
+  로그인 화면
+-->
+<dom-module id="any-login">
   <template>
     <style include="shared-styles">
       #login-form {
@@ -61,7 +64,7 @@ Copyright © HatioLab Inc. All rights reserved.
       name="setting.mgrSiteUrl"
       value="{{mgrSiteUrl}}">
     </iron-localstorage>
-    
+
     <sys-ajax
       id="sign-in-ajax"
       method="POST"
@@ -86,7 +89,7 @@ Copyright © HatioLab Inc. All rights reserved.
       </form>
     </iron-form>
 
-    <things-portal-display 
+    <things-portal-display
       background-url="/images/mobile_brand.png">
     </things-portal-display>
 
@@ -97,7 +100,7 @@ Copyright © HatioLab Inc. All rights reserved.
         <span class="label">[[labelUser]]</span>
         <input id="email" label="[[labelUser]]">
       </div>
-      
+
       <div class="input-container">
         <span class="label">[[labelPassword]]</span>
         <input id="password" label="[[labelPassword]]" type="password">
@@ -110,8 +113,8 @@ Copyright © HatioLab Inc. All rights reserved.
   </template>
 
   <script>
-    class MpsLogin extends mix(Polymer.Element).with(Things.Encrypt) {
-      static get is() { return 'mps-login' }
+    class AnyLogin extends mix(Polymer.Element).with(Things.Encrypt) {
+      static get is() { return 'any-login' }
 
       static get properties() {
         return {
@@ -212,7 +215,7 @@ Copyright © HatioLab Inc. All rights reserved.
       _handleResponseSuccess(event) {
         this.$['submit-btn'].disabled = false;
         const userInfo = event.currentTarget.request.lastResponse;
-        
+
         if(userInfo && userInfo.status && userInfo.status !== 'ok') {
           this._checkUserStatus(userInfo);
           return;
@@ -231,7 +234,7 @@ Copyright © HatioLab Inc. All rights reserved.
               this._moveToSetting();
             }
           })
-        }        
+        }
       }
 
       /**
@@ -269,7 +272,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       _moveToSetting() {
-        location.hash = '/mps_setting'
+        location.hash = '/any_setting'
       }
 
       _showSiteSelector(siteList) {
@@ -361,6 +364,6 @@ Copyright © HatioLab Inc. All rights reserved.
       }
     }
 
-    customElements.define(MpsLogin.is, MpsLogin);
+    customElements.define(AnyLogin.is, AnyLogin);
   </script>
 </dom-module>

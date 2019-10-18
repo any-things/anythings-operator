@@ -4,8 +4,8 @@ Copyright © HatioLab Inc. All rights reserved.
 -->
 
 <script>
-  MpsSettingMixin = superClass => {
-    return class MpsSettingMixin extends superClass {
+  AnySettingMixin = superClass => {
+    return class AnySettingMixin extends superClass {
       static get properties() {
         return {
           regionLabel: { type: String, value: () => t('label.region_nm')},
@@ -84,7 +84,6 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _getBrokerAddress(){
         let brokerAddrsAjax = this._getBrokerAddrsAjax();
-        //brokerAddrsAjax.curl = '/settings/find_by_name?name=mps.broker.address';
         brokerAddrsAjax.curl = '/settings/show_by_name?name=mps.broker.address';
         brokerAddrsAjax.baseUrl = this._getLocalStorage('setting.baseUrl');
         brokerAddrsAjax.generateRequest();
@@ -105,7 +104,6 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _getBrokerSite(){
         let brokerSiteAjax = this._getBrokerSiteAjax();
-        //brokerSiteAjax.curl = '/settings/find_by_name?name=mps.broker.site.code';
         brokerSiteAjax.curl = '/settings/show_by_name?name=mps.broker.site.code';
         brokerSiteAjax.baseUrl = this._getLocalStorage('setting.baseUrl');
         brokerSiteAjax.generateRequest();
@@ -161,7 +159,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
       _getRegionItems() {
         const regionItemAjax = this._getRegionItemAjax();
-        regionItemAjax.curl = `/region?limit=1000`;
+        regionItemAjax.curl = `/racks?limit=1000`;
         regionItemAjax.baseUrl = this._getLocalStorage('setting.baseUrl');
         regionItemAjax.generateRequest();
       }
@@ -171,7 +169,7 @@ Copyright © HatioLab Inc. All rights reserved.
         if(selectedOption && selectedOption.value) {
           const regionCode = selectedOption.value;
           const zoneItemAjax = this._getZoneItemAjax();
-          zoneItemAjax.curl = `/region/${regionCode}/zones`;
+          zoneItemAjax.curl = `/racks/${regionCode}/zones`;
           zoneItemAjax.baseUrl = this._getLocalStorage('setting.baseUrl');
           zoneItemAjax.generateRequest();
         }
@@ -250,11 +248,11 @@ Copyright © HatioLab Inc. All rights reserved.
         this._clearCombo(regionCombo);
         if(event && event.detail) {
           event.detail.items.forEach(region => {
-            const option = new Option(region.region_nm, region.region_cd);
+            const option = new Option(region.rack_nm, region.rack_cd);
 
-            if(this.regionCode === region.region_cd) {
+            if(this.regionCode === region.rack_cd) {
               option.selected = true;
-              this.regionName = region.region_nm;
+              this.regionName = region.rack_nm;
             }
 
             regionCombo.appendChild(option);

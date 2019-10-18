@@ -7,18 +7,21 @@ Copyright © HatioLab Inc. All rights reserved.
 <link rel="import" href="../units/sys-translator.html">
 <link rel="import" href="../units/sys-ajax.html">
 
+<!--
+  공통 로그아웃 기능 
+-->
 <dom-module id="sys-logout">
 	<template>
-		<sys-ajax 
-			curl="[[logoutUrl]]" 
+		<sys-ajax
+			curl="[[logoutUrl]]"
 			method="POST"
 			on-iron-ajax-response="_handleAjaxResponse">
 		</sys-ajax>
 
-    <iron-localstorage 
+    <iron-localstorage
       name="setting.user"
       value="{{user}}">
-    </iron-localstorage>		
+    </iron-localstorage>
 	</template>
 	<script>
 		class SysLogout extends Polymer.Element {
@@ -61,7 +64,7 @@ Copyright © HatioLab Inc. All rights reserved.
 				window.location.hash = "/login";
 			}
 		}
-		
+
 		window.customElements.define(SysLogout.is, SysLogout);
 	</script>
 </dom-module>

@@ -8,9 +8,9 @@ Copyright © HatioLab Inc. All rights reserved.
 <link rel="import" href="./mps-setting-styles.html">
 
 <!--
-  태블릿 설정 화면
+  태블릿 > 설정 화면
 -->
-<dom-module id="mps-setting-tab">
+<dom-module id="any-setting-tab">
   <template>
     <style include="shared-styles mps-setting-styles"></style>
 
@@ -106,10 +106,10 @@ Copyright © HatioLab Inc. All rights reserved.
           <template>
             <input value="f" name="work-location" type="radio" work-loc-name$="[[frontLabel]]">
             <label>[[leftLabel]]</label>
-            
+
             <input value="r" name="work-location" type="radio" work-loc-name$="[[rearLabel]]">
             <label>[[rightLabel]]</label>
-            
+
             <input value="all" name="work-location" type="radio" work-loc-name$="[[leftLabel]]/[[rightLabel]]" checked>
             <label>[[leftLabel]]/[[rightLabel]]</label>
           </template>
@@ -156,8 +156,8 @@ Copyright © HatioLab Inc. All rights reserved.
   </template>
 
   <script>
-    class MpsSettingTab extends MpsSettingMixin(MpsNetworkInfoMixin(Polymer.Element)) {
-      static get is() { return 'mps-setting-tab' }
+    class AnySettingTab extends AnySettingMixin(MpsNetworkInfoMixin(Polymer.Element)) {
+      static get is() { return 'any-setting-tab' }
 
       static get properties() {
         return {
@@ -466,6 +466,6 @@ Copyright © HatioLab Inc. All rights reserved.
       }
     }
 
-    customElements.define(MpsSettingTab.is, MpsSettingTab);
+    customElements.define(AnySettingTab.is, AnySettingTab);
   </script>
 </dom-module>

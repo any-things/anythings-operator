@@ -8,7 +8,7 @@ Copyright © HatioLab Inc. All rights reserved.
 <!--
   PDA > 설정 화면
 -->
-<dom-module id="mps-setting-pda">
+<dom-module id="any-setting-pda">
   <template>
     <style include="shared-styles mps-setting-styles"></style>
 
@@ -125,8 +125,8 @@ Copyright © HatioLab Inc. All rights reserved.
   </template>
 
   <script>
-    class MpsSettingPda extends MpsSettingMixin(Polymer.Element) {
-      static get is() { return 'mps-setting-pda' }
+    class AnySettingPda extends AnySettingMixin(Polymer.Element) {
+      static get is() { return 'any-setting-pda' }
 
       static get properties() {
         return {
@@ -380,7 +380,7 @@ Copyright © HatioLab Inc. All rights reserved.
             zoneCombo.appendChild(option);
           } else {
             zoneCombo.value = zoneCd;
-          }         
+          }
         }
 
       }
@@ -414,6 +414,6 @@ Copyright © HatioLab Inc. All rights reserved.
       }
     }
 
-    customElements.define(MpsSettingPda.is, MpsSettingPda);
+    customElements.define(AnySettingPda.is, AnySettingPda);
   </script>
 </dom-module>

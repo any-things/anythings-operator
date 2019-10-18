@@ -44,7 +44,7 @@ Copyright © HatioLab Inc. All rights reserved.
       on-sys-ajax-response="_menuResponsed">
     </sys-ajax>
 
-    <mps-menu-tile id="mps-setting" page="mps_setting" on-click="_menuClicked">
+    <mps-menu-tile id="mps-setting" page="any_setting" on-click="_menuClicked">
         <img src="./static/assets/menu-icons/menuicon-setting.png"/>
         [[settingLabel]]
     </mps-menu-tile>
@@ -105,7 +105,7 @@ Copyright © HatioLab Inc. All rights reserved.
         if(!iconName || !iconName.endsWith('.png')) {
           iconName = 'menuicon-prodinfo.png';
         }
-        return `./static/assets/menu-icons/${iconName}`;       
+        return `./static/assets/menu-icons/${iconName}`;
       }
 
       /**
