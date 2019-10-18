@@ -9,7 +9,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
 <link rel="import" href="../../../bower_components/polymer/polymer-element.html">
 
-<dom-module id="mps-site-selector">
+<dom-module id="any-site-selector">
   <template>
     <style include="shared-styles">
       :host {
@@ -45,8 +45,8 @@ Copyright © HatioLab Inc. All rights reserved.
   </template>
 
   <script>
-    class MpsSiteSelector extends Polymer.Element {
-      static get is() { return 'mps-site-selector' }
+    class AnySiteSelector extends Polymer.Element {
+      static get is() { return 'any-site-selector' }
 
       static get properties() {
         return {
@@ -118,6 +118,6 @@ Copyright © HatioLab Inc. All rights reserved.
       }      
     }
 
-    customElements.define(MpsSiteSelector.is, MpsSiteSelector);
+    customElements.define(AnySiteSelector.is, AnySiteSelector);
   </script>
 </dom-module>

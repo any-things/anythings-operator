@@ -12,7 +12,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
 <link rel="import" href="../../mixins/things-encrypt.html">
 
-<link rel="import" href="./mps-site-selector.html">
+<link rel="import" href="./any-site-selector.html">
 
 <!--
   로그인 화면
@@ -276,7 +276,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       _showSiteSelector(siteList) {
-        const siteSelector = document.createElement('mps-site-selector');
+        const siteSelector = document.createElement('any-site-selector');
         siteSelector.siteList = siteList;
 
         document.dispatchEvent(new CustomEvent('open-dialog', {
