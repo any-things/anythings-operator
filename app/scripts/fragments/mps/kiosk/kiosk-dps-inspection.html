@@ -638,7 +638,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
            getSkuAjaxUrl: {
             type: String,
-            value : `/pda_process/find_sku/${MPS_UTIL.getRegionCd()}/:inputValue`
+            value : `/pda_process/find_sku/${ANY_UTIL.getRegionCd()}/:inputValue`
           },
           /**
            * SKU 정보 조회 후 복수개가 조회된 경우 사용자가 고를 수 있는 팝업이 실행되는데 그 팝업에 표시할 타이틀
@@ -706,7 +706,7 @@ Copyright © HatioLab Inc. All rights reserved.
           this.bucketCd = bucketCd;
           this.validateBeforeBucketScan();
           var ajaxLabel = this.$['inspection-items-ajax'];
-          var inputType = MPS_UTIL.getKioskInputType();
+          var inputType = ANY_UTIL.getKioskInputType();
           ajaxLabel.curl = '/kiosk_process/dps/inspection/by_qty/ready/by_box/' + inputType + '/' + this.bucketCd;
           ajaxLabel.generateRequest();
         } catch (error) {
@@ -977,7 +977,7 @@ Copyright © HatioLab Inc. All rights reserved.
           this.$['reset-btn'].hidden = true;
           this.$['reset-all-btn'].hidden = true;
           //화면에서 완료된건은 빨강색으로 표현이 되기에 아래 메시지 필요 없음, 송장프린트는 별도 기능으로 처리
-          // MPS_UTIL.showMessage(t('error.already_processed'), t('text.can_re_issue_invoice'), this.focusBucketInput.bind());
+          // ANY_UTIL.showMessage(t('error.already_processed'), t('text.can_re_issue_invoice'), this.focusBucketInput.bind());
         }
 
         this.items = inspItems.map((item) => {
@@ -1056,7 +1056,7 @@ Copyright © HatioLab Inc. All rights reserved.
           var completeAjax = this.$['inspection-complete-ajax'];
           completeAjax.curl = '/kiosk_process/dps/inspection/by_qty/finish/' + this.currentOrderId;
           completeAjax.customParams = {
-            printer_id: MPS_UTIL.getKioskPrinterId()
+            printer_id: ANY_UTIL.getKioskPrinterId()
           };
           completeAjax.generateRequest();
         }
@@ -1158,7 +1158,7 @@ Copyright © HatioLab Inc. All rights reserved.
           var reprintAjax = this.$['reprint-invoice-ajax'];
           reprintAjax.curl = '/kiosk_process/dps/inspection/print/' + this.currentOrderId;
           reprintAjax.customParams = {
-            printer_id: MPS_UTIL.getKioskPrinterId()
+            printer_id: ANY_UTIL.getKioskPrinterId()
           };
           reprintAjax.generateRequest();
         } else {
@@ -1277,7 +1277,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
       changeInspectionStatus(){
         var boxId = this.$['bucket-cd'].value;
-        var inputType = MPS_UTIL.getKioskInputType();
+        var inputType = ANY_UTIL.getKioskInputType();
         var changeStatusAjax = this.$['change-status-ajax'];
         changeStatusAjax.curl = '/kiosk_process/dps/inspection/by_qty/again/'+inputType+'/'+boxId;
         changeStatusAjax.generateRequest();

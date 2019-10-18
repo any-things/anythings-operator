@@ -393,7 +393,7 @@ Copyright © HatioLab Inc. All rights reserved.
           showFullCode: {
             type: Boolean,
             value: () => {
-              return MPS_UTIL.getShowFullCode()
+              return ANY_UTIL.getShowFullCode()
             }
           },
 
@@ -414,7 +414,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           getSkuAjaxUrl: {
             type: String,
-            value: `/tablet_process/find_sku/${MPS_UTIL.getRegionCd()}/:inputValue`
+            value: `/tablet_process/find_sku/${ANY_UTIL.getRegionCd()}/:inputValue`
           },
 
           /**
@@ -578,7 +578,7 @@ Copyright © HatioLab Inc. All rights reserved.
       queryBatchSummary() {
         var ajax = this.$['query-batch-sum'];
         var baseUrl = ajax.baseUrl || JSON.parse(localStorage.getItem('setting.baseUrl'));
-        var regionCd = MPS_UTIL.getRegionCd();
+        var regionCd = ANY_UTIL.getRegionCd();
         ajax.url = `${baseUrl}/tablet_process/batch/progress_rate/${regionCd}`;
         ajax.generateRequest();
       }
@@ -625,7 +625,7 @@ Copyright © HatioLab Inc. All rights reserved.
         this.custCdQty = custCds.length;
         this._updateStatus(inputDetails);
 
-        let sideCd = MPS_UTIL.getSideCd();
+        let sideCd = ANY_UTIL.getSideCd();
         if (sideCd === 'F' || sideCd === 'f') {
           this.frontDetailList = this.sortByStatus(inputDetails);
 
@@ -642,7 +642,7 @@ Copyright © HatioLab Inc. All rights reserved.
           this.totalDetailList = this.sortByStatus(inputDetails);
 
         } else {
-          MPS_UTIL.showMessage(t('error.SETTING_ERROR'), t('text.invalid_sidecode'), this.moveToSetting);
+          ANY_UTIL.showMessage(t('error.SETTING_ERROR'), t('text.invalid_sidecode'), this.moveToSetting);
         }
       }
 
@@ -766,9 +766,9 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       mpiOffByTabletZone() {
         const mpiOffAjax = this.$['mpi-off-my-zone-ajax'];
-        let regionCd = MPS_UTIL.getRegionCd();
-        let zoneCd = MPS_UTIL.getZoneCd();
-        let sideCd = MPS_UTIL.getSideCd();
+        let regionCd = ANY_UTIL.getRegionCd();
+        let zoneCd = ANY_UTIL.getZoneCd();
+        let sideCd = ANY_UTIL.getSideCd();
         mpiOffAjax.curl = `/tablet_process/mpi_off/${regionCd}/${zoneCd}/${sideCd}`;
         mpiOffAjax.generateRequest();
       }
@@ -780,9 +780,9 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       mpiOnByTabletZone(mode) {
         const mpiOnAjax = this.$['mpi-on-jobs-ajax'];
-        let regionCd = MPS_UTIL.getRegionCd();
-        let zoneCd = MPS_UTIL.getZoneCd();
-        let sideCd = MPS_UTIL.getSideCd();
+        let regionCd = ANY_UTIL.getRegionCd();
+        let zoneCd = ANY_UTIL.getZoneCd();
+        let sideCd = ANY_UTIL.getSideCd();
         mpiOnAjax.curl = `/tablet_process/mpi_on/${regionCd}/${zoneCd}/${sideCd}`;
         mpiOnAjax.generateRequest();
       }
@@ -804,13 +804,13 @@ Copyright © HatioLab Inc. All rights reserved.
           popup.pickedQty = event.detail.data.picked_qty;
           popup.isFinished = (status === 'F');
 
-          MPS_UTIL.showPopup(t('title.job_select'), popup, 'fit', 'fit', null, closeParam => {
+          ANY_UTIL.showPopup(t('title.job_select'), popup, 'fit', 'fit', null, closeParam => {
             if(!closeParam || (!closeParam.type || closeParam.type != 'adjust-qty')) {
               this.refreshInputDetails();
             } else {
               const adjustPopup = document.createElement('mps-adjust-qty-dialog');
               setTimeout(() => {
-                MPS_UTIL.showPopup(t('button.adjust_qty'), adjustPopup, 'fit', 'fit', () => {
+                ANY_UTIL.showPopup(t('button.adjust_qty'), adjustPopup, 'fit', 'fit', () => {
                   adjustPopup.setCurrentQty(closeParam.pickingQty);
                   adjustPopup.jobId = closeParam.jobId;
                 }, this.refreshInputDetails.bind(this));
@@ -901,9 +901,9 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       inputSku(event) {
         let skuInfo = event.detail;
-        const regionCd = MPS_UTIL.getRegionCd();
-        const sideCd = MPS_UTIL.getSideCd();
-        let zoneCd = MPS_UTIL.getZoneCd();
+        const regionCd = ANY_UTIL.getRegionCd();
+        const sideCd = ANY_UTIL.getSideCd();
+        let zoneCd = ANY_UTIL.getZoneCd();
         let comCd = skuInfo.com_cd;
         let skuCd = skuInfo.sku_cd;
         let skuBarcd = skuInfo.sku_barcd;
@@ -1045,7 +1045,7 @@ Copyright © HatioLab Inc. All rights reserved.
         try {
           this.validateBeforeMapping(code, boxId);
           const assignBoxAjax = this.$['assign-box-to-loc'];
-          var regionCd = MPS_UTIL.getRegionCd();
+          var regionCd = ANY_UTIL.getRegionCd();
           assignBoxAjax.curl = `/pda_process/assign/${codeType}_box/${regionCd}/${code}/${boxId}`;
           assignBoxAjax.generateRequest();
         } catch (error) {
@@ -1103,9 +1103,9 @@ Copyright © HatioLab Inc. All rights reserved.
        * @Override
        */
       refreshInputDetails(mpiOnFlag) {
-        let regionCd = MPS_UTIL.getRegionCd();
-        let zoneCd = MPS_UTIL.getZoneCd();
-        let sideCd = MPS_UTIL.getSideCd();
+        let regionCd = ANY_UTIL.getRegionCd();
+        let zoneCd = ANY_UTIL.getZoneCd();
+        let sideCd = ANY_UTIL.getSideCd();
         let comCd = this.comCd ? this.comCd : '_na_';
         let skuCd = this.skuCd ? this.skuCd : '_na_';
         let headerColor = this.selectedInput ? this.selectedInput.mpi_color : 'Y';
@@ -1119,7 +1119,7 @@ Copyright © HatioLab Inc. All rights reserved.
             detailAjax.curl = `/tablet_process/job_details/${regionCd}/${sideCd}/${zoneCd}/${comCd}/${skuCd}`;
             detailAjax.generateRequest();
           } catch (error) {
-            MPS_UTIL.showMessage(error.title, error.message, error.callback);
+            ANY_UTIL.showMessage(error.title, error.message, error.callback);
           }
         }
       }

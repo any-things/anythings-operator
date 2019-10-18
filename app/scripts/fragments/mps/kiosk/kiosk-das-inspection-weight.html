@@ -736,7 +736,7 @@ Copyright © HatioLab Inc. All rights reserved.
         this.$['complete-btn'].hidden = alreadyEndFlag;
 
         if(alreadyEndFlag) {
-          MPS_UTIL.showMessage(t('text.already_done'), t('text.able_reprint'));
+          ANY_UTIL.showMessage(t('text.already_done'), t('text.able_reprint'));
         }
       }
 
@@ -748,7 +748,7 @@ Copyright © HatioLab Inc. All rights reserved.
       _printingResultChanged(printingResult) {
         if(!printingResult) return;
 
-        MPS_UTIL.showMessage(t('text.in_printing'), t('text.invoice_printing'));
+        ANY_UTIL.showMessage(t('text.in_printing'), t('text.invoice_printing'));
       }
 
       /**
@@ -799,7 +799,7 @@ Copyright © HatioLab Inc. All rights reserved.
           var reprintAjax = this.$['inspection-print-ajax'];
           reprintAjax.curl = '/kiosk_process/das/inspection/print/' + this.invoiceCode;
           reprintAjax.customParams = {
-            printer_id: MPS_UTIL.getKioskPrinterId()
+            printer_id: ANY_UTIL.getKioskPrinterId()
           }
           var self = this;
 
@@ -809,7 +809,7 @@ Copyright © HatioLab Inc. All rights reserved.
             reprintAjax.generateRequest();
           });
         } else {
-          MPS_UTIL.showMessage(t('text.input_invoice_number'), t('text.scan_invoice_number'));
+          ANY_UTIL.showMessage(t('text.input_invoice_number'), t('text.scan_invoice_number'));
         }
       }
 
@@ -818,12 +818,12 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _inspectionComplete() {
         if(this.currentExpectWeightValue == 0 || this.currentWeightValue == 0) {
-          MPS_UTIL.showMessage(t('text.ok'), t('text.inspection_no_complete'));
+          ANY_UTIL.showMessage(t('text.ok'), t('text.inspection_no_complete'));
           return;
         }
 
         if(this.boxWeightValue <= 0 || this.errorRangeValue < 0) {
-          MPS_UTIL.showMessage(t('text.ok'), t('text.select_range_boxweight'));
+          ANY_UTIL.showMessage(t('text.ok'), t('text.select_range_boxweight'));
           return;
         }
 
@@ -834,7 +834,7 @@ Copyright © HatioLab Inc. All rights reserved.
           var completeAjax = this.$['inspection-complete-ajax'];
           completeAjax.curl = '/kiosk_process/das/inspection/by_weight/finish/' + this.invoiceCode;
           completeAjax.customParams = {
-            printer_id: MPS_UTIL.getKioskPrinterId()
+            printer_id: ANY_UTIL.getKioskPrinterId()
           };
 
           var self = this;
@@ -845,7 +845,7 @@ Copyright © HatioLab Inc. All rights reserved.
             completeAjax.generateRequest();
           });
         } else {
-          MPS_UTIL.showMessage(t('text.checking_weight'), t('text.out_of_range'));
+          ANY_UTIL.showMessage(t('text.checking_weight'), t('text.out_of_range'));
         }
       }
 
@@ -886,7 +886,7 @@ Copyright © HatioLab Inc. All rights reserved.
         if(num >= 0) {
           this.errorRangeValue = num;
         } else {
-          MPS_UTIL.showMessage(t('text.ok'), t('text.not_number'));
+          ANY_UTIL.showMessage(t('text.ok'), t('text.not_number'));
         }
       }
     }

@@ -272,8 +272,8 @@ Copyright © HatioLab Inc. All rights reserved.
           this.skuName = data.sku_nm;
           this.inputSeq = data.input_seq;
 
-          let regionCd = MPS_UTIL.getRegionCd();
-          let zoneCd = MPS_UTIL.getZoneCd();
+          let regionCd = ANY_UTIL.getRegionCd();
+          let zoneCd = ANY_UTIL.getZoneCd();
           const inputDetailsAjax = this.$['input-details-ajax'];
           inputDetailsAjax.curl = `/tablet_process/das/input_status_details/${regionCd}/${zoneCd}/ALL/${this.comCd}/${this.skuCd}`;
         }

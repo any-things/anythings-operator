@@ -742,7 +742,7 @@ Copyright © HatioLab Inc. All rights reserved.
           this.$['inspection-btn'].hidden = true;
           this.$['reset-btn'].hidden = true;
           this.$['reset-all-btn'].hidden = true;
-          MPS_UTIL.showMessage(t('error.already_processed'), t('text.can_re_issue_invoice'), this.focusInvoiceInput.bind(this));
+          ANY_UTIL.showMessage(t('error.already_processed'), t('text.can_re_issue_invoice'), this.focusInvoiceInput.bind(this));
         }
 
         if(inspection.items) {
@@ -791,7 +791,7 @@ Copyright © HatioLab Inc. All rights reserved.
           var completeAjax = this.$['inspection-complete-ajax'];
           completeAjax.curl = '/kiosk_process/das/inspection/by_qty/finish/' + this.invoiceCode;
           completeAjax.customParams = {
-            printer_id: MPS_UTIL.getKioskPrinterId()
+            printer_id: ANY_UTIL.getKioskPrinterId()
           };
           completeAjax.generateRequest();
 
@@ -887,7 +887,7 @@ Copyright © HatioLab Inc. All rights reserved.
         var reprintAjax = this.$['reprint-invoice-ajax'];
         reprintAjax.curl = '/kiosk_process/das/inspection/print/' + this.invoiceCode;
         reprintAjax.customParams = {
-          printer_id: MPS_UTIL.getKioskPrinterId()
+          printer_id: ANY_UTIL.getKioskPrinterId()
         };
         reprintAjax.generateRequest();
         this.$['label-cd'].value = '';

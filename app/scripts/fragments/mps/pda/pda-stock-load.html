@@ -289,7 +289,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           getSkuAjaxUrl: {
             type: String,
-            value : `/pda_process/find_stock_sku/${MPS_UTIL.getRegionCd()}/:inputValue`
+            value : `/pda_process/find_stock_sku/${ANY_UTIL.getRegionCd()}/:inputValue`
           },
           /**
            * 점등 버튼 라벨
@@ -323,7 +323,7 @@ Copyright © HatioLab Inc. All rights reserved.
           if(skuCd) {
             this._getSkuInfo(skuCd);
           } else {
-            MPS_UTIL.showMessage(t('error.VALIDATION_ERROR'), t('error.barcd_is_not_typed'), this._initialSetup.bind(this));
+            ANY_UTIL.showMessage(t('error.VALIDATION_ERROR'), t('error.barcd_is_not_typed'), this._initialSetup.bind(this));
           }
         }
       }*/
@@ -345,7 +345,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _getSkuInfo(skuBarcd) {
         const skuInfoAjax = this.$['sku-info-ajax'];
-        let regionCd = MPS_UTIL.getRegionCd();
+        let regionCd = ANY_UTIL.getRegionCd();
         skuInfoAjax.curl = `/pda_process/find_stock_sku/${regionCd}/${skuBarcd}`;
         skuInfoAjax.generateRequest();
       }
@@ -375,7 +375,7 @@ Copyright © HatioLab Inc. All rights reserved.
         if (skuInfo) {
           if (skuInfo.sku_cd && skuInfo.sku_cd.length >= 4) {
             const locationAjax = this.$['location-ajax'];
-            let regionCd = MPS_UTIL.getRegionCd();
+            let regionCd = ANY_UTIL.getRegionCd();
             locationAjax.curl = `/pda_process/dps/recommend_load_locs/${regionCd}/${skuInfo.sku_cd}/${skuInfo.com_cd}`;
             locationAjax.generateRequest();
           }
@@ -429,7 +429,7 @@ Copyright © HatioLab Inc. All rights reserved.
       getOrderStockInfo() {
         try {
           this.validateBeforeOrderStockAjax();
-          const regionCd = MPS_UTIL.getRegionCd();
+          const regionCd = ANY_UTIL.getRegionCd();
           const orderStockAjax = this.$['order-stock-ajax'];
           orderStockAjax.curl = `/pda_process/dps/find_order_stock/${regionCd}/${this.locCd}/${this.skuCd}`;
           orderStockAjax.generateRequest();
@@ -560,7 +560,7 @@ Copyright © HatioLab Inc. All rights reserved.
           try {
             // 재고 적치전 validation 수행
             this.validateBeforeLoadStock();
-            let regionCd = MPS_UTIL.getRegionCd();
+            let regionCd = ANY_UTIL.getRegionCd();
             let loadQty = this.inputQty;
             let qtyUnit = 'P';
             const loadStockAjax = this.$['load-stock-ajax'];

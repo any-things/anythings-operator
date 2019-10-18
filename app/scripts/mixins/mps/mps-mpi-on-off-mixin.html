@@ -72,7 +72,7 @@ Copyright © HatioLab Inc. All rights reserved.
           title: t('button.led_on'),
           message: t('text.Sure to process'),
           confirmCallback: () => {
-            const regionCd = MPS_UTIL.getRegionCd();
+            const regionCd = ANY_UTIL.getRegionCd();
             const mpiOnAjax = this._getMpiOnAjax();
             mpiOnAjax.curl = `/kiosk_process/restore_mpi/${regionCd}`;
             mpiOnAjax.generateRequest();
@@ -89,7 +89,7 @@ Copyright © HatioLab Inc. All rights reserved.
           title: t('button.led_off'),
           message: t('text.Sure to process'),
           confirmCallback: () => {
-            const regionCd = MPS_UTIL.getRegionCd();
+            const regionCd = ANY_UTIL.getRegionCd();
             const mpiOffAjax = this._getMpiOffAjax();
             mpiOffAjax.curl = `/kiosk_process/mpi_off_all/${regionCd}`;
             mpiOffAjax.generateRequest();

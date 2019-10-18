@@ -356,7 +356,7 @@
                     */
                     getSkuAjaxUrl: {
                         type: String,
-                        value : `/pda_process/find_sku/${MPS_UTIL.getRegionCd()}/:inputValue`
+                        value : `/pda_process/find_sku/${ANY_UTIL.getRegionCd()}/:inputValue`
                     },
                     /**
                      * 재발행 라벨
@@ -507,7 +507,7 @@
             }
             _skuChangeConfirm(skuCd,skuBarcd){
                 var self = this;
-                MPS_UTIL.showConfirm(t('button.confirm'), t('text.confirm_sku_change'), function(){
+                ANY_UTIL.showConfirm(t('button.confirm'), t('text.confirm_sku_change'), function(){
                     self._getSkuCdInput().value = self.skuBarcd;
                     self._getSkuCdInput().select();
                     if(self.boxId){
@@ -532,7 +532,7 @@
             _getSkuData(e){
                 // if(this.skuItem && e.detail && e.detail[0] && e.detail[0].orderList[0] 
                 //     &&this.skuItem.pick_qty != e.detail[0].orderList[0].pick_qty){
-                //     MPS_UTIL.showMessage(t('button.confirm'), t('text.confirm_qty_change'), function(){
+                //     ANY_UTIL.showMessage(t('button.confirm'), t('text.confirm_qty_change'), function(){
                 //         this._doGetSkuData(e.detail[0].orderList[0],e.detail[0].summaryList);
                 //     }.bind(this));
                 //      e.target.blur();
@@ -619,7 +619,7 @@
 
                             if(this.boxId && this._getBoxIdInput().value &&this.boxId != this._getBoxIdInput().value){
                                 var self = this;
-                                MPS_UTIL.showMessage(t('button.confirm'), t('text.not_comp_exis_box_id'), function(){
+                                ANY_UTIL.showMessage(t('button.confirm'), t('text.not_comp_exis_box_id'), function(){
                                     if(self.skuItem && self.skuItem.bucket_cd){
                                         self._getBoxIdInput().value = self.skuItem.bucket_cd;
                                     }
@@ -691,7 +691,7 @@
                         if(skuInfo.picking_qty == 0 && !skuInfo.bucket_cd){
                             if(this.skuItem && this.skuItem.pick_qty!=skuInfo.pick_qty){
                               var self = this;
-                              MPS_UTIL.showMessage(t('button.confirm'), t('text.confirm_qty_change'), function(){
+                              ANY_UTIL.showMessage(t('button.confirm'), t('text.confirm_qty_change'), function(){
                                 self._getBoxIdInput().select();    
                               });
                               e.target.blur();
@@ -739,7 +739,7 @@
                     var reprintAjax = this.$['reprint-invoice-ajax'];
                     reprintAjax.curl = '/kiosk_process/dps/packing/print/' + this._getBoxIdInput().value;
                     reprintAjax.customParams = {
-                        printer_id: MPS_UTIL.getKioskPrinterId()
+                        printer_id: ANY_UTIL.getKioskPrinterId()
                     };
                     reprintAjax.generateRequest();
                 }

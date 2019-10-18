@@ -525,7 +525,7 @@ Copyright © HatioLab Inc. All rights reserved.
           const skuCd = input.value;
           ajax.curl = `/kiosk_process/middle_assort/find_sku/${this.batchListParams}/${skuCd}`;
         } else {
-          MPS_UTIL.showMessage(t('button.confirm'), t('text.select_operation_batch'));
+          ANY_UTIL.showMessage(t('button.confirm'), t('text.select_operation_batch'));
         }
 
         ajax.generateRequest();

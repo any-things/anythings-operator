@@ -696,7 +696,7 @@ Copyright © HatioLab Inc. All rights reserved.
         this.adjustPopup = adjustPopup;
 
         setTimeout(() => {
-          MPS_UTIL.showPopup(t('button.adjust_qty'), adjustPopup, 'fit', 'fit', () => {
+          ANY_UTIL.showPopup(t('button.adjust_qty'), adjustPopup, 'fit', 'fit', () => {
             adjustPopup.setCurrentQty(totalPickedQty);
             adjustPopup.adjustQty = () => {
               let adjustQty = parseInt(adjustPopup._getAdjustQtyInput().value);

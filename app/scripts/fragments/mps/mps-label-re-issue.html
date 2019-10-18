@@ -106,7 +106,7 @@ Copyright © HatioLab Inc. All rights reserved.
                 },
                 displayCallback: (value, rowData) => {
                   var val = value ? value : rowData.box_id;
-                  return val.substring(MPS_UTIL.getInvoiceFieldSubstr());
+                  return val.substring(ANY_UTIL.getInvoiceFieldSubstr());
                 }
               }, {
                 fieldname: 'id',
@@ -169,7 +169,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       searchBoxList() {
         var ajax = this.$['box-list-ajax'];
-        ajax.curl = '/tablet_process/boxed_list/' + MPS_UTIL.getRegionCd() + '/' + MPS_UTIL.getZoneCd() + '/' + MPS_UTIL.getSideCd();
+        ajax.curl = '/tablet_process/boxed_list/' + ANY_UTIL.getRegionCd() + '/' + ANY_UTIL.getZoneCd() + '/' + ANY_UTIL.getSideCd();
 
         // 최초 조회 이후 baseUrl이 초기화 되었다면 명시적으로 generateRequest를 호출함
         if(ajax.baseUrl) {

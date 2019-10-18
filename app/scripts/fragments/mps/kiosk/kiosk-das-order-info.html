@@ -714,8 +714,8 @@ Copyright © HatioLab Inc. All rights reserved.
         });
 
         // 3. 호기 선택 체크
-        if(!MPS_UTIL.getRegionCd()) {
-          MPS_UTIL.showMessage(t('text.selecting_region'), t('text.select_region'));
+        if(!ANY_UTIL.getRegionCd()) {
+          ANY_UTIL.showMessage(t('text.selecting_region'), t('text.select_region'));
         }
 
         document.addEventListener(`alert-closed-at-${location.hash.replace('#/', '')}`, event => {
@@ -758,7 +758,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
         setTimeout(function() {
           this.startAutoRefresh();
-        }.bind(this), MPS_UTIL.getRefreshInterval());
+        }.bind(this), ANY_UTIL.getRefreshInterval());
       }
 
       /**
@@ -825,7 +825,7 @@ Copyright © HatioLab Inc. All rights reserved.
        ***********************
        */
       getBatchSummary() {
-        const regionCd = MPS_UTIL.getRegionCd();
+        const regionCd = ANY_UTIL.getRegionCd();
         if(regionCd) {
           const batchSummaryAjax = this.$['batch-summary-ajax'];
           let status = this.$['unfinished-only'].checked == true ? 'U' : '';
@@ -876,7 +876,7 @@ Copyright © HatioLab Inc. All rights reserved.
         popup.skuList = skuList;
         var self = this;
 
-        MPS_UTIL.showPopup(t('title.sku_selection'), popup, null, null, null, () => {
+        ANY_UTIL.showPopup(t('title.sku_selection'), popup, null, null, null, () => {
           self.sku = popup.selectedSku;
           this.inputSku(self.sku.com_cd, self.sku.sku_cd, self.sku.sku_barcd);
         });
@@ -924,8 +924,8 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       inputSku(comCd, skuCd, skuBarcd) {
         if (skuCd && skuCd.length >= 3) {
-          var regionCd = MPS_UTIL.getRegionCd();
-          var workLoc = MPS_UTIL.getWorkLoc();
+          var regionCd = ANY_UTIL.getRegionCd();
+          var workLoc = ANY_UTIL.getWorkLoc();
           var startAssortAjax = this.$['input-sku-ajax'];
           let status = this.$['unfinished-only'].checked == true ? 'U' : '';
 
@@ -961,7 +961,7 @@ Copyright © HatioLab Inc. All rights reserved.
         const input = event.detail.input;
         const ajax = event.detail.ajax;
         const skuCd = input.value;
-        ajax.curl = `/kiosk_process/find_sku/${MPS_UTIL.getRegionCd()}/${skuCd}`;
+        ajax.curl = `/kiosk_process/find_sku/${ANY_UTIL.getRegionCd()}/${skuCd}`;
         ajax.generateRequest();
       }
 
@@ -991,9 +991,9 @@ Copyright © HatioLab Inc. All rights reserved.
             title: t('text.checking_inspection'),
             message: t('text.check_inspection'),
             confirmCallback: () => {
-              const regionCd = MPS_UTIL.getRegionCd();
-              const sideCd = MPS_UTIL.getSideCd();
-              let zoneCd = MPS_UTIL.getZoneCd();
+              const regionCd = ANY_UTIL.getRegionCd();
+              const sideCd = ANY_UTIL.getSideCd();
+              let zoneCd = ANY_UTIL.getZoneCd();
               let comCd = this.sku.com_cd;
               let skuCd = this.sku.sku_cd;
               this.doInspectTransaction(regionCd, sideCd, zoneCd, comCd, skuCd);
@@ -1005,7 +1005,7 @@ Copyright © HatioLab Inc. All rights reserved.
             }
           });
         } else {
-          MPS_UTIL.showMessage(detail.code, detail.msg, () => {
+          ANY_UTIL.showMessage(detail.code, detail.msg, () => {
             this._initialSetup();
             this._scannedFlag = false;
           });
@@ -1055,7 +1055,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} event
        */
       showDetailList(event) {
-        const regionCd = MPS_UTIL.getRegionCd();
+        const regionCd = ANY_UTIL.getRegionCd();
         const inputSeq = event.detail.data.input_seq;
         document.dispatchEvent(new CustomEvent('open-form-list-dialog', {
           detail: {

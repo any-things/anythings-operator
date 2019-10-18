@@ -166,7 +166,7 @@ Copyright © HatioLab Inc. All rights reserved.
         }
 
         var ajax = this.$['assign-box-to-loc'];
-        var regionCd = this.regionCd || MPS_UTIL.getRegionCd();
+        var regionCd = this.regionCd || ANY_UTIL.getRegionCd();
         ajax.curl = `/pda_process/assign/location_box/${regionCd}/${lcCode}/${boxId}`;
 
         // 요청 직전 AJAX 핸들링을 위한 이벤트

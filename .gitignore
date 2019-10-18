@@ -2,3 +2,4 @@ node_modules
 app/bower_components
 app/dist
 bower_components
+.DS_Store

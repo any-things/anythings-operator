@@ -89,9 +89,9 @@ Copyright © HatioLab Inc. All rights reserved.
           return;
         }
 
-        let regionCode = MPS_UTIL.getRegionCd();
-        let sideCode = MPS_UTIL.getSideCd();
-        let zoneCode = MPS_UTIL.getZoneCd();
+        let regionCode = ANY_UTIL.getRegionCd();
+        let sideCode = ANY_UTIL.getSideCd();
+        let zoneCode = ANY_UTIL.getZoneCd();
         let inspectAjax = this.$['inspect-sku-ajax'];
         inspectAjax.curl = `/pda_process/inspection_by_mpi/${regionCode}/${sideCode}/${zoneCd}/${this.comCode}/${skuCode}`;
         inspectAjax.generateRequest();
@@ -110,9 +110,9 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _mpiOffByTabletZone() {
         const mpiOffAjax = this.$['mpi-off-my-zone-ajax'];
-        let regionCd = MPS_UTIL.getRegionCd();
-        let zoneCd = MPS_UTIL.getZoneCd();
-        let sideCd = MPS_UTIL.getSideCd();
+        let regionCd = ANY_UTIL.getRegionCd();
+        let zoneCd = ANY_UTIL.getZoneCd();
+        let sideCd = ANY_UTIL.getSideCd();
         mpiOffAjax.curl = `/tablet_process/mpi_off/${regionCd}/${zoneCd}/${sideCd}`;
         mpiOffAjax.generateRequest();
       }
@@ -124,9 +124,9 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _mpiOnByTabletZone(mode) {
         const mpiOnAjax = this.$['mpi-on-jobs-ajax'];
-        let regionCd = MPS_UTIL.getRegionCd();
-        let zoneCd = MPS_UTIL.getZoneCd();
-        let sideCd = MPS_UTIL.getSideCd();
+        let regionCd = ANY_UTIL.getRegionCd();
+        let zoneCd = ANY_UTIL.getZoneCd();
+        let sideCd = ANY_UTIL.getSideCd();
         mpiOnAjax.curl = `/tablet_process/mpi_on/${regionCd}/${zoneCd}/${sideCd}`;
         mpiOnAjax.generateRequest();
       }

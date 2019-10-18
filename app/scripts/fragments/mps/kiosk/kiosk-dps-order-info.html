@@ -696,7 +696,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
         let interval = 20 * 1000;
         try {
-          interval = MPS_UTIL.getRefreshInterval();
+          interval = ANY_UTIL.getRefreshInterval();
         } catch (e) {
         }
 
@@ -791,7 +791,7 @@ Copyright © HatioLab Inc. All rights reserved.
           if(/^[bcdfghiBCDFGHI][0-9]{7}$/.exec(boxCd)) {
             event.currentTarget.value = '';
 
-            if(MPS_UTIL.getKioskInputType() === 'box') {
+            if(ANY_UTIL.getKioskInputType() === 'box') {
               this.inputBox(boxCd);
             } else {
               this.inputBucket(boxCd);
@@ -818,7 +818,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       refresh(event) {
         this._barcodeInputReset();
-        var regionCd = MPS_UTIL.getRegionCd();
+        var regionCd = ANY_UTIL.getRegionCd();
 
         if(regionCd) {
           var showOrderAjax = this.$['batch-summary-ajax'];
@@ -827,7 +827,7 @@ Copyright © HatioLab Inc. All rights reserved.
           showOrderAjax.curl = url;
           showOrderAjax.generateRequest();
         } else {
-          MPS_UTIL.showMessage(t('title.selecting_region'), t('text.select_region'));
+          ANY_UTIL.showMessage(t('title.selecting_region'), t('text.select_region'));
         }
       }
 
@@ -861,7 +861,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       inputBucket(bucketCd) {
         if(bucketCd && bucketCd.length >= 4) {
-          var regionCd = MPS_UTIL.getRegionCd();
+          var regionCd = ANY_UTIL.getRegionCd();
 
           if(regionCd) {
             var inputBucketAjax = this.$['input-ajax'];
@@ -870,7 +870,7 @@ Copyright © HatioLab Inc. All rights reserved.
             inputBucketAjax.curl = url;
             inputBucketAjax.generateRequest();
           } else {
-            MPS_UTIL.showMessage(t('title.selecting_region'), t('text.select_region'));
+            ANY_UTIL.showMessage(t('title.selecting_region'), t('text.select_region'));
           }
         }
       }
@@ -882,7 +882,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       inputBox(boxId) {
         if(boxId && boxId.length >= 4) {
-          var regionCd = MPS_UTIL.getRegionCd();
+          var regionCd = ANY_UTIL.getRegionCd();
 
           if(regionCd) {
             // 박스 ID의 첫 번째 글자가 박스 타입
@@ -893,7 +893,7 @@ Copyright © HatioLab Inc. All rights reserved.
             inputBucketAjax.curl = url;
             inputBucketAjax.generateRequest();
           } else {
-            MPS_UTIL.showMessage(t('title.selecting_region'), t('text.select_region'));
+            ANY_UTIL.showMessage(t('title.selecting_region'), t('text.select_region'));
           }
         }
       }
@@ -905,7 +905,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} e
        */
       _onBucketCdScanError(e) {
-        // MPS_UTIL.showMessage(e.detail.code, e.detail.msg, () => {
+        // ANY_UTIL.showMessage(e.detail.code, e.detail.msg, () => {
         //   this._initialSetup();
         // });
         this.enableAutoRefresh = false;

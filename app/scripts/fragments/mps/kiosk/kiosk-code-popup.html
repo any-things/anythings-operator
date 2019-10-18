@@ -123,7 +123,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @returns {String} qrImgSrc
        */
       _computeQRImgSrc(actionType) {
-        const kioskCodeType = MPS_UTIL.getKioskCodeType();
+        const kioskCodeType = ANY_UTIL.getKioskCodeType();
         const basePath = './static/assets/kiosk_codes/';
 
         if(actionType === 'mpi-off') {
@@ -162,8 +162,8 @@ Copyright © HatioLab Inc. All rights reserved.
             message: t('text.Sure to process'),
             confirmCallback: () => {
               const trxAjax = this.$['trx-ajax'];
-              let regionCd = MPS_UTIL.getRegionCd();
-              let sideCd = MPS_UTIL.getSideCd();
+              let regionCd = ANY_UTIL.getRegionCd();
+              let sideCd = ANY_UTIL.getSideCd();
 
               if(this.actionType === 'mpi-off') {
                 trxAjax.curl = '/kiosk_process/mpi_off_all/' + regionCd;

@@ -729,7 +729,7 @@ Copyright © HatioLab Inc. All rights reserved.
           ajaxWeight.body = this.weightParams;
           ajaxWeight.generateRequest();
         } catch (error) {
-          MPS_UTIL.showMessage(error.title, error.message);
+          ANY_UTIL.showMessage(error.title, error.message);
         }
       }
 
@@ -742,7 +742,7 @@ Copyright © HatioLab Inc. All rights reserved.
           var ajaxScale = this.$['scale-weight-ajax'];
           ajaxScale.generateRequest();
         } catch (error) {
-          MPS_UTIL.showMessage(error.title, error.message);
+          ANY_UTIL.showMessage(error.title, error.message);
         }
       }
 
@@ -816,7 +816,7 @@ Copyright © HatioLab Inc. All rights reserved.
             const skuCd = input.value;
             ajax.curl = `/kiosk_process/middle_assort/find_sku/${this.batchListParams}/${skuCd}`;
           } else {
-            MPS_UTIL.showMessage(t('button.confirm'), t('text.select_operation_batch'));
+            ANY_UTIL.showMessage(t('button.confirm'), t('text.select_operation_batch'));
           }
 
           ajax.generateRequest();
@@ -882,7 +882,7 @@ Copyright © HatioLab Inc. All rights reserved.
           var ajaxClear = this.$['scale-data-clear-ajax'];
           ajaxClear.generateRequest();
         } catch (error) {
-          MPS_UTIL.showMessage(error.title, error.message);
+          ANY_UTIL.showMessage(error.title, error.message);
         }
       }
 
@@ -907,7 +907,7 @@ Copyright © HatioLab Inc. All rights reserved.
             var ajaxStableData = root.$['scale-stable-data-ajax'];
             ajaxStableData.generateRequest();
           } catch (error) {
-            MPS_UTIL.showMessage(error.title, error.message);
+            ANY_UTIL.showMessage(error.title, error.message);
           }
         }, 2000);
       }
@@ -1008,14 +1008,14 @@ Copyright © HatioLab Inc. All rights reserved.
         if(!response) return;
 
         if(response.sku_real_wt) {
-          MPS_UTIL.showMessage(t('text.weight_(') + response.sku_real_wt + t('text.)_complete'), '', this.focusSkuInput());
+          ANY_UTIL.showMessage(t('text.weight_(') + response.sku_real_wt + t('text.)_complete'), '', this.focusSkuInput());
 
           setTimeout(function() {
             mpsAlert.close();
             this.focusSkuInput();
           }.bind(this), 3000);
         } else {
-          MPS_UTIL.showMessage(t('text.error'), '');
+          ANY_UTIL.showMessage(t('text.error'), '');
         }
       }
 
@@ -1028,7 +1028,7 @@ Copyright © HatioLab Inc. All rights reserved.
         if(!response) return;
 
         if(response.result == 'fail') {
-          MPS_UTIL.showMessage(t('text.no_scan_data'));
+          ANY_UTIL.showMessage(t('text.no_scan_data'));
         } else {
           this.$['current-weight'].value = response.data.data;
         }

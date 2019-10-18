@@ -4,7 +4,7 @@ Copyright © HatioLab Inc. All rights reserved.
 -->
 
 <link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
-<script src = "../../../units/mps-util.js"></script>
+<script src = "../../../units/any-util.js"></script>
 <dom-module id="pda-one-sku-order">
   <template>
     <style include="shared-styles">
@@ -117,7 +117,7 @@ Copyright © HatioLab Inc. All rights reserved.
           <input type="number" id="finished-sku" readonly />
         </div>
       </div>
-      
+
       <div id="input-container">
         <div class="input-row">
           <span class="label">[[skuCdLabel]]</span>
@@ -131,7 +131,7 @@ Copyright © HatioLab Inc. All rights reserved.
             button-txt-callback="[[_skuButtonTxtCallback]]"
             allowed-focus-out
             on-item-selected="_requestBoxType">
-          </mps-auto-popup-input>          
+          </mps-auto-popup-input>
         </div>
 
         <div class="input-row">
@@ -171,7 +171,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
   <script>
     class PdaOneSkuOrder extends MpsScannerMixin(Polymer.Element) {
-      static get is() { 
+      static get is() {
         return 'pda-one-sku-order'
       }
 
@@ -246,7 +246,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           getSkuAjaxUrl: {
             type: String,
-            value: `/pda_process/find_sku/${MPS_UTIL.getRegionCd()}/:inputValue`
+            value: `/pda_process/find_sku/${ANY_UTIL.getRegionCd()}/:inputValue`
           },
 
           /**
@@ -452,7 +452,7 @@ Copyright © HatioLab Inc. All rights reserved.
               this._getSkuCdInput().select();
             }
           }
-          
+
         }
       }
 
@@ -548,7 +548,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * 맵핑이 완료 되어 서버로 부터 END 상태를 전달 받으면 mps-message-spinner를 close
        *
        * 맵핑 상태
-       * MAPPING : 재고 맵핑 대기 
+       * MAPPING : 재고 맵핑 대기
        * END : 작업 맵핑 완료
        */
       _handleStatusResponse(event) {
@@ -556,7 +556,7 @@ Copyright © HatioLab Inc. All rights reserved.
           setTimeout(() => {
             this._requestStatusCheck()
           }, 3000);
-          
+
         } else if (event.detail.status.toUpperCase() === 'END') {
           this.mapId = null;
           this._toggleMessageSpinner();
@@ -584,8 +584,8 @@ Copyright © HatioLab Inc. All rights reserved.
        * 에러 발생시 mps-message-spinner를 close함
        *
        * 맵핑 에러 상태
-	     * LOC : location 에 상품 없음  
-	     * STOCK : 재고가 부족함 
+	     * LOC : location 에 상품 없음
+	     * STOCK : 재고가 부족함
        */
       _handleStatusError() {
         var boxInput = this._getBoxIdInput();

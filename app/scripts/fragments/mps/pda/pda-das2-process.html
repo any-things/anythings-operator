@@ -591,7 +591,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           regionCd: {
             type: String,
-            value: MPS_UTIL.getRegionCd(),
+            value: ANY_UTIL.getRegionCd(),
             observer: '_regionCdChanged'
           },
 
@@ -603,7 +603,7 @@ Copyright © HatioLab Inc. All rights reserved.
           regionNm: {
             type: String,
             notify: true,
-            value: MPS_UTIL.getRegionNm(),
+            value: ANY_UTIL.getRegionNm(),
             observer: '_regionNmChanged'
           },
 
@@ -615,7 +615,7 @@ Copyright © HatioLab Inc. All rights reserved.
           zoneCd: {
             type: String,
             notify: true,
-            value: MPS_UTIL.getZoneCd(),
+            value: ANY_UTIL.getZoneCd(),
             observer: '_zoneCdChanged'
           }
         }
@@ -872,7 +872,7 @@ Copyright © HatioLab Inc. All rights reserved.
       refreshInputDetails(mpiOnFlag) {
         let regionCd = this.regionCd;
         let zoneCd = this.zoneCd;
-        let sideCd = MPS_UTIL.getSideCd();
+        let sideCd = ANY_UTIL.getSideCd();
         let comCd = this.comCd ? this.comCd : '_na_';
         let skuCd = this.skuCd ? this.skuCd : '_na_';
         let headerColor = this.selectedInput ? this.selectedInput.mpi_color : 'Y';
@@ -886,7 +886,7 @@ Copyright © HatioLab Inc. All rights reserved.
           detailAjax.curl = `/tablet_process/job_details/${regionCd}/${sideCd}/${zoneCd}/${comCd}/${skuCd}`;
           detailAjax.generateRequest();
         } catch (error) {
-          MPS_UTIL.showMessage(error.title, error.message, error.callback);
+          ANY_UTIL.showMessage(error.title, error.message, error.callback);
         }
       }
 
@@ -983,7 +983,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
         var inputAjax = this.$['input-sku-ajax'];
         // 연속 스캔 허용 여부 설정에서 조회
-        var isContinousScanAllowed = MPS_UTIL.isContinousScanAllowed();
+        var isContinousScanAllowed = ANY_UTIL.isContinousScanAllowed();
 
         // 마지막으로 스캔한 코드가 박스 바코드이면 박스째 투입으로 처리
         if (this.inputValue === boxBarcd) {
@@ -1155,7 +1155,7 @@ Copyright © HatioLab Inc. All rights reserved.
       _reset(isItemReset) {
         this.regionCd = this.regionCd;
         this.zoneCd = this.zoneCd;
-        this.sideCd = MPS_UTIL.getSideCd();
+        this.sideCd = ANY_UTIL.getSideCd();
         this.showOthersOrder = false;
 
         this.skuBarcd = '';

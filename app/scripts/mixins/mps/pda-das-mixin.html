@@ -87,10 +87,10 @@ Copyright © HatioLab Inc. All rights reserved.
         }
 
         let inputListAjax = this.$['input-list-ajax'];
-        let regionCd = MPS_UTIL.getRegionCd();
-        let zoneCd = MPS_UTIL.getZoneCd();
-        let sideCd = MPS_UTIL.getSideCd();
-        let showOthersOrder = MPS_UTIL.getShowOthersOrder();
+        let regionCd = ANY_UTIL.getRegionCd();
+        let zoneCd = ANY_UTIL.getZoneCd();
+        let sideCd = ANY_UTIL.getSideCd();
+        let showOthersOrder = ANY_UTIL.getShowOthersOrder();
 
         inputListAjax.curl =
           `/tablet_process/input_list/${regionCd}/${zoneCd}/${sideCd}`;
@@ -108,9 +108,9 @@ Copyright © HatioLab Inc. All rights reserved.
       refreshInputDetails(mpiOnFlag) {
         this.setListHeaderColor(this.selectedInput.mpi_color);
         let inputSeqId = this.selectedInput.id;
-        let regionCd = MPS_UTIL.getRegionCd();
-        let zoneCd = MPS_UTIL.getZoneCd();
-        let sideCd = MPS_UTIL.getSideCd();
+        let regionCd = ANY_UTIL.getRegionCd();
+        let zoneCd = ANY_UTIL.getZoneCd();
+        let sideCd = ANY_UTIL.getSideCd();
         try {
           this.validationBeforeRefreshDetail(zoneCd, sideCd);
           let detailAjax = this.$['input-job-details-ajax'];
@@ -128,7 +128,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
           detailAjax.generateRequest();
         } catch (error) {
-          MPS_UTIL.showMessage(error.title, error.message, error.callback);
+          ANY_UTIL.showMessage(error.title, error.message, error.callback);
         }
       }
 
@@ -237,34 +237,34 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _inputDetailsChanged(inputDetails) {
         if (inputDetails == null) return;
-        let sideCd = MPS_UTIL.getSideCd();
+        let sideCd = ANY_UTIL.getSideCd();
 
         if (sideCd === 'F') {
           this._updateStatus(inputDetails[sideCd]);
-          this.frontDetailList = MPS_UTIL.sortByLeftQty(inputDetails[sideCd]);
+          this.frontDetailList = ANY_UTIL.sortByLeftQty(inputDetails[sideCd]);
 
         } else if (sideCd === 'R') {
           this._updateStatus(inputDetails[sideCd]);
-          this.rearDetailList = MPS_UTIL.sortByLeftQty(inputDetails[sideCd]);
+          this.rearDetailList = ANY_UTIL.sortByLeftQty(inputDetails[sideCd]);
 
         } else if (sideCd === 'ALL') {
           if (inputDetails['F']) {
             // FIXME: 제품 코드가 처음 입력될때 클라이언트 에러발생, inputDetails['F']가 undefined
             this._updateStatus(inputDetails['F'].concat(inputDetails['R']));
-            this.frontDetailList = MPS_UTIL.sortByLeftQty(inputDetails['F']);
+            this.frontDetailList = ANY_UTIL.sortByLeftQty(inputDetails['F']);
           } else if (inputDetails['R']) {
             this._updateStatus(inputDetails['R']);
           }
 
           if (inputDetails['R']) {
-            this.rearDetailList = MPS_UTIL.sortByLeftQty(inputDetails['R']);
+            this.rearDetailList = ANY_UTIL.sortByLeftQty(inputDetails['R']);
           }
 
         } else if (sideCd === 'T') {
           // TODO
 
         } else {
-          MPS_UTIL.showMessage(t('error.SETTING_ERROR'), t('text.invalid_sidecode'), this.moveToSetting);
+          ANY_UTIL.showMessage(t('error.SETTING_ERROR'), t('text.invalid_sidecode'), this.moveToSetting);
         }
 
         this.playSound();
