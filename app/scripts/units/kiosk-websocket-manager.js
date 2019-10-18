@@ -39,14 +39,14 @@ KIOSK_WS = {
       equip_type : 'kiosk',
       region_cd : '',
       command : 'CONNECT',
-      message : 'MPS 서버와 웹 소켓연결이 완료되었습니다.'
+      message : '서버와 웹 소켓 연결이 완료되었습니다.'
     },
 
     CLOSE : {
       equip_type : 'kiosk',
       region_cd : '',
       command : 'CLOSE',
-      message : 'MPS 서버와 웹 소켓연결을 종료합니다.'
+      message : '서버와 웹 소켓 연결을 종료합니다.'
     },
 
     REFRESH: {

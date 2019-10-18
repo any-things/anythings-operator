@@ -9,8 +9,8 @@
 			PDA: 'PDA',
 			KIOSK: 'KIOSK'
 		},
-		SRC_URL: 'http://128.10.1.143:8080',
-		IS_DEV_MODE: false,
-		MY_DEVICE: 'TABLET',
+		SRC_URL: 'http://localhost:4500',
+		IS_DEV_MODE: true,
+		MY_DEVICE: 'KIOSK',
 	}
 })();

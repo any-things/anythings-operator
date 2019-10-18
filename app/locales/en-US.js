@@ -225,7 +225,7 @@ window.locales['en-US'] = {
   'text.work_done': 'Work is done',
   'text.login_not_typed': 'Please type valid ID.',
   'text.password_not_typed': 'Please type valid password.',
-  'text.ip_addr_not_typed': 'Please type valid MPS Server IP.',
+  'text.ip_addr_not_typed': 'Please type valid Server IP.',
   'text.port_not_typed': 'Please type valid Port.',
   'text.invalid_sidecode': 'Please select valid work location via setting menu.',
   'text.check_baseUrl': 'Please check IP Address.',

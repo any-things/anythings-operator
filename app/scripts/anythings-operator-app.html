@@ -13,11 +13,11 @@ Copyright © HatioLab Inc. All rights reserved.
 
 <script src="./units/mixin-builder.js"></script>
 
-<link rel="import" href="./mps-operator-app-import.html">
+<link rel="import" href="./anythings-operator-app-import.html">
 
 <link rel="import" href="../styles/mobile-theme.html">
 
-<dom-module id="mps-operator-app">
+<dom-module id="anythings-operator-app">
   <template>
     <style>
       :host {
@@ -319,8 +319,8 @@ Copyright © HatioLab Inc. All rights reserved.
   </template>
 
   <script>
-    class MpsOperatorApp extends Polymer.Element {
-      static get is() { return 'mps-operator-app'; }
+    class AnythingsOperatorApp extends Polymer.Element {
+      static get is() { return 'anythings-operator-app'; }
 
       static get properties() {
         return {
@@ -421,7 +421,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           currentSite: {
             type: String,
-            value: 'MPS'
+            value: 'Operato'
           }
         }
       }
@@ -784,7 +784,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * 5. 로그인 여부 플래그 변경
        */
       _handleLogOut(e) {
-        this.currentSite = 'MPS';
+        this.currentSite = 'Operato';
         this.clearUserInfo();
         this.showLogoutBtn(false);
         this.showKioskSettingBtn(this.deviceType === 'KIOSK');
@@ -1044,6 +1044,6 @@ Copyright © HatioLab Inc. All rights reserved.
       }
     }
 
-    window.customElements.define(MpsOperatorApp.is, MpsOperatorApp);
+    window.customElements.define(AnythingsOperatorApp.is, AnythingsOperatorApp);
   </script>
 </dom-module>

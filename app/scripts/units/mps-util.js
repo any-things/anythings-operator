@@ -1,6 +1,6 @@
 /*******************************************************************************
  *  Source Name:    mps-util.js
- *  Description:    mps 유틸리티
+ *  Description:    유틸리티
  *  Author:         남종호
  *  Update History:
  *                  2018. 04. 27  남종호 최초 작성
