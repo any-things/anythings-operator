@@ -2,9 +2,10 @@
   "entrypoint": "app/index.html",
   "shell": "app/scripts/operato-logis-app.html",
   "fragments": [
-    "app/scripts/fragments/**/*",
     "app/scripts/mixins/**/*",
-    "app/scripts/units/**/*",
+    "app/scripts/components/**/*",
+    "app/scripts/fragments/**/*",
+    "app/scripts/logis/**/*",
     "app/bower_components/**/*"
   ],
   "sources": [
