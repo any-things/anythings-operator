@@ -5,19 +5,19 @@ Copyright © HatioLab Inc. All rights reserved.
 
 <link rel="import" href="../../../bower_components/polymer/polymer-element.html">
 
-<link rel="import" href="./any-setting-common.html">
-<link rel="import" href="./any-setting-tab.html">
-<link rel="import" href="./any-setting-pda.html">
-<link rel="import" href="./any-setting-kiosk.html">
-
-<link rel="import" href="../../mixins/common/network-info-mixin.html">
+<link rel="import" href="../common/any-setting-common.html">
+<link rel="import" href="./logis-setting-tab.html">
+<link rel="import" href="./logis-setting-pda.html">
+<link rel="import" href="./logis-setting-kiosk.html">
 
 <link rel="import" href="../../components/common/sound-player.html">
 
+<link rel="import" href="../../mixins/common/network-info-mixin.html">
+
 <!--
-  공통 > 설정 화면
+  물류 > 공통 > 설정 화면
 -->
-<dom-module id="any-setting">
+<dom-module id="logis-setting">
   <template>
     <style include="shared-styles">
       :host {
@@ -76,7 +76,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
   <script>
     class AnySetting extends Polymer.Element {
-      static get is() { return 'any-setting' }
+      static get is() { return 'logis-setting' }
 
       static get properties() {
         return {
@@ -145,7 +145,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
       _visibleChanged(visible) {
         if (visible) {
-          var settingPda = this.shadowRoot.querySelector('any-setting-pda')
+          var settingPda = this.shadowRoot.querySelector('logis-setting-pda')
           if (settingPda) {
             settingPda.resetRegionInfo();
           }
@@ -178,15 +178,15 @@ Copyright © HatioLab Inc. All rights reserved.
           let viewName;
           switch(deviceType) {
             case 'TABLET':
-              viewName = 'any-setting-tab';
+              viewName = 'logis-setting-tab';
               break;
 
             case 'PDA':
-              viewName = 'any-setting-pda';
+              viewName = 'logis-setting-pda';
               break;
 
             case 'KIOSK':
-              viewName = 'any-setting-kiosk';
+              viewName = 'logis-setting-kiosk';
               break;
           }
 
@@ -281,7 +281,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @description any-setting-common은 현재 사용자가
        * 관리 도메인의 주소가 유효한지 & 현재 선택한 사이트 도메인에 로그인 되어 있는지를 확인함
        * 관리 도메인의 주소가 유효하며 사이트 도메인에 정상 로그인 된 상태일 때 호출 됨
-       * session-responsed 이벤트를 발생시키고 operato-app의 event handler를 통해 화면상 필요한 작업을 수행함
+       * session-responsed 이벤트를 발생시키고 operato-logis-app의 event handler를 통해 화면상 필요한 작업을 수행함
        */
       _sessionResponseHandler(event) {
         this.dispatchEvent(new CustomEvent('session-responsed', {
@@ -299,7 +299,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @description any-setting-common은 현재 사용자가
        * 관리 도메인의 주소가 유효한지 & 현재 선택한 사이트 도메인에 로그인 되어 있는지를 확인함
        * 관리 도메인의 주소가 유효하지만 사이트 도메인에 로그인하지 않은 상태 일 때 호출 됨
-       * session-unauthorized 이벤트를 발생시키고 operato-app의 event handler를 통해 로그인 화면으로 이동함
+       * session-unauthorized 이벤트를 발생시키고 operato-logis-app의 event handler를 통해 로그인 화면으로 이동함
        */
       _sessionUnauthHandler() {
         this.dispatchEvent(new CustomEvent('session-unauthorized'));
@@ -324,7 +324,7 @@ Copyright © HatioLab Inc. All rights reserved.
             let title = error.detail ? error.detail.code : 'Error';
             let message = error.detail ? error.detail.msg : 'Error occured while saving setting.';
             this._showErrorMessage(title, message, () => {
-              location.hash = '/any_setting'
+              location.hash = '/logis_setting'
             });
           });
         }

@@ -182,7 +182,7 @@ LOGIS_UTIL.showConfirm = function(title, message, cancelCallback, confirmCallbac
  */
 LOGIS_UTIL.handleRequiredSettingEmpty = function() {
   LOGIS_UTIL.showMessage(t('text.selecting_region'), t('text.select_region'), function() {
-    location.hash = '/any_setting';
+    location.hash = '/logis_setting';
   });
 };
 

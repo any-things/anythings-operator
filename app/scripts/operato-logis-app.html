@@ -13,11 +13,11 @@ Copyright © HatioLab Inc. All rights reserved.
 
 <script src="./mixins/mixin-builder.js"></script>
 
-<link rel="import" href="./operato-app-import.html">
+<link rel="import" href="./operato-logis-app-import.html">
 
 <link rel="import" href="../styles/mobile-theme.html">
 
-<dom-module id="operato-app">
+<dom-module id="operato-logis-app">
   <template>
     <style>
       :host {
@@ -300,15 +300,15 @@ Copyright © HatioLab Inc. All rights reserved.
             on-login-succeed="_handleLoginSuccess">
           </any-login>
 
-          <any-setting
-            id="any-setting"
-            name="any_setting"
+          <logis-setting
+            id="logis-setting"
+            name="logis_setting"
             device-type="[[deviceType]]"
             is-dev-mode="[[isDevMode]]"
             is-not-login="[[isNotLogin]]"
             on-session-responsed="_sessionResponsed"
             on-session-unauthorized="_sessionUnauthorized">
-          </any-setting>
+          </logis-setting>
 
           <any-home
             name="home">
@@ -320,7 +320,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
   <script>
     class AnythingsOperatorApp extends Polymer.Element {
-      static get is() { return 'operato-app'; }
+      static get is() { return 'operato-logis-app'; }
 
       static get properties() {
         return {
@@ -375,7 +375,7 @@ Copyright © HatioLab Inc. All rights reserved.
           /**
            * KIOSK 환경에서 상단에 표시되는 작업 위치
            ***************
-           * any-setting에 의해 workLoc이 결정되면 workLoc을 바탕으로 화면에 표시할
+           * logis-setting에 의해 workLoc이 결정되면 workLoc을 바탕으로 화면에 표시할
            * 값을 결정함
            */
           kioskWorkLocLabel: {
@@ -441,9 +441,9 @@ Copyright © HatioLab Inc. All rights reserved.
           // 설정 화면에서 다른 화면으로 이동할 경우
           // 기존의 페이지 이동 이벤트를 prevent 하고 설정을 저장함
           // 설정을 저장하면 최종적으로 location.repload 수행
-          if(prevPage === 'any_setting') {
+          if(prevPage === 'logis_setting') {
             event.preventDefault();
-            this.$['any-setting'].saveSetting();
+            this.$['logis-setting'].saveSetting();
           }
         });
 
@@ -727,13 +727,13 @@ Copyright © HatioLab Inc. All rights reserved.
        * login 성공시
        * 1. 로그아웃 버튼 활성화
        * 2. 홈 화면으로 이동
-       * 3. any-setting 화면의 region items 조회
+       * 3. logis-setting 화면의 region items 조회
        * 4. 사용자 정보 reset
        */
       _handleLoginSuccess() {
         this.isNotLogin = false;
         this.showLogoutBtn();
-        // this.shadowRoot.querySelector('any-setting')._getRegionItems();
+        // this.shadowRoot.querySelector('logis-setting')._getRegionItems();
         this.resetInfo();
         this._moveToDefaultView();
 
@@ -757,7 +757,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       resetInfo() {
         // get user
-        this.$['any-setting'].checkSession();
+        this.$['logis-setting'].checkSession();
       }
 
       /**
@@ -922,7 +922,7 @@ Copyright © HatioLab Inc. All rights reserved.
           default:
             if(this.isNotLogin === undefined) return;
 
-            if (this.isNotLogin && !(page === 'any_setting' || page === 'login')) {
+            if (this.isNotLogin && !(page === 'logis_setting' || page === 'login')) {
               // 로그인 되지 않은 상태에서 setting 화면이나 login 화면이 아닌 다른곳으로 라우팅 시 로그인으로 강제 이동
               this.toLogin();
               openAlert({
@@ -951,7 +951,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * MPS 설정 화면으로 이동
        */
       toSetting() {
-        this.route = { prefix: '/', path: 'any_setting', title: t('menu.Settings') };
+        this.route = { prefix: '/', path: 'logis_setting', title: t('menu.Settings') };
       }
 
       /**

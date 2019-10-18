@@ -1,6 +1,6 @@
 {
   "entrypoint": "app/index.html",
-  "shell": "app/scripts/operato-app.html",
+  "shell": "app/scripts/operato-logis-app.html",
   "fragments": [
     "app/scripts/fragments/**/*",
     "app/scripts/mixins/**/*",

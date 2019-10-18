@@ -68,7 +68,7 @@ Copyright © HatioLab Inc. All rights reserved.
               return new Map([
                 ['home', {title: 'menu.Home'}],
                 ['login', {title: 'label.login'}],
-                ['any_setting', {title: 'menu.Settings'}]
+                ['logis_setting', {title: 'menu.Settings'}]
               ])
             }
           }
@@ -86,7 +86,7 @@ Copyright © HatioLab Inc. All rights reserved.
           const route = dataObj.route;
           const paramsKey = dataObj.paramsKey ? dataObj.paramsKey : 'routingParams';
           const params = dataObj.params;
-          const app = document.querySelector('operato-app');
+          const app = document.querySelector('operato-logis-app');
           const ironPages = app.$['main'];
           const pageChangeEventHandler = function(event) {
             if(event.currentTarget.selectedItem) {

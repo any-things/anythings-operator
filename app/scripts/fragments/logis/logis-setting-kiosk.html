@@ -6,10 +6,10 @@ Copyright © HatioLab Inc. All rights reserved.
 <link rel="import" href="../../../bower_components/polymer/polymer-element.html">
 
 <!--
-  KIOSK > 설정 화면
+  물류 > KIOSK > 설정 화면
  -->
 
-<dom-module id="any-setting-kiosk">
+<dom-module id="logis-setting-kiosk">
   <template>
     <style include="shared-styles any-setting-styles">
       .button-container {
@@ -113,7 +113,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
   <script>
     class AnySettingKiosk extends AnySettingMixin(Polymer.Element) {
-      static get is() { return 'any-setting-kiosk' }
+      static get is() { return 'logis-setting-kiosk' }
 
       static get properties() {
         return {
@@ -410,7 +410,7 @@ Copyright © HatioLab Inc. All rights reserved.
           this.updateSetting().then(() => {
             this._setLocalStorage(this.regionCodeLSKey, this._getRegionCombo().selectedOptions[0].value)
             this._setLocalStorage(this.regionNameLSKey, this._getRegionCombo().selectedOptions[0].innerText);
-            this._setLocalStorage(this.kioskScreenLSKey, this._getScreenCombo().selectedOptions[0] ? this._getScreenCombo().selectedOptions[0].value : 'any_setting');
+            this._setLocalStorage(this.kioskScreenLSKey, this._getScreenCombo().selectedOptions[0] ? this._getScreenCombo().selectedOptions[0].value : 'logis_setting');
             this._setLocalStorage(this.kioskPrinterIdLSKey, this._getPrintersCombo().selectedOptions[0] ? this._getPrintersCombo().selectedOptions[0].value : null);
             const kioskInterval = parseInt(this._getKioskIntervalInput().value);
             this._setLocalStorage(this.kioskIntervalLSKey,  kioskInterval >= 30 ? kioskInterval : 30);

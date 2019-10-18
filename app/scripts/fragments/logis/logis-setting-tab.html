@@ -5,12 +5,12 @@ Copyright © HatioLab Inc. All rights reserved.
 
 <link rel="import" href="../../../bower_components/polymer/polymer-element.html">
 
-<link rel="import" href="./any-setting-styles.html">
+<link rel="import" href="../common/any-setting-styles.html">
 
 <!--
-  태블릿 > 설정 화면
+  물류 > 태블릿 > 설정 화면
 -->
-<dom-module id="any-setting-tab">
+<dom-module id="logis-setting-tab">
   <template>
     <style include="shared-styles any-setting-styles"></style>
 
@@ -157,7 +157,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
   <script>
     class AnySettingTab extends AnySettingMixin(NetworkInfoMixin(Polymer.Element)) {
-      static get is() { return 'any-setting-tab' }
+      static get is() { return 'logis-setting-tab' }
 
       static get properties() {
         return {
