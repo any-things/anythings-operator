@@ -6,26 +6,32 @@ Copyright © HatioLab Inc. All rights reserved.
 <link rel="import" href="../../components/common/msg-alert.html">
 
 <script>
-  MpsBleScannerMixin = superClass => {
-    return class MpsBleScannerMixin extends superClass {
+  BleScannerMixin = superClass => {
+    return class BleScannerMixin extends superClass {
       static get properties() {
         return {
           /**
-           * 이 믹스인을 사용하는 화면의 라우팅 URL
+           * @description 이 믹스인을 사용하는 화면의 라우팅 URL
+           ****************************
+           * @type {String}
            */
           routingUrl: {
             type: String
           },
 
           /**
-           * 연결 대상 device id
+           * @description 연결 대상 device id
+           ****************************
+           * @type {String}
            */
           deviceId: {
             type: String
           },
 
           /**
-           * notification 대상 serviceUUID
+           * @description notification 대상 serviceUUID
+           ****************************
+           * @type {String}
            */
           serviceUUID: {
             type: String,
@@ -33,7 +39,9 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * notification 대상 characteristicUUID
+           * @description notification 대상 characteristicUUID
+           ****************************
+           * @type {String}
            */
           characteristicUUID: {
             type: String,
@@ -43,7 +51,8 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 라우팅 변경시 현재 연결된 장비가 있다면 ble 연결을 해제함
+       * @description 라우팅 변경시 현재 연결된 장비가 있다면 ble 연결을 해제함
+       ****************************
        */
       connectedCallback() {
         super.connectedCallback();
@@ -56,23 +65,24 @@ Copyright © HatioLab Inc. All rights reserved.
         document.addEventListener('page-changed', event => {
           const currentPage = event.detail.currentPage;
           const prevPage = event.detail.prevPage;
+
           if(!this.isCurrentPage(currentPage) && 'ble' in window) {
-            this.isConnected()
-                .then(isConnected => {
-                  if(isConnected) this.disconnectDevice();
-                });
+            this.isConnected().then(isConnected => {
+              if(isConnected) this.disconnectDevice();
+            });
           } else if ('ble' in window) {
-            this.isConnected()
-                .then(isConnected => {
-                  if(!isConnected) this.connectDevice();
-                })
+            this.isConnected().then(isConnected => {
+              if(!isConnected) this.connectDevice();
+            })
           }
         });
       }
 
       /**
-       * page-changed 이벤트 핸들러에 의해 호출되며
+       * @description page-changed 이벤트 핸들러에 의해 호출되며
        * 변경된 페이지가 현재 믹스인이 포함되어 있는 화면인지 여부를 return
+       ****************************
+       * @param {String} currentPage
        */
       isCurrentPage(currentPage) {
         return currentPage === this.routingUrl;
@@ -84,7 +94,8 @@ Copyright © HatioLab Inc. All rights reserved.
        * 2. 이미 연결되어 있는 장비인지 확인
        * 3. 연결 가능한 상태라면 주변 장치 검색을 중단
        * 4. 연결
-       * 5. 연결 성공호  startNotification을 호출
+       * 5. 연결 성공 후  startNotification을 호출
+       ****************************
        */
       connectDevice() {
         if(this.deviceId) {
@@ -93,34 +104,37 @@ Copyright © HatioLab Inc. All rights reserved.
                 if(isEnabled) {
                   return this.isConnected();
                 } else {
-                  document.dispatchEvent(new CustomEvent('show-toast',{
-                        detail:{
-                          type: t('error.SETTING_ERROR'),
-                          message: t('text.bluetooth_is_not_on')
-                        }
+                  document.dispatchEvent(new CustomEvent('show-toast', {
+                    detail:{
+                      type: t('error.SETTING_ERROR'),
+                      message: t('text.bluetooth_is_not_on')
+                    }
                   }));
                 }
               })
               .then(isConnected => {
                 if(isConnected) {
-                  document.dispatchEvent(new CustomEvent('show-toast',{
-                        detail:{
-                          type: t('title.connect_scanner'),
-                          message: t('text.bluetooth_scanner_connected')
-                        }
+                  document.dispatchEvent(new CustomEvent('show-toast', {
+                    detail:{
+                      type: t('title.connect_scanner'),
+                      message: t('text.bluetooth_scanner_connected')
+                    }
                   }));
+
                 } else {
                   this.stopScanDevices();
 
-                  if(this.beforeConnect && typeof this.beforeConnect === 'function') this.beforeConnect();
+                  if(this.beforeConnect && typeof this.beforeConnect === 'function') {
+                    this.beforeConnect();
+                  }
 
                   ble.connect(this.deviceId, () => {
                     this.startNotification();
                     document.dispatchEvent(new CustomEvent('show-toast',{
-                        detail:{
-                          type: t('title.connect_scanner'),
-                          message: t('text.bluetooth_scanner_connected')
-                        }
+                      detail:{
+                        type: t('title.connect_scanner'),
+                        message: t('text.bluetooth_scanner_connected')
+                      }
                     }));
                     if(this.afterConnect && typeof this.afterConnect === 'function') this.afterConnect();
                   });
@@ -134,6 +148,7 @@ Copyright © HatioLab Inc. All rights reserved.
       /**
        * @description 주변에 연결 가능한 장치가 있는지 검색함
        * deviceFound라는 명칭의 함수를 반드시 구현해야 함 (장비 검색에 성공 했을 때 호출하는 callback)
+       ****************************
        */
       scanDevices() {
         ble.startScan([], device => {
@@ -147,6 +162,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description 장치 검색을 중단함
+       ****************************
        */
       stopScanDevices() {
         ble.stopScan();
@@ -154,16 +170,17 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description deviceId를 통해 연결되어 있는 장비를 연결 해제함
+       ****************************
        */
       disconnectDevice() {
         if(this.beforeDisconnect && typeof this.beforeDisconnect === 'function') this.beforeDisconnect();
 
         ble.disconnect(this.deviceId, () => {
           document.dispatchEvent(new CustomEvent('show-toast',{
-              detail:{
-                type: t('title.disconnect_scanner'),
-                message: t('text.bluetooth_scanner_disconnected')
-              }
+            detail:{
+              type: t('title.disconnect_scanner'),
+              message: t('text.bluetooth_scanner_disconnected')
+            }
           }));
           if(this.afterDisconnect && typeof this.afterDisconnect === 'function') this.afterDisconnect();
         });
@@ -173,6 +190,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @description 장치 연결이 성공적으로 완료 되었을 때 호출 되며
        * 스캐너를 통해 입력된 값을 문자로 치환하여 scanned 함수를 호출 함
        * scanned라는 명칭의 함수를 반드시 구현해야 함 (스캔에 성공 했을 때 호출하는 callback)
+       ****************************
        */
       startNotification() {
         ble.startNotification(this.deviceId, this.serviceUUID, this.characteristicUUID, buffer => {
@@ -181,7 +199,6 @@ Copyright © HatioLab Inc. All rights reserved.
           } else {
             throw new Error('scanned callback function is not defined');
           }
-
         }, this._failCallback.bind(this));
       }
 
@@ -189,6 +206,9 @@ Copyright © HatioLab Inc. All rights reserved.
        * @description 현재 tablet이 사용할 수 있는지를 채크함
        * 사용할 수 있다면 true를 반환하는 promise return
        * 사용 할 수 없다면 false를 반환하는 promise return
+       ****************************
+       * @param {Function} successCallback
+       * @param {Function} failCallback
        */
       isEnabled(successCallback, failCallback) {
         return new Promise(resolve => {
@@ -204,6 +224,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @description this.deviceId를 통해 해당 장비가 연결되어 있는 상태인지를 확인함
        * 연결되어 있다면 true를 반환하는 promise return
        * 연결되어 있지 않다면 false를 반환하는 promise return
+       ****************************
        */
       isConnected() {
         return new Promise(resolve => {
@@ -216,7 +237,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * @description MpsBleScannerMixin에서 공통적으로 사용하는 failCallback 함수
+       * @description BleScannerMixin에서 공통적으로 사용하는 failCallback 함수
        * ble 연결을 위해 android는 위치 서비스가 활성화 되어 있는 상태여야 하기 때문에
        * parameter로 돌아온 error message에 location service와 관련된 내용이 있다면 관련 메시지를 출력함
        * (TODO: 근본적인 해결을 위해서는 location service가 활성화 된 상태인지 먼저 확인 한 뒤 connect를 시도해야함)

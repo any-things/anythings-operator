@@ -142,7 +142,7 @@ Copyright © HatioLab Inc. All rights reserved.
   </template>
 
   <script>
-    class PdaLocStockLookup extends MpsScannerMixin(Polymer.Element) {
+    class PdaLocStockLookup extends BarcodeScannerMixin(Polymer.Element) {
       static get is() { return 'pda-loc-stock-lookup' }
       static get properties() {
         return {

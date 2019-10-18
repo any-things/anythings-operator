@@ -7,7 +7,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
 <link rel="import" href="../../../logis/logis-pda-libs.html">
 
-<link rel="import" href="../../../mixins/mps/mps-message-subscribe-mixin.html">
+<link rel="import" href="../../../mixins/logis/logis-msg-subscribe-mixin.html">
 
 <link rel="import" href="./pda-job-process-detail.html">
 <link rel="import" href="../mps-adjust-qty-dialog.html">
@@ -195,7 +195,7 @@ Copyright © HatioLab Inc. All rights reserved.
   </template>
 
   <script>
-    class PdaJobProcess extends MpsMessageSubscribeMixin(Polymer.Element) {
+    class PdaJobProcess extends LogisMsgSubscribeMixin(Polymer.Element) {
       static get is() { return 'pda-job-process' }
 
       static get properties() {

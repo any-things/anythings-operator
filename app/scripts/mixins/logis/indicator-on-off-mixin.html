@@ -11,10 +11,11 @@ Copyright © HatioLab Inc. All rights reserved.
 -->
 
 <script>
-  MpsOnOffMixin = superClass => {
-    return class MpsOnOffMixin extends superClass {
+  IndicatorOnOffMixin = superClass => {
+    return class IndicatorOnOffMixin extends superClass {
       constructor(...args) {
         super(...args);
+        
         this.mpiOnAjax = (() => {
           var ajax = document.createElement('sys-ajax');
           ajax.id = 'mpi-on-ajax';
@@ -22,6 +23,7 @@ Copyright © HatioLab Inc. All rights reserved.
           ajax.contentType = 'application/json';
           return ajax;
         })();
+
         this.mpiOffAjax = (() => {
           var ajax = document.createElement('sys-ajax');
           ajax.id = 'mpi-off-ajax';
@@ -29,6 +31,7 @@ Copyright © HatioLab Inc. All rights reserved.
           ajax.contentType = 'application/json';
           return ajax;
         })();
+
         // 요소가 문서에 실존하지 않으면 요소 내부 콜백 등이 동작하지 않음으로 인함
         this.appendChild(this.mpiOnAjax);
         this.appendChild(this.mpiOffAjax);
@@ -52,6 +55,8 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description MPI 점등 Ajax 생성 후 리턴
+       *******************
+       * @return
        */
       _getMpiOnAjax() {
         return this.mpiOnAjax;
@@ -59,6 +64,8 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description MPI 소등 Ajax 생성 후 리턴
+       *******************
+       * @return
        */
       _getMpiOffAjax() {
         return this.mpiOffAjax;
@@ -66,6 +73,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description MPI 점등
+       *******************
        */
       _mpiOnRequest() {
         openConfirm({
@@ -83,6 +91,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description MPI 소등
+       *******************
        */
       _mpiOffRequest() {
         openConfirm({

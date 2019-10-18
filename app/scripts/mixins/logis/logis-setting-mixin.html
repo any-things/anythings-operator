@@ -8,81 +8,222 @@ Copyright © HatioLab Inc. All rights reserved.
     return class LoigsSettingMixin extends superClass {
       static get properties() {
         return {
-          regionLabel: { type: String, value: () => t('label.region_nm')},
-          jobLabel: { type: String, value: () => t('label.job_nm')},
-          zoneLabel: { type: String, value: () => t('label.zone_cd')},
-          workLocLabel: {type: String, value: () => t('label.work_location')},
-          leftLabel: { type: String, value: () => t('label.left') },
-          rightLabel: { type: String, value: () => t('label.right') },
-          frontLabel: { type: String, value: () => t('label.front')},
-          rearLabel: { type: String, value: () => t('label.rear')},
-          allLabel: { type: String, value: () => t('label.all')},
+          /**
+           * @description 랙 라벨
+           ****************
+           * @type {String}
+           */
+          regionLabel: {
+            type: String,
+            value: () => t('label.region_nm')
+          },
 
+          /**
+           * @description 작업 라벨
+           ****************
+           * @type {String}
+           */
+          jobLabel: {
+            type: String,
+            value: () => t('label.job_nm')
+          },
+
+          /**
+           * @description 스테이션 라벨
+           ****************
+           * @type {String}
+           */
+          zoneLabel: {
+            type: String,
+            value: () => t('label.zone_cd')
+          },
+
+          /**
+           * @description 작업 위치 라벨
+           ****************
+           * @type {String}
+           */
+          workLocLabel: {
+            type: String,
+            value: () => t('label.work_location')
+          },
+
+          /**
+           * @description 왼쪽 라벨
+           ****************
+           * @type {String}
+           */
+          leftLabel: {
+            type: String,
+            value: () => t('label.left')
+          },
+
+          /**
+           * @description 오른쪽 라벨
+           ****************
+           * @type {String}
+           */
+          rightLabel: {
+            type: String,
+            value: () => t('label.right')
+          },
+
+          /**
+           * @description 앞쪽 라벨
+           ****************
+           * @type {String}
+           */
+          frontLabel: {
+            type: String,
+            value: () => t('label.front')
+          },
+
+          /**
+           * @description 뒤쪽 라벨
+           ****************
+           * @type {String}
+           */
+          rearLabel: {
+            type: String,
+            value: () => t('label.rear')
+          },
+
+          /**
+           * @description All 라벨
+           ****************
+           * @type {String}
+           */
+          allLabel: {
+            type: String,
+            value: () => t('label.all')
+          },
+
+          /**
+           * @description 랙 코드
+           ****************
+           * @type {String}
+           */
           regionCode: {
             type: String,
             value: () => JSON.parse(localStorage.getItem('setting.regionCode'))
           },
 
+          /**
+           * @description 랙 코드 로케일 키
+           ****************
+           * @type {String}
+           */
           regionCodeLSKey: {
             type: String,
             value: 'setting.regionCode'
           },
 
+          /**
+           * @description 랙 이름
+           ****************
+           * @type {String}
+           */
           regionName: {
             type: String
           },
 
+          /**
+           * @description 랙 이름 로케일 키
+           ****************
+           * @type {String}
+           */
           regionNameLSKey: {
             type: String,
             value: 'setting.regionName'
           },
 
+          /**
+           * @description 스테이션 코드
+           ****************
+           * @type {String}
+           */
           zoneCode: {
             type: String,
             value: () => JSON.parse(localStorage.getItem('setting.zoneCode'))
           },
 
+          /**
+           * @description 스테이션 라벨 로케일 키
+           ****************
+           * @type {String}
+           */
           zoneCodeLSKey: {
             type: String,
             value: 'setting.zoneCode'
           },
 
+          /**
+           * @description 작업 이름
+           ****************
+           * @type {String}
+           */
           jobName: {
             type: String,
             value: () => JSON.parse(localStorage.getItem('setting.jobName'))
           },
 
+          /**
+           * @description 작업 이름 로케일 키
+           ****************
+           * @type {String}
+           */
           jobNameLSKey: {
             type: String,
             value: 'setting.jobName'
           },
 
+          /**
+           * @description 작업 위치
+           ****************
+           * @type {String}
+           */
           workLoc: {
             type: String,
             value: () => JSON.parse(localStorage.getItem('setting.workLocation'))
           },
 
+          /**
+           * @description 작업 위치 로케일 키
+           ****************
+           * @type {String}
+           */
           workLocLSKey: {
             type: String,
             value: 'setting.workLocation'
           },
 
+          /**
+           * @description 작업 위치 명
+           ****************
+           * @type {String}
+           */
           workLocName: {
             type: String
           },
 
+          /**
+           * @description 작업 위치 명 로케일 키
+           ****************
+           * @type {String}
+           */
           workLocNameLSKey: {
             type: String,
             value: 'setting.workLocationLabel'
-          },
-
+          }
         }
       }
 
       /**
        * @description broker address를 조회
+       *******************************
+       * @return
        */
-      _getBrokerAddress(){
+      _getBrokerAddress() {
         let brokerAddrsAjax = this._getBrokerAddrsAjax();
         brokerAddrsAjax.curl = '/settings/show_by_name?name=mps.broker.address';
         brokerAddrsAjax.baseUrl = this._getLocalStorage('setting.baseUrl');
@@ -91,6 +232,8 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description broker port를 조회
+       *******************************
+       * @return
        */
       _getBrokerPort() {
         let brokerPortAjax = this._getBrokerPortAjax();
@@ -101,8 +244,10 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description broker site를 조회
+       *******************************
+       * @return
        */
-      _getBrokerSite(){
+      _getBrokerSite() {
         let brokerSiteAjax = this._getBrokerSiteAjax();
         brokerSiteAjax.curl = '/settings/show_by_name?name=mps.broker.site.code';
         brokerSiteAjax.baseUrl = this._getLocalStorage('setting.baseUrl');
@@ -111,6 +256,8 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description return broker-addrs-ajax
+       *******************************
+       * @return
        */
       _getBrokerAddrsAjax() {
         return this.$['broker-addrs-ajax'];
@@ -118,6 +265,8 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description return broker-port-ajax
+       *******************************
+       * @return
        */
       _getBrokerPortAjax() {
         return this.$['broker-port-ajax'];
@@ -125,6 +274,8 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description return broker-site-ajax
+       *******************************
+       * @return
        */
       _getBrokerSiteAjax() {
         return this.$['broker-site-ajax'];
@@ -132,8 +283,9 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description 조회한 broker address를 localStorage에 저장함
+       *******************************
        */
-      _setBrokerAddress(response){
+      _setBrokerAddress(response) {
         if(response && response.detail) {
           localStorage.setItem('setting.brokerAddress', response.detail.value);
         }
@@ -141,6 +293,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description 조회한 broker port를 localStorage에 저장함
+       *******************************
        */
       _setBrokerPort(response) {
         if (response && response.detail) {
@@ -150,13 +303,19 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description 조회한 broker site를 localStorage에 저장함
+       *******************************
        */
-      _setBrokerSite(response){
+      _setBrokerSite(response) {
         if(response && response.detail) {
           localStorage.setItem('setting.brokerSite', response.detail.value);
         }
       }
 
+      /**
+       * @description 호기 리스트를 조회
+       *******************************
+       * @return
+       */
       _getRegionItems() {
         const regionItemAjax = this._getRegionItemAjax();
         regionItemAjax.curl = `/racks?limit=1000`;
@@ -164,6 +323,11 @@ Copyright © HatioLab Inc. All rights reserved.
         regionItemAjax.generateRequest();
       }
 
+      /**
+       * @description 스테이션 리스트를 조회
+       *******************************
+       * @return
+       */
       _getZoneItems() {
         const selectedOption = this._getRegionCombo().selectedOptions[0];
         if(selectedOption && selectedOption.value) {
@@ -175,6 +339,11 @@ Copyright © HatioLab Inc. All rights reserved.
         }
       }
 
+      /**
+       * @description 작업 유형 리스트 조회
+       *******************************
+       * @return
+       */
       _getJobItems() {
         const jobItemAjax = this._getJobItemAjax();
         jobItemAjax.curl = `/common_codes/show_by_name?name=JOB_TYPE`;
@@ -182,58 +351,117 @@ Copyright © HatioLab Inc. All rights reserved.
         jobItemAjax.generateRequest();
       }
 
+      /**
+       * @description 콤보 클리어
+       *******************************
+       */
       _clearCombo(combo) {
         while(combo.childElementCount) {
           combo.removeChild(combo.firstElementChild);
         }
       }
 
+      /**
+       * @description key로 로컬 스토리지에서 뽑아냄
+       *******************************
+       * @return
+       */
       _getLocalStorage(key) {
         return JSON.parse(localStorage.getItem(key));
       }
 
+      /**
+       * @description 로컬 스토리지에서 key, value로 저장
+       *******************************
+       */
       _setLocalStorage(key, value) {
         localStorage.setItem(key, JSON.stringify(value));
       }
 
+      /**
+       * @description 체크한 옵션 값 리턴
+       *******************************
+       * @return
+       */
       _getSelectedOpt(options) {
         return options.filter(option => {
           return option.checked
         })[0];
       }
 
+      /**
+       * @description 호기 리스트 Ajax
+       *******************************
+       */
       _getRegionItemAjax() {
         return this.$['region-items-ajax'];
       }
 
+      /**
+       * @description 작업 유형 리스트 Ajax
+       *******************************
+       */
       _getJobItemAjax() {
         return this.$['job-combo-ajax'];
       }
 
+      /**
+       * @description 스테이션 리스트 Ajax
+       *******************************
+       * @return
+       */
       _getZoneItemAjax() {
         return this.$['zone-items-ajax'];
       }
 
+      /**
+       * @description 업데이트 세팅 ajax 리턴
+       *******************************
+       * @return
+       */
       _getUpdateSettingAjax() {
         return this.$['update-setting-ajax'];
       }
 
+      /**
+       * @description 유형 리스트 콤보 리턴
+       *******************************
+       * @return
+       */
       _getRegionCombo() {
         return this.$['region-combo'];
       }
 
+      /**
+       * @description 스테이션 리스트 콤보 리턴
+       *******************************
+       */
       _getZoneCombo() {
         return this.$['zone-combo'];
       }
 
+      /**
+       * @description 작업 유형 리스트 콤보 리턴
+       *******************************
+       * @return
+       */
       _getJobCombo() {
         return this.$['job-combo'];
       }
 
+      /**
+       * @description 작업 위치 (사이드 코드) 값 리턴
+       *******************************
+       * @return
+       */
       _getWorkLocationOpts() {
         return Array.from(this.$['work-loc'].querySelectorAll('input[name=work-location]'));
       }
 
+      /**
+       * @description 작업 위치 (사이드 코드) 콤보 렌더링
+       *******************************
+       */
       _setWorkLocDefaultValue() {
         const workLocationOpts = this._getWorkLocationOpts();
         workLocationOpts.forEach(workLocationOpt => {
@@ -243,6 +471,10 @@ Copyright © HatioLab Inc. All rights reserved.
         });
       }
 
+      /**
+       * @description 호기 콤보 렌더링
+       *******************************
+       */
       _renderRegionCombo(event) {
         const regionCombo = this._getRegionCombo();
         this._clearCombo(regionCombo);
@@ -264,6 +496,10 @@ Copyright © HatioLab Inc. All rights reserved.
         }
       }
 
+      /**
+       * @description 작업 스테이션 콤보 렌더링
+       *******************************
+       */
       _renderZoneCombo(event) {
         const zoneCombo = this._getZoneCombo();
         this._clearCombo(zoneCombo);
@@ -280,6 +516,11 @@ Copyright © HatioLab Inc. All rights reserved.
         }
       }
 
+      /**
+       * @description 작업 유형 콤보 렌더링
+       *******************************
+       * @param {Object} event
+       */
       _renderJobCombo(event) {
         const jobCombo = this._getJobCombo();
         this._clearCombo(jobCombo);

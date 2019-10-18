@@ -7,9 +7,9 @@ Copyright © HatioLab Inc. All rights reserved.
 
 <link rel="import" href="../../../logis/logis-tablet-libs.html">
 
-<link rel="import" href="../../../mixins/mps/mps-ble-scanner-mixin.html">
-<link rel="import" href="../../../mixins/mps/tab-ord-info-common-mixin.html">
-<link rel="import" href="../../../mixins/mps/mps-message-subscribe-mixin.html">
+<link rel="import" href="../../../mixins/common/ble-scanner-mixin.html">
+<link rel="import" href="../../../mixins/logis/logis-common-assort-mixin.html">
+<link rel="import" href="../../../mixins/logis/logis-msg-subscribe-mixin.html">
 
 <link rel="import" href="../../../../styles/tab-order-info-styles.html">
 
@@ -192,7 +192,7 @@ Copyright © HatioLab Inc. All rights reserved.
   </template>
 
   <script>
-    class TabDasOrderInfo extends MpsMessageSubscribeMixin(TabOrdInfoCommonMixin(MpsBleScannerMixin(Polymer.Element))) {
+    class TabDasOrderInfo extends LogisMsgSubscribeMixin(LosigCommonAssortMixin(BleScannerMixin(Polymer.Element))) {
       static get is() { return 'tab-das-order-info' }
 
       static get properties() {

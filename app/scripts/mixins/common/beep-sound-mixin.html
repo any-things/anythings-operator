@@ -7,12 +7,12 @@ Copyright © HatioLab Inc. All rights reserved.
   사운드 처리 mixin
 -->
 <script>
-  MpsSoundMixin = superClass => {
-    return class MpsSoundMixin extends superClass {
+  BeepSoundMixin = superClass => {
+    return class BeepSoundMixin extends superClass {
       static get properties() {
         return {
           /**
-           * @description 성공 사운드 소스 
+           * @description 성공 사운드 소스
            *******************
            * @type {String}
            */
@@ -23,7 +23,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * @description 실패 사운드 소스 
+           * @description 실패 사운드 소스
            *******************
            * @type {String}
            */
@@ -33,7 +33,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * @description audio 오브젝트 
+           * @description audio 오브젝트
            *******************
            * @type {Object}
            */
@@ -56,7 +56,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * @description 사운드 실행 
+       * @description 사운드 실행
        *******************
        * @param {String} type
        */

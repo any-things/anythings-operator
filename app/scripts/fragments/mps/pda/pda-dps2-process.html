@@ -8,7 +8,7 @@ Copyright © HatioLab Inc. All rights reserved.
 <link rel="import" href="../../../logis/logis-pda-libs.html">
 <link rel="import" href="../mps-adjust-qty-dialog.html">
 
-<link rel="import" href="../../../mixins/mps/mps-message-subscribe-mixin.html">
+<link rel="import" href="../../../mixins/logis/logis-msg-subscribe-mixin.html">
 <link rel="import" href="../../../components/logis/box-process-checker.html">
 <link rel="import" href="../../../components/common/barcode-field.html">
 <link rel="import" href="../../../components/logis/plan-actual-display.html">
@@ -237,7 +237,7 @@ Copyright © HatioLab Inc. All rights reserved.
   </template>
 
   <script>
-    class PdaDps2Process extends MpsMessageSubscribeMixin(Polymer.Element) {
+    class PdaDps2Process extends LogisMsgSubscribeMixin(Polymer.Element) {
       static get is() { return 'pda-dps2-process' }
 
       static get properties() {

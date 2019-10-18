@@ -5,9 +5,9 @@ Copyright © HatioLab Inc. All rights reserved.
 
 <link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
 
-<link rel="import" href="../../../mixins/mps/mps-scanner-mixin.html">
-<link rel="import" href="../../../mixins/mps/mps-mpi-on-off-mixin.html">
-<link rel="import" href="../../../mixins/mps/mps-message-subscribe-mixin.html">
+<link rel="import" href="../../../mixins/common/barcode-scanner-mixin.html">
+<link rel="import" href="../../../mixins/logis/indicator-on-off-mixin.html">
+<link rel="import" href="../../../mixins/logis/logis-msg-subscribe-mixin.html">
 <link rel="import" href="../../../logis/logis-pda-libs.html">
 
 <link rel="import" href="./pda-rtn-process-detail.html">
@@ -246,7 +246,7 @@ Copyright © HatioLab Inc. All rights reserved.
   </template>
 
   <script>
-    class PdaRtnProcess extends MpsMessageSubscribeMixin(Polymer.Element) {
+    class PdaRtnProcess extends LogisMsgSubscribeMixin(Polymer.Element) {
       static get is() { return 'pda-rtn-process' }
       static get properties() {
         return {

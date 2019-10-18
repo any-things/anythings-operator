@@ -6,7 +6,7 @@ Copyright © HatioLab Inc. All rights reserved.
 <link rel="import" href="../../../bower_components/polymer/polymer-element.html">
 
 <link rel="import" href="../../../styles/shared-styles.html">
-<link rel="import" href="../../mixins/mps/mps-scanner-mixin.html">
+<link rel="import" href="../../mixins/common/barcode-scanner-mixin.html">
 
 <link rel="import" href="../sys/sys-ajax.html">
 <link rel="import" href="./auto-list-popup.html">
@@ -40,7 +40,7 @@ Copyright © HatioLab Inc. All rights reserved.
   </template>
 
   <script>
-    class AutoPopupInput extends MpsScannerMixin(Polymer.Element) {
+    class AutoPopupInput extends BarcodeScannerMixin(Polymer.Element) {
       static get is() { return 'auto-popup-input' }
 
       static get properties() {
