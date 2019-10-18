@@ -3,9 +3,12 @@
 Copyright © HatioLab Inc. All rights reserved.
 -->
 
-<link rel="import" href="../../bower_components/polymer/polymer-element.html" />
+<link rel="import" href="../../../bower_components/polymer/polymer-element.html" />
 
-<dom-module id="things-sound">
+<!--
+  사운드 재생 컴포넌트
+-->
+<dom-module id="sound-player">
   <template>
     <style></style>
 
@@ -14,9 +17,9 @@ Copyright © HatioLab Inc. All rights reserved.
   </template>
 
   <script>
-    class ThingsSound extends Polymer.Element {
+    class SoundPlayer extends Polymer.Element {
       static get is() {
-        return "things-sound";
+        return "sound-player";
       }
 
       static get properties() {
@@ -62,6 +65,6 @@ Copyright © HatioLab Inc. All rights reserved.
       }
     }
 
-    customElements.define(ThingsSound.is, ThingsSound);
+    customElements.define(SoundPlayer.is, SoundPlayer);
   </script>
 </dom-module>

@@ -10,9 +10,9 @@ Copyright © HatioLab Inc. All rights reserved.
 <link rel="import" href="./any-setting-pda.html">
 <link rel="import" href="./any-setting-kiosk.html">
 
-<link rel="import" href="../../mixins/mps/mps-network-info-mixin.html">
+<link rel="import" href="../../mixins/common/network-info-mixin.html">
 
-<link rel="import" href="../../units/things-sound.html">
+<link rel="import" href="../../components/common/sound-player.html">
 
 <!--
   공통 > 설정 화면
@@ -71,7 +71,7 @@ Copyright © HatioLab Inc. All rights reserved.
       <!--div class="version">[[version]]</div-->
     </div>
 
-    <things-sound></things-sound>
+    <sound-player></sound-player>
   </template>
 
   <script>
@@ -281,7 +281,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @description any-setting-common은 현재 사용자가
        * 관리 도메인의 주소가 유효한지 & 현재 선택한 사이트 도메인에 로그인 되어 있는지를 확인함
        * 관리 도메인의 주소가 유효하며 사이트 도메인에 정상 로그인 된 상태일 때 호출 됨
-       * session-responsed 이벤트를 발생시키고 anythings-operator-app의 event handler를 통해 화면상 필요한 작업을 수행함
+       * session-responsed 이벤트를 발생시키고 operato-app의 event handler를 통해 화면상 필요한 작업을 수행함
        */
       _sessionResponseHandler(event) {
         this.dispatchEvent(new CustomEvent('session-responsed', {
@@ -299,7 +299,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @description any-setting-common은 현재 사용자가
        * 관리 도메인의 주소가 유효한지 & 현재 선택한 사이트 도메인에 로그인 되어 있는지를 확인함
        * 관리 도메인의 주소가 유효하지만 사이트 도메인에 로그인하지 않은 상태 일 때 호출 됨
-       * session-unauthorized 이벤트를 발생시키고 anythings-operator-app의 event handler를 통해 로그인 화면으로 이동함
+       * session-unauthorized 이벤트를 발생시키고 operato-app의 event handler를 통해 로그인 화면으로 이동함
        */
       _sessionUnauthHandler() {
         this.dispatchEvent(new CustomEvent('session-unauthorized'));

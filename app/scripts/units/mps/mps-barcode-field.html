@@ -4,17 +4,17 @@ Copyright © HatioLab Inc. All rights reserved.
 -->
 
 <link rel="import" href="../../../bower_components/polymer/polymer-element.html">
-<link rel="import" href="../things-permanent-focus-input.html">
+<link rel="import" href="../../components/common/permanent-focus-input.html">
 <link rel="import" href="../mps/mps-auto-popup.html">
 
 <dom-module id="mps-barcode-field">
   <template>
     <style>
-      
+
     </style>
 
-    <things-permanent-focus-input id="input" timeout="2000" value="{{value}}">
-    </things-permanent-focus-input>
+    <permanent-focus-input id="input" timeout="2000" value="{{value}}">
+    </permanent-focus-input>
 
     <mps-auto-popup id="popup"
       button-txt-callback="[[buttonTextCallback]]" hidden>
@@ -112,7 +112,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
       _resetPopupContainer() {
         var popup = this.$.popup;
-        
+
         var container = popup.$.container;
         while (container.firstChild) {
           container.removeChild(container.firstChild);

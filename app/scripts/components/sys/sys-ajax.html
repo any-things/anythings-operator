@@ -3,11 +3,15 @@
 Copyright © HatioLab Inc. All rights reserved.
 -->
 
-<link rel="import" href="../../bower_components/polymer/polymer-element.html">
-<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
-<link rel="import" href="../../bower_components/iron-localstorage/iron-localstorage.html">
-<link rel="import" href="../units/mps/mps-alert.html">
+<link rel="import" href="../../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../../../bower_components/iron-localstorage/iron-localstorage.html">
 
+<link rel="import" href="../common/msg-alert.html">
+
+<!--
+  Ajax 처리 컴포넌트
+-->
 <dom-module id="sys-ajax">
 	<template>
 		<style>
@@ -105,7 +109,7 @@ Copyright © HatioLab Inc. All rights reserved.
 						notify: true,
 						observer: '_loadingChanged'
 					},
-					
+
 					/**
 					 * lastRequest's response.
 					 *
@@ -158,8 +162,6 @@ Copyright © HatioLab Inc. All rights reserved.
 			}
 
 			_curlChanged(curl) {
-				// console.log(this.baseUrl + ': ' + curl);
-
 				if (this.baseUrl === undefined) {
 					return;
 				}
@@ -223,24 +225,24 @@ Copyright © HatioLab Inc. All rights reserved.
 
 			_handleAjaxError(e, {request, error}) {
 				var response = request.xhr.response;
-				
+
 				// 에러 사운드 재생
 				if (window.SOUND) {
 					window.SOUND.playErrorSound();
 				}
-				
+
 				if(this.customErrorHandler) {
 					this.dispatchEvent(new CustomEvent('sys-ajax-error', {
 						detail: response
 					}));
 				} else {
 					if(request.xhr.status == 401) {
-						let event = new CustomEvent('sys-unauthorized-session', { 
-							detail: response, 
-							bubbles: true, 
+						let event = new CustomEvent('sys-unauthorized-session', {
+							detail: response,
+							bubbles: true,
 							composed: true
 						});
-						
+
 						this.dispatchEvent(event);
 					} else if (response) {
 						if (!response.status && !response.msg) {

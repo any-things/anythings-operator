@@ -1,4 +1,4 @@
-<link rel="import" href="../../units/sys-ajax.html">
+<link rel="import" href="../../components/sys/sys-ajax.html">
 
 <script>
   /**
@@ -7,8 +7,8 @@
    * 웹 환경에서는 서버에 요청을 통해 ip address를 확인함
    * 웹 환경의 경우 ip 주소를 돌려주는 서비스를 반드시 구현해야 함
    */
-  MpsNetworkInfoMixin = superClass => {
-    return class MpsNetworkInfoMixin extends superClass {
+  NetworkInfoMixin = superClass => {
+    return class NetworkInfoMixin extends superClass {
       static get properties() {
         return {
           /**
@@ -22,7 +22,7 @@
 
       /**
        * @description 웹/모바일 ip 주소를 확인하기 위해 호출
-       * @param {Function} @requires successCallback ip 주소 확인이 성공적으로 종료 되었을 경우 호출하는 callback 
+       * @param {Function} @requires successCallback ip 주소 확인이 성공적으로 종료 되었을 경우 호출하는 callback
        * @param {Function} failCallback ip 주소 확인이 실패했을 경우 호출되는 callback
        */
       getIpAddress(successCallback, failCallback) {
@@ -39,12 +39,12 @@
 
       /**
        * @description 모바일 환경에서 ip 주소를 확인하기 위해 호출
-       * @param {Function} @requires successCallback ip 주소 확인이 성공적으로 종료 되었을 경우 호출하는 callback 
+       * @param {Function} @requires successCallback ip 주소 확인이 성공적으로 종료 되었을 경우 호출하는 callback
        * @param {Function} failCallback ip 주소 확인이 실패했을 경우 호출되는 callback
        */
       getMobileIpAddress(successCallback, failCallback) {
         networkinterface.getWiFiIPAddress(success => {
-          successCallback(success);  
+          successCallback(success);
         }, fail => {
           if(this.failCallback && typeof this.failCallback === 'function') {
             failCallback(fail);
@@ -54,19 +54,21 @@
 
       /**
        * @description 웹 환경에서 ip 주소를 확인하기 위해 호출
-       * @param {Function} @requires successCallback ip 주소 확인이 성공적으로 종료 되었을 경우 호출하는 callback 
+       * @param {Function} @requires successCallback ip 주소 확인이 성공적으로 종료 되었을 경우 호출하는 callback
        * @param {Function} failCallback ip 주소 확인이 실패했을 경우 호출되는 callback
        */
       getWebIpAddress(successCallback, failCallback) {
         if(this.serviceApi) {
           if(!this.getIpAdressAjax) {
             this.getIpAdressAjax = document.createElement('sys-ajax');
+
             if(this.serviceApi.indexOf('http') === 0) {
               this.getIpAdressAjax.url = this.serviceApi;
             } else {
               this.getIpAddress.curl = this.serviceApi;
             }
           }
+
           this.getIpAdressAjax.addEventListener('sys-ajax-response', event => {
             this.successCallback(event.detail);
           });
@@ -78,6 +80,7 @@
           });
 
           this.getIpAddress.generateRequest();
+
         } else {
           throw new Error('serviceApi is not defined.');
         }

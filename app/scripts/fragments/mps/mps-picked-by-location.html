@@ -203,7 +203,7 @@ Copyright © HatioLab Inc. All rights reserved.
         // 현재 페이지의 URL을 저장
         this.routingUrl = location.hash.replace('#/', '');
         // 호기 코드를 현재 호기 코드로 설정
-        this.chuteNo = ANY_UTIL.getZoneCd();
+        this.chuteNo = LOGIS_UTIL.getZoneCd();
         this.$['chute-no'].value = this.chuteNo;
 
         document.addEventListener(`alert-closed-at-${this.routingUrl}`, event => {

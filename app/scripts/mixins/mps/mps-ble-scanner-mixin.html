@@ -1,9 +1,10 @@
-<link rel="import" href="../../units/mps/mps-alert.html">
-
 <!--
 @license
 Copyright © HatioLab Inc. All rights reserved.
 -->
+
+<link rel="import" href="../../components/common/msg-alert.html">
+
 <script>
   MpsBleScannerMixin = superClass => {
     return class MpsBleScannerMixin extends superClass {
@@ -112,7 +113,7 @@ Copyright © HatioLab Inc. All rights reserved.
                   this.stopScanDevices();
 
                   if(this.beforeConnect && typeof this.beforeConnect === 'function') this.beforeConnect();
-                  
+
                   ble.connect(this.deviceId, () => {
                     this.startNotification();
                     document.dispatchEvent(new CustomEvent('show-toast',{
@@ -135,7 +136,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * deviceFound라는 명칭의 함수를 반드시 구현해야 함 (장비 검색에 성공 했을 때 호출하는 callback)
        */
       scanDevices() {
-        ble.startScan([], device => { 
+        ble.startScan([], device => {
           if(this.deviceFound && typeof this.deviceFound === 'function') {
             this.deviceFound(device);
           } else {
@@ -180,7 +181,7 @@ Copyright © HatioLab Inc. All rights reserved.
           } else {
             throw new Error('scanned callback function is not defined');
           }
-          
+
         }, this._failCallback.bind(this));
       }
 
@@ -216,7 +217,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description MpsBleScannerMixin에서 공통적으로 사용하는 failCallback 함수
-       * ble 연결을 위해 android는 위치 서비스가 활성화 되어 있는 상태여야 하기 때문에 
+       * ble 연결을 위해 android는 위치 서비스가 활성화 되어 있는 상태여야 하기 때문에
        * parameter로 돌아온 error message에 location service와 관련된 내용이 있다면 관련 메시지를 출력함
        * (TODO: 근본적인 해결을 위해서는 location service가 활성화 된 상태인지 먼저 확인 한 뒤 connect를 시도해야함)
        * 그 외의 경우 exception 발생

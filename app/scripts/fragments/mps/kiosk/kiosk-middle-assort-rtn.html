@@ -457,12 +457,12 @@ Copyright © HatioLab Inc. All rights reserved.
         try {
           const skuCd = input.value;
           this.validateBeforeAssort(skuCd);
-          ajax.curl = `/kiosk_process/find_sku/${ANY_UTIL.getRegionCd()}/${skuCd}`;
+          ajax.curl = `/kiosk_process/find_sku/${LOGIS_UTIL.getRegionCd()}/${skuCd}`;
           // TODO 아래 형식으로 변경
           //ajax.curl = `/kiosk_process/middle_assort/find_sku/${배치 그룹 ID}/${skuCd}`;
           ajax.generateRequest();
         } catch (error) {
-          ANY_UTIL.showMessage(error.title, error.message, error.confirmCallback);
+          LOGIS_UTIL.showMessage(error.title, error.message, error.confirmCallback);
         }
       }
 
@@ -487,8 +487,8 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _middleAssortRtnAjaxResponsed(event) {
         this.midAssortResp = event.detail
-        var regionCd = ANY_UTIL.getRegionCd();
-        var workLoc = ANY_UTIL.getWorkLoc();
+        var regionCd = LOGIS_UTIL.getRegionCd();
+        var workLoc = LOGIS_UTIL.getWorkLoc();
         this.skuNm = this.midAssortResp && this.midAssortResp.sku_nm;
         this.boxInQty = this.midAssortResp && this.midAssortResp.box_in_qty;
       }

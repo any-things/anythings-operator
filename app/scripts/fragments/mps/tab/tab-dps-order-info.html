@@ -410,7 +410,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           getSkuAjaxUrl: {
             type: String,
-            value: `/pda_process/find_sku/${ANY_UTIL.getRegionCd()}/:inputValue`
+            value: `/pda_process/find_sku/${LOGIS_UTIL.getRegionCd()}/:inputValue`
           },
 
           /**
@@ -503,7 +503,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _updateStatus(inputDetails) {
         // input detail의 내용이 없을 경우 다음 아이템을 선택함 == 나와 관계 없는 작업들 처리...
-        if (inputDetails.length === 0 && !this.holdIndicator && ANY_UTIL.getAutoPicking()) {
+        if (inputDetails.length === 0 && !this.holdIndicator && LOGIS_UTIL.getAutoPicking()) {
           if (!this.$['dps-job-indicator'].selectNextItem()) {
             this.refreshInputList();
           }
@@ -535,7 +535,7 @@ Copyright © HatioLab Inc. All rights reserved.
         this._updateBlockChart(this.pickedPercent);
 
         // 작업률 100% & 자동피킹이 true로 설정 && 사용자에 의해 클릭을 통해 변경되지 않은 경우 => true
-        if (pickedCanceldPercent === 100 && ANY_UTIL.getAutoPicking() && !this.holdIndicator) {
+        if (pickedCanceldPercent === 100 && LOGIS_UTIL.getAutoPicking() && !this.holdIndicator) {
           // 다음 아이템이 없을 경우 false를 리턴함
           if (!this.$['dps-job-indicator'].selectNextItem()) {
             // 마지막 아이템일 경우 input list를 다시 조회
@@ -597,9 +597,9 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       mpiOffByTabletZone() {
         const mpiOffAjax = this.$['mpi-off-my-zone-ajax'];
-        let regionCd = ANY_UTIL.getRegionCd();
-        let zoneCd = ANY_UTIL.getZoneCd();
-        let sideCd = ANY_UTIL.getSideCd();
+        let regionCd = LOGIS_UTIL.getRegionCd();
+        let zoneCd = LOGIS_UTIL.getZoneCd();
+        let sideCd = LOGIS_UTIL.getSideCd();
         mpiOffAjax.curl = `/tablet_process/mpi_off/${regionCd}/${zoneCd}/${sideCd}`;
         mpiOffAjax.generateRequest();
       }
@@ -612,9 +612,9 @@ Copyright © HatioLab Inc. All rights reserved.
       mpiOnByTabletZone(mode) {
         const mpiOnAjax = this.$['mpi-on-jobs-ajax'];
         let inputSeqId = this.selectedInput.id;
-        let regionCd = ANY_UTIL.getRegionCd();
-        let zoneCd = ANY_UTIL.getZoneCd();
-        let sideCd = ANY_UTIL.getSideCd();
+        let regionCd = LOGIS_UTIL.getRegionCd();
+        let zoneCd = LOGIS_UTIL.getZoneCd();
+        let sideCd = LOGIS_UTIL.getSideCd();
         mpiOnAjax.curl = `/tablet_process/dps/mpi_on/${inputSeqId}/${regionCd}/${zoneCd}/${sideCd}/${mode}`;
         mpiOnAjax.generateRequest();
       }
@@ -640,12 +640,12 @@ Copyright © HatioLab Inc. All rights reserved.
           popup.isFinished = (status === 'F');
           var self = this;
 
-          ANY_UTIL.showPopup(t('title.job_select'), popup, 'fit', 'fit', null, closeParam => {
+          LOGIS_UTIL.showPopup(t('title.job_select'), popup, 'fit', 'fit', null, closeParam => {
             if (closeParam && typeof closeParam === 'object' && closeParam.type === 'adjust-qty') {
               const adjustPopup = document.createElement('mps-adjust-qty-dialog');
 
               setTimeout(() => {
-                ANY_UTIL.showPopup(t('button.adjust_qty'), adjustPopup, 'fit', 'fit', () => {
+                LOGIS_UTIL.showPopup(t('button.adjust_qty'), adjustPopup, 'fit', 'fit', () => {
                   adjustPopup.setCurrentQty(closeParam.pickQty);
                   adjustPopup.jobId = closeParam.jobId;
                 }, () => {
@@ -747,11 +747,11 @@ Copyright © HatioLab Inc. All rights reserved.
       swipeLeft(event) {
         if (!this.inputList || this.inputList.length == 0) return;
         let startInputSeq = this.inputList[0].input_seq;
-        let regionCd = ANY_UTIL.getRegionCd();
-        let zoneCd = ANY_UTIL.getZoneCd();
-        let sideCd = ANY_UTIL.getSideCd();
+        let regionCd = LOGIS_UTIL.getRegionCd();
+        let zoneCd = LOGIS_UTIL.getZoneCd();
+        let sideCd = LOGIS_UTIL.getSideCd();
         let pageAjax = this.$['input-list-pages-ajax'];
-        pageAjax.customParams = { show_others_order: ANY_UTIL.getShowOthersOrder() };
+        pageAjax.customParams = { show_others_order: LOGIS_UTIL.getShowOthersOrder() };
         pageAjax.curl = `/tablet_process/dps/input_pages/${regionCd}/${zoneCd}/${sideCd}/DOWN/${startInputSeq}`;
         pageAjax.generateRequest();
       }
@@ -764,9 +764,9 @@ Copyright © HatioLab Inc. All rights reserved.
       swipeRight(event) {
         if (!this.inputList || this.inputList.length == 0) return;
         let startInputSeq = this.inputList[this.inputList.length - 1].input_seq;
-        let regionCd = ANY_UTIL.getRegionCd();
-        let zoneCd = ANY_UTIL.getZoneCd();
-        let sideCd = ANY_UTIL.getSideCd();
+        let regionCd = LOGIS_UTIL.getRegionCd();
+        let zoneCd = LOGIS_UTIL.getZoneCd();
+        let sideCd = LOGIS_UTIL.getSideCd();
         let pageAjax = this.$['input-list-pages-ajax'];
         pageAjax.curl = `/tablet_process/dps/input_pages/${regionCd}/${zoneCd}/${sideCd}/UP/${startInputSeq}`;
         pageAjax.generateRequest();
@@ -781,8 +781,8 @@ Copyright © HatioLab Inc. All rights reserved.
         const inspWithPickAjax = this.$['depart-ajax'];
         let scannedBarcode = this.selectedInput.bucket_cd;
         //if(this.selectedInput.status==='F') {
-        let regionCd = ANY_UTIL.getRegionCd();
-        let zoneCd = ANY_UTIL.getZoneCd();
+        let regionCd = LOGIS_UTIL.getRegionCd();
+        let zoneCd = LOGIS_UTIL.getZoneCd();
         inspWithPickAjax.curl = `/tablet_process/dps/box_depart/${regionCd}/${zoneCd}/${scannedBarcode}`;
         inspWithPickAjax.generateRequest();
         //}
@@ -876,9 +876,9 @@ Copyright © HatioLab Inc. All rights reserved.
         const inspWithPickAjax = this.$['insp-with-pick-ajax'];
         let scannedBarcode = this.scannedBarcode = event.detail.sku_cd;
         let inputSeqId = this.selectedInput ? this.selectedInput.id : 'none';
-        let regionCd = ANY_UTIL.getRegionCd();
-        let zoneCd = ANY_UTIL.getZoneCd();
-        let sideCd = ANY_UTIL.getSideCd();
+        let regionCd = LOGIS_UTIL.getRegionCd();
+        let zoneCd = LOGIS_UTIL.getZoneCd();
+        let sideCd = LOGIS_UTIL.getSideCd();
         inspWithPickAjax.curl = `/tablet_process/dps/insp_with_pick/${regionCd}/${sideCd}/${zoneCd}/${inputSeqId}/${scannedBarcode}/${this.mpiCd}`;
         inspWithPickAjax.generateRequest();
       }

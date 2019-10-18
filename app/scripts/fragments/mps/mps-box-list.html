@@ -102,7 +102,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           jobType: {
             type: Boolean,
-            value: () => ANY_UTIL.getJobName()
+            value: () => LOGIS_UTIL.getJobName()
           },
 
           /**
@@ -135,7 +135,7 @@ Copyright © HatioLab Inc. All rights reserved.
             value: function() {
               return [{
                 // 반품 화면일 때 로케이션 대신 상품 표시
-                display: ANY_UTIL.getJobName() === 'RTN' ? t('label.sku') : t('label.customer'),
+                display: LOGIS_UTIL.getJobName() === 'RTN' ? t('label.sku') : t('label.customer'),
                 fieldname: 'cust_nm',
                 columnWidth: '0.5fr',
                 displayCallback: (value, rowData) => {
@@ -156,7 +156,7 @@ Copyright © HatioLab Inc. All rights reserved.
                 fieldname: 'box_id',
                 columnWidth: '0.325fr',
                 displayCallback: (value) => {
-                  return value.substring(ANY_UTIL.getInvoiceFieldSubstr());
+                  return value.substring(LOGIS_UTIL.getInvoiceFieldSubstr());
                 },
                 style: {
                   textAlign: 'center'
@@ -235,7 +235,7 @@ Copyright © HatioLab Inc. All rights reserved.
         if (visible) {
           this.searchBoxList();
 
-          /*var brokerSite = ANY_UTIL.getBrokerSiteCd();
+          /*var brokerSite = LOGIS_UTIL.getBrokerSiteCd();
           if(this.jobType == 'DAS' && (brokerSite == 'ym01' || brokerSite == 'ym02')) {
             var boxCancelEnabledAjax = this.$['cancel-box-enabled-ajax'];
             boxCancelEnabledAjax.curl = '/company_setting/BD5393FB-DBEC-4DF1-A996-4CB3E3F26324';
@@ -259,7 +259,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       searchBoxList() {
         var ajax = this.$['box-list-ajax'];
-        ajax.curl = `/tablet_process/boxed_list/${ANY_UTIL.getRegionCd()}/${ANY_UTIL.getZoneCd()}/${ANY_UTIL.getSideCd()}`;
+        ajax.curl = `/tablet_process/boxed_list/${LOGIS_UTIL.getRegionCd()}/${LOGIS_UTIL.getZoneCd()}/${LOGIS_UTIL.getSideCd()}`;
 
         // 최초 조회 이후 baseUrl이 초기화 되었다면 명시적으로 generateRequest를 호출함
         if(ajax.baseUrl) {
@@ -286,7 +286,7 @@ Copyright © HatioLab Inc. All rights reserved.
         const mpsBoxListDetail = document.createElement('mps-box-list-detail');
         mpsBoxListDetail.boxResult = boxResult;
 
-        var brokerSite = ANY_UTIL.getBrokerSiteCd();
+        var brokerSite = LOGIS_UTIL.getBrokerSiteCd();
         if(this.jobType == 'DAS' && (brokerSite == 'ym01' || brokerSite == 'ym02')) {
           mpsBoxListDetail.isBoxCancelEnabled = true;
         }

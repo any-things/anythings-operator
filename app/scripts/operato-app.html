@@ -11,13 +11,13 @@ Copyright © HatioLab Inc. All rights reserved.
 <script src="../locales/en-US.js"></script>
 <script src="../locales/zh-CN.js"></script>
 
-<script src="./units/mixin-builder.js"></script>
+<script src="./mixins/mixin-builder.js"></script>
 
-<link rel="import" href="./anythings-operator-app-import.html">
+<link rel="import" href="./operato-app-import.html">
 
 <link rel="import" href="../styles/mobile-theme.html">
 
-<dom-module id="anythings-operator-app">
+<dom-module id="operato-app">
   <template>
     <style>
       :host {
@@ -175,7 +175,7 @@ Copyright © HatioLab Inc. All rights reserved.
     </mps-locale>
 
     <mps-dialog id="mps-dialog"></mps-dialog>
-    <mps-alert id="mps-alert"></mps-alert>
+    <msg-alert id="msg-alert"></msg-alert>
     <mps-toast-msg id="mps-toast-msg"></mps-toast-msg>
 
     <app-drawer-layout id="drawer-layout" fullbleed force-narrow narrow="{{narrow}}" responsive-width="1000px">
@@ -320,7 +320,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
   <script>
     class AnythingsOperatorApp extends Polymer.Element {
-      static get is() { return 'anythings-operator-app'; }
+      static get is() { return 'operato-app'; }
 
       static get properties() {
         return {

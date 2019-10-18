@@ -110,7 +110,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * focus를 code input으로 이동함
-       * anythings-operator-app에 의해 dialog가 나타나고 openCallback에 의해 실행됨
+       * operato-app에 의해 dialog가 나타나고 openCallback에 의해 실행됨
        */
       initialSetup() {
         this.$['code'].select();
@@ -123,7 +123,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @returns {String} qrImgSrc
        */
       _computeQRImgSrc(actionType) {
-        const kioskCodeType = ANY_UTIL.getKioskCodeType();
+        const kioskCodeType = LOGIS_UTIL.getKioskCodeType();
         const basePath = './static/assets/kiosk_codes/';
 
         if(actionType === 'mpi-off') {
@@ -162,8 +162,8 @@ Copyright © HatioLab Inc. All rights reserved.
             message: t('text.Sure to process'),
             confirmCallback: () => {
               const trxAjax = this.$['trx-ajax'];
-              let regionCd = ANY_UTIL.getRegionCd();
-              let sideCd = ANY_UTIL.getSideCd();
+              let regionCd = LOGIS_UTIL.getRegionCd();
+              let sideCd = LOGIS_UTIL.getSideCd();
 
               if(this.actionType === 'mpi-off') {
                 trxAjax.curl = '/kiosk_process/mpi_off_all/' + regionCd;

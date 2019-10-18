@@ -370,7 +370,7 @@
                     var reprintAjax = this.$['reprint-invoice-ajax'];
                     reprintAjax.curl = '/kiosk_process/dps/packing/print/' + this.$['box-id'].value;
                     reprintAjax.customParams = {
-                        printer_id: ANY_UTIL.getKioskPrinterId()
+                        printer_id: LOGIS_UTIL.getKioskPrinterId()
                     };
                     reprintAjax.generateRequest();
                 }

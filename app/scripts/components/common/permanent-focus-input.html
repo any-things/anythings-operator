@@ -3,13 +3,15 @@
 Copyright © HatioLab Inc. All rights reserved.
 -->
 
-<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../../bower_components/polymer/polymer-element.html">
 
-<dom-module id="things-permanent-focus-input">
+<!--
+  Focus를 계속해서 자신쪽으로 가져오는 Input Field 컴포넌트
+-->
+<dom-module id="permanent-focus-input">
   <template>
     <style>
       :host {
-        
       }
 
       .input-row {
@@ -40,14 +42,14 @@ Copyright © HatioLab Inc. All rights reserved.
 
     <div class="input-row">
       <span class="label">[[valueLabel]]</span>
-      <input id="input" max-length="[[maxLength]]" on-keypress="_handleValueKeypress" 
+      <input id="input" max-length="[[maxLength]]" on-keypress="_handleValueKeypress"
         value="[[value::change]]" hidden="[[hidden]]" on-blur="_onValueBlur" on-focus="_onValueFocus">
     </div>
   </template>
 
   <script>
-    class ThingsPermanentFocusInput extends Polymer.Element {
-      static get is() { return 'things-permanent-focus-input'; }
+    class PermanentFocusInput extends Polymer.Element {
+      static get is() { return 'permanent-focus-input'; }
 
       static get properties() {
         return {
@@ -94,10 +96,9 @@ Copyright © HatioLab Inc. All rights reserved.
             currentTarget: e.currentTarget,
             detail: e.detail
           };
+
           var event = new CustomEvent('value-enter', opts);
           this.dispatchEvent(event);
-
-          return;
         }
       }
 
@@ -143,7 +144,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
     }
 
-    customElements.define(ThingsPermanentFocusInput.is, ThingsPermanentFocusInput);
+    customElements.define(PermanentFocusInput.is, PermanentFocusInput);
   </script>
 
 </dom-module>

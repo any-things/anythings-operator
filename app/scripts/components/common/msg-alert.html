@@ -5,7 +5,10 @@ Copyright © HatioLab Inc. All rights reserved.
 
 <link rel="import" href="../../../bower_components/polymer/polymer-element.html">
 
-<dom-module id="mps-alert">
+<!--
+  메시지 Alert
+-->
+<dom-module id="msg-alert">
   <template>
     <style>
       #modal {
@@ -89,8 +92,8 @@ Copyright © HatioLab Inc. All rights reserved.
   </template>
 
   <script>
-    class MpsAlert extends Polymer.Element {
-      static get is() { return 'mps-alert' }
+    class MsgAlert extends Polymer.Element {
+      static get is() { return 'msg-alert' }
       static get properties() {
         return {
           title: {
@@ -170,7 +173,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       connectedCallback() {
         super.connectedCallback();
-        window.mpsAlert = this;
+        window.MsgAlert = this;
         window.openAlert = this.openAlert.bind(this);
         window.openConfirm = this.openConfirm.bind(this);
       }
@@ -292,7 +295,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * 메시지 박스 가리고 옵션값 제거
-       */ 
+       */
       close() {
         this.$['modal'].style.display = 'none';
         this.resetOpt();
@@ -342,6 +345,6 @@ Copyright © HatioLab Inc. All rights reserved.
       }
     }
 
-    customElements.define(MpsAlert.is, MpsAlert);
+    customElements.define(MsgAlert.is, MsgAlert);
   </script>
 </dom-module>

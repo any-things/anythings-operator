@@ -25,12 +25,12 @@ Copyright © HatioLab Inc. All rights reserved.
 
         // MQTT 연결
         WEB_MQTT.startConnectionMonitor(
-          ANY_UTIL.getRegionCd(),
-          ANY_UTIL.getZoneCd(),
-          ANY_UTIL.getDeviceType(),
-          ANY_UTIL.getBrokerAddress(),
-          ANY_UTIL.getBrokerPort(),
-          ANY_UTIL.getBrokerSiteCd()
+          LOGIS_UTIL.getRegionCd(),
+          LOGIS_UTIL.getZoneCd(),
+          LOGIS_UTIL.getDeviceType(),
+          LOGIS_UTIL.getBrokerAddress(),
+          LOGIS_UTIL.getBrokerPort(),
+          LOGIS_UTIL.getBrokerSiteCd()
         );
 
         // 메시지 수신 이벤트
@@ -75,10 +75,10 @@ Copyright © HatioLab Inc. All rights reserved.
               {
                 if (jobType) {
                   if (this.jobType === jobType) {
-                    mpsAlert.webAlert({ title: t('title.error'), message, sound: 'error' });
+                    MsgAlert.webAlert({ title: t('title.error'), message, sound: 'error' });
                   }
                 } else {
-                  mpsAlert.webAlert({ title: t('title.error'), message, sound: 'error' });
+                  MsgAlert.webAlert({ title: t('title.error'), message, sound: 'error' });
                 }
               }
               break;

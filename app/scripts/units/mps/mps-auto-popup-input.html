@@ -7,7 +7,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
 <link rel="import" href="../../../styles/shared-styles.html">
 
-<link rel="import" href="../sys-ajax.html">
+<link rel="import" href="../../components/sys/sys-ajax.html">
 <link rel="import" href="./mps-auto-popup.html">
 
 <link rel="import" href="../../mixins/mps/mps-scanner-mixin.html">
@@ -36,7 +36,7 @@ Copyright © HatioLab Inc. All rights reserved.
     </sys-ajax>
 
     <!-- Input Ajax -->
-    <input id="input" max-length="[[maxLength]]" on-keypress="_keypressHandler" 
+    <input id="input" max-length="[[maxLength]]" on-keypress="_keypressHandler"
       on-input="_valueChanged" hidden="[[hidden]]" on-blur="_onValueBlur">
   </template>
 

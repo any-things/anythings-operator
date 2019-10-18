@@ -212,7 +212,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           getSkuAjaxUrl: {
             type: String,
-            value: `/pda_process/find_sku/${ANY_UTIL.getRegionCd()}/:inputValue`
+            value: `/pda_process/find_sku/${LOGIS_UTIL.getRegionCd()}/:inputValue`
           },
 
           /**
@@ -597,8 +597,8 @@ Copyright © HatioLab Inc. All rights reserved.
         this.$['sku-nm'].value = skuInfo.sku_nm;
         this.$['com-cd'].value = comCd;
         this.$['box-in-qty'].value = skuInfo.box_in_qty;
-        const regionCd = ANY_UTIL.getRegionCd();
-        const sideCd = ANY_UTIL.getSideCd();
+        const regionCd = LOGIS_UTIL.getRegionCd();
+        const sideCd = LOGIS_UTIL.getSideCd();
         this.doInputTransaction(regionCd, sideCd, comCd, skuCd);
 
         // if(this.currentMode === 'input-mode') {
@@ -619,7 +619,7 @@ Copyright © HatioLab Inc. All rights reserved.
           const adjustPopup = document.createElement('mps-adjust-qty-dialog');
 
           setTimeout(() => {
-            ANY_UTIL.showPopup(t('button.adjust_qty'), adjustPopup, 'fit', 'fit', () => {
+            LOGIS_UTIL.showPopup(t('button.adjust_qty'), adjustPopup, 'fit', 'fit', () => {
               adjustPopup.setCurrentQty(closeParam.pickQty);
               adjustPopup.jobId = closeParam.jobId;
             }, this.refresh.bind(this));
@@ -631,9 +631,9 @@ Copyright © HatioLab Inc. All rights reserved.
 
           if(comCd && skuCd) {
             const ajax = this.$['search-job-ajax'];
-            const regionCd = ANY_UTIL.getRegionCd();
-            const sideCd = ANY_UTIL.getSideCd();
-            let zoneCd = ANY_UTIL.getZoneCd();
+            const regionCd = LOGIS_UTIL.getRegionCd();
+            const sideCd = LOGIS_UTIL.getSideCd();
+            let zoneCd = LOGIS_UTIL.getZoneCd();
             ajax.curl = `/pda_process/search_jobs/${regionCd}/${sideCd}/${zoneCd}/${comCd}/${skuCd}`;
             ajax.generateRequest();
           }
@@ -670,7 +670,7 @@ Copyright © HatioLab Inc. All rights reserved.
         try {
           this.validateBeforeRequest();
           const inputAjax = this._getInputAjax();
-          let zoneCd = ANY_UTIL.getZoneCd();
+          let zoneCd = LOGIS_UTIL.getZoneCd();
           inputAjax.curl = `/pda_process/input_sku/${regionCd}/${sideCd}/${zoneCd}/${comCd}/${skuCd}`;
           inputAjax.generateRequest();
         } catch (error) {
@@ -761,9 +761,9 @@ Copyright © HatioLab Inc. All rights reserved.
             title: t('text.checking_inspection'),
             message: t('text.check_inspection'),
             confirmCallback: () => {
-              const regionCd = ANY_UTIL.getRegionCd();
-              const sideCd = ANY_UTIL.getSideCd();
-              let zoneCd = ANY_UTIL.getZoneCd();
+              const regionCd = LOGIS_UTIL.getRegionCd();
+              const sideCd = LOGIS_UTIL.getSideCd();
+              let zoneCd = LOGIS_UTIL.getZoneCd();
               let comCd = this.getComCd();
               let skuCd = this.getSkuCd();
               this.doInspectTransaction(regionCd, sideCd, zoneCd, comCd, skuCd);
@@ -798,7 +798,7 @@ Copyright © HatioLab Inc. All rights reserved.
           popup.pickedQty = data.picked_qty;
           popup.pickQty = data.pick_qty;
           popup.totalQty = data.total_qty;
-          ANY_UTIL.showPopup(t('title.job_select'), popup, '70%', 'fit', null, this.refresh.bind(this));
+          LOGIS_UTIL.showPopup(t('title.job_select'), popup, '70%', 'fit', null, this.refresh.bind(this));
         } else if (status !== 'F' && status !== 'P') {
           openAlert({
             title: t('error.VALIDATION_ERROR'),
@@ -867,7 +867,7 @@ Copyright © HatioLab Inc. All rights reserved.
           title: t('button.led_on'),
           message: t('text.Sure to process'),
           confirmCallback: () => {
-            const regionCd = ANY_UTIL.getRegionCd();
+            const regionCd = LOGIS_UTIL.getRegionCd();
             const mpiOnAjax = this._getMpiOnAjax();
             mpiOnAjax.curl = `/kiosk_process/restore_mpi/${regionCd}`;
             mpiOnAjax.generateRequest();
@@ -887,7 +887,7 @@ Copyright © HatioLab Inc. All rights reserved.
           title: t('button.led_off'),
           message: t('text.Sure to process'),
           confirmCallback: () => {
-            const regionCd = ANY_UTIL.getRegionCd();
+            const regionCd = LOGIS_UTIL.getRegionCd();
             const mpiOffAjax = this._getMpiOffAjax();
             mpiOffAjax.curl = `/kiosk_process/mpi_off_all/${regionCd}`;
             mpiOffAjax.generateRequest();

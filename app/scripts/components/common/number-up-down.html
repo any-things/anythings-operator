@@ -6,10 +6,10 @@ Copyright © HatioLab Inc. All rights reserved.
 <link rel="import" href="../../../bower_components/polymer/polymer-element.html">
 
 <!--
-  작업 처리 중 수량 조정 팝업
+  +, - 버튼을 눌러서 +, - 조정하는 Input Field 컴포넌트
 -->
 
-<dom-module id="things-number-up-down">
+<dom-module id="number-up-down">
   <template>
     <style include="shared-styles">
       :host {
@@ -18,7 +18,6 @@ Copyright © HatioLab Inc. All rights reserved.
         /* --input-field-height: 24px; */
         /* --border-color: rgb(160, 209, 218); */
         --total-width: 70%;
-
         width: var(--total-width);
       }
 
@@ -44,8 +43,8 @@ Copyright © HatioLab Inc. All rights reserved.
   </template>
 
   <script>
-    class ThingsNumberUpDown extends Polymer.Element {
-      static get is() { return 'things-number-up-down' }
+    class NumberUpDown extends Polymer.Element {
+      static get is() { return 'number-up-down' }
 
       static get properties() {
         return {
@@ -79,6 +78,6 @@ Copyright © HatioLab Inc. All rights reserved.
       }
     }
 
-    customElements.define(ThingsNumberUpDown.is, ThingsNumberUpDown);
+    customElements.define(NumberUpDown.is, NumberUpDown);
   </script>
 </dom-module>

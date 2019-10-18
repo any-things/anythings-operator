@@ -5,7 +5,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
 <link rel="import" href="../../../bower_components/polymer/polymer-element.html">
 
-<link rel="import" href="../../units/things-number-up-down.html">
+<link rel="import" href="../../components/common/number-up-down.html">
 
 <!--
   작업 처리 중 수량 조정 팝업
@@ -72,7 +72,7 @@ Copyright © HatioLab Inc. All rights reserved.
         <!-- <template> -->
           <div class="input-row">
             <span class="label">[[adjustQtyLabel]]</span>
-            <things-number-up-down id="adjust-qty" value="{{confirmValue}}" min="1"></things-number-up-down>
+            <number-up-down id="adjust-qty" value="{{confirmValue}}" min="1"></number-up-down>
           </div>
         <!-- </template> -->
       <!-- </dom-if> -->

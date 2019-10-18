@@ -593,13 +593,13 @@ Copyright © HatioLab Inc. All rights reserved.
         popup.pickedQty = rowData.picked_qty;
         popup.isFinished = (status === 'F');
 
-        ANY_UTIL.showPopup(t('title.job_select'), popup, 'fit', 'fit', null, closeParam => {
+        LOGIS_UTIL.showPopup(t('title.job_select'), popup, 'fit', 'fit', null, closeParam => {
           if (!closeParam || (!closeParam.type || closeParam.type != 'adjust-qty')) {
             this.isDataPolution = true;
           } else {
             let adjustPopup = document.createElement('mps-adjust-qty-dialog');
             setTimeout(() => {
-              ANY_UTIL.showPopup(t('button.adjust_qty'), adjustPopup, 'fit', 'fit', () => {
+              LOGIS_UTIL.showPopup(t('button.adjust_qty'), adjustPopup, 'fit', 'fit', () => {
                 adjustPopup.setCurrentQty(closeParam.pickingQty);
                 adjustPopup.jobId = closeParam.jobId;
               }, () => {

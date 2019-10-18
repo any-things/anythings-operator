@@ -289,8 +289,8 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       refreshList() {
         const refreshAjax = this.$['refresh-ajax'];
-        var regionCd = ANY_UTIL.getRegionCd();
-        var equipZoneCd = ANY_UTIL.getZoneCd();
+        var regionCd = LOGIS_UTIL.getRegionCd();
+        var equipZoneCd = LOGIS_UTIL.getZoneCd();
         var params = {
           query: JSON.stringify([{
             name: 'region_cd',
@@ -339,7 +339,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       clearJobMapping(locationCode) {
         let ajax = this.$['clear-job-mapping'];
-        var regionCd = ANY_UTIL.getRegionCd();
+        var regionCd = LOGIS_UTIL.getRegionCd();
         ajax.curl = `/pda_process/unassign/location_box/${regionCd}/${locationCode}`;
         ajax.generateRequest();
       }
@@ -377,7 +377,7 @@ Copyright © HatioLab Inc. All rights reserved.
           const execJobMappingAjax = this.$['exec-job-mapping'];
           const locCd = this.$['loc-cd'].value;
           const boxId = this.$['box-id'].value;
-          var regionCd = ANY_UTIL.getRegionCd();
+          var regionCd = LOGIS_UTIL.getRegionCd();
           execJobMappingAjax.curl = `/pda_process/assign/location_box/${regionCd}/${locCd}/${boxId}`;
           execJobMappingAjax.generateRequest();
         } catch (error) {

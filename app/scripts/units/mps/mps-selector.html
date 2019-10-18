@@ -1,7 +1,8 @@
-<link rel="import" href="../sys-ajax.html">
+<link rel="import" href="../../../bower_components/iron-icon/iron-icon.html">
+
+<link rel="import" href="../../components/sys/sys-ajax.html">
 <link rel="import" href="./mps-dialog.html">
 <link rel="import" href="./mps-list.html">
-<link rel="import" href="../../../bower_components/iron-icon/iron-icon.html">
 
 <!--
 @license
@@ -43,7 +44,7 @@ Copyright © HatioLab Inc. All rights reserved.
         background-color:rgba(0,0,0,.3);
         border-radius:7px;
         fill:#f9a21f;
-      } 
+      }
     </style>
     <sys-ajax
       id="get-data-ajax"
@@ -136,11 +137,11 @@ Copyright © HatioLab Inc. All rights reserved.
         infoFields.forEach(infoField => {
           const infoFieldContainer = document.createElement('div');
           infoFieldContainer.classList.add('info-field-container');
-          
+
           const label = document.createElement('span');
           label.classList.add('label');
           label.innerText = infoField.display;
-          
+
           const inputElement = document.createElement('input');
           inputElement.classList.add('info-input');
           inputElement.name = infoField.fieldname;
@@ -169,7 +170,7 @@ Copyright © HatioLab Inc. All rights reserved.
           maxHeight: '80vh',
           margin: '15px'
         });
-        
+
         const mpsList = document.createElement('mps-list');
         mpsList.header = this.header;
         mpsList.setAttribute('dialog', '');
@@ -199,7 +200,7 @@ Copyright © HatioLab Inc. All rights reserved.
             this.closeSelector();
           }
         }
-        
+
         buttonContainer.appendChild(confirmBtn);
 
         container.appendChild(mpsList);
@@ -247,7 +248,7 @@ Copyright © HatioLab Inc. All rights reserved.
           const fieldName = input.getAttribute('name');
           input.value = data[fieldName];
         });
-        
+
         this.dispatchEvent(new CustomEvent('value-changed', {
           detail: {
             value: this.value

@@ -119,7 +119,7 @@ Copyright © HatioLab Inc. All rights reserved.
           return;
         }
 
-        mpsAlert.webAlert({
+        MsgAlert.webAlert({
           title: `${lcCode}`,
           message: t('text.please_scan_box'),
           confirmText: t('button.cancel'),
@@ -154,7 +154,7 @@ Copyright © HatioLab Inc. All rights reserved.
         try {
           this.validateBeforeMapping(lcCode, boxId);
         } catch (error) {
-          mpsAlert.webAlert({
+          MsgAlert.webAlert({
             title: error.title,
             message: error.message,
             confirmCallback: error.confirmCallback
@@ -166,7 +166,7 @@ Copyright © HatioLab Inc. All rights reserved.
         }
 
         var ajax = this.$['assign-box-to-loc'];
-        var regionCd = this.regionCd || ANY_UTIL.getRegionCd();
+        var regionCd = this.regionCd || LOGIS_UTIL.getRegionCd();
         ajax.curl = `/pda_process/assign/location_box/${regionCd}/${lcCode}/${boxId}`;
 
         // 요청 직전 AJAX 핸들링을 위한 이벤트
@@ -202,7 +202,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _handleAssignError(e) {
         this._reset();
-        mpsAlert.close();
+        MsgAlert.close();
       }
 
       /**
@@ -249,7 +249,7 @@ Copyright © HatioLab Inc. All rights reserved.
         this.inputValue = null;
 
         if(!isContinueAlert || isContinueAlert != true) {
-          mpsAlert.close();
+          MsgAlert.close();
         }
       }
     }

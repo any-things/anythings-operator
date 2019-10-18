@@ -174,8 +174,8 @@ Copyright © HatioLab Inc. All rights reserved.
        * @description 설정을 통해 선택한 호기와 존 영역내의 상품 리스트 조회
        */
       refresh() {
-        let regionCd = ANY_UTIL.getRegionCd();
-        let zoneCd = ANY_UTIL.getZoneCd();
+        let regionCd = LOGIS_UTIL.getRegionCd();
+        let zoneCd = LOGIS_UTIL.getZoneCd();
         const inputListAjax = this.$['input-list-ajax'];
         inputListAjax.curl = `/tablet_process/input_status/${regionCd}/${zoneCd}/ALL`;
         inputListAjax.generateRequest();

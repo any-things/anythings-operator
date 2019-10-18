@@ -435,7 +435,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           regionCd: {
             type: String,
-            value: ANY_UTIL.getRegionCd(),
+            value: LOGIS_UTIL.getRegionCd(),
             observer: '_regionCdChanged'
           },
 
@@ -447,7 +447,7 @@ Copyright © HatioLab Inc. All rights reserved.
           regionNm: {
             type: String,
             notify: true,
-            value: ANY_UTIL.getRegionNm(),
+            value: LOGIS_UTIL.getRegionNm(),
             observer: '_regionNmChanged'
           },
 
@@ -805,7 +805,7 @@ Copyright © HatioLab Inc. All rights reserved.
         adjustPopup.isNumberUpDown = true;
 
         setTimeout(() => {
-          ANY_UTIL.showPopup(t('button.adjust_qty'), adjustPopup, 'fit', 'fit', () => {
+          LOGIS_UTIL.showPopup(t('button.adjust_qty'), adjustPopup, 'fit', 'fit', () => {
             adjustPopup.setCurrentQty(totalPickedQty);
             adjustPopup.adjustQty = () => {
               let adjustQty = parseInt(adjustPopup._getAdjustQtyInput().value);

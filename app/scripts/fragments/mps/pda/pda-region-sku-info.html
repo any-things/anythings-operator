@@ -74,7 +74,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           jobType: {
             type: String,
-            value: () => ANY_UTIL.getJobName('setting.jobName')
+            value: () => LOGIS_UTIL.getJobName('setting.jobName')
           },
 
           /**
@@ -100,14 +100,14 @@ Copyright © HatioLab Inc. All rights reserved.
                 fieldname: 'sku_cd_widt_seq',
                 displayCallback: (value, rowData) => {
                   // 작업 유형에 따라 가변, 반품 작업일 때 투입 순서 없음
-                  return ANY_UTIL.getJobName() === 'RTN' ?
+                  return LOGIS_UTIL.getJobName() === 'RTN' ?
                     `${rowData['sku_nm']}` :
                     `(${rowData['input_seq']}) ${rowData['sku_nm']}`
                 }
               }, (() => {
                 // 작업 유형에 따라 가변
                 // 반품 작업일 때 거래처 대신 로케이션 표시
-                return ANY_UTIL.getJobName() === 'RTN' ?
+                return LOGIS_UTIL.getJobName() === 'RTN' ?
                 {
                   display: t('label.location'),
                   fieldname: 'loc_cd',
@@ -267,8 +267,8 @@ Copyright © HatioLab Inc. All rights reserved.
        * @description 설정을 통해 선택한 호기와 존 영역내의 상품 리스트 조회
        */
       refresh() {
-        let regionCd = ANY_UTIL.getRegionCd();
-        let zoneCd = ANY_UTIL.getZoneCd();
+        let regionCd = LOGIS_UTIL.getRegionCd();
+        let zoneCd = LOGIS_UTIL.getZoneCd();
         const inputListAjax = this.$['input-list-ajax'];
         inputListAjax.curl = `/tablet_process/input_status/${regionCd}/${zoneCd}/ALL`;
         inputListAjax.generateRequest();
@@ -299,11 +299,11 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _skuSelected(event) {
         // 반품 작업일 때 상세 화면 없음
-        if (ANY_UTIL.getJobName() === 'RTN') return;
+        if (LOGIS_UTIL.getJobName() === 'RTN') return;
 
         const inputSeq = event.detail.data.input_seq;
-        const regionCd = ANY_UTIL.getRegionCd();
-        const zoneCd = ANY_UTIL.getZoneCd();
+        const regionCd = LOGIS_UTIL.getRegionCd();
+        const zoneCd = LOGIS_UTIL.getZoneCd();
 
         document.dispatchEvent(new CustomEvent('open-form-list-dialog', {
           detail: {

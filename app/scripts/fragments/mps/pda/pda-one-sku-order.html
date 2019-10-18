@@ -4,7 +4,7 @@ Copyright © HatioLab Inc. All rights reserved.
 -->
 
 <link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
-<script src = "../../../units/any-util.js"></script>
+<script src = "../../../components/logis/logis-util.js"></script>
 <dom-module id="pda-one-sku-order">
   <template>
     <style include="shared-styles">
@@ -246,7 +246,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           getSkuAjaxUrl: {
             type: String,
-            value: `/pda_process/find_sku/${ANY_UTIL.getRegionCd()}/:inputValue`
+            value: `/pda_process/find_sku/${LOGIS_UTIL.getRegionCd()}/:inputValue`
           },
 
           /**

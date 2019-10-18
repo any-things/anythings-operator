@@ -393,7 +393,7 @@ Copyright © HatioLab Inc. All rights reserved.
           showFullCode: {
             type: Boolean,
             value: () => {
-              return ANY_UTIL.getShowFullCode()
+              return LOGIS_UTIL.getShowFullCode()
             }
           },
 
@@ -414,7 +414,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           getSkuAjaxUrl: {
             type: String,
-            value: `/tablet_process/find_sku/${ANY_UTIL.getRegionCd()}/:inputValue`
+            value: `/tablet_process/find_sku/${LOGIS_UTIL.getRegionCd()}/:inputValue`
           },
 
           /**
@@ -578,7 +578,7 @@ Copyright © HatioLab Inc. All rights reserved.
       queryBatchSummary() {
         var ajax = this.$['query-batch-sum'];
         var baseUrl = ajax.baseUrl || JSON.parse(localStorage.getItem('setting.baseUrl'));
-        var regionCd = ANY_UTIL.getRegionCd();
+        var regionCd = LOGIS_UTIL.getRegionCd();
         ajax.url = `${baseUrl}/tablet_process/batch/progress_rate/${regionCd}`;
         ajax.generateRequest();
       }
@@ -625,7 +625,7 @@ Copyright © HatioLab Inc. All rights reserved.
         this.custCdQty = custCds.length;
         this._updateStatus(inputDetails);
 
-        let sideCd = ANY_UTIL.getSideCd();
+        let sideCd = LOGIS_UTIL.getSideCd();
         if (sideCd === 'F' || sideCd === 'f') {
           this.frontDetailList = this.sortByStatus(inputDetails);
 
@@ -642,7 +642,7 @@ Copyright © HatioLab Inc. All rights reserved.
           this.totalDetailList = this.sortByStatus(inputDetails);
 
         } else {
-          ANY_UTIL.showMessage(t('error.SETTING_ERROR'), t('text.invalid_sidecode'), this.moveToSetting);
+          LOGIS_UTIL.showMessage(t('error.SETTING_ERROR'), t('text.invalid_sidecode'), this.moveToSetting);
         }
       }
 
@@ -766,9 +766,9 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       mpiOffByTabletZone() {
         const mpiOffAjax = this.$['mpi-off-my-zone-ajax'];
-        let regionCd = ANY_UTIL.getRegionCd();
-        let zoneCd = ANY_UTIL.getZoneCd();
-        let sideCd = ANY_UTIL.getSideCd();
+        let regionCd = LOGIS_UTIL.getRegionCd();
+        let zoneCd = LOGIS_UTIL.getZoneCd();
+        let sideCd = LOGIS_UTIL.getSideCd();
         mpiOffAjax.curl = `/tablet_process/mpi_off/${regionCd}/${zoneCd}/${sideCd}`;
         mpiOffAjax.generateRequest();
       }
@@ -780,9 +780,9 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       mpiOnByTabletZone(mode) {
         const mpiOnAjax = this.$['mpi-on-jobs-ajax'];
-        let regionCd = ANY_UTIL.getRegionCd();
-        let zoneCd = ANY_UTIL.getZoneCd();
-        let sideCd = ANY_UTIL.getSideCd();
+        let regionCd = LOGIS_UTIL.getRegionCd();
+        let zoneCd = LOGIS_UTIL.getZoneCd();
+        let sideCd = LOGIS_UTIL.getSideCd();
         mpiOnAjax.curl = `/tablet_process/mpi_on/${regionCd}/${zoneCd}/${sideCd}`;
         mpiOnAjax.generateRequest();
       }
@@ -804,13 +804,13 @@ Copyright © HatioLab Inc. All rights reserved.
           popup.pickedQty = event.detail.data.picked_qty;
           popup.isFinished = (status === 'F');
 
-          ANY_UTIL.showPopup(t('title.job_select'), popup, 'fit', 'fit', null, closeParam => {
+          LOGIS_UTIL.showPopup(t('title.job_select'), popup, 'fit', 'fit', null, closeParam => {
             if(!closeParam || (!closeParam.type || closeParam.type != 'adjust-qty')) {
               this.refreshInputDetails();
             } else {
               const adjustPopup = document.createElement('mps-adjust-qty-dialog');
               setTimeout(() => {
-                ANY_UTIL.showPopup(t('button.adjust_qty'), adjustPopup, 'fit', 'fit', () => {
+                LOGIS_UTIL.showPopup(t('button.adjust_qty'), adjustPopup, 'fit', 'fit', () => {
                   adjustPopup.setCurrentQty(closeParam.pickingQty);
                   adjustPopup.jobId = closeParam.jobId;
                 }, this.refreshInputDetails.bind(this));
@@ -833,7 +833,7 @@ Copyright © HatioLab Inc. All rights reserved.
         // 스캔한 코드가 유효하지 않으면 처리 안 함
         if (str.length <= 3) return;
         // 알림 팝업이 떠있으면 처리 안 함 (박스 매핑중이 아닌 경우에만)
-        if (mpsAlert.visible && !(this.mappingCodeType === 'location' || this.mappingCodeType === 'mpi')) return;
+        if (MsgAlert.visible && !(this.mappingCodeType === 'location' || this.mappingCodeType === 'mpi')) return;
         // 스피너가 동작 중이면 무시
         if (mpsSpinner.active) return;
 
@@ -842,7 +842,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
         // 이전에 로케이션 코드나 표시기 코드를 스캔해서 팝업이 떠 있는 상태이면, 지금 스캔된 코드는 박스 아이디로 예상
         if (this.mappingCodeType === 'location' || this.mappingCodeType === 'mpi') {
-          mpsAlert.close();
+          MsgAlert.close();
           this.assignBoxToLocation(this.locCd, str, this.mappingCodeType);
           this.mappingCodeType = null;
 
@@ -851,7 +851,7 @@ Copyright © HatioLab Inc. All rights reserved.
           this.locCd = str;
           this.mappingCodeType = 'location';
 
-          mpsAlert.webAlert({
+          MsgAlert.webAlert({
             title: `${this.locCd}`,
             message: t('text.please_scan_box'),
             confirmText: t('button.cancel'),
@@ -865,7 +865,7 @@ Copyright © HatioLab Inc. All rights reserved.
           this.locCd = str.substring(2, 8);
           this.mappingCodeType = 'mpi';
 
-          mpsAlert.webAlert({
+          MsgAlert.webAlert({
             title: `${this.locCd}`,
             message: t('text.please_scan_box'),
             confirmText: t('button.cancel'),
@@ -901,9 +901,9 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       inputSku(event) {
         let skuInfo = event.detail;
-        const regionCd = ANY_UTIL.getRegionCd();
-        const sideCd = ANY_UTIL.getSideCd();
-        let zoneCd = ANY_UTIL.getZoneCd();
+        const regionCd = LOGIS_UTIL.getRegionCd();
+        const sideCd = LOGIS_UTIL.getSideCd();
+        let zoneCd = LOGIS_UTIL.getZoneCd();
         let comCd = skuInfo.com_cd;
         let skuCd = skuInfo.sku_cd;
         let skuBarcd = skuInfo.sku_barcd;
@@ -941,7 +941,7 @@ Copyright © HatioLab Inc. All rights reserved.
         try {
           inputAjax.generateRequest();
         } catch (error) {
-          mpsAlert.webAlert({ title: t('error.VALIDATION_ERROR'), message: error });
+          MsgAlert.webAlert({ title: t('error.VALIDATION_ERROR'), message: error });
         }
       }
 
@@ -980,7 +980,7 @@ Copyright © HatioLab Inc. All rights reserved.
         var res = event.detail;
         // FIXME 에러 코드를 사용하는 것으로 변경
         if (res.msg.startsWith('처리되지 ', 0)) {
-          mpsAlert.webAlert({
+          MsgAlert.webAlert({
             title: res.code,
             message: '이전 작업 미처리!',
             critical: true
@@ -1045,11 +1045,11 @@ Copyright © HatioLab Inc. All rights reserved.
         try {
           this.validateBeforeMapping(code, boxId);
           const assignBoxAjax = this.$['assign-box-to-loc'];
-          var regionCd = ANY_UTIL.getRegionCd();
+          var regionCd = LOGIS_UTIL.getRegionCd();
           assignBoxAjax.curl = `/pda_process/assign/${codeType}_box/${regionCd}/${code}/${boxId}`;
           assignBoxAjax.generateRequest();
         } catch (error) {
-          mpsAlert.webAlert({
+          MsgAlert.webAlert({
             title: error.title,
             message: error.message,
             confirmCallback: error.confirmCallback
@@ -1103,9 +1103,9 @@ Copyright © HatioLab Inc. All rights reserved.
        * @Override
        */
       refreshInputDetails(mpiOnFlag) {
-        let regionCd = ANY_UTIL.getRegionCd();
-        let zoneCd = ANY_UTIL.getZoneCd();
-        let sideCd = ANY_UTIL.getSideCd();
+        let regionCd = LOGIS_UTIL.getRegionCd();
+        let zoneCd = LOGIS_UTIL.getZoneCd();
+        let sideCd = LOGIS_UTIL.getSideCd();
         let comCd = this.comCd ? this.comCd : '_na_';
         let skuCd = this.skuCd ? this.skuCd : '_na_';
         let headerColor = this.selectedInput ? this.selectedInput.mpi_color : 'Y';
@@ -1119,7 +1119,7 @@ Copyright © HatioLab Inc. All rights reserved.
             detailAjax.curl = `/tablet_process/job_details/${regionCd}/${sideCd}/${zoneCd}/${comCd}/${skuCd}`;
             detailAjax.generateRequest();
           } catch (error) {
-            ANY_UTIL.showMessage(error.title, error.message, error.callback);
+            LOGIS_UTIL.showMessage(error.title, error.message, error.callback);
           }
         }
       }
@@ -1144,7 +1144,7 @@ Copyright © HatioLab Inc. All rights reserved.
         let title = t('text.box_check');
         let message = t('text.box_no_process');
         let critical = true;
-        mpsAlert.webAlert({ title, message, critical });
+        MsgAlert.webAlert({ title, message, critical });
         SOUND.playErrorSound();
       }
 
