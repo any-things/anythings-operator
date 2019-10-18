@@ -4,10 +4,10 @@ Copyright © HatioLab Inc. All rights reserved.
 -->
 
 <!--
-  블루투스 장비 선택 다이얼로그
+  공통 > 블루투스 장비 선택 다이얼로그
 -->
 
-<dom-module id="tab-bluetooth-scanner-selector">
+<dom-module id="bluetooth-scanner-selector">
   <template>
     <style include="shared-styles">
       :host {
@@ -43,13 +43,13 @@ Copyright © HatioLab Inc. All rights reserved.
   </template>
 
   <script>
-    class TabBluetoothScannerSelector extends Polymer.Element {
-      static get is() { return 'tab-bluetooth-scanner-selector' }
+    class BluetoothScannerSelector extends Polymer.Element {
+      static get is() { return 'bluetooth-scanner-selector' }
 
       static get properties() {
         return {
           /**
-           * 취소 라벨
+           * @description 취소 라벨
            ****************
            * @type {String}
            */
@@ -58,7 +58,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 확인 라벨
+           * @description 확인 라벨
            ****************
            * @type {String}
            */
@@ -67,7 +67,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 선택 대상 device list
+           * @description 선택 대상 device list
            ****************
            * @type {String}
            */
@@ -78,21 +78,36 @@ Copyright © HatioLab Inc. All rights reserved.
         }
       }
 
+      /**
+       * @description 블루투스 리스트 클리어
+       *******************
+       */
       clearOptions() {
         Array.from(this.$['device-select'].options).forEach(option => {
           option.remove();
         });
       }
 
+      /**
+       * @description 블루투스 리스트에 추가
+       *******************
+       * @param {Object} device
+       */
       appendDevice(device) {
         if(!this.isDuplicate(device.id) && device.id && device.name) {
           this.$['device-select'].appendChild(new Option(device.name, device.id));
         }
       }
 
+      /**
+       * @description 중복 데이터인지 체크
+       *******************
+       * @param {String} deviceId
+       */
       isDuplicate(deviceId) {
         const options = Array.from(this.$['device-select'].options);
         let result = false;
+
         for(let i = 0; i < options.length; i++) {
           if(options[i].value === deviceId) {
             result = true;
@@ -103,15 +118,28 @@ Copyright © HatioLab Inc. All rights reserved.
         return result;
       }
 
+      /**
+       * @description 블루투스 리스트에 추가
+       *******************
+       * @param {Object} option
+       */
       appendOption(option) {
         this.$['device-select'].appendChild(option);
       }
 
+      /**
+       * @description  다이얼로그 조회
+       *******************
+       */
       _cancelClicked() {
         this.selectedDeviceId = null;
         document.dispatchEvent(new CustomEvent('close-dialog'));
       }
 
+      /**
+       * @description 블루투스 항목 선택시
+       *******************
+       */
       _confirmClicked() {
         var devName = this.$['device-select'].selectedOptions[0].label;
         this.selectedDeviceId = this.$['device-select'].selectedOptions[0].value;
@@ -120,6 +148,6 @@ Copyright © HatioLab Inc. All rights reserved.
       }
     }
 
-    customElements.define(TabBluetoothScannerSelector.is, TabBluetoothScannerSelector);
+    customElements.define(BluetoothScannerSelector.is, BluetoothScannerSelector);
   </script>
 </dom-module>

@@ -3,17 +3,14 @@
 Copyright © HatioLab Inc. All rights reserved.
 -->
 
-<link rel="import" href="../../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
 
-<link rel="import" href="../../logis/logis-tablet-libs.html">
-
-<link rel="import" href="./mps-box-list-detail.html">
+<link rel="import" href="./box-details.html">
 
 <!--
   공통 > 박스 리스트
 -->
-
-<dom-module id="mps-box-list">
+<dom-module id="box-list">
   <template>
     <style include="shared-styles">
       :host {
@@ -22,6 +19,7 @@ Copyright © HatioLab Inc. All rights reserved.
         padding: 10px;
         height: calc(100% - 20px);
       }
+
       #button-container {
         display: grid;
         grid-template-columns: auto auto;
@@ -62,8 +60,8 @@ Copyright © HatioLab Inc. All rights reserved.
   </template>
 
   <script>
-    class MpsBoxList extends Polymer.Element {
-      static get is() { return 'mps-box-list' }
+    class BoxList extends Polymer.Element {
+      static get is() { return 'box-list' }
 
       static get properties() {
         return {
@@ -108,7 +106,7 @@ Copyright © HatioLab Inc. All rights reserved.
           /**
            * 새로고침 라벨
            ****************
-           * @type {Array}
+           * @type {String}
            */
           refreshBtnLabel: {
             type: String,
@@ -210,7 +208,8 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * connectedCallback
+       * @description connectedCallback
+       *******************
        */
       connectedCallback() {
         super.connectedCallback();
@@ -283,7 +282,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} boxResult
        */
       _showDetailPopup(boxResult) {
-        const mpsBoxListDetail = document.createElement('mps-box-list-detail');
+        const mpsBoxListDetail = document.createElement('box-details');
         mpsBoxListDetail.boxResult = boxResult;
 
         var brokerSite = LOGIS_UTIL.getBrokerSiteCd();
@@ -303,6 +302,6 @@ Copyright © HatioLab Inc. All rights reserved.
       }
     }
 
-    customElements.define(MpsBoxList.is, MpsBoxList);
+    customElements.define(BoxList.is, BoxList);
   </script>
 </dom-module>

@@ -3,18 +3,14 @@
 Copyright © HatioLab Inc. All rights reserved.
 -->
 
-<link rel="import" href="../../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
 
-<link rel="import" href="../../logis/logis-tablet-libs.html">
-
-<link rel="import" href="./mps-label-re-issue-detail.html">
+<link rel="import" href="./label-details.html">
 
 <!--
-  Tablet > DAS 라벨 재발행
-  PDA > DAS 라벨 재발행 공통 화면
+  공통 > 라벨 발행 리스트
 -->
-
-<dom-module id="mps-label-re-issue">
+<dom-module id="label-list">
   <template>
     <style include="shared-styles">
       :host {
@@ -53,8 +49,8 @@ Copyright © HatioLab Inc. All rights reserved.
   </template>
 
   <script>
-    class MpsLabelReIssue extends Polymer.Element {
-      static get is() { return 'mps-label-re-issue' }
+    class LabelList extends Polymer.Element {
+      static get is() { return 'label-list' }
 
       static get properties() {
         return {
@@ -181,7 +177,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * 리스트에서 선택한 로우를 활성화 함
        */
       _showReprintPopup(event) {
-        const labelReIssueDetail = document.createElement('mps-label-re-issue-detail');
+        const labelReIssueDetail = document.createElement('label-details');
         labelReIssueDetail.boxResultId = event.detail.data.id;
         labelReIssueDetail.custName = event.detail.data.cust_nm;
         labelReIssueDetail.invoiceId = event.detail.data.invoice_id ? event.detail.data.invoice_id : event.detail.data.box_id;
@@ -201,6 +197,6 @@ Copyright © HatioLab Inc. All rights reserved.
       }
     }
 
-    customElements.define(MpsLabelReIssue.is, MpsLabelReIssue);
+    customElements.define(LabelList.is, LabelList);
   </script>
 </dom-module>

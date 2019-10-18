@@ -12,7 +12,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
 <link rel="import" href="./pda-rtn-process-detail.html">
 <link rel="import" href="./pda-job-process-btn-popup.html">
-<link rel="import" href="../mps-adjust-qty-dialog.html">
+<link rel="import" href="../common/adjust-qty-dialog.html">
 
 <link rel="import" href="../../../components/logis/box-process-checker.html">
 <link rel="import" href="../../../components/common/barcode-field.html">
@@ -797,7 +797,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Number} totalPickedQty 총 확정 수량
        */
       _showAdjustFullboxQty(locInfo, locCd, totalPickedQty) {
-        const adjustPopup = document.createElement('mps-adjust-qty-dialog');
+        const adjustPopup = document.createElement('adjust-qty-dialog');
         this.adjustPopup = adjustPopup;
         adjustPopup.id = 'fullboxRemainsPopup';
         adjustPopup.locCd = locCd;

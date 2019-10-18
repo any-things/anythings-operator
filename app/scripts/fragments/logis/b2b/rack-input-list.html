@@ -5,15 +5,12 @@ Copyright © HatioLab Inc. All rights reserved.
 
 <link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
 
-<link rel="import" href="../../../logis/logis-pda-libs.html">
-
-<link rel="import" href="./mps-region-input-list-detail.html">
+<link rel="import" href="./rack-input-details.html">
 
 <!--
-  공통 > 호기별 상품 정보
+  DAS > 호기별 상품 정보
 -->
-
-<dom-module id="mps-region-input-list">
+<dom-module id="rack-input-list">
   <template>
     <style include="shared-styles">
       :host {
@@ -64,15 +61,15 @@ Copyright © HatioLab Inc. All rights reserved.
   </template>
 
   <script>
-    class MpsRegionInputList extends Polymer.Element {
-      static get is() { return 'mps-region-input-list' }
+    class RackInputList extends Polymer.Element {
+      static get is() { return 'rack-input-list' }
 
       static get properties() {
         return {
           /**
            * @description 새로고침 버튼 라벨
            ****************
-           * @type {Array}
+           * @type {String}
            */
           refreshBtnLabel: {
             type: String,
@@ -148,6 +145,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description Life Cycle - connected callback
+       ****************
        */
       connectedCallback() {
         super.connectedCallback();
@@ -155,7 +153,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
         // 현재 페이지로 라우팅 변경시 데이터 다시 조회하도록
         document.addEventListener('page-changed', event => {
-          if(event.detail.currentPage === 'mps-region-input-list') {
+          if(event.detail.currentPage === 'rack-input-list') {
             this.refresh();
           }
         });
@@ -172,6 +170,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description 설정을 통해 선택한 호기와 존 영역내의 상품 리스트 조회
+       ****************
        */
       refresh() {
         let regionCd = LOGIS_UTIL.getRegionCd();
@@ -205,7 +204,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @type {Object} event
        */
       _skuSelected(event) {
-        const content = document.createElement('mps-region-input-list-detail');
+        const content = document.createElement('rack-input-details');
         content.data = event.detail.data;
 
         document.dispatchEvent(new CustomEvent('open-dialog', {
@@ -219,6 +218,6 @@ Copyright © HatioLab Inc. All rights reserved.
       }
     }
 
-    customElements.define(MpsRegionInputList.is, MpsRegionInputList);
+    customElements.define(RackInputList.is, RackInputList);
   </script>
 </dom-module>

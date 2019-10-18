@@ -6,7 +6,7 @@ Copyright © HatioLab Inc. All rights reserved.
 <!--
   공통 > 박스 리스트 > 박스 내품 팝업
 -->
-<dom-module id="mps-box-list-detail">
+<dom-module id="box-details">
   <template>
     <style>
       :host {
@@ -176,12 +176,12 @@ Copyright © HatioLab Inc. All rights reserved.
   </template>
 
   <script>
-    class MpsBoxListDetail extends Polymer.Element {
-      static get is() { return 'mps-box-list-detail' }
+    class BoxDetails extends Polymer.Element {
+      static get is() { return 'box-details' }
       static get properties() {
         return {
           /**
-           * 박스 실적
+           * @description 박스 실적
            *******************
            * @type {Object}
            */
@@ -191,7 +191,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 박스 ID
+           * @description 박스 ID
            *******************
            * @type {String}
            */
@@ -211,7 +211,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 닫기 버튼 label
+           * @description 닫기 버튼 label
            *******************
            * @type {String}
            */
@@ -221,7 +221,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 풀 박스 취소 버튼 label
+           * @description 풀 박스 취소 버튼 label
            *******************
            * @type {String}
            */
@@ -303,8 +303,8 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       cancelBox(event) {
         openConfirm({
-          title: t('text.cancel_full_box'), //t('title.cancel_confirmation'),
-          message: t('text.cancel_full_box?'), //t('text.Sure to process'),
+          title: t('text.cancel_full_box'),
+          message: t('text.cancel_full_box?'),
           critical: true,
           confirmCallback: () => {
             var ajax = this.$['cancel-box-ajax'];
@@ -319,12 +319,13 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description 팝업 닫기
+       ****************
        */
       closeDialog() {
         document.dispatchEvent(new CustomEvent('close-dialog'));
       }
     }
 
-    customElements.define(MpsBoxListDetail.is, MpsBoxListDetail);
+    customElements.define(BoxDetails.is, BoxDetails);
   </script>
 </dom-module>

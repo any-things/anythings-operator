@@ -8,10 +8,9 @@ Copyright © HatioLab Inc. All rights reserved.
 <link rel="import" href="../../../logis/logis-pda-libs.html">
 
 <!--
-  공통 > 호기별 상품 정보 > 상품별 거래처 상세 정보
+  DAS > 호기별 상품 정보 > 상품별 거래처 상세 정보
 -->
-
-<dom-module id="mps-region-input-list-detail">
+<dom-module id="rack-input-details">
   <template>
     <style>
       :host {
@@ -111,11 +110,11 @@ Copyright © HatioLab Inc. All rights reserved.
   </template>
 
   <script>
-    class MpsRegionInputListDetail extends Polymer.Element {
-      static get is() { return 'mps-region-input-list-detail' }
+    class RackInputDetails extends Polymer.Element {
+      static get is() { return 'rack-input-details' }
+
       static get properties() {
         return {
-
           /**
            * @description 상품명 라벨
            ****************
@@ -247,6 +246,8 @@ Copyright © HatioLab Inc. All rights reserved.
       /**
        * @description list의 데이터 상태에 따라 행의 색상을 변경
        * R: Running 진행중, F: Finished 완료, U: Unfinished 미완료 (취소건이 포함되어 있어서 완료되지 않은 상태)
+       ***********************
+       * @param {Object} event
        */
       _addCompleteAttribute(event) {
         const rows = event.detail.contentElements;
@@ -262,7 +263,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
      /**
       * @description 상품 코드 값이 변경되면 해당 상품코드에 따른 거래처 리스트 조회
-      **************
+      ***********************
       * @param {Object} data
       */
       _dataChanged(data) {
@@ -281,7 +282,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description 리스트 데이터 변경시 호출
-       ************
+       ***********************
        * @param {Array} items 리스트 데이터
        */
        _itemsChanged(items) {
@@ -302,12 +303,13 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description 팝업 닫기
+       ***********************
        */
       _backBtnClicked() {
         document.dispatchEvent(new CustomEvent('close-dialog'));
       }
     }
 
-    customElements.define(MpsRegionInputListDetail.is, MpsRegionInputListDetail);
+    customElements.define(RackInputDetails.is, RackInputDetails);
   </script>
 </dom-module>

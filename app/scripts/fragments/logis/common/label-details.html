@@ -4,11 +4,9 @@ Copyright © HatioLab Inc. All rights reserved.
 -->
 
 <!--
-  Tablet > DAS 라벨 재발행 팝업
-  PDA > DAS 라벨 재발행 팝업 공통 화면
+  공통 > 라벨 상세 팝업
 -->
-
-<dom-module id="mps-label-re-issue-detail">
+<dom-module id="label-details">
   <template>
     <style include="shared-styles">
       :host {
@@ -77,12 +75,14 @@ Copyright © HatioLab Inc. All rights reserved.
   </template>
 
   <script>
-    class MpsLabelReIssueDetail extends Polymer.Element {
-      static get is() { return 'mps-label-re-issue-detail' }
+    class LabelDetails extends Polymer.Element {
+      static get is() { return 'label-details' }
       static get properties() {
         return {
           /**
-           * 거래처 명 label
+           * @description 거래처 명 label
+           ****************
+           * @type {String}
            */
           custNameLabel: {
             type: String,
@@ -90,7 +90,9 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 로케이션  label
+           * @description 로케이션  label
+           ****************
+           * @type {String}
            */
           locationLabel: {
             type: String,
@@ -98,7 +100,9 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 송장 번호 label
+           * @description 송장 번호 label
+           ****************
+           * @type {String}
            */
           invoiceLabel: {
             type: String,
@@ -106,7 +110,9 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 닫기 버튼 label
+           * @description 닫기 버튼 label
+           ****************
+           * @type {String}
            */
           closeBtnLabel: {
             type: String,
@@ -115,6 +121,8 @@ Copyright © HatioLab Inc. All rights reserved.
 
           /**
            * 재발행 버튼 label
+           ****************
+           * @type {String}
            */
           invokePrintBtnLabel: {
             type: String,
@@ -122,7 +130,9 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 거래처 명 label
+           * @description 거래처 명 label
+           ****************
+           * @type {String}
            */
           custName: {
             type: String,
@@ -130,14 +140,18 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 박스 실적 ID
+           * @description 박스 실적 ID
+           ****************
+           * @type {String}
            */
           boxResultId: {
             type: String
           },
 
           /**
-           * print 대상 송장 번호
+           * @description print 대상 송장 번호
+           ****************
+           * @type {String}
            */
           invoiceId: {
             type: String,
@@ -145,7 +159,9 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * print 대상 송장 번호
+           * @description print 대상 송장 번호
+           ****************
+           * @type {String}
            */
           locCd: {
             type: String,
@@ -155,8 +171,10 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * custNameChanged event handler
+       * @description custNameChanged event handler
        * custName이 변경되면 cust-nm-input의 값을 변경함
+       ****************************
+       * @param {String} custName
        */
       _custNameChanged(custName) {
         const custNameInput = this._getCustNameInput();
@@ -164,8 +182,10 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * invoiceIdChanged event handler
+       * @description invoiceIdChanged event handler
        * invoiceId가 변경되면 invoice-input의 값을 변경함
+       ****************************
+       * @param {String} invoiceId
        */
       _invoiceIdChanged(invoiceId) {
         const invoiceInpupt = this._getInvoiceInput();
@@ -173,8 +193,10 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * locCdChanged event handler
+       * @description locCdChanged event handler
        * locCd가 변경되면 loc-cd-input의 값을 변경함
+       ****************************
+       * @param {String} locCd
        */
       _locCdChanged(locCd) {
         const locInpupt = this._getLocCdInput();
@@ -182,8 +204,9 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * invoke print button click event handler
+       * @description invoke print button click event handler
        * invoiceId를 바탕으로 라벨 재 발행 요청을 보냄
+       ****************************
        */
       _invokePrint() {
         const invokePrintAjax = this._getInvokePrintAjax();
@@ -192,14 +215,16 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * close button click event handler
-       * 팝업 닫기
+       * @description 팝업 닫기
+       ****************************
        */
       _closeDialog() {
         document.dispatchEvent(new CustomEvent('close-dialog'));
       }
 
       /**
+       * @description
+       ****************************
        * @return cust-nm-input element
        */
       _getCustNameInput() {
@@ -207,6 +232,8 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
+       * @description
+       ****************************
        * @return invoice-input element
        */
       _getInvoiceInput() {
@@ -214,6 +241,8 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
+       * @description
+       ****************************
        * @return loc-cd-input element
        */
       _getLocCdInput() {
@@ -221,6 +250,8 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
+       * @description
+       ****************************
        * @return invoke-print-ajax element
        */
       _getInvokePrintAjax() {
@@ -228,6 +259,6 @@ Copyright © HatioLab Inc. All rights reserved.
       }
     }
 
-    customElements.define(MpsLabelReIssueDetail.is, MpsLabelReIssueDetail);
+    customElements.define(LabelDetails.is, LabelDetails);
   </script>
 </dom-module>

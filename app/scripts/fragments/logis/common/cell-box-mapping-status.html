@@ -3,14 +3,12 @@
 Copyright © HatioLab Inc. All rights reserved.
 -->
 
-<link rel="import" href="../../../bower_components/polymer/polymer-element.html">
-
-<link rel="import" href="../../logis/logis-tablet-libs.html">
+<link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
 
 <!--
   공통 > 박스 할당 화면
 -->
-<dom-module id="mps-box-assign">
+<dom-module id="cell-box-mapping-status">
   <template>
     <style include="shared-styles">
       :host {
@@ -102,8 +100,8 @@ Copyright © HatioLab Inc. All rights reserved.
   </template>
 
   <script>
-    class MpsBoxAssign extends BarcodeScannerMixin(Polymer.Element) {
-      static get is() { return 'mps-box-assign' }
+    class CellBoxMappingStatus extends BarcodeScannerMixin(Polymer.Element) {
+      static get is() { return 'cell-box-mapping-status' }
 
       static get properties() {
         return {
@@ -127,47 +125,47 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * @description 로케이션 코드 라벨 
+           * @description 로케이션 코드 라벨
            ****************
            * @type {String}
            */
           locCodeLabel: {
-            type: String, 
+            type: String,
             value: () => t('label.location')
           },
-          
+
           /**
-           * @description 박스 ID 라벨 
+           * @description 박스 ID 라벨
            ****************
            * @type {String}
            */
           boxIdLabel: {
-            type: String, 
+            type: String,
             value: () => t('label.box_id')
           },
 
           /**
-           * @description 초기화 버튼 라벨 
+           * @description 초기화 버튼 라벨
            ****************
            * @type {String}
            */
           resetBtnLabel: {
-            type: String, 
+            type: String,
             value: () => t('button.reset')
           },
-          
+
           /**
-           * @description 새로고침 버튼 라벨 
+           * @description 새로고침 버튼 라벨
            ****************
            * @type {String}
            */
           refreshBtnLabel: {
-            type: String, 
+            type: String,
             value: () => t('button.refresh')
           },
 
           /**
-           * @description 그리드 헤더  
+           * @description 그리드 헤더
            ****************
            * @type {Array}
            */
@@ -232,7 +230,7 @@ Copyright © HatioLab Inc. All rights reserved.
            * @description 새로고침 서비스 호출 결과
            ****************
            * @type {Object}
-           */          
+           */
           data: {
             type: Array,
             value: () => {
@@ -244,7 +242,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description Life Cycle - connectedCallback
-       ********************************************
+       *********************
        */
       connectedCallback() {
         super.connectedCallback();
@@ -267,6 +265,8 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description 이 화면의 표시 상태가 바뀔 때 handle
+       *********************
+       * @param {Boolean} visible
        */
       _visibleChanged(visible) {
         if (visible) {
@@ -285,7 +285,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description 현재 호기의 로케이션 목록 ajax 호출
-       ********************************************
+       *********************
        */
       refreshList() {
         const refreshAjax = this.$['refresh-ajax'];
@@ -370,6 +370,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description validation 진행 후 job mapping transaction 시도
+       *********************
        */
       executeJobMapping() {
         try {
@@ -380,6 +381,7 @@ Copyright © HatioLab Inc. All rights reserved.
           var regionCd = LOGIS_UTIL.getRegionCd();
           execJobMappingAjax.curl = `/pda_process/assign/location_box/${regionCd}/${locCd}/${boxId}`;
           execJobMappingAjax.generateRequest();
+
         } catch (error) {
           openAlert({
             title: error.title,
@@ -391,6 +393,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description job mapping 시도 이전에 수행하는 유효성 검사
+       *********************
        */
       validateBeforeMapping() {
         let locCd = this.$['loc-cd'].value;
@@ -403,15 +406,18 @@ Copyright © HatioLab Inc. All rights reserved.
             return locCd === rowData.loc_cd;
           }) ? true : false;
         }
+
         if (boxId) {
           isValidBoxId = true;
         }
+
         if(!isValidLocCd) {
           throw {
             title: t('error.VALIDATION_ERROR'),
             message: t('error.loc_cd_invalid'),
             confirmCallback: this._clearView.bind(this)
           }
+
         } else if(!isValidBoxId) {
           throw {
             title: t('error.VALIDATION_ERROR'),
@@ -434,7 +440,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * @description 그리드의 아이템 클릭 이벤트 핸들러 
+       * @description 그리드의 아이템 클릭 이벤트 핸들러
        *********************
        * @param {Object} event
        */
@@ -445,6 +451,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description 초기화 버튼을 통해 화면에서 설정한 값들을 초기화 함
+       *********************
        */
       _clearView() {
         this.$['loc-cd'].value = '';
@@ -453,6 +460,6 @@ Copyright © HatioLab Inc. All rights reserved.
       }
     }
 
-    customElements.define(MpsBoxAssign.is, MpsBoxAssign);
+    customElements.define(CellBoxMappingStatus.is, CellBoxMappingStatus);
   </script>
 </dom-module>

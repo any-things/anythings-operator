@@ -10,7 +10,7 @@ Copyright © HatioLab Inc. All rights reserved.
 <link rel="import" href="../../../mixins/logis/logis-msg-subscribe-mixin.html">
 
 <link rel="import" href="./pda-job-process-detail.html">
-<link rel="import" href="../mps-adjust-qty-dialog.html">
+<link rel="import" href="../common/adjust-qty-dialog.html">
 <link rel="import" href="./pda-job-process-btn-popup.html">
 
 <!--
@@ -616,7 +616,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       refresh(closeParam) {
         if(closeParam && closeParam.type === 'adjust-qty') {
-          const adjustPopup = document.createElement('mps-adjust-qty-dialog');
+          const adjustPopup = document.createElement('adjust-qty-dialog');
 
           setTimeout(() => {
             LOGIS_UTIL.showPopup(t('button.adjust_qty'), adjustPopup, 'fit', 'fit', () => {

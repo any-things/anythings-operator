@@ -2,7 +2,8 @@
 @license
 Copyright © HatioLab Inc. All rights reserved.
 -->
-<link rel="import" href="./tab-sku-qrcode.html">
+<link rel="import" href="../common/sku-qrcode-view.html">
+
 <dom-module id="tab-order-info-detail">
   <template>
     <style>
@@ -54,7 +55,7 @@ Copyright © HatioLab Inc. All rights reserved.
     <div id="container">
 
       <template is="dom-if" if="[[showQrCode]]">
-        <tab-sku-qrcode data=[[skuCd]]></tab-sku-qrcode>
+        <sku-qrcode-view data=[[skuCd]]></sku-qrcode-view>
       </template>
 
       <button on-click="adjustQty" hidden$="[[hideAdjustBtn]]">[[adjustQtyLabel]]</button>

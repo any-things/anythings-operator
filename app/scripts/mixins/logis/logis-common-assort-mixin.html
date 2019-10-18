@@ -508,7 +508,7 @@ Copyright © HatioLab Inc. All rights reserved.
         if (this.popupOpened) {
           this.popup.appendDevice(device);
         } else {
-          if (!this.popup) this.popup = document.createElement('tab-bluetooth-scanner-selector');
+          if (!this.popup) this.popup = document.createElement('bluetooth-scanner-selector');
           document.dispatchEvent(new CustomEvent('open-dialog', {
             detail: {
               content: this.popup,

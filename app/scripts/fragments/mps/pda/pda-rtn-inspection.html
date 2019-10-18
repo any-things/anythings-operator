@@ -5,7 +5,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
 <link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
 
-<link rel="import" href="../mps-adjust-qty-dialog.html">
+<link rel="import" href="../common/adjust-qty-dialog.html">
 <link rel="import" href="../../../components/common/barcode-field.html">
 <link rel="import" href="../../../components/logis/job-list.html">
 <link rel="import" href="../../../components/logis/plan-actual-display.html">
@@ -688,7 +688,7 @@ Copyright © HatioLab Inc. All rights reserved.
       _showSplitFullboxPopup(boxId, locCd, totalPickedQty) {
         if (!boxId || totalPickedQty <= 0) return;
 
-        const adjustPopup = document.createElement('mps-adjust-qty-dialog');
+        const adjustPopup = document.createElement('adjust-qty-dialog');
         adjustPopup.id = 'fullboxPopup';
         adjustPopup.locCd = locCd;
         adjustPopup.jobType = this.jobType;

@@ -5,22 +5,20 @@ Copyright © HatioLab Inc. All rights reserved.
 
 <link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
 
-<link rel="import" href="../../../logis/logis-tablet-libs.html">
-<link rel="import" href="./tab-order-info-detail.html">
-<link rel="import" href="./tab-bluetooth-scanner-selector.html">
+<link rel="import" href="../../../../styles/tab-order-info-styles.html">
 
 <link rel="import" href="../../../mixins/common/ble-scanner-mixin.html">
 <link rel="import" href="../../../mixins/logis/logis-common-assort-mixin.html">
 <link rel="import" href="../../../mixins/logis/logis-msg-subscribe-mixin.html">
 
-<link rel="import" href="../../../../styles/tab-order-info-styles.html">
+<link rel="import" href="../common/bluetooth-scanner-selector.html">
+<link rel="import" href="../common/adjust-qty-dialog.html">
 
-<link rel="import" href="../mps-adjust-qty-dialog.html">
+<link rel="import" href="./tab-order-info-detail.html">
 
 <!--
   DPS 작업 정보 화면
 -->
-
 <dom-module id="tab-dps-order-info">
   <template>
     <style include="tab-order-info-styles">
@@ -642,7 +640,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
           LOGIS_UTIL.showPopup(t('title.job_select'), popup, 'fit', 'fit', null, closeParam => {
             if (closeParam && typeof closeParam === 'object' && closeParam.type === 'adjust-qty') {
-              const adjustPopup = document.createElement('mps-adjust-qty-dialog');
+              const adjustPopup = document.createElement('adjust-qty-dialog');
 
               setTimeout(() => {
                 LOGIS_UTIL.showPopup(t('button.adjust_qty'), adjustPopup, 'fit', 'fit', () => {

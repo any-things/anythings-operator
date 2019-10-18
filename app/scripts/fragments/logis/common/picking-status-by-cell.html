@@ -5,12 +5,10 @@ Copyright © HatioLab Inc. All rights reserved.
 
 <link rel="import" href="../../../bower_components/polymer/polymer-element.html">
 
-<link rel="import" href="../../logis/logis-tablet-libs.html">
-
 <!--
   공통 > 로케이션 별 확정 수량 화면
 -->
-<dom-module id="mps-picked-by-location">
+<dom-module id="picking-status-by-cell">
   <template>
     <style include="shared-styles">
       :host {
@@ -82,8 +80,8 @@ Copyright © HatioLab Inc. All rights reserved.
   </template>
 
   <script>
-    class MpsPickedByLocation extends BarcodeScannerMixin(Polymer.Element) {
-      static get is() { return 'mps-picked-by-location' }
+    class PickingStatusByCell extends BarcodeScannerMixin(Polymer.Element) {
+      static get is() { return 'picking-status-by-cell' }
 
       static get properties() {
         return {
@@ -195,7 +193,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description Life Cycle - connectedCallback
-       ********************************************
+       *********************
        */
       connectedCallback() {
         super.connectedCallback();
@@ -221,6 +219,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description 이 화면의 표시 상태가 바뀔 때 handle
+       *********************
        */
       _visibleChanged(visible) {
         if (visible) {
@@ -288,6 +287,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description 초기화 버튼을 통해 화면에서 설정한 값들을 초기화 함
+       *********************
        */
       _clearView() {
         this.chuteNo = '';
@@ -296,6 +296,6 @@ Copyright © HatioLab Inc. All rights reserved.
       }
     }
 
-    customElements.define(MpsPickedByLocation.is, MpsPickedByLocation);
+    customElements.define(PickingStatusByCell.is, PickingStatusByCell);
   </script>
 </dom-module>

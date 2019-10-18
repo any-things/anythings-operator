@@ -240,21 +240,16 @@ Copyright © HatioLab Inc. All rights reserved.
           selected-attribute="visible">
 
           <!-- Common Views -->
-          <!--sys-setting
-            id="sys-setting"
-            name="setting"
-            resources="[[resources]]"
-            language="[[language]]"
-            device-type="{{deviceType}}">
-          </sys-setting-->
-
-          <mps-label-re-issue name="mps_label_re_issue" is-pda="[[isPDA]]"></mps-label-re-issue>
-          <mps-region-input-list name="mps_region_input_list" is-pda="[[isPDA]]"></mps-region-input-list>
-          <mps-box-assign name="mps_box_assign" is-pda="[[isPDA]]"></mps-box-assign>
-          <mps-box-list name="mps_box_list" is-kiosk="[[isKIOSK]]"></mps-box-list>
-          <mps-picking-list name="mps_picking_list" is-kiosk="[[isKIOSK]]"></mps-picking-list>
-          <mps-picked-by-location name="mps_picked_by_location" is-pda="[[isPDA]]"></mps-picked-by-location>
+          <cell-box-mapping-status name="cell_box_mapping_status" is-pda="[[isPDA]]"></cell-box-mapping-status>
+          <picking-status name="picking_status" is-kiosk="[[isKIOSK]]"></picking-status>
+          <picking-status-by-cell name="picking_status_by_cell" is-pda="[[isPDA]]"></picking-status-by-cell>
+          <box-list name="box_list" is-kiosk="[[isKIOSK]]"></box-list>
+          <label-list name="label_list" is-pda="[[isPDA]]"></label-list>
           <!-- Common Views -->
+
+          <!-- DAS Views -->
+          <rack-input-list name="rack_input_list" is-pda="[[isPDA]]"></rack-input-list>
+          <!-- DAS Views -->
 
           <!-- Tablet Views -->
           <tab-das-order-info name="tab_das_ord_info"></tab-das-order-info>
@@ -325,58 +320,98 @@ Copyright © HatioLab Inc. All rights reserved.
       static get properties() {
         return {
           /**
-           * 화면의 타이틀
+           * @description 화면의 타이틀
+           ******************************
+           * @type {String}
            */
-          title: String,
+          title: {
+            type : String
+          },
+
           /**
-           * 페이지 routing을 위한 Object
+           * @description 페이지 routing을 위한 Object
+           ******************************
+           * @type {Object}
            */
-          route: Object,
+          route: {
+            type: Object
+          },
+
           /**
-           * 현재 page hash
+           * @description 현재 page hash
+           ******************************
+           * @type {Object}
            */
           page: {
             type: String,
             observer: '_pageChanged'
           },
+
           /**
-           * 현재 장비의 타입
+           * @description 현재 장비의 타입
+           ******************************
+           * @type {Object}
            */
           deviceType: {
             type: String,
             observer: '_deviceTypeChanged'
           },
 
+          /**
+           * @description 현재 장비의 타입
+           ******************************
+           * @type {Object}
+           */
           regionName: {
             type: String,
             value: () => JSON.parse(localStorage.getItem('setting.regionName'))
           },
 
+          /**
+           * @description 현재 장비의 타입
+           ******************************
+           * @type {Object}
+           */
           zoneCode: {
             type: String,
             value: () => JSON.parse(localStorage.getItem('setting.zoneCode'))
           },
 
+          /**
+           * @description 현재 장비의 타입
+           ******************************
+           * @type {Object}
+           */
           jobName: {
             type: String,
             value: () => JSON.parse(localStorage.getItem('setting.jobName'))
           },
 
+          /**
+           * @description 현재 장비의 타입
+           ******************************
+           * @type {Object}
+           */
           isQps:{
             type: Boolean,
             value: () => JSON.parse(localStorage.getItem('setting.isQps'))
           },
 
+          /**
+           * @description 현재 장비의 타입
+           ******************************
+           * @type {Object}
+           */
           kioskWorkLoc: {
             type: String,
             value: () => JSON.parse(localStorage.getItem('setting.workLocation'))
           },
 
           /**
-           * KIOSK 환경에서 상단에 표시되는 작업 위치
-           ***************
-           * logis-setting에 의해 workLoc이 결정되면 workLoc을 바탕으로 화면에 표시할
-           * 값을 결정함
+           * @description KIOSK 환경에서 상단에 표시되는 작업 위치
+           * logis-setting에 의해 workLoc이 결정되면 workLoc을 바탕으로 화면에 표시할 값을 결정함
+           ******************************
+           * @type {String}
            */
           kioskWorkLocLabel: {
             type: String,
@@ -384,7 +419,9 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 개발 모드 여부
+           * @description 개발 모드 여부
+           ******************************
+           * @type {Boolean}
            */
           isDevMode: {
             type: Boolean,
@@ -392,29 +429,45 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * deviceType이 TABLET일 때 화면 핸들링을 위한 flag
+           * @description 태블릿 여부
+           ******************************
+           * @type {Boolean}
            */
-          isTABLET: Boolean,
+          isTABLET: {
+            type: Boolean
+          },
 
           /**
-           * deviceType이 PDA일 때 화면 핸들링을 위한 flag
+           * @description PDA 여부
+           ******************************
+           * @type {Boolean}
            */
-          isPDA: Boolean,
+          isPDA: {
+            type: Boolean
+          },
 
           /**
-           * deviceType이 KIOSK일 때 화면 핸들링을 위한 flag
+           * @description KIOSK 여부
+           ******************************
+           * @type {Boolean}
            */
-          isKIOSK: Boolean,
+          isKIOSK: {
+            type: Boolean
+          },
 
           /**
-           * 로그인 여부를 확인하기 위한 flag
+           * @description 로그인 여부를 확인하기 위한 flag
+           ******************************
+           * @type {Boolean}
            */
           isNotLogin: {
             type: Boolean
           },
 
           /**
-           * KIOSK 환경에서 QR 코드 버튼이 활성화 되어 있는지 여부를 확인하기 위한 flag
+           * @description KIOSK 환경에서 QR 코드 버튼이 활성화 되어 있는지 여부를 확인하기 위한 flag
+           ******************************
+           * @type {Boolean}
            */
           isShowCodeButton: {
             type: Boolean,
@@ -422,7 +475,9 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 화면 상단에 표시 할 현재 로그인한 사이트 코드
+           * @description 화면 상단에 표시 할 현재 로그인한 사이트 코드
+           ******************************
+           * @type {String}
            */
           currentSite: {
             type: String,
@@ -488,11 +543,13 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _checkDeviceType() {
         this.deviceType = '';
+
         if(CONST.IS_DEV_MODE) { // 개발 모드일 때 localstorage에서 값을 조회 함
           this.deviceType = JSON.parse(localStorage.getItem('setting.deviceType')) ? JSON.parse(localStorage.getItem('setting.deviceType')) : CONST.MY_DEVICE;
         } else {
           this.deviceType = CONST.MY_DEVICE;
         }
+
         return this.deviceType;
       }
 
@@ -554,6 +611,7 @@ Copyright © HatioLab Inc. All rights reserved.
             this.showKioskSettingBtn(false);
             this.showSidebar(true);
             importNativeLibs();
+
           } else {
             this.fixViewSize(false);
             this.showKioskSettingBtn(true);
@@ -574,7 +632,7 @@ Copyright © HatioLab Inc. All rights reserved.
               break;
 
             case CONST.DEVICE_TYPE.PDA:
-              if(this.isQps){
+              if(this.isQps) {
                 this.showKioskSettingBtn(false);
                 this.showLogoutBtn(true);
                 this.showRefreshBtn(true);
@@ -584,7 +642,8 @@ Copyright © HatioLab Inc. All rights reserved.
                 this.fixViewSize(true);
                 importNativeLibs();
                 this.enableMenuBtn(true);
-              }else{
+
+              } else {
                 this.showKioskSettingBtn(false);
                 this.showLogoutBtn(true);
                 this.showRefreshBtn(false);
@@ -596,6 +655,7 @@ Copyright © HatioLab Inc. All rights reserved.
                 this.enableMenuBtn(true);
               }
               break;
+
             default:
               this.showKioskSettingBtn(false);
               this.showLogoutBtn(true);

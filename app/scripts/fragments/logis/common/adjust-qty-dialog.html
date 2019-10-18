@@ -3,15 +3,14 @@
 Copyright © HatioLab Inc. All rights reserved.
 -->
 
-<link rel="import" href="../../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
 
-<link rel="import" href="../../components/common/number-up-down.html">
+<link rel="import" href="../../../components/common/number-up-down.html">
 
 <!--
   작업 처리 중 수량 조정 팝업
 -->
-
-<dom-module id="mps-adjust-qty-dialog">
+<dom-module id="adjust-qty-dialog">
   <template>
     <style include="shared-styles">
       :host {
@@ -59,23 +58,10 @@ Copyright © HatioLab Inc. All rights reserved.
         <input type="number" id="current-qty" readonly>
       </div>
 
-      <!-- <dom-if if="[[!isNumberUpDown]]">
-        <template>
-          <div class="input-row">
-            <span class="label">[[adjustQtyLabel]]</span>
-            <input type="number" id="adjust-qty" min="1">
-          </div>
-        </template>
-      </dom-if> -->
-
-      <!-- <dom-if if="[[isNumberUpDown]]"> -->
-        <!-- <template> -->
-          <div class="input-row">
-            <span class="label">[[adjustQtyLabel]]</span>
-            <number-up-down id="adjust-qty" value="{{confirmValue}}" min="1"></number-up-down>
-          </div>
-        <!-- </template> -->
-      <!-- </dom-if> -->
+      <div class="input-row">
+        <span class="label">[[adjustQtyLabel]]</span>
+        <number-up-down id="adjust-qty" value="{{confirmValue}}" min="1"></number-up-down>
+      </div>
 
       <div id="button-container">
         <button id="btn-close" on-click="closeDialog">[[closeButtonLabel]]</button>
@@ -85,13 +71,13 @@ Copyright © HatioLab Inc. All rights reserved.
   </template>
 
   <script>
-    class MpsAdjustQtyDialog extends Polymer.Element {
-      static get is() { return 'mps-adjust-qty-dialog' }
+    class AdjustQtyDialog extends Polymer.Element {
+      static get is() { return 'adjust-qty-dialog' }
 
       static get properties() {
         return {
           /**
-           * 작업 유형
+           * @description 작업 유형
            ****************
            * @type {String}
            */
@@ -100,26 +86,51 @@ Copyright © HatioLab Inc. All rights reserved.
             value: 'DAS'
           },
 
+          /**
+           * @description 현재 수량 라벨
+           ****************
+           * @type {String}
+           */
           currentQtyLabel: {
             type: String,
             value: () => t('label.current_qty')
           },
 
+          /**
+           * @description 수량 조정 라벨
+           ****************
+           * @type {String}
+           */
           adjustQtyLabel: {
             type: String,
             value: () => t('label.adjust_qty')
           },
 
+          /**
+           * @description 적용 버튼 라벨
+           ****************
+           * @type {String}
+           */
           applyButtonLabel: {
             type: String,
             value: () => t('button.apply')
           },
 
+          /**
+           * @description 닫기 버튼 라벨
+           ****************
+           * @type {String}
+           */
           closeButtonLabel: {
             type: String,
             value: () => t('button.close')
           },
 
+          /**
+           * @description 숫자 위 아래 조정 여부
+           ****************
+           * @type {Boolean}
+           */
           isNumberUpDown: {
             type: Boolean,
             value: false
@@ -127,40 +138,65 @@ Copyright © HatioLab Inc. All rights reserved.
         }
       }
 
+      /**
+       * @description 현재 수량 설정
+       *****************************
+       * @param {Number} qty
+       */
       setCurrentQty(qty) {
         qty = parseInt(qty);
         const currentQtyInput = this._getCurrentQtyInput();
         currentQtyInput.value = qty;
         const adjustQtyInput = this._getAdjustQtyInput();
+
         var maxQty = qty - 1;
-        if(maxQty <= 0) { maxQty = 1; }
+        if(maxQty <= 0) {
+          maxQty = 1;
+        }
         adjustQtyInput.setAttribute('max', maxQty);
 
         if (this.isNumberUpDown) {
           adjustQtyInput.value = qty;
           adjustQtyInput.setAttribute('max', qty);
+
         } else {
           adjustQtyInput.value = qty;
           adjustQtyInput.setAttribute('max', maxQty);
         }
       }
 
+      /**
+       * @description 현재 수량 설정
+       *****************************
+       * @return
+       */
       _getCurrentQtyInput() {
         return this.$['current-qty'];
       }
 
+      /**
+       * @description 조정 수량 리턴
+       *****************************
+       * @return
+       */
       _getAdjustQtyInput() {
         return this.$['adjust-qty'];
       }
 
+      /**
+       * @description 수량 적용 처리
+       *****************************
+       */
       adjustQty() {
         const adjustQty = parseInt(this._getAdjustQtyInput().value);
         const currentQty = parseInt(this._getCurrentQtyInput().value);
+
         if(adjustQty >= currentQty) {
           openAlert({
             title: t('text.invalid_value'),
             message: t('text.adjust_value_invalid')
           });
+
         } else {
           const adjustQtyAjax = this._getAdjustQtyAjax();
           adjustQtyAjax.curl = `/tablet_process/split_job/${this.jobId}`;
@@ -174,16 +210,24 @@ Copyright © HatioLab Inc. All rights reserved.
         }
       }
 
+      /**
+       * @description 수량 적용 Ajax
+       *****************************
+       * @return
+       */
       _getAdjustQtyAjax() {
         return this.$['adjust-qty-ajax'];
       }
 
+      /**
+       * @description 다이얼로그 닫기
+       *****************************
+       */
       closeDialog() {
         document.dispatchEvent(new CustomEvent('close-dialog'));
       }
-
     }
 
-    customElements.define(MpsAdjustQtyDialog.is, MpsAdjustQtyDialog);
+    customElements.define(AdjustQtyDialog.is, AdjustQtyDialog);
   </script>
 </dom-module>

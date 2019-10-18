@@ -600,7 +600,7 @@ Copyright © HatioLab Inc. All rights reserved.
           if (!closeParam || (!closeParam.type || closeParam.type != 'adjust-qty')) {
             this.isDataPolution = true;
           } else {
-            let adjustPopup = document.createElement('mps-adjust-qty-dialog');
+            let adjustPopup = document.createElement('adjust-qty-dialog');
             setTimeout(() => {
               LOGIS_UTIL.showPopup(t('button.adjust_qty'), adjustPopup, 'fit', 'fit', () => {
                 adjustPopup.setCurrentQty(closeParam.pickingQty);
