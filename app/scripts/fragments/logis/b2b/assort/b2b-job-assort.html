@@ -15,10 +15,10 @@ Copyright © HatioLab Inc. All rights reserved.
 <link rel="import" href="../../../../components/logis/job-transaction-popup.html">
 
 <!--
-  물류 > 출고 > 소분류 처리 화면
+  물류 > 출고 > 소분류 처리 화면 (Tablet)
 -->
 
-<dom-module id="tab-das-order-info">
+<dom-module id="b2b-job-assort">
   <template>
     <style include="tab-order-info-styles">
       #status {
@@ -188,8 +188,8 @@ Copyright © HatioLab Inc. All rights reserved.
   </template>
 
   <script>
-    class TabDasOrderInfo extends LogisMsgSubscribeMixin(LosigCommonAssortMixin(BleScannerMixin(Polymer.Element))) {
-      static get is() { return 'tab-das-order-info' }
+    class B2BJobAssort extends LogisMsgSubscribeMixin(LosigCommonAssortMixin(BleScannerMixin(Polymer.Element))) {
+      static get is() { return 'b2b-job-assort' }
 
       static get properties() {
         return {
@@ -598,6 +598,6 @@ Copyright © HatioLab Inc. All rights reserved.
       }
     }
 
-    customElements.define(TabDasOrderInfo.is, TabDasOrderInfo);
+    customElements.define(B2BJobAssort.is, B2BJobAssort);
   </script>
 </dom-module>

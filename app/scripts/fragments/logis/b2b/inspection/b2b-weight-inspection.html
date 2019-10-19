@@ -8,9 +8,9 @@ Copyright © HatioLab Inc. All rights reserved.
 <link rel="import" href="../../../logis/logis-kiosk-libs.html">
 
 <!--
-  KIOSK > DAS 중량 검수 화면
+  물류 > B2B > 검수 화면 - 중량 측정 (KIOSK)
 -->
-<dom-module id="kiosk-das-inspection-weight">
+<dom-module id="b2b-weight-inspection">
   <template>
     <style>
       .container {
@@ -331,8 +331,8 @@ Copyright © HatioLab Inc. All rights reserved.
   </template>
 
   <script>
-    class KioskDasInspectionWeight extends Polymer.Element {
-      static get is() { return 'kiosk-das-inspection-weight' }
+    class B2BWeightInspection extends Polymer.Element {
+      static get is() { return 'b2b-weight-inspection' }
 
       static get properties() {
         return {
@@ -891,7 +891,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
     }
 
-    customElements.define(KioskDasInspectionWeight.is, KioskDasInspectionWeight);
+    customElements.define(B2BWeightInspection.is, B2BWeightInspection);
   </script>
 
 </dom-module>

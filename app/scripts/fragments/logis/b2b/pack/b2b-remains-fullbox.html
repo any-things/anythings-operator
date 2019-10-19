@@ -18,12 +18,12 @@ Copyright © HatioLab Inc. All rights reserved.
 <link rel="import" href="../../../../components/logis/job-list.html">
 
 <!-- TODO 아래는 공통 컴포넌트로 교체 -->
-<link rel="import" href="./pda-rtn-process-detail.html">
+<link rel="import" href="./rtn-assort-transaction.html">
 
 <!--
-  PDA > 반품 잔량 풀박스 처리 화면
+  물류 > B2B > 잔량 풀박스 처리 화면 (PDA)
 -->
-<dom-module id="pda-rtn-fullbox">
+<dom-module id="b2b-remains-fullbox">
   <template>
     <style include="shared-styles">
       :host {
@@ -219,8 +219,8 @@ Copyright © HatioLab Inc. All rights reserved.
   </template>
 
   <script>
-    class PdaRtnFullbox extends Polymer.Element {
-      static get is() { return 'pda-rtn-fullbox' }
+    class B2BRemainsFullbox extends Polymer.Element {
+      static get is() { return 'b2b-remains-fullbox' }
       static get properties() {
         return {
           /**
@@ -920,6 +920,6 @@ Copyright © HatioLab Inc. All rights reserved.
       }
     }
 
-    customElements.define(PdaRtnFullbox.is, PdaRtnFullbox);
+    customElements.define(B2BRemainsFullbox.is, B2BRemainsFullbox);
   </script>
 </dom-module>

@@ -9,20 +9,20 @@ Copyright © HatioLab Inc. All rights reserved.
 <link rel="import" href="../../../../mixins/logis/indicator-on-off-mixin.html">
 <link rel="import" href="../../../../mixins/logis/logis-msg-subscribe-mixin.html">
 
-<link rel="import" href="../../../../components/logis/box-process-checker.html">
 <link rel="import" href="../../../../components/common/barcode-field.html">
+<link rel="import" href="../../../../components/logis/box-process-checker.html">
 <link rel="import" href="../../../../components/logis/job-list.html">
 <link rel="import" href="../../../../components/logis/indicator-inspector.html">
 <link rel="import" href="../../../../components/logis/cell-box-mapper-popup.html">
 <link rel="import" href="../../../../components/logis/indicator-on-off-popup.html">
 <link rel="import" href="../../../../components/logis/adjust-qty-popup.html">
 
-<link rel="import" href="./pda-rtn-process-detail.html">
+<link rel="import" href="./rtn-assort-transaction.html">
 
 <!--
-  반품 소분류 처리 화면
+  물류 > B2B > 반품 소분류 처리 화면 (PDA)
 -->
-<dom-module id="pda-rtn-process">
+<dom-module id="b2b-rtn-assort-job">
   <template>
     <style include="shared-styles">
       :host {
@@ -245,8 +245,8 @@ Copyright © HatioLab Inc. All rights reserved.
   </template>
 
   <script>
-    class PdaRtnProcess extends LogisMsgSubscribeMixin(Polymer.Element) {
-      static get is() { return 'pda-rtn-process' }
+    class B2BRtnAssortJob extends LogisMsgSubscribeMixin(Polymer.Element) {
+      static get is() { return 'b2b-rtn-assort-job' }
       static get properties() {
         return {
           /**
@@ -1293,6 +1293,6 @@ Copyright © HatioLab Inc. All rights reserved.
       }
     }
 
-    customElements.define(PdaRtnProcess.is, PdaRtnProcess);
+    customElements.define(B2BRtnAssortJob.is, B2BRtnAssortJob);
   </script>
 </dom-module>

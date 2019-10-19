@@ -11,9 +11,9 @@ Copyright © HatioLab Inc. All rights reserved.
 <link rel="import" href="../../../../components/logis/plan-actual-display.html">
 
 <!--
-  물류 > 반품 > 검수 화면
+  물류 > B2B > 반품 검수 화면
 -->
-<dom-module id="pda-rtn-inspection">
+<dom-module id="b2b-rtn-inspection">
   <template>
     <style include="shared-styles any-setting-styles">
       :host {
@@ -229,8 +229,8 @@ Copyright © HatioLab Inc. All rights reserved.
   </template>
 
   <script>
-    class PdaRtnInspection extends Polymer.Element {
-      static get is() { return 'pda-rtn-inspection' }
+    class B2BRtnInspection extends Polymer.Element {
+      static get is() { return 'b2b-rtn-inspection' }
 
       static get properties() {
         return {
@@ -771,7 +771,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
     }
 
-    customElements.define(PdaRtnInspection.is, PdaRtnInspection);
+    customElements.define(B2BRtnInspection.is, B2BRtnInspection);
   </script>
 
 </dom-module>

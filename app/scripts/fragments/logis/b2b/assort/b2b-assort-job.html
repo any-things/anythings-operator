@@ -9,13 +9,13 @@ Copyright © HatioLab Inc. All rights reserved.
 <link rel="import" href="../../../../components/logis/indicator-on-off-popup.html">
 <link rel="import" href="../../../../components/logis/adjust-qty-popup.html">
 
-<!-- 아래 pda-job-process-detail 공통 컴포넌트로 교체 -->
-<link rel="import" href="./pda-job-process-detail.html">
+<!-- 아래 out-assort-transaction 공통 컴포넌트로 교체 -->
+<link rel="import" href="./out-assort-transaction.html">
 
 <!--
-  PDA > DAS 작업 처리 화면
+  물류 > B2B > 소분류 처리 화면 (PDA)
 -->
-<dom-module id="pda-job-process">
+<dom-module id="b2b-assort-job">
   <template>
     <style include="shared-styles">
       :host {
@@ -194,8 +194,8 @@ Copyright © HatioLab Inc. All rights reserved.
   </template>
 
   <script>
-    class PdaJobProcess extends LogisMsgSubscribeMixin(Polymer.Element) {
-      static get is() { return 'pda-job-process' }
+    class B2BAssortJob extends LogisMsgSubscribeMixin(Polymer.Element) {
+      static get is() { return 'b2b-assort-job' }
 
       static get properties() {
         return {
@@ -789,7 +789,7 @@ Copyright © HatioLab Inc. All rights reserved.
       _showProcessPopup(event) {
         const status = event.detail.data.status;
         if(status === 'P') {
-          const popup = document.createElement('pda-job-process-detail');
+          const popup = document.createElement('out-assort-transaction');
           const data = event.detail.data;
           popup.jobId = data.id;
           popup.custNm = data.cust_nm;
@@ -1014,6 +1014,6 @@ Copyright © HatioLab Inc. All rights reserved.
       }*/
     }
 
-    customElements.define(PdaJobProcess.is, PdaJobProcess);
+    customElements.define(B2BAssortJob.is, B2BAssortJob);
   </script>
 </dom-module>

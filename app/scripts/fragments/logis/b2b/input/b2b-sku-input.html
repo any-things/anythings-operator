@@ -8,9 +8,9 @@ Copyright © HatioLab Inc. All rights reserved.
 <link rel="import" href="../../../../components/logis/sku-selection-popup.html">
 
 <!--
-  KIOSK > DAS 작업 화면
+  물류 > 출고 > 상품 투입 화면
 -->
-<dom-module id="kiosk-das-order-info">
+<dom-module id="b2b-sku-input">
   <template>
     <style>
       #container {
@@ -292,8 +292,8 @@ Copyright © HatioLab Inc. All rights reserved.
   </template>
 
   <script>
-    class KioskDasOrderInfo extends Polymer.Element {
-      static get is() { return 'kiosk-das-order-info' }
+    class B2bSkuInput extends Polymer.Element {
+      static get is() { return 'b2b-sku-input' }
 
       static get properties() {
         return {
@@ -1078,7 +1078,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
     }
 
-    customElements.define(KioskDasOrderInfo.is, KioskDasOrderInfo);
+    customElements.define(B2bSkuInput.is, B2bSkuInput);
   </script>
 
 </dom-module>

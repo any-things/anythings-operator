@@ -8,9 +8,9 @@ Copyright © HatioLab Inc. All rights reserved.
 <link rel="import" href="../../../../components/logis/inspection-enter-qty-popup.html">
 
 <!--
-  KIOSK > DAS 검수 화면
+  물류 > B2B > 검수 화면 (KIOSK)
 -->
-<dom-module id="kiosk-das-inspection">
+<dom-module id="b2b-qty-inspection">
   <template>
     <style>
       .container {
@@ -212,8 +212,8 @@ Copyright © HatioLab Inc. All rights reserved.
   </template>
 
   <script>
-    class KioskDasInspection extends Polymer.Element {
-      static get is() { return 'kiosk-das-inspection' }
+    class B2BQtyInspection extends Polymer.Element {
+      static get is() { return 'b2b-qty-inspection' }
 
       static get properties() {
         return {
@@ -972,7 +972,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
     }
 
-    customElements.define(KioskDasInspection.is, KioskDasInspection);
+    customElements.define(B2BQtyInspection.is, B2BQtyInspection);
   </script>
 
 </dom-module>

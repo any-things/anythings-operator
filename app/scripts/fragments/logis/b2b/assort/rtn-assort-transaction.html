@@ -3,15 +3,14 @@
 Copyright © HatioLab Inc. All rights reserved.
 -->
 
-<link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
-
-<link rel="import" href="../../../logis/logis-pda-libs.html">
+<link rel="import" href="../../../../../bower_components/polymer/polymer-element.html">
 
 <!--
-  PDA > DAS 작업 처리 화면 > 작업 상세 화면 (작업 취소 / 작업 완료)
--->
+  물류 > B2B > 반품 소분류 처리 화면 > 작업 상세 화면 (작업 취소 / 작업 완료 / 수량 조정 / 풀 박스) (PDA)
 
-<dom-module id="pda-job-process-detail">
+  TODO 이 화면 추후 삭제하고 공통 화면 사용
+-->
+<dom-module id="rtn-assort-transaction">
   <template>
     <style include="shared-styles">
       :host {
@@ -51,20 +50,21 @@ Copyright © HatioLab Inc. All rights reserved.
       }
     </style>
 
+    <!-- 트랜잭션 처리 Ajax -->
     <sys-ajax
       id="job-handle-ajax"
       content-type="application/json">
     </sys-ajax>
 
     <div id="container">
+      <!-- 작업 요약 섹션 -->
       <div id="summary">
-        <span class="label">[[custNmLabel]]: [[custNm]]</span>
+        <span class="label">[[skuNmLabel]]: [[skuNm]]</span>
         <span class="label">[[locationLabel]]: [[locCd]]</span>
-        <span class="label">[[pickQtyLabel]]: [[totalQty]]</span>
+        <span class="label">[[pickQtyLabel]]: [[pickingQty]]/[[pickedQty]]/[[pickQty]]</span>
       </div>
 
-      </div>
-
+      <!-- 트랜잭션 버튼 섹션 -->
       <div id="btn-container">
         <button on-click="adjustQty" hidden$="[[hideAdjustBtn]]">[[adjustQtyLabel]]</button>
         <button on-click="jobCancel">[[jobCancelLabel]]</button>
@@ -76,25 +76,46 @@ Copyright © HatioLab Inc. All rights reserved.
   </template>
 
   <script>
-    class PdaJobProcessDetail extends Polymer.Element {
-      static get is() { return 'pda-job-process-detail' }
+    class RtnAssortTransaction extends Polymer.Element {
+      static get is() { return 'rtn-assort-transaction' }
+
       static get properties() {
         return {
-          custNmLabel: {
+          /**
+           * 상품명 라벨
+           ****************
+           * @type {String}
+           */
+          skuNmLabel: {
             type: String,
-            value: () => t('label.cust_nm')
+            value: () => t('label.sku_nm')
           },
 
+          /**
+           * 로케이션 라벨
+           ****************
+           * @type {String}
+           */
           locationLabel: {
             type: String,
             value: () => t('label.location')
           },
 
+          /**
+           * 예정 수량 라벨
+           ****************
+           * @type {String}
+           */
           pickQtyLabel: {
             type: String,
-            value: () => t('label.picked_qty') + '/' + t('label.pick_qty')
+            value: () => t('label.picking_qty') + '/' + t('label.picked_qty') + '/' + t('label.pick_qty')
           },
 
+          /**
+           * 조정 수량 라벨
+           ****************
+           * @type {String}
+           */
           adjustQtyLabel: {
             type: String,
             value: () => t('button.adjust_qty')
@@ -120,6 +141,11 @@ Copyright © HatioLab Inc. All rights reserved.
             value: () => t('button.job_complete')
           },
 
+          /**
+           * Fullbox 라벨
+           ****************
+           * @type {String}
+           */
           fullBoxLabel: {
             type: String,
             value: () => t('button.full_box')
@@ -147,7 +173,7 @@ Copyright © HatioLab Inc. All rights reserved.
            ********************
            * @type {String}
            */
-          custNm: String,
+          skuNm: String,
 
           /**
            * 선택한 작업의 로케이션 정보
@@ -156,24 +182,41 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           locCd: String,
 
+          /**
+           * 예정 수량
+           ****************
+           * @type {Number}
+           */
           pickQty: {
             type: Number,
             observer: '_pickQtyChanged'
           },
 
+          /**
+           * 확정 수량
+           ****************
+           * @type {Number}
+           */
           pickedQty: {
             type: Number
           },
 
           /**
-           * 선택한 작업의 처리 수량 정보
-           ********************
-           * @type {String}
+           * 처리중 수량
+           ****************
+           * @type {Number}
            */
-          totalQty: String
+          pickingQty: {
+            type: Number
+          },
         }
       }
 
+      /**
+       * 예정 수량 변경시
+       ********************
+       * @param {Number} pickQty
+       */
       _pickQtyChanged(pickQty) {
         if(pickQty <= 1) {
           this.hideAdjustBtn = true;
@@ -195,11 +238,15 @@ Copyright © HatioLab Inc. All rights reserved.
         return jobHandlerAjax;
       }
 
+      /**
+       * 수량 조정
+       ********************
+       */
       adjustQty() {
         this.closeDialog({
           detail: {
             type: 'adjust-qty',
-            pickQty: this.pickQty,
+            pickingQty: this.pickingQty,
             jobId: this.jobId
           }
         });
@@ -207,6 +254,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * 작업 취소
+       *********************
        */
       jobCancel() {
         let jobCancelAjax = this.getJobHandleAjax({
@@ -220,6 +268,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * 작업 완료
+       *********************
        */
       jobFinish() {
         let jobFinishAjax = this.getJobHandleAjax({
@@ -231,6 +280,10 @@ Copyright © HatioLab Inc. All rights reserved.
         jobFinishAjax.generateRequest();
       }
 
+      /**
+       * Fullbox
+       *********************
+       */
       fullBox() {
         let fullboxAjax = this.getJobHandleAjax({
           curl: `/tablet_process/fullbox/${this.jobId}`,
@@ -261,12 +314,14 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * 팝업 닫기
+       ********************
+       * @param {Object} event
        */
       closeDialog(event) {
         document.dispatchEvent(new CustomEvent('close-dialog', event));
       }
     }
 
-    customElements.define(PdaJobProcessDetail.is, PdaJobProcessDetail);
+    customElements.define(RtnAssortTransaction.is, RtnAssortTransaction);
   </script>
 </dom-module>

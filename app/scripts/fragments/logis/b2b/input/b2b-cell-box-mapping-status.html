@@ -3,12 +3,12 @@
 Copyright © HatioLab Inc. All rights reserved.
 -->
 
-<link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../../../../bower_components/polymer/polymer-element.html">
 
 <!--
-  PDA > 박스 할당 화면
+  물류 > B2B > 셀 별 박스 할당 상태 조회 (PDA)
 -->
-<dom-module id="pda-bucket-assign">
+<dom-module id="b2b-cell-box-mapping-status">
   <template>
     <style include="shared-styles">
       :host {
@@ -77,15 +77,26 @@ Copyright © HatioLab Inc. All rights reserved.
   </template>
 
   <script>
-    class PdaBucketAssign extends BarcodeScannerMixin(Polymer.Element) {
-      static get is() { return 'pda-bucket-assign' }
+    class B2BCellBoxMappingStatus extends BarcodeScannerMixin(Polymer.Element) {
+      static get is() { return 'b2b-cell-box-mapping-status' }
 
       static get properties() {
         return {
           // locale 처리
-          locCodeLabel: {type: String, value: () => t('label.location')},
-          bucketCodeLabel: {type: String, value: () => t('label.bucket_cd')},
-          resetBtnLabel: {type: String, value: () => t('button.reset')},
+          locCodeLabel: {
+            type: String,
+            value: () => t('label.location')
+          },
+
+          bucketCodeLabel: {
+            type: String,
+            value: () => t('label.bucket_cd')
+          },
+
+          resetBtnLabel: {
+            type: String,
+            value: () => t('button.reset')
+          },
 
           header: {
             type: Array,
@@ -228,6 +239,6 @@ Copyright © HatioLab Inc. All rights reserved.
     }
 
 
-    customElements.define(PdaBucketAssign.is, PdaBucketAssign);
+    customElements.define(B2BCellBoxMappingStatus.is, B2BCellBoxMappingStatus);
   </script>
 </dom-module>
