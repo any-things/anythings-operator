@@ -3,22 +3,22 @@
 Copyright © HatioLab Inc. All rights reserved.
 -->
 
-<link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../../../../bower_components/polymer/polymer-element.html">
 
-<link rel="import" href="../../../../styles/tab-order-info-styles.html">
+<link rel="import" href="../../../../../styles/tab-order-info-styles.html">
 
-<link rel="import" href="../../../mixins/common/ble-scanner-mixin.html">
-<link rel="import" href="../../../mixins/logis/logis-common-assort-mixin.html">
-<link rel="import" href="../../../mixins/logis/logis-msg-subscribe-mixin.html">
+<link rel="import" href="../../../../mixins/common/ble-scanner-mixin.html">
+<link rel="import" href="../../../../mixins/logis/logis-common-assort-mixin.html">
+<link rel="import" href="../../../../mixins/logis/logis-msg-subscribe-mixin.html">
 
-<link rel="import" href="../common/bluetooth-scanner-selector.html">
-<link rel="import" href="../common/adjust-qty-dialog.html">
-<link rel="import" href="../common/job-transaction-popup.html">
+<link rel="import" href="../../../../components/common/bluetooth-scanner-selector.html">
+<link rel="import" href="../../../../components/logis/adjust-qty-popup.html">
+<link rel="import" href="../../../../components/logis/job-transaction-popup.html">
 
 <!--
-  DPS 작업 정보 화면
+  물류 > B2C > 소분류 처리 화면 (Tablet)
 -->
-<dom-module id="tab-dps-order-info">
+<dom-module id="b2c-picking-job">
   <template>
     <style include="tab-order-info-styles">
       #prod-info #prod-info-right {
@@ -219,9 +219,9 @@ Copyright © HatioLab Inc. All rights reserved.
   </template>
 
   <script>
-    class TabDpsOrderInfo extends LogisMsgSubscribeMixin(LosigCommonAssortMixin(BleScannerMixin(Polymer.Element))) {
+    class B2cPickingJob extends LogisMsgSubscribeMixin(LosigCommonAssortMixin(BleScannerMixin(Polymer.Element))) {
       static get is() {
-        return 'tab-dps-order-info'
+        return 'b2c-picking-job'
       }
 
       static get properties() {
@@ -639,7 +639,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
           LOGIS_UTIL.showPopup(t('title.job_select'), popup, 'fit', 'fit', null, closeParam => {
             if (closeParam && typeof closeParam === 'object' && closeParam.type === 'adjust-qty') {
-              const adjustPopup = document.createElement('adjust-qty-dialog');
+              const adjustPopup = document.createElement('adjust-qty-popup');
 
               setTimeout(() => {
                 LOGIS_UTIL.showPopup(t('button.adjust_qty'), adjustPopup, 'fit', 'fit', () => {
@@ -920,6 +920,6 @@ Copyright © HatioLab Inc. All rights reserved.
       }
     }
 
-    customElements.define(TabDpsOrderInfo.is, TabDpsOrderInfo);
+    customElements.define(B2cPickingJob.is, B2cPickingJob);
   </script>
 </dom-module>

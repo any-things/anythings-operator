@@ -3,9 +3,14 @@
 Copyright © HatioLab Inc. All rights reserved.
 -->
 
-<link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
-<script src = "../../../components/logis/logis-util.js"></script>
-<dom-module id="pda-one-sku-order">
+<link rel="import" href="../../../../../bower_components/polymer/polymer-element.html">
+
+<script src = "../../../../components/logis/logis-util.js"></script>
+
+<!--
+  물류 > B2C > 1 SKU - 1 Order 소분류 처리 화면 (PDA)
+-->
+<dom-module id="b2c-one-sku-order">
   <template>
     <style include="shared-styles">
       :host {
@@ -68,6 +73,7 @@ Copyright © HatioLab Inc. All rights reserved.
         justify-items: end;
       }
     </style>
+
     <sys-ajax
       id="summary-ajax"
       method="GET"
@@ -170,9 +176,9 @@ Copyright © HatioLab Inc. All rights reserved.
   </template>
 
   <script>
-    class PdaOneSkuOrder extends BarcodeScannerMixin(Polymer.Element) {
+    class B2COneSkuOrder extends BarcodeScannerMixin(Polymer.Element) {
       static get is() {
-        return 'pda-one-sku-order'
+        return 'b2c-one-sku-order'
       }
 
       static get properties() {
@@ -703,6 +709,6 @@ Copyright © HatioLab Inc. All rights reserved.
       }
     }
 
-    customElements.define(PdaOneSkuOrder.is, PdaOneSkuOrder)
+    customElements.define(B2COneSkuOrder.is, B2COneSkuOrder)
   </script>
 </dom-module>

@@ -1,19 +1,18 @@
-<!--
+\<!--
 @license
 Copyright © HatioLab Inc. All rights reserved.
 -->
 
-<link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../../../../bower_components/polymer/polymer-element.html">
 
-<link rel="import" href="../../../components/common/sound-player.html">
+<link rel="import" href="../../../../components/common/sound-player.html">
 
-<link rel="import" href="../common/sku-selection-popup.html">
+<link rel="import" href="../../../../components/logis/sku-selection-popup.html">
 
 <!--
-  KIOSK 중량 업데이트 중분류 화면
+  물류 > B2B > 출고 중량 업데이트 && 중분류 화면 (KIOSK)
  -->
-
-<dom-module id="kiosk-middle-assort-weight">
+<dom-module id="b2b-out-middle-assort-with-weight">
   <template>
     <style include="shared-styles">
       #container {
@@ -147,7 +146,7 @@ Copyright © HatioLab Inc. All rights reserved.
         width:60px;height:60px;
         margin:10px 0 0 5px;
         float:left;
-        background:url('../../../../images/icon-weight.png') no-repeat;
+        background:url('../../../../../images/icon-weight.png') no-repeat;
       }
       .weight-section span{
         position:relative;
@@ -288,9 +287,9 @@ Copyright © HatioLab Inc. All rights reserved.
   </template>
 
   <script>
-    class KioskMiddleAssortWeight extends Polymer.Element {
+    class B2BOutMiddleAssortWithWeight extends Polymer.Element {
       static get is() {
-        return 'kiosk-middle-assort-weight'
+        return 'b2b-out-middle-assort-with-weight'
       }
 
       static get properties() {
@@ -1055,6 +1054,6 @@ Copyright © HatioLab Inc. All rights reserved.
       }
     }
 
-    customElements.define(KioskMiddleAssortWeight.is, KioskMiddleAssortWeight);
+    customElements.define(B2BOutMiddleAssortWithWeight.is, B2BOutMiddleAssortWithWeight);
   </script>
 </dom-module>

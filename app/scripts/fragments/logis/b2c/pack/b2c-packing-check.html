@@ -1,9 +1,16 @@
-<!-- QPS 포장화면 -->
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
 
-<link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
-<link rel="import" href="../../../logis/logis-kiosk-libs.html">
-<link rel="import" href="./kiosk-packing-popup.html">
-<dom-module id="kiosk-packing-check">
+<link rel="import" href="../../../../../bower_components/polymer/polymer-element.html">
+
+<link rel="import" href="./b2c-packing-popup.html">
+
+<!--
+  물류 > B2C > 포장 화면 (KIOSK)
+-->
+<dom-module id="b2c-packing-check">
     <template>
         <style include="shared-styles">
             :host {
@@ -67,7 +74,7 @@
                 height: 80vh;
             }
         </style>
-        
+
         <sys-ajax
             id="box-get-ajax"
             curl="/kiosk_process/dps/inspection/packing/"
@@ -84,7 +91,7 @@
             content-type="application/json"
             on-sys-ajax-response="_reprintSucceed">
         </sys-ajax>
-        
+
         <div id = "top-container">
             <div class = "left">
                 <span class="label">[[boxIdLabel]]</span>
@@ -112,10 +119,11 @@
             </div>
         </div>
     </template>
+
     <script>
-        class KioskPackingCheck extends Polymer.Element{
+        class B2CPackingCheck extends Polymer.Element{
             static get is() {
-                return 'kiosk-packing-check';
+                return 'b2c-packing-check';
             }
             static get properties() {
                 return {
@@ -248,7 +256,7 @@
             _getBoxResult(e){
                 this.checkBoxId = this.$['box-id'].value;
                 if(e.detail.length > 0){
-                    const content = document.createElement('kiosk-packing-popup');
+                    const content = document.createElement('b2c-packing-popup');
                     content.firstRow = this.dangerousText;
                     content.secondRow = this.attachLabelText;
                     content.imgSrc = "../../../../images/dangerAttachImg.png";
@@ -384,6 +392,6 @@
                 }
             }
         }
-        window.customElements.define(KioskPackingCheck.is, KioskPackingCheck);
+        window.customElements.define(B2CPackingCheck.is, B2CPackingCheck);
     </script>
 </dom-module>

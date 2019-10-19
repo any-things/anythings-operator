@@ -8,7 +8,7 @@ Copyright © HatioLab Inc. All rights reserved.
 <link rel="import" href="../../logis/logis-tablet-libs.html">
 
 <!--
-  공통 > 박스 할당 화면
+  물류 공통 > 표시기로 검수하는 기능
 -->
 <dom-module id="indicator-inspector">
   <template>
@@ -46,25 +46,50 @@ Copyright © HatioLab Inc. All rights reserved.
 
       static get properties() {
         return {
+          /**
+           * @description TODO 모드
+           ****************
+           * @type {Boolean}
+           */
           isOnTodo: {
             type: Boolean,
             observer: '_isOnTodoChanged'
           },
 
+          /**
+           * @description Done 모드
+           ****************
+           * @type {Boolean}
+           */
           isOnDone: {
             type: Boolean,
             observer: '_isOnDoneChanged'
           },
 
+          /**
+           * @description 검수 모드 여부
+           ****************
+           * @type {Boolean}
+           */
           isInspectMode: {
             type: Boolean,
             observer: '_isInspectModeChanged'
           },
 
+          /**
+           * @description 고객사 코드
+           ****************
+           * @type {String}
+           */
           comCode: {
             type: String
           },
 
+          /**
+           * @description 상품 코드
+           ****************
+           * @type {String}
+           */
           skuCode: {
             type: String,
             observer: '_skuCodeChanged'
@@ -72,6 +97,11 @@ Copyright © HatioLab Inc. All rights reserved.
         }
       }
 
+      /**
+       * @description TODO 모드 변경시
+       ******************
+       * @param {Boolean} isOnTodo
+       */
       _isOnTodoChanged(isOnTodo) {
         if (isOnTodo) {
           this._mpiOnByTabletZone('todo');
@@ -80,12 +110,13 @@ Copyright © HatioLab Inc. All rights reserved.
         }
       }
 
+      /**
+       * @description 상품 코드 변경시
+       ******************
+       * @param {String} skuCode
+       */
       _skuCodeChanged(skuCode) {
-        if (!skuCode) {
-          return;
-        }
-
-        if (!this.isInspectMode) {
+        if (!skuCode || !this.isInspectMode) {
           return;
         }
 
@@ -95,10 +126,14 @@ Copyright © HatioLab Inc. All rights reserved.
         let inspectAjax = this.$['inspect-sku-ajax'];
         inspectAjax.curl = `/pda_process/inspection_by_mpi/${regionCode}/${sideCode}/${zoneCd}/${this.comCode}/${skuCode}`;
         inspectAjax.generateRequest();
-
         this.skuCode = null;
       }
 
+      /**
+       * @description 검수 모드 변경시
+       ******************
+       * @param {Boolean} isInspectMode
+       */
       _isInspectModeChanged(isInspectMode) {
         if (!isInspectMode) {
           this._mpiOffByTabletZone();
@@ -107,6 +142,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description 태블릿 작업 존에 해당하는 표시기 리스트를 소등한다.
+       ******************
        */
       _mpiOffByTabletZone() {
         const mpiOffAjax = this.$['mpi-off-my-zone-ajax'];

@@ -3,7 +3,10 @@
 Copyright © HatioLab Inc. All rights reserved.
 -->
 
-<dom-module id="pda-job-process-btn-popup">
+<!--
+  물류 공통 > 표시기 점등 / 소등 버튼 팝업
+-->
+<dom-module id="indicator-on-off-popup">
   <template>
     <style include="shared-styles">
       :host {
@@ -45,8 +48,8 @@ Copyright © HatioLab Inc. All rights reserved.
   </template>
 
   <script>
-    class PdaJobProcessBtnPopup extends Polymer.Element {
-      static get is() { return 'pda-job-process-btn-popup' }
+    class IndicatorOnOffPopup extends Polymer.Element {
+      static get is() { return 'indicator-on-off-popup' }
 
       static get properties() {
         return {
@@ -64,10 +67,6 @@ Copyright © HatioLab Inc. All rights reserved.
               id: 'mpi-off',
               label: t('button.end_inspection')
             }
-            // , {
-            //   id: 'cancel-input',
-            //   label: t('button.cancel_input')
-            // }
             ]
           }
         }
@@ -87,6 +86,6 @@ Copyright © HatioLab Inc. All rights reserved.
       }
     }
 
-    customElements.define(PdaJobProcessBtnPopup.is, PdaJobProcessBtnPopup);
+    customElements.define(IndicatorOnOffPopup.is, IndicatorOnOffPopup);
   </script>
 </dom-module>

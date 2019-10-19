@@ -3,19 +3,19 @@
 Copyright © HatioLab Inc. All rights reserved.
 -->
 
-<link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
-<link rel="import" href="../../../../styles/tab-order-info-styles.html">
+<link rel="import" href="../../../../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../../../../styles/tab-order-info-styles.html">
 
-<link rel="import" href="../../../mixins/common/ble-scanner-mixin.html">
-<link rel="import" href="../../../mixins/logis/logis-common-assort-mixin.html">
-<link rel="import" href="../../../mixins/logis/logis-msg-subscribe-mixin.html">
+<link rel="import" href="../../../../mixins/common/ble-scanner-mixin.html">
+<link rel="import" href="../../../../mixins/logis/logis-common-assort-mixin.html">
+<link rel="import" href="../../../../mixins/logis/logis-msg-subscribe-mixin.html">
 
-<link rel="import" href="../common/adjust-qty-dialog.html">
-<link rel="import" href="../common/bluetooth-scanner-selector.html">
-<link rel="import" href="../common/job-transaction-popup.html">
+<link rel="import" href="../../../../components/common/bluetooth-scanner-selector.html">
+<link rel="import" href="../../../../components/logis/adjust-qty-popup.html">
+<link rel="import" href="../../../../components/logis/job-transaction-popup.html">
 
 <!--
-  태블릿 - DAS 작업 정보 화면
+  물류 > 출고 > 소분류 처리 화면
 -->
 
 <dom-module id="tab-das-order-info">
@@ -495,7 +495,7 @@ Copyright © HatioLab Inc. All rights reserved.
           popup.isFinished = (status === 'F');
           LOGIS_UTIL.showPopup(t('title.job_select'), popup, 'fit', 'fit', null, closeParam => {
             if (closeParam && typeof closeParam === 'object' && closeParam.type === 'adjust-qty') {
-              const adjustPopup = document.createElement('adjust-qty-dialog');
+              const adjustPopup = document.createElement('adjust-qty-popup');
 
               setTimeout(() => {
                 LOGIS_UTIL.showPopup(t('button.adjust_qty'), adjustPopup, 'fit', 'fit', () => {

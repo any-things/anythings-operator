@@ -3,14 +3,12 @@
 Copyright © HatioLab Inc. All rights reserved.
 -->
 
-<link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
-
-<link rel="import" href="../../../logis/logis-kiosk-libs.html">
+<link rel="import" href="../../../../../bower_components/polymer/polymer-element.html">
 
 <!--
-  KIOSK > DPS 작업 화면
+  물류 > B2C > 박스 투입 화면 (KIOSK)
 -->
-<dom-module id="kiosk-dps-order-info">
+<dom-module id="b2c-box-input">
   <template>
     <style>
       #container {
@@ -282,8 +280,8 @@ Copyright © HatioLab Inc. All rights reserved.
   </template>
 
   <script>
-    class KioskDpsOrderInfo extends Polymer.Element {
-      static get is() { return 'kiosk-dps-order-info' }
+    class B2CBoxInput extends Polymer.Element {
+      static get is() { return 'b2c-box-input' }
 
       static get properties() {
         return {
@@ -939,6 +937,6 @@ Copyright © HatioLab Inc. All rights reserved.
       }
     }
 
-    customElements.define(KioskDpsOrderInfo.is, KioskDpsOrderInfo);
+    customElements.define(B2CBoxInput.is, B2CBoxInput);
   </script>
 </dom-module>

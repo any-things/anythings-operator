@@ -1,7 +1,15 @@
-<link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
-<link rel="import" href="../../../logis/logis-kiosk-libs.html">
-<link rel="import" href="../../../../styles/shared-styles.html">
-<dom-module id="kiosk-packing-popup">
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+
+<link rel="import" href="../../../../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../../../../styles/shared-styles.html">
+
+<!--
+  물류 > B2C > 포장 팝업 화면
+-->
+<dom-module id="b2c-packing-popup">
     <template>
         <style include="shared-styles">
             :host {
@@ -41,9 +49,9 @@
     </template>
 
     <script>
-        class KioskPackingPopup extends Polymer.Element {
+        class B2CPackingPopup extends Polymer.Element {
             static get is() {
-                return 'kiosk-packing-popup';
+                return 'b2c-packing-popup';
             }
             static get properties() {
                 return {
@@ -67,6 +75,6 @@
             }
         }
 
-        window.customElements.define(KioskPackingPopup.is, KioskPackingPopup);
+        window.customElements.define(B2CPackingPopup.is, B2CPackingPopup);
     </script>
 </dom-module>

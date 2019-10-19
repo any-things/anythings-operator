@@ -3,11 +3,14 @@
 Copyright © HatioLab Inc. All rights reserved.
 -->
 
-<link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../../../../bower_components/polymer/polymer-element.html">
 
-<link rel="import" href="../common/sku-selection-popup.html">
+<link rel="import" href="../../../../components/logis/sku-selection-popup.html">
 
-<dom-module id="kiosk-middle-assort-rtn">
+<!--
+  물류 > B2B > 반품 중분류 화면 (KIOSK)
+ -->
+<dom-module id="b2b-rtn-middle-assort">
   <template>
     <style include="shared-styles">
       #container {
@@ -154,14 +157,13 @@ Copyright © HatioLab Inc. All rights reserved.
       <!--div class="button-container">
         <button on-click="refresh">[[refreshLabel]]</button>
       </div-->
-
     </div>
   </template>
 
   <script>
-    class KioskMiddleAssortRtn extends Polymer.Element {
+    class B2BRtnMiddleAssort extends Polymer.Element {
       static get is() {
-        return 'kiosk-middle-assort-rtn'
+        return 'b2b-rtn-middle-assort'
       }
 
       static get properties() {
@@ -603,6 +605,6 @@ Copyright © HatioLab Inc. All rights reserved.
       }*/
     }
 
-    customElements.define(KioskMiddleAssortRtn.is, KioskMiddleAssortRtn);
+    customElements.define(B2BRtnMiddleAssort.is, B2BRtnMiddleAssort);
   </script>
 </dom-module>

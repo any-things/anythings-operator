@@ -6,7 +6,7 @@ Copyright © HatioLab Inc. All rights reserved.
 <link rel="import" href="../../../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout.html">
 
-<link rel="import" href="../../fragments/logis/common/job-transaction-popup.html">
+<link rel="import" href="./job-transaction-popup.html">
 
 <!--
   작업 리스트
@@ -687,7 +687,7 @@ Copyright © HatioLab Inc. All rights reserved.
             this.isDataPolution = true;
 
           } else {
-            let adjustPopup = document.createElement('adjust-qty-dialog');
+            let adjustPopup = document.createElement('adjust-qty-popup');
             setTimeout(() => {
               LOGIS_UTIL.showPopup(t('button.adjust_qty'), adjustPopup, 'fit', 'fit', () => {
                 adjustPopup.setCurrentQty(closeParam.pickingQty);

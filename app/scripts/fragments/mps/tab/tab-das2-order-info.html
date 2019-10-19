@@ -3,19 +3,18 @@
 Copyright © HatioLab Inc. All rights reserved.
 -->
 
-<link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../../../../bower_components/polymer/polymer-element.html">
 
-<link rel="import" href="../../../../styles/tab-order-info-styles.html">
+<link rel="import" href="../../../../../styles/tab-order-info-styles.html">
 
-<link rel="import" href="../../../mixins/common/ble-scanner-mixin.html">
-<link rel="import" href="../../../mixins/logis/logis-common-assort-mixin.html">
-<link rel="import" href="../../../mixins/logis/logis-msg-subscribe-mixin.html">
+<link rel="import" href="../../../../mixins/common/ble-scanner-mixin.html">
+<link rel="import" href="../../../../mixins/logis/logis-common-assort-mixin.html">
+<link rel="import" href="../../../../mixins/logis/logis-msg-subscribe-mixin.html">
 
-<link rel="import" href="../../../components/logis/plan-actual-display.html">
-
-<link rel="import" href="../common/bluetooth-scanner-selector.html">
-<link rel="import" href="../common/adjust-qty-dialog.html">
-<link rel="import" href="../common/job-transaction-popup.html">
+<link rel="import" href="../../../../components/common/bluetooth-scanner-selector.html">
+<link rel="import" href="../../../../components/logis/plan-actual-display.html">
+<link rel="import" href="../../../../components/logis/adjust-qty-popup.html">
+<link rel="import" href="../../../../components/logis/job-transaction-popup.html">
 
 <!--
   태블릿 - DAS 2차 분류 작업 정보 화면
@@ -807,7 +806,7 @@ Copyright © HatioLab Inc. All rights reserved.
             if(!closeParam || (!closeParam.type || closeParam.type != 'adjust-qty')) {
               this.refreshInputDetails();
             } else {
-              const adjustPopup = document.createElement('adjust-qty-dialog');
+              const adjustPopup = document.createElement('adjust-qty-popup');
               setTimeout(() => {
                 LOGIS_UTIL.showPopup(t('button.adjust_qty'), adjustPopup, 'fit', 'fit', () => {
                   adjustPopup.setCurrentQty(closeParam.pickingQty);
