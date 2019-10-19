@@ -15,8 +15,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
 <link rel="import" href="../common/bluetooth-scanner-selector.html">
 <link rel="import" href="../common/adjust-qty-dialog.html">
-
-<link rel="import" href="./tab-order-info-detail.html">
+<link rel="import" href="../common/job-transaction-popup.html">
 
 <!--
   태블릿 - DAS 2차 분류 작업 정보 화면
@@ -796,7 +795,7 @@ Copyright © HatioLab Inc. All rights reserved.
         // status가 'F'면 완료된 작업
         let status = event.detail.data.status;
         if (status == 'I' || status == 'P' || status == 'F') {
-          const popup = document.createElement('tab-order-info-detail');
+          const popup = document.createElement('job-transaction-popup');
           popup.jobType = this.jobType;
           popup.jobId = event.detail.data.id;
           popup.pickQty = event.detail.data.pick_qty;

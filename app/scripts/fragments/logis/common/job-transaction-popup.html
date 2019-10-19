@@ -2,9 +2,12 @@
 @license
 Copyright © HatioLab Inc. All rights reserved.
 -->
-<link rel="import" href="../common/sku-qrcode-view.html">
+<link rel="import" href="./sku-qrcode-view.html">
 
-<dom-module id="tab-order-info-detail">
+<!--
+  공통 작업 처리 정보 팝업 (원래 태블릿 용)
+-->
+<dom-module id="job-transaction-popup">
   <template>
     <style>
       :host {
@@ -53,7 +56,6 @@ Copyright © HatioLab Inc. All rights reserved.
     </sys-ajax>
 
     <div id="container">
-
       <template is="dom-if" if="[[showQrCode]]">
         <sku-qrcode-view data=[[skuCd]]></sku-qrcode-view>
       </template>
@@ -77,26 +79,74 @@ Copyright © HatioLab Inc. All rights reserved.
   </template>
 
   <script>
-    class TabOrderInfoDetail extends Polymer.Element {
-      static get is() { return 'tab-order-info-detail' }
+    class JobTransactionPopup extends Polymer.Element {
+      static get is() {
+        return 'job-transaction-popup'
+      }
+
       static get properties() {
         return {
-          //label locale 처리
-          adjustQtyLabel: { type: String, value: () => t('button.adjust_qty') },
-          fullBoxLabel: { type: String, value: () => t('button.full_box') },
-          jobCancelLabel: { type: String, value: () => t('button.job_cancel') },
-          jobFinishLabel: { type: String, value: () => t('button.job_complete') },
-          closeDialogLabel: { type: String, value: () => t('button.close') },
-
           /**
-           * 선택한 작업 정보의 id
+           * @description 수량 조절 라벨
            ********************
            * @type {String}
            */
-          jobId: String,
+          adjustQtyLabel: {
+            type: String,
+            value: () => t('button.adjust_qty')
+          },
 
           /**
-           * 현재 선택된 작업의 완료 여부
+           * @description 풀 박스 라벨
+           ********************
+           * @type {String}
+           */
+          fullBoxLabel: {
+            type: String,
+            value: () => t('button.full_box')
+          },
+
+          /**
+           * @description 작업 취소 라벨
+           ********************
+           * @type {String}
+           */
+          jobCancelLabel: {
+            type: String,
+            value: () => t('button.job_cancel')
+          },
+
+          /**
+           * @description 작업 완료 라벨
+           ********************
+           * @type {String}
+           */
+          jobFinishLabel: {
+            type: String,
+            value: () => t('button.job_complete')
+          },
+
+          /**
+           * @description 닫기 버튼 라벨
+           ********************
+           * @type {String}
+           */
+          closeDialogLabel: {
+            type: String,
+            value: () => t('button.close')
+          },
+
+          /**
+           * @description Job Instance ID
+           ********************
+           * @type {String}
+           */
+          jobId: {
+            type: String
+          },
+
+          /**
+           * @description 현재 선택된 작업의 완료 여부
            * 작업 완료 여부에 따라 활성화 되는 버튼이 결정됨
            ********************
            * @type {Boolean}
@@ -107,25 +157,48 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * DAS / DPS 작업 타입
+           * @description DAS / DPS 작업 타입
            * 팝업을 출력하기 전 초기화 해야함
+           *********************
+           * @type {String}
            */
           jobType: {
             type: String
           },
+
+          /**
+           * @description 상품 코드
+           ********************
+           * @type {String}
+           */
           skuCd: {
             type: String
           },
 
+          /**
+           * @description 피킹 중 수량
+           ********************
+           * @type {Number}
+           */
           pickingQty: {
             type: Number,
             observer: '_pickingQtyChanged'
           },
 
+          /**
+           * @description 피킹 확정 수량
+           ********************
+           * @type {Number}
+           */
           pickedQty: {
             type: Number
           },
 
+          /**
+           * @description 피킹 예정 수량
+           ********************
+           * @type {Number}
+           */
           pickQty: {
             type: Number
           }
@@ -133,7 +206,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 작업처리 ajax 일괄 처리를 위함 function
+       * @description 작업처리 ajax 일괄 처리를 위함 function
        ********************
        * @param {Object} ajaxInfo
        */
@@ -146,7 +219,8 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 라벨 출력
+       * @description 라벨 출력
+       ********************
        */
       labelPrint() {
         let fullBoxAjax = this.getJobHandleAjax({
@@ -159,7 +233,8 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 작업 취소
+       * @description 작업 취소
+       ********************
        */
       jobCancel() {
         let jobCancelAjax = this.getJobHandleAjax({
@@ -172,7 +247,8 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 작업 완료
+       * @description 작업 완료
+       ********************
        */
       jobFinish() {
         let jobFinishAjax = this.getJobHandleAjax({
@@ -184,6 +260,11 @@ Copyright © HatioLab Inc. All rights reserved.
         jobFinishAjax.generateRequest();
       }
 
+      /**
+       * @description 피킹 수량 변경
+       ********************
+       * @param {Number} pickingQty
+       */
       _pickingQtyChanged(pickingQty) {
         if (pickingQty <= 1) {
           this.hideAdjustBtn = true;
@@ -192,6 +273,10 @@ Copyright © HatioLab Inc. All rights reserved.
         }
       }
 
+      /**
+       * @description 수량 조절
+       ********************
+       */
       adjustQty() {
         this.closeDialog({
           detail: {
@@ -205,7 +290,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 라벨 출력, full box response event handler
+       * @description 라벨 출력, full box response event handler
        ********************
        * @param {Object} event
        */
@@ -214,7 +299,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 작업 취소 reponse event handler
+       * @description 작업 취소 reponse event handler
        ********************
        * @param {Object} event
        */
@@ -223,7 +308,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 작업 완료 response event handler
+       * @description 작업 완료 response event handler
        ********************
        * @param {Object} event
        */
@@ -232,7 +317,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * isFinished의 값에 따라 화면에 출력할 버튼을 결정
+       * @description isFinished의 값에 따라 화면에 출력할 버튼을 결정
        ********************
        * @param {Boolean} isFinished
        */
@@ -294,14 +379,16 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 뒤로가기 버튼 클릭 event handler
+       * @description 뒤로가기 버튼 클릭 event handler
        * 다이얼로그 close 이벤트 발생
+       ********************
+       * @param {Object} event
        */
       closeDialog(event) {
         document.dispatchEvent(new CustomEvent('close-dialog', event));
       }
     }
 
-    customElements.define(TabOrderInfoDetail.is, TabOrderInfoDetail);
+    customElements.define(JobTransactionPopup.is, JobTransactionPopup);
   </script>
 </dom-module>

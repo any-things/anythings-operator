@@ -1,4 +1,12 @@
-<dom-module id="kiosk-inspection-input-count">
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+
+<!--
+  검수 화면에서 수량 일괄 입력을 위한 팝업 화면
+-->
+<dom-module id="inspection-enter-qty-popup">
   <template>
     <style>
       #container {
@@ -51,27 +59,58 @@
   </template>
 
   <script>
-    class KioskInspectionInputCount extends Polymer.Element {
-      static get is() { return 'kiosk-inspection-input-count' }
+    class InspectionEnterQtyPopup extends Polymer.Element {
+      static get is() { return 'inspection-enter-qty-popup' }
 
       static get properties() {
         return {
-          // locale
-          closeBtnLabel: {type: String, value: () => t('button.close')},
-          confirmBtnLabel: {type: String, value: () => t('button.confirm')},
+          /**
+           * @description 닫기 버튼 라벨
+           ****************
+           * @type {String}
+           */
+          closeBtnLabel: {
+            type: String,
+            value: () => t('button.close')
+          },
 
+          /**
+           * @description 확인 버튼 라벨
+           ****************
+           * @type {String}
+           */
+          confirmBtnLabel: {
+            type: String,
+            value: () => t('button.confirm')
+          },
+
+          /**
+           * @description 검수 항목
+           ****************
+           * @type {Object}
+           */
           item: {
             type: Object
           },
 
+          /**
+           * @description 투입 수량
+           ****************
+           * @type {String}
+           */
           inputQty: {
             type: Number
           }
         }
       }
 
+      /**
+       * @description connectedCallback lifecycle
+       *******************************
+       */
       connectedCallback() {
         super.connectedCallback();
+
         document.addEventListener(`alert-closed-at-${location.hash.replace('#/', '')}`, event => {
           if(!event.detail.hasCallback) {
             this._initialSetup();
@@ -79,17 +118,27 @@
         });
       }
 
+      /**
+       * @description 키보드 핸들러
+       *******************************
+       * @param {Object} event
+       */
       _keypressHandler(event) {
         if(event.charCode === 13) {
           this.doInspection();
         }
       }
 
+      /**
+       * @description 트랜잭션 처리
+       *******************************
+       */
       doInspection() {
         try {
           this.validateBeforeInspection();
           this.item.confirm_qty = this.item.confirm_qty + this.inputQty;
           this.closeDialog();
+
         } catch (error) {
           openAlert({
             title: error.title,
@@ -99,6 +148,10 @@
         }
       }
 
+      /**
+       * @description 검수 전 유효성 체크
+       *******************************
+       */
       validateBeforeInspection() {
         this.inputQty = parseInt(this.$['input-count'].value);
         if(isNaN(this.inputQty) || !this.inputQty || this.inputQty < 0) {
@@ -114,19 +167,24 @@
         }
       }
 
+      /**
+       * @description 다이얼로그 닫기
+       *******************************
+       */
       closeDialog() {
         document.dispatchEvent(new CustomEvent('close-dialog'));
       }
 
       /**
-       * focus를 code input으로 이동함
+       * @description focus를 code input으로 이동함
        * operato-logis-app에 의해 dialog가 나타나고 openCallback에 의해 실행됨
+       *******************************
        */
       _initialSetup() {
         this.$['input-count'].select();
       }
     }
 
-    customElements.define(KioskInspectionInputCount.is, KioskInspectionInputCount);
+    customElements.define(InspectionEnterQtyPopup.is, InspectionEnterQtyPopup);
   </script>
 </dom-module>

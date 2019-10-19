@@ -3,7 +3,10 @@
 Copyright © HatioLab Inc. All rights reserved.
 -->
 
-<dom-module id="kiosk-sku-selection">
+<!--
+  상품 코드 (혹은 상품 바코드) 스캔시 상품 조회 결과가 여러 개 인 경우 사용자가 직접 선택할 수 있는 팝업
+-->
+<dom-module id="sku-selection-popup">
   <template>
     <style>
       :host {
@@ -20,7 +23,7 @@ Copyright © HatioLab Inc. All rights reserved.
         grid-auto-flow: row;
         justify-content: end;
         padding: 20px;
-      } 
+      }
       button {
         @apply --operator-default-btn;
       }
@@ -28,25 +31,40 @@ Copyright © HatioLab Inc. All rights reserved.
         @apply --operator-default-btn-active;
       }
     </style>
+
     <item-list
       header="[[header]]"
       data="[[skuList]]"
       on-data-list-click="_skuSelected"
       dialog>
     </item-list>
-    
+
     <div id="button-container">
-      <button id="back-btn" on-click="closeDialog">[[confirmLabel]]</button>    
+      <button id="back-btn" on-click="closeDialog">[[confirmLabel]]</button>
     </div>
   </template>
 
   <script>
-    class KioskSkuSelection extends Polymer.Element {
-      static get is() { return 'kiosk-sku-selection' }
+    class SkuSelectionPopup extends Polymer.Element {
+      static get is() { return 'sku-selection-popup' }
+
       static get properties() {
         return {
-          confirmLabel: { type: String, value: () => t('button.confirm')},
-          
+          /**
+           * @description 확인 버튼 라벨
+           ****************
+           * @type {String}
+           */
+          confirmLabel: {
+            type: String,
+            value: () => t('button.confirm')
+          },
+
+          /**
+           * @description 상품 리스트 헤더
+           ****************
+           * @type {Array}
+           */
           header: {
             type: Array,
             value: () => [{
@@ -64,26 +82,41 @@ Copyright © HatioLab Inc. All rights reserved.
             }]
           },
 
+          /**
+           * @description 상품 리스트
+           ****************
+           * @type {Array}
+           */
           skuList: {
             type: Array
           }
         }
       }
 
+      /**
+       * @description 상품 선택시 처리 로직
+       *******************************
+       * @param {Object} event
+       */
       _skuSelected(event) {
         if(this.selectedSkuEl) {
           this.selectedSkuEl.classList.remove('complete');
         }
+
         event.detail.row.classList.add('complete');
         this.selectedSkuEl = event.detail.row;
         this.selectedSku = event.detail.data;
       }
 
+      /**
+       * @description 다이얼로그 닫기
+       *******************************
+       */
       closeDialog() {
         document.dispatchEvent(new CustomEvent('close-dialog'));
       }
     }
 
-    customElements.define(KioskSkuSelection.is, KioskSkuSelection);
+    customElements.define(SkuSelectionPopup.is, SkuSelectionPopup);
   </script>
 </dom-module>

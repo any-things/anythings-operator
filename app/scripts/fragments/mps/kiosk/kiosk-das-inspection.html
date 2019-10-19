@@ -5,9 +5,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
 <link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
 
-<link rel="import" href="../../../logis/logis-kiosk-libs.html">
-
-<link rel="import" href="./kiosk-inspection-input-count.html">
+<link rel="import" href="../common/inspection-enter-qty-popup.html">
 
 <!--
   KIOSK > DAS 검수 화면
@@ -620,7 +618,7 @@ Copyright © HatioLab Inc. All rights reserved.
               this.sortSkuPcsQty = this.sortSkuPcsQty + calcQty;
 
             } else if(this.inspectionMethodValue == 'inputCount') {
-              const inputCountPopup = document.createElement('kiosk-inspection-input-count');
+              const inputCountPopup = document.createElement('inspection-enter-qty-popup');
               inputCountPopup.item = item;
 
               if(item.sku_cd == skuBarcode || item.sku_barcd == skuBarcode) {

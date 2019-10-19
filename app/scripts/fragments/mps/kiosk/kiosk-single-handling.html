@@ -1,10 +1,10 @@
 <!-- QPS 단포 -->
 
 <link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
-<link rel="import" href="../../../logis/logis-kiosk-libs.html">
-<link rel="import" href="./kiosk-sku-selection.html">
 
 <link rel="import" href="../../../../styles/shared-styles.html">
+
+<link rel="import" href="../common/sku-selection-popup.html">
 
 <dom-module id="kiosk-single-handling">
     <template>
@@ -19,7 +19,7 @@
                 color: rgba(255,255,255,.8);
                 text-align: center;
             }
-            
+
             #left-container {
                 height: 100%;
             }
@@ -180,7 +180,7 @@
                         on-item-selected="skuChange"
                         on-sys-ajax-error="_findSkuError">
                     </auto-popup-input>
-    
+
                     <span class="label">[[skuNmLabel]]</span>
                     <input id="sku-name" readonly>
 
@@ -217,7 +217,7 @@
                     },
                     header:{
                         type: Array,
-                        value: function() {  		
+                        value: function() {
                             // a. 피스 수량/ 박스타입/ 주문 수/ 완료주문 수
                             return [{
                                 display: t('label.pcs_qty'),
@@ -439,7 +439,7 @@
                 return {
                     'page-changed-to-kiosk_single_handling' : '_routingChanged'
                 }
-            }     
+            }
 
             //페이지 변경시 상품코드 select
             connectedCallback() {
@@ -464,7 +464,7 @@
                         if(data.box_type_cd == this.currentSkuInfo.box_type_cd && data.pcs_qty ==this.currentSkuInfo.pick_qty){
                             row.classList.add('selected');
                         }else{
-                            row.classList.remove('selected'); 
+                            row.classList.remove('selected');
                         }
                     })
                 }
@@ -501,7 +501,7 @@
                         }else{
                             self._getSkuAjax().curl = `/kiosk_process/dps/single_packaging/${self.regionCd}/${skuCode}/S/NA`;
                         }
-                        self._getSkuAjax().generateRequest();    
+                        self._getSkuAjax().generateRequest();
                     }
                 }
             }
@@ -525,12 +525,12 @@
                     self._getBoxIdInput().value ="";
                     self.skuBarcd = skuBarcd;
                     self._getSkuAjax().curl = `/kiosk_process/dps/single_packaging/${self.regionCd}/${skuCode}/S/NA`;
-                    self._getSkuAjax().generateRequest();                            
+                    self._getSkuAjax().generateRequest();
                 });
                 this.blur();
             }
             _getSkuData(e){
-                // if(this.skuItem && e.detail && e.detail[0] && e.detail[0].orderList[0] 
+                // if(this.skuItem && e.detail && e.detail[0] && e.detail[0].orderList[0]
                 //     &&this.skuItem.pick_qty != e.detail[0].orderList[0].pick_qty){
                 //     LOGIS_UTIL.showMessage(t('button.confirm'), t('text.confirm_qty_change'), function(){
                 //         this._doGetSkuData(e.detail[0].orderList[0],e.detail[0].summaryList);
@@ -542,7 +542,7 @@
                     if(summary){
                         this.boxPicking = summary.all_box_qty;
                         this.boxPicked = summary.finish_box_qty;
-                    }                    
+                    }
                     this._doGetSkuData(e.detail[0].orderList[0],e.detail[0].summary[0],e.detail[0].summaryList);
                 }
                 // }
@@ -692,7 +692,7 @@
                             if(this.skuItem && this.skuItem.pick_qty!=skuInfo.pick_qty){
                               var self = this;
                               LOGIS_UTIL.showMessage(t('button.confirm'), t('text.confirm_qty_change'), function(){
-                                self._getBoxIdInput().select();    
+                                self._getBoxIdInput().select();
                               });
                               e.target.blur();
                             }

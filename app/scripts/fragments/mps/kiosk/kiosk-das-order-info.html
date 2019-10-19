@@ -4,8 +4,8 @@ Copyright © HatioLab Inc. All rights reserved.
 -->
 
 <link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
-<link rel="import" href="../../../logis/logis-kiosk-libs.html">
-<link rel="import" href="./kiosk-sku-selection.html">
+
+<link rel="import" href="../common/sku-selection-popup.html">
 
 <!--
   KIOSK > DAS 작업 화면
@@ -872,7 +872,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Array} skuList
        */
       showSkuSelectPopup(skuList) {
-        const popup = document.createElement('kiosk-sku-selection');
+        const popup = document.createElement('sku-selection-popup');
         popup.skuList = skuList;
         var self = this;
 

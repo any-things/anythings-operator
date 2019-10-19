@@ -5,13 +5,10 @@ Copyright © HatioLab Inc. All rights reserved.
 
 <link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
 
-<link rel="import" href="../../../logis/logis-kiosk-libs.html">
-
 <!--
   KIOSK QR Code 팝업 화면
  -->
-
-<dom-module id="kiosk-code-popup">
+<dom-module id="qrcode-popup">
   <template>
     <style>
       #container {
@@ -74,33 +71,65 @@ Copyright © HatioLab Inc. All rights reserved.
   </template>
 
   <script>
-    class KioskCodePopup extends Polymer.Element {
-      static get is() { return 'kiosk-code-popup' }
+    class QrcodePopup extends Polymer.Element {
+      static get is() { return 'qrcode-popup' }
 
       static get properties() {
         return {
-          // locale 처리
-          closeBtnLabel: { type: String, value: () => t('button.close') },
+          /**
+           * @description 닫기 라벨
+           ****************
+           * @type {String}
+           */
+          closeBtnLabel: {
+            type: String,
+            value: () => t('button.close')
+          },
 
+          /**
+           * @description 액션 유형
+           ****************
+           * @type {String}
+           */
           actionType: {
             type: String
           },
 
+          /**
+           * @description QR Code 이미지 소스
+           ****************
+           * @type {String}
+           */
           qrImgSrc: {
             type: String,
             computed: '_computeQRImgSrc(actionType)'
           },
 
+          /**
+           * @description 호기 내 표시기 전체 소등 액션 키
+           ****************
+           * @type {String}
+           */
           mpiOffKey: {
             type: String,
             value: 'MPI_OFF_ALL'
           },
 
+          /**
+           * @description 호기 내 로케이션 모두 Fullbox 명령
+           ****************
+           * @type {String}
+           */
           batchFullBoxKey: {
             type: String,
             value: 'BATCH_FULL_BOX'
           },
 
+          /**
+           * @description 호기 내 로케이션 마지막 작업에 대한 표시기 복원
+           ****************
+           * @type {String}
+           */
           mpiOnLastKey: {
             type: String,
             value: 'MPI_ON_LAST'
@@ -109,16 +138,17 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * focus를 code input으로 이동함
+       * @description focus를 code input으로 이동함
        * operato-logis-app에 의해 dialog가 나타나고 openCallback에 의해 실행됨
+       *******************************
        */
       initialSetup() {
         this.$['code'].select();
       }
 
       /**
-       * actionType에 따라 QR 코드 이미지의 경로를 계산하여 return
-       **********
+       * @description actionType에 따라 QR 코드 이미지의 경로를 계산하여 return
+       *******************************
        * @param {String} actionType
        * @returns {String} qrImgSrc
        */
@@ -138,8 +168,10 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * keypress event handler
+       * @description keypress event handler
        * 엔터 입력시 doTransaction을 통해 MPI 전체소등/일괄 Full Box를 수행
+       *******************************
+       * @param {Object} event
        */
       _keypressHandler(event) {
         if(event.charCode === 13) {
@@ -148,11 +180,12 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * actionType에 의해 transaction을 수행함
+       * @description actionType에 의해 transaction을 수행함
        * 1. actionType이 mpi-off 일 경우
        *    MPI 전체소등 수행
        * 2. actionType이 batch-full-box 일 경우
        *    일괄 풀 박스 수행
+       *******************************
        */
       doTransaction() {
         try {
@@ -179,8 +212,6 @@ Copyright © HatioLab Inc. All rights reserved.
               this.initialSetup();
             }
           })
-
-
         } catch (error) {
           openAlert({
             title: error.title,
@@ -191,7 +222,8 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * transaction 전 수행하는 validtion
+       * @description transaction 전 수행하는 validtion
+       *******************************
        */
       validateBeforeTrx() {
         let code = this.$['code'].value;
@@ -212,13 +244,14 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 다이얼로그 닫기
+       * @description 다이얼로그 닫기
+       *******************************
        */
       closeDialog() {
         document.dispatchEvent(new CustomEvent('close-dialog'));
       }
     }
 
-    customElements.define(KioskCodePopup.is, KioskCodePopup);
+    customElements.define(QrcodePopup.is, QrcodePopup);
   </script>
 </dom-module>

@@ -4,17 +4,15 @@ Copyright © HatioLab Inc. All rights reserved.
 -->
 
 <link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../../../styles/tab-order-info-styles.html">
 
 <link rel="import" href="../../../mixins/common/ble-scanner-mixin.html">
 <link rel="import" href="../../../mixins/logis/logis-common-assort-mixin.html">
 <link rel="import" href="../../../mixins/logis/logis-msg-subscribe-mixin.html">
 
-<link rel="import" href="../../../../styles/tab-order-info-styles.html">
-
 <link rel="import" href="../common/adjust-qty-dialog.html">
 <link rel="import" href="../common/bluetooth-scanner-selector.html">
-
-<link rel="import" href="./tab-order-info-detail.html">
+<link rel="import" href="../common/job-transaction-popup.html">
 
 <!--
   태블릿 - DAS 작업 정보 화면
@@ -488,7 +486,7 @@ Copyright © HatioLab Inc. All rights reserved.
         // status가 'F'면 완료된 작업
         let status = event.detail.data.status;
         if (status === 'W' || status == 'I' || status == 'P' || status == 'F') {
-          const popup = document.createElement('tab-order-info-detail');
+          const popup = document.createElement('job-transaction-popup');
           const data = event.detail.data;
           popup.jobType = this.jobType;
           popup.jobId = data.id;

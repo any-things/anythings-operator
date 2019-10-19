@@ -259,9 +259,9 @@ Copyright © HatioLab Inc. All rights reserved.
           <!-- Tablet Views -->
 
           <!-- PDA Views -->
-          <pda-loc-stock-lookup name="pda_loc_stock_lookup"></pda-loc-stock-lookup>
-          <pda-stock-load name="pda_stock_load"></pda-stock-load>
-          <pda-stock-load-fixed name="pda_stock_load_fixed"></pda-stock-load-fixed>
+          <stock-status-by-cell name="pda_loc_stock_lookup"></stock-status-by-cell>
+          <cell-stock-supplement name="cell_stock_supplement"></cell-stock-supplement>
+          <fixed-cell-stock-supplement name="fixed_cell_stock_supplement"></fixed-cell-stock-supplement>
           <pda-region-sku-info name="pda_region_sku_info"></pda-region-sku-info>
           <pda-bucket-assign name="pda_bucket_assign"></pda-bucket-assign>
           <pda-job-process name="pda_job_process"></pda-job-process>
@@ -1071,7 +1071,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       showCodePopup(event) {
         let buttonId = event.currentTarget.id;
-        const popup = document.createElement('kiosk-code-popup');
+        const popup = document.createElement('qrcode-popup');
         let title;
 
         if(buttonId.indexOf('mpi-off-btn') >= 0) {

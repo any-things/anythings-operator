@@ -5,10 +5,11 @@ Copyright © HatioLab Inc. All rights reserved.
 
 <link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
 
-<link rel="import" href="../../../logis/logis-kiosk-libs.html">
+<link rel="import" href="../common/inspection-enter-qty-popup.html">
 
-<link rel="import" href="./kiosk-inspection-input-count.html">
-
+<!--
+  KIOSK > DPS 검수 화면
+-->
 <dom-module id="kiosk-dps-inspection">
   <template>
     <style>
@@ -819,7 +820,7 @@ Copyright © HatioLab Inc. All rights reserved.
               this.confirmSkuPcsQty = this.confirmSkuPcsQty + calcQty;
 
             } else if(this.inspectionMethodValue == 'inputCount') {
-              const inputCountPopup = document.createElement('kiosk-inspection-input-count');
+              const inputCountPopup = document.createElement('inspection-enter-qty-popup');
               inputCountPopup.item = item;
 
               if(item.sku_cd == skuBarcode || skuBarcode == item.sku_barcd) {

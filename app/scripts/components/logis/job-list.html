@@ -6,7 +6,7 @@ Copyright © HatioLab Inc. All rights reserved.
 <link rel="import" href="../../../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout.html">
 
-<link rel="import" href="../../fragments/mps/tab/tab-order-info-detail.html">
+<link rel="import" href="../../fragments/logis/common/job-transaction-popup.html">
 
 <!--
   작업 리스트
@@ -293,15 +293,15 @@ Copyright © HatioLab Inc. All rights reserved.
                 <template>
                   <span class="header-item">[[item.display]]</span>
                 </template>
-              </dom-if>
-            </template>
-          </dom-repeat>
-        </li>
-      </div>
+  </dom-if>
+  </template>
+  </dom-repeat>
+  </li>
+  </div>
 
-      <div id="data-container" dialog$="[[dialog]]">
-        <dom-repeat items="[[items]]" as="rowData" index-as="rowIndex">
-          <template>
+  <div id="data-container" dialog$="[[dialog]]">
+    <dom-repeat items="[[items]]" as="rowData" index-as="rowIndex">
+      <template>
             <!-- <li class$="[[_computeRowClass(rowData.status)]]" style="[[liStyle]]" on-touchend="_tapDataRow" row-data="[[rowData]]"> -->
               <li class$="[[_computeRowClass(rowData.status)]]" style="[[liStyle]]" on-click="_tapDataRow" row-data="[[rowData]]">
               <dom-repeat items="[[_computeLiItems(rowData)]]" as="cellData" index-as="colIndex">
@@ -313,49 +313,52 @@ Copyright © HatioLab Inc. All rights reserved.
                         [[_computeCellData(cellData, rowData)]]
                       </span>
                     </template>
-                  </dom-if>
-                </template>
-              </dom-repeat>
-            </li>
-          </template>
-        </dom-repeat>
-      </div>
+      </dom-if>
+      </template>
+    </dom-repeat>
+    </li>
+    </template>
+    </dom-repeat>
+  </div>
 
-      <!-- TODO: item-list에 로직을 복사해왔음.테스트 못해봤음. -->
-      <div id="paginator-container">
-        <div id="paginator">
-          <iron-icon icon="icons:chevron-left" on-tap="prevPage" class="prevPage"></iron-icon>
-          <input id="page" type="number" name="page" max="[[lastPage]]" on-change="_initPage" value="[[page]]">
-          <iron-icon icon="icons:chevron-right" on-tap="nextPage" class="nextPage"></iron-icon>
-          <span><b>[[page]]</b> Page of [[endPage]] Pages</span>
-        </div>
-
-        <div id="page-summary">
-          <span>Limit</span>
-          <input id="limit" type="number" name="limit" id="limit" min="[[minLimit]]" max="[[maxLimit]]" on-change="_initLimit"
-            value="[[limit]]">
-          <span>from [[beginDataNumber]] to [[endDataNumber]] Total [[total]]</span>
-        </div>
-      </div>
+  <!-- TODO: item-list에 로직을 복사해왔음.테스트 못해봤음. -->
+  <div id="paginator-container">
+    <div id="paginator">
+      <iron-icon icon="icons:chevron-left" on-tap="prevPage" class="prevPage"></iron-icon>
+      <input id="page" type="number" name="page" max="[[lastPage]]" on-change="_initPage" value="[[page]]">
+      <iron-icon icon="icons:chevron-right" on-tap="nextPage" class="nextPage"></iron-icon>
+      <span><b>[[page]]</b> Page of [[endPage]] Pages</span>
     </div>
 
-    <!-- 현재tab-order-info-detail를 createElement로 생성함. template로 처리할지 고민? -->
-    <!-- <div class="detail-menu-container" style="[[_computeDetailMenuStyle(showDetailMenu)]]">
-      <div></div>
-      <tab-order-info-detail class="detail-menu"></tab-order-info-detail>
-      <div></div>
-    </div> -->
+    <div id="page-summary">
+      <span>Limit</span>
+      <input id="limit" type="number" name="limit" id="limit" min="[[minLimit]]" max="[[maxLimit]]" on-change="_initLimit" value="[[limit]]">
+      <span>from [[beginDataNumber]] to [[endDataNumber]] Total [[total]]</span>
+    </div>
+  </div>
+  </div>
   </template>
 
   <script>
     class JobList extends Polymer.Element {
-      static get is() { return 'job-list' }
+      static get is() {
+        return 'job-list'
+      }
       static get properties() {
         return {
-          jobType: String,
+          /**
+           * @description 작업 유형
+           ****************
+           * @type {String}
+           */
+          jobType: {
+            type: String
+          },
 
           /**
-           * list column header
+           * @description 작업 리스트 헤더
+           ****************
+           * @type {Array}
            */
           header: {
             type: Array,
@@ -363,26 +366,37 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * list data
+           * @description 작업 리스트 데이터
+           ****************
+           * @type {Array}
            */
           data: {
             type: Array
           },
 
+          /**
+           * @description 작업 리스트 헤더 메타 데이터
+           ****************
+           * @type {Object}
+           */
           columnMetas: {
             type: Object,
             computed: '_computeColumnMetas(header)'
           },
 
           /**
-           * header hidden 처리 flag
+           * @description header hidden 처리 flag
+           ****************
+           * @type {Boolean}
            */
           hideHeader: {
             type: Boolean
           },
 
           /**
-           * list header configured 여부 flag
+           * @description 리스트 헤더 configured 여부 flag
+           ****************
+           * @type {Boolean}
            */
           isHeaderConfigured: {
             type: Boolean,
@@ -390,7 +404,9 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * list content configured 여부 flag
+           * @description 리스트 컨텐트 configured 여부 flag
+           ****************
+           * @type {Boolean}
            */
           isContentConfigured: {
             type: Boolean,
@@ -398,14 +414,18 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * list 스타일을 dialog 타입에 맞추기 위한 flag
+           * @description 리스트 스타일을 dialog 타입에 맞추기 위한 flag
+           ****************
+           * @type {Boolean}
            */
           dialog: {
             type: Boolean
           },
 
           /**
-           * pagination 처리 여부 flag
+           * @description pagination 처리 여부 flag
+           ****************
+           * @type {Boolean}
            */
           showPaginator: {
             type: Boolean,
@@ -414,7 +434,9 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 현재 리스트의 page 값
+           * @description 현재 리스트의 page 값
+           ****************
+           * @type {Number}
            */
           page: {
             type: Number,
@@ -423,8 +445,9 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 마지막 page 값
-           * 기본값: 1
+           * @description 마지막 page 값
+           ****************
+           * @type {Number}
            */
           endPage: {
             type: Number,
@@ -432,7 +455,9 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 리스트 출력 limit
+           * @description 한 페이지 당 출력 리스트 개수 값
+           ****************
+           * @type {Number}
            */
           limit: {
             type: Number,
@@ -441,7 +466,9 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 리스트 출력 limit minimum
+           * @description limit minimum
+           ****************
+           * @type {Number}
            */
           minLimit: {
             type: Number,
@@ -449,18 +476,30 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 리스트 출력 limit maximum
+           * @description limit maximum
+           ****************
+           * @type {Number}
            */
           maxLimit: {
             type: Number,
             value: 5000
           },
 
+          /**
+           * @description 작업 트랜잭션 팝업을 표시할 지 여부
+           ****************
+           * @type {Boolean}
+           */
           showDetailMenu: {
             type: Boolean,
             value: false
           },
 
+          /**
+           * @description ?
+           ****************
+           * @type {Boolean}
+           */
           isDataPolution: {
             type: Boolean,
             notify: true
@@ -468,14 +507,22 @@ Copyright © HatioLab Inc. All rights reserved.
         }
       }
 
+      /**
+       * @description 그리드 Cell Index
+       ****************
+       * @param {Number}
+       * @return
+       */
       _computeCellClass(index) {
-        // if (index === 0) { // header도 data로 받을지?
-        //   return 'header-item';
-        // } else {
-          return 'data-item';
-        // }
+        return 'data-item';
       }
 
+      /**
+       * @description 컬럼 메타 계산
+       ****************
+       * @param {Object}
+       * @return
+       */
       _computeColumnMetas(header) {
         if (!header) {
           return {};
@@ -483,23 +530,27 @@ Copyright © HatioLab Inc. All rights reserved.
 
         var columnMetas = {};
         var showColumnCount = 0;
+
         header.forEach((obj) => {
           columnMetas[obj.fieldname] = obj;
-
           if (!obj.hidden) {
             showColumnCount++;
           }
         });
 
         this.style.setProperty("--columnCount", showColumnCount);
-
-        // console.log(Object.keys(columnMetas));
         return columnMetas;
       }
 
+      /**
+       * @description 리스트 로우 클래스 계산
+       ****************
+       * @param {String}
+       * @return
+       */
       _computeRowClass(status) {
         var clazz = 'data-list';
-        switch(status) {
+        switch (status) {
           case 'F':
             clazz += ' complete';
             break;
@@ -514,6 +565,12 @@ Copyright © HatioLab Inc. All rights reserved.
         return clazz;
       }
 
+      /**
+       * @description
+       ****************
+       * @param {Object}
+       * @return
+       */
       _computeLiItems(rowData) {
         if (!rowData) {
           return [];
@@ -522,6 +579,7 @@ Copyright © HatioLab Inc. All rights reserved.
         var columnMetas = this.columnMetas;
         var keys = Object.keys(columnMetas);
         var liItems = [];
+
         for (let key of keys) {
           let obj = {
             name: key,
@@ -531,10 +589,15 @@ Copyright © HatioLab Inc. All rights reserved.
           liItems.push(obj);
         }
 
-        // console.log(liItems);
         return liItems;
       }
 
+      /**
+       * @description
+       ****************
+       * @param {Object}
+       * @return
+       */
       _computeCellStyle(cellData) {
         var columnMeta = this.getColumnMeta(cellData);
         if (!columnMeta) {
@@ -543,6 +606,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
         var columnStyle = columnMeta.style;
         var style = '';
+
         if (typeof columnStyle === 'object') {
           style += this._convertStyleFormat(columnStyle);
         } else if (typeof columnStyle === 'string') {
@@ -552,6 +616,12 @@ Copyright © HatioLab Inc. All rights reserved.
         return style;
       }
 
+      /**
+       * @description
+       ****************
+       * @param {Object}
+       * @return
+       */
       _computeCellData(cellData, rowData) {
         var columnMeta = this.getColumnMeta(cellData);
         if (!columnMeta) {
@@ -566,29 +636,45 @@ Copyright © HatioLab Inc. All rights reserved.
         }
       }
 
+      /**
+       * @description
+       ****************
+       * @param {Object}
+       * @return
+       */
       _computeDetailMenuStyle(showDetailMenu) {
         if (!showDetailMenu) {
           return 'display: none;';
         }
       }
 
+      /**
+       * @description
+       ****************
+       * @param {Object}
+       * @return
+       */
       _headerChanged(header) {
         var gridTempCols = this._getGridTempCols(header);
         this.liStyle = `grid-template-columns: ${gridTempCols}`;
       }
 
+      /**
+       * @description
+       ****************
+       * @param {Object}
+       * @return
+       */
       _tapDataRow(e) {
         var rowData = e.currentTarget.rowData;
-        // this.showDetailMenu = true;
-
         var status = rowData.status;
-        var popupStatus = [ 'I', 'P', 'F' ];
+        var popupStatus = ['I', 'P', 'F'];
         if (popupStatus.indexOf(status) < 0) {
           return;
         }
 
         this.isDataPolution = false;
-        let popup = document.createElement('tab-order-info-detail');
+        let popup = document.createElement('job-transaction-popup');
         popup.jobType = this.jobType;
         popup.jobId = rowData.id;
         popup.pickQty = rowData.pick_qty;
@@ -599,6 +685,7 @@ Copyright © HatioLab Inc. All rights reserved.
         LOGIS_UTIL.showPopup(t('title.job_select'), popup, 'fit', 'fit', null, closeParam => {
           if (!closeParam || (!closeParam.type || closeParam.type != 'adjust-qty')) {
             this.isDataPolution = true;
+
           } else {
             let adjustPopup = document.createElement('adjust-qty-dialog');
             setTimeout(() => {
@@ -613,8 +700,15 @@ Copyright © HatioLab Inc. All rights reserved.
         })
       }
 
+      /**
+       * @description
+       ****************
+       * @param {Array}
+       * @return
+       */
       _getGridTempCols(header) {
         let gridTempCols = [];
+
         header.forEach(item => {
           let colWidth = item.columnWidth ? item.columnWidth : '1fr';
           if (!item.hidden) {
@@ -625,9 +719,16 @@ Copyright © HatioLab Inc. All rights reserved.
         return gridTempCols.join(' ');
       }
 
+      /**
+       * @description
+       ****************
+       * @param {String}
+       * @return
+       */
       _convertStyleFormat(columnStyle) {
         var styles = '';
         var keys = Object.keys(columnStyle);
+
         for (let key of keys) {
           let value = columnStyle[key];
           let dashedKey = key.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
@@ -637,6 +738,12 @@ Copyright © HatioLab Inc. All rights reserved.
         return styles;
       }
 
+      /**
+       * @description
+       ****************
+       * @param {Object}
+       * @return
+       */
       getColumnMeta(cellData) {
         var columnMetas = this.columnMetas;
         if (!columnMetas) {
@@ -648,13 +755,17 @@ Copyright © HatioLab Inc. All rights reserved.
         return columnMeta;
       }
 
+      /**
+       * @description
+       ****************
+       */
       _clearRows() {
         this.data = [];
       }
 
       /**
-       * paginator 사용 여부를 결정하는 showPaginator의 값이 변경되면 호출
-       *************
+       * @description paginator 사용 여부를 결정하는 showPaginator의 값이 변경되면 호출
+       ****************
        * @param {Boolean} showPaginator 페이지네이션 처리 여부를 결정하는 flag
        */
       _showPaginatorChanged(showPaginator) {
@@ -669,7 +780,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 페이지의 값이 변경될 경우 validation 이후 정상적이라면
+       * @description 페이지의 값이 변경될 경우 validation 이후 정상적이라면
        * this.page에 초기화하여 _pageChanged가 호출 되도록 함
        *************
        * @param {Object} event input on-change event
@@ -691,7 +802,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 리미트 값이 변경될 경우 validation 이후 정상적이라면
+       * @description 리미트 값이 변경될 경우 validation 이후 정상적이라면
        * this.limit에 초기화하여 _limitChanged가 호출 되도록 함
        *************
        * @param {Object} event input on-change event
@@ -699,9 +810,9 @@ Copyright © HatioLab Inc. All rights reserved.
       _initLimit(event) {
         const limitInput = event.currentTarget;
         const limit = parseInt(limitInput.value);
+
         if (limit <= this.maxLimit && limit >= this.minLimit) {
           this.limit = limit;
-
         } else {
           openAlert({
             title: t('error.out_of_range'),
@@ -714,7 +825,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * data, page, total, limit 값들이 변경될 때 호출되며
+       * @description data, page, total, limit 값들이 변경될 때 호출되며
        * 페이지네이터의 beginDataNumber, endDataNumber, endPage를 계산하고 초기화 함
        *************
        * @param {Array} data
@@ -731,7 +842,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 현재 페이지에서 시작되는 데이터가 몇 번째 데이터인지 표시하기 위한 값 중
+       * @description 현재 페이지에서 시작되는 데이터가 몇 번째 데이터인지 표시하기 위한 값 중
        * 첫번째 번호를 계산함
        *************
        * @return {Number}
@@ -741,7 +852,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 현재 페이지에서 끝나는 데이터가 몇 번째 데이터인지 표시하기 위한 값 중
+       * @description 현재 페이지에서 끝나는 데이터가 몇 번째 데이터인지 표시하기 위한 값 중
        * 마지막 번호를 계산함
        *************
        * @return {Number}
@@ -751,7 +862,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 마지막 페이지 값을 계산함
+       * @description 마지막 페이지 값을 계산함
        *************
        * @return {Number}
        */
@@ -760,7 +871,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * page or limit 변경시 호출되며
+       * @description page or limit 변경시 호출되며
        * paginator-changed 이벤트를 발생 시킴
        *************
        * @param {Number} page 현재 리스트의 페이지
@@ -776,7 +887,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * iron-icon click event handler
+       * @description iron-icon click event handler
        * 이전 페이지로
        * _initPage를 통해 this.page 값을 초기화 하기 위해
        * input change 이벤트를 발생
@@ -790,7 +901,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * iron-icon click event handler
+       * @description iron-icon click event handler
        * 다음 페이지로
        * _initPage를 통해 this.page 값을 초기화 하기 위해
        * input change 이벤트를 발생
@@ -804,7 +915,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 현재 페이지 이상의 페이지가 있는지 여부를 return
+       * @description 현재 페이지 이상의 페이지가 있는지 여부를 return
        *************
        * @param {Number} page 현재 페이지 값
        * @return {Boolean}

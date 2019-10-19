@@ -3,14 +3,12 @@
 Copyright © HatioLab Inc. All rights reserved.
 -->
 
-<link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
-
-<link rel="import" href="../../../logis/logis-pda-libs.html">
+<link rel="import" href="../../../../../bower_components/polymer/polymer-element.html">
 
 <!--
-  PDA > 재고 적치 화면
+  B2C 재고 적치 화면
 -->
-<dom-module id="pda-stock-load">
+<dom-module id="cell-stock-supplement">
   <template>
     <style include="shared-styles">
       :host {
@@ -84,7 +82,7 @@ Copyright © HatioLab Inc. All rights reserved.
       method="GET"
       content-type="application/json">
     </sys-ajax>
-    
+
     <!-- LED OFF Ajax -->
     <sys-ajax
       id="led-off-ajax"
@@ -103,6 +101,7 @@ Copyright © HatioLab Inc. All rights reserved.
     <div id="container">
       <div class="input-container">
         <span class="label">[[skuBarcdLabel]]</span>
+
         <!-- SKU 정보 조회 시 복수개가 조회된 경우 실행되는 사용자가 고를 수 있는 팝업이 가미된 SKU Input -->
         <auto-popup-input
           hide-keyboard
@@ -123,12 +122,9 @@ Copyright © HatioLab Inc. All rights reserved.
         <span class="label">[[stockQtyLabel]]</span>
         <input id="stock-qty" readonly>
 
-        <!-- <span class="label">[[allocQtyLabel]]</span>
-        <input id="alloc-qty" readonly> -->
-
         <span class="label">[[inputQtyLabel]]</span>
         <input id="input-qty" type="number" min="1" max = "[[inputMaxQty]]" on-keypress="_inputQtyKeypressHandler">
-        
+
         <span class="label" hidden>[[locationLabel]]</span>
         <select id="location" on-change="_locationSelected" hidden>
           <option></option>
@@ -148,6 +144,7 @@ Copyright © HatioLab Inc. All rights reserved.
         <button id="load-btn" on-click="_load">[[loadBtnLabel]]</button>
       </div>
     </div>
+
     <div id = "bottom-container">
       <select id="region-combo" on-change="_getZoneItems"></select>
       <button id = "on-btn" class= 'btn' on-click="_ledOn">[[ledOnBtnLabel]]</button>
@@ -156,14 +153,15 @@ Copyright © HatioLab Inc. All rights reserved.
   </template>
 
   <script>
-    class PdaStockLoad extends BarcodeScannerMixin(Polymer.Element) {
-      static get is() { return 'pda-stock-load' }
+    class CellStockSupplement extends BarcodeScannerMixin(Polymer.Element) {
+      static get is() {
+        return 'cell-stock-supplement'
+      }
 
       static get properties() {
         return {
-
           /**
-           * 변경 로케이션 라벨
+           * @description 변경 로케이션 라벨
            ***************
            * @type {String}
            */
@@ -173,7 +171,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 상품 바코드 라벨
+           * @description 상품 바코드 라벨
            ***************
            * @type {String}
            */
@@ -183,7 +181,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 상품명 라벨
+           * @description 상품명 라벨
            ***************
            * @type {String}
            */
@@ -193,7 +191,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 로케이션 라벨
+           * @description 로케이션 라벨
            ***************
            * @type {String}
            */
@@ -203,7 +201,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 주문 수량 라벨
+           * @description 주문 수량 라벨
            ***************
            * @type {String}
            */
@@ -213,7 +211,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 적치 수량 라벨
+           * @description 적치 수량 라벨
            ***************
            * @type {String}
            */
@@ -223,7 +221,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 할당 수량 라벨
+           * @description 할당 수량 라벨
            ***************
            * @type {String}
            */
@@ -233,7 +231,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 입력 수량 라벨
+           * @description 입력 수량 라벨
            ***************
            * @type {String}
            */
@@ -243,7 +241,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 초기화 버튼 라벨
+           * @description 초기화 버튼 라벨
            ***************
            * @type {String}
            */
@@ -253,7 +251,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 적치 버튼 라벨
+           * @description 적치 버튼 라벨
            ***************
            * @type {String}
            */
@@ -263,7 +261,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * SKU 정보 조회 후 복수개가 조회된 경우 사용자가 고를 수 있는 팝업이 실행되는데 그 팝업에 표시할 타이틀
+           * @description SKU 정보 조회 후 복수개가 조회된 경우 사용자가 고를 수 있는 팝업이 실행되는데 그 팝업에 표시할 타이틀
            ****************
            * @type {String}
            */
@@ -273,7 +271,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 적치 처리 대상 로케이션 코드
+           * @description 적치 처리 대상 로케이션 코드
            ***************
            * @type {String}
            */
@@ -283,25 +281,27 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * SKU 정보 조회를 위한 URL
+           * @description SKU 정보 조회를 위한 URL
            ****************
            * @type {String}
            */
           getSkuAjaxUrl: {
             type: String,
-            value : `/pda_process/find_stock_sku/${LOGIS_UTIL.getRegionCd()}/:inputValue`
+            value: `/pda_process/find_stock_sku/${LOGIS_UTIL.getRegionCd()}/:inputValue`
           },
+
           /**
-           * 점등 버튼 라벨
+           * @description 점등 버튼 라벨
            ****************
            * @type {String}
            */
-           ledOnBtnLabel: {
+          ledOnBtnLabel: {
             type: String,
             value: () => t('button.led_on')
           },
+
           /**
-           * 소등 버튼 라벨
+           * @description 소등 버튼 라벨
            ****************
            * @type {String}
            */
@@ -313,7 +313,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 스캔한 바코드를 통해 재고 정보를 조회
+       * @description 스캔한 바코드를 통해 재고 정보를 조회
        ******************
        * @param {Object} event
        */
@@ -328,10 +328,14 @@ Copyright © HatioLab Inc. All rights reserved.
         }
       }*/
 
+      /**
+       * @description lifecycle
+       ******************
+       */
       connectedCallback() {
         super.connectedCallback();
         document.addEventListener(`alert-closed-at-${location.hash.replace('#/', '')}`, event => {
-          if(!event.detail.hasCallback) {
+          if (!event.detail.hasCallback) {
             this._initialSetup();
           }
         });
@@ -339,7 +343,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 스캔한 skuBarcd를 통해 재고 정보를 조회
+       * @description 스캔한 skuBarcd를 통해 재고 정보를 조회
        ******************
        * @param {String} skuBarcd
        */
@@ -351,7 +355,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 적치 대상 상품 선택 완료시 적치 위치 콤보박스를 구성하기 위해 대상 location을 조회함
+       * @description 적치 대상 상품 선택 완료시 적치 위치 콤보박스를 구성하기 위해 대상 location을 조회함
        ***************
        * @param {Object} event
        */
@@ -367,7 +371,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 적치 대상 상품 선택 완료시 적치 위치 콤보박스를 구성하기 위해 대상 location을 조회함
+       * @description 적치 대상 상품 선택 완료시 적치 위치 콤보박스를 구성하기 위해 대상 location을 조회함
        ***************
        * @param {String} skuCd
        */
@@ -383,7 +387,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * location-ajax response event handler
+       * @description location-ajax response event handler
        * location 조회 후 combo box를 구성함
        ***************
        * @param {Object} response
@@ -401,6 +405,7 @@ Copyright © HatioLab Inc. All rights reserved.
         this.locCd = null;
         this.locCd = locationCombo.selectedOptions[0].getAttribute('loc-id');
         this.getOrderStockInfo();
+
         // // 추천 로케이션이 1개일 경우 _locationSelected를 직접 호출
         // if(locations.length == 1) {
         //   locationCombo.options[1].selected = true;
@@ -412,8 +417,9 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * _locationSelected를 수동 호출 / select on change event handler를 통해 호출 됨
+       * @description _locationSelected를 수동 호출 / select on change event handler를 통해 호출 됨
        * 선택한 location 정보를 바탕으로 재고 수량을 조회함
+       ****************
        */
       _locationSelected() {
         const locationCombo = this.$['location'];
@@ -424,7 +430,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 추천 로케이션 리스트에서 선택시에 해당 로케이션의 재고 정보를 조회한다
+       * @description 추천 로케이션 리스트에서 선택시에 해당 로케이션의 재고 정보를 조회한다
        */
       getOrderStockInfo() {
         try {
@@ -434,38 +440,38 @@ Copyright © HatioLab Inc. All rights reserved.
           orderStockAjax.curl = `/pda_process/dps/find_order_stock/${regionCd}/${this.locCd}/${this.skuCd}`;
           orderStockAjax.generateRequest();
         } catch (error) {
-          document.dispatchEvent(new CustomEvent('show-toast',{
-              detail:{
-                type: `${error.title}`,
-                message: `${error.message}`
-              }
+          document.dispatchEvent(new CustomEvent('show-toast', {
+            detail: {
+              type: `${error.title}`,
+              message: `${error.message}`
+            }
           }));
         }
       }
 
       /**
-       * 재고 정보 조회 전 Validation Check
+       * @description 재고 정보 조회 전 Validation Check
        */
       validateBeforeOrderStockAjax() {
-        if(!this.locCd) {
-          document.dispatchEvent(new CustomEvent('show-toast',{
-              detail:{
-                type: t('error.VALIDATION_ERROR'),
-                message: t('error.loc_cd_invalid')
-              }
+        if (!this.locCd) {
+          document.dispatchEvent(new CustomEvent('show-toast', {
+            detail: {
+              type: t('error.VALIDATION_ERROR'),
+              message: t('error.loc_cd_invalid')
+            }
           }));
         } else if (!this.skuCd) {
-          document.dispatchEvent(new CustomEvent('show-toast',{
-              detail:{
-                type: t('error.VALIDATION_ERROR'),
-                message: t('error.invalid_sku_cd')
-              }
+          document.dispatchEvent(new CustomEvent('show-toast', {
+            detail: {
+              type: t('error.VALIDATION_ERROR'),
+              message: t('error.invalid_sku_cd')
+            }
           }));
         }
       }
 
       /**
-       * SKU 정보 조회 시 복수개가 조회된 경우 사용자가 고를 수 있는 버튼이 실행되는데 그 버튼에 표시할 내용
+       * @description SKU 정보 조회 시 복수개가 조회된 경우 사용자가 고를 수 있는 버튼이 실행되는데 그 버튼에 표시할 내용
        *******************
        * @param {Object} item
        */
@@ -475,53 +481,53 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * order-stock-ajax response event handler
+       * @description order-stock-ajax response event handler
        * 조회 결과를 화면에 출력 & 변경 로케이션 input으로 focus 이동
        ******************
        * @param {Object} response
        */
       _fillOrderStockInfo(response) {
         let data = response.detail;
-        if(data.fixed_flag){
+        if (data.fixed_flag) {
           this.orderQtyLabel = t('label.max_load_qty');
-        }else{
+        } else {
           this.orderQtyLabel = t('label.order_qty');
         }
-        if(data.input_qty <= 0) {
-          document.dispatchEvent(new CustomEvent('show-toast',{
-            detail:{
-              type:t('error.out_of_valid_qty'),
-              message:t('text.stock_load_done')
+        if (data.input_qty <= 0) {
+          document.dispatchEvent(new CustomEvent('show-toast', {
+            detail: {
+              type: t('error.out_of_valid_qty'),
+              message: t('text.stock_load_done')
             }
           }));
           this._clearView();
-        }else {
+        } else {
           // 조회를 통해 구한 값을 input에 출력
           this.$['order-qty'].value = data.picked_qty;
           this.$['stock-qty'].value = data.stock_qty;
-          this.$['input-qty'].value= data.input_qty;
+          this.$['input-qty'].value = data.input_qty;
           setTimeout(500);
           data.input_qty <= 1 ? this.$['change-loc'].select() : this.$['input-qty'].select();
         }
       }
 
       /**
-       * 변경 로케이션에 엔터 키 핸들러
+       * @description 변경 로케이션에 엔터 키 핸들러
        ******************
        * @param {Object} event
        */
       _locScanHandler(event) {
-        if(event.keyCode === 13 && /([FR]{1}[0-9]{2}[-]{1}[0-9]{3}[-]{1}[0-9]{2})/g.exec(this.$['change-loc'].value)) {
+        if (event.keyCode === 13 && /([FR]{1}[0-9]{2}[-]{1}[0-9]{3}[-]{1}[0-9]{2})/g.exec(this.$['change-loc'].value)) {
           this.locCd = null;
           this.locCd = this.$['change-loc'].value;
           this.$['location'].value = '';
           this.$['change-loc'].select();
           this._load();
-        }else if(event.keyCode === 13){
-          document.dispatchEvent(new CustomEvent('show-toast',{
-            detail:{
-              type:t(''),
-              message:t("error.loc_cd_invalid")
+        } else if (event.keyCode === 13) {
+          document.dispatchEvent(new CustomEvent('show-toast', {
+            detail: {
+              type: t(''),
+              message: t("error.loc_cd_invalid")
             }
           }))
           this.$['change-loc'].value = '';
@@ -530,7 +536,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * input-qty keypress event handler
+       * @description input-qty keypress event handler
        * 1. input-qty에서 바코드 리드시 keypress event가 발생함
        * 2. 발생한 이벤트의 charCode가 13이 아니면 selectedLocationCd에 붙여 스캔한 로케이션 코드를 초기화함
        * 3. 발생한 이벤터의 charCode가 13이면 _load()를 호출하여 적치 trx를 수행함
@@ -538,25 +544,26 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} event
        */
       _inputQtyKeypressHandler(event) {
-        if(event.charCode === 13) {
-          if(Number(this.$['order-qty'].value)-Number(this.$['stock-qty'].value)< Number(this.$['input-qty'].value)){
-            document.dispatchEvent(new CustomEvent('show-toast',{
-              detail:{
+        if (event.charCode === 13) {
+          if (Number(this.$['order-qty'].value) - Number(this.$['stock-qty'].value) < Number(this.$['input-qty'].value)) {
+            document.dispatchEvent(new CustomEvent('show-toast', {
+              detail: {
                 type: t('error.VALIDATION_ERROR'),
                 message: t('error.out_of_valid_qty')
               }
             }));
-          }else{
+          } else {
             this.$['change-loc'].select();
           }
         }
       }
 
       /**
-       * 재고 적치 transaction
+       * @description 재고 적치 transaction
+       *******************
        */
       _load() {
-        if(Number(this.$['order-qty'].value) - Number(this.$['stock-qty'].value)>= Number(this.$['input-qty'].value) && /([FR]{1}[0-9]{2}[-]{1}[0-9]{3}[-]{1}[0-9]{2})/g.exec(this.$['change-loc'].value) && Number(this.$['input-qty'].value) > 0 && this.$['change-loc'].value.length > 0){
+        if (Number(this.$['order-qty'].value) - Number(this.$['stock-qty'].value) >= Number(this.$['input-qty'].value) && /([FR]{1}[0-9]{2}[-]{1}[0-9]{3}[-]{1}[0-9]{2})/g.exec(this.$['change-loc'].value) && Number(this.$['input-qty'].value) > 0 && this.$['change-loc'].value.length > 0) {
           try {
             // 재고 적치전 validation 수행
             this.validateBeforeLoadStock();
@@ -568,42 +575,46 @@ Copyright © HatioLab Inc. All rights reserved.
             loadStockAjax.generateRequest();
 
           } catch (error) {
-            document.dispatchEvent(new CustomEvent('show-toast',{
-              detail:{
+            document.dispatchEvent(new CustomEvent('show-toast', {
+              detail: {
                 type: `${error.title}`,
-                message:`${error.message}`
+                message: `${error.message}`
               }
             }));
             this.$['change-loc'].select();
           }
-        }else{
-          if(Number(this.$['order-qty'].value)-Number(this.$['stock-qty'].value)< Number(this.$['input-qty'].value)) {
-            document.dispatchEvent(new CustomEvent('show-toast',{
-              detail:{
+
+        } else {
+          if (Number(this.$['order-qty'].value) - Number(this.$['stock-qty'].value) < Number(this.$['input-qty'].value)) {
+            document.dispatchEvent(new CustomEvent('show-toast', {
+              detail: {
                 type: t('error.VALIDATION_ERROR'),
                 message: t('error.out_of_valid_qty')
               }
             }));
             this.$['input-qty'].select();
-          } else if(this.$['change-loc'].value == null || this.$['change-loc'].value == '') {
-            document.dispatchEvent(new CustomEvent('show-toast',{
-              detail:{
+
+          } else if (this.$['change-loc'].value == null || this.$['change-loc'].value == '') {
+            document.dispatchEvent(new CustomEvent('show-toast', {
+              detail: {
                 type: t('error.loc_cd_invalid'),
                 message: t('error.loc_cd_invalid'),
               }
             }));
             this.$['change-loc'].select();
-          } else if(Number(this.$['input-qty'].value) <= 0 || this.$['input-qty'].value == '' || this.$['input-qty'].value == undefined){
-            document.dispatchEvent(new CustomEvent('show-toast',{
-              detail:{
+
+          } else if (Number(this.$['input-qty'].value) <= 0 || this.$['input-qty'].value == '' || this.$['input-qty'].value == undefined) {
+            document.dispatchEvent(new CustomEvent('show-toast', {
+              detail: {
                 type: t('text.input_qty_none'),
                 message: t('text.input_qty_none'),
               }
             }));
             this.$['input-qty'].select();
+
           } else {
-            document.dispatchEvent(new CustomEvent('show-toast',{
-              detail:{
+            document.dispatchEvent(new CustomEvent('show-toast', {
+              detail: {
                 type: t('text.invalid_value'),
                 message: t('text.invalid_value'),
               }
@@ -614,53 +625,58 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 재고적치 transaction이전 validation
+       * @description 재고적치 transaction이전 validation
        * 1. 입력 수량이 빈값인지 확인
        * 2. 로케이션을 선택했는지 확인
+       *******************
        */
       validateBeforeLoadStock() {
         this.inputQty = this.$['input-qty'].value;
 
         if (!this.locCd) {
-          document.dispatchEvent(new CustomEvent('show-toast',{
-              detail:{
-                type: t('error.VALIDATION_ERROR'),
-                message: t('text.location_is_not_set')
-              }
+          document.dispatchEvent(new CustomEvent('show-toast', {
+            detail: {
+              type: t('error.VALIDATION_ERROR'),
+              message: t('text.location_is_not_set')
+            }
           }));
-        } else if(!this.inputQty || this.inputQty <= 0) {
-          document.dispatchEvent(new CustomEvent('show-toast',{
-              detail:{
-                type: t('error.VALIDATION_ERROR'),
-                message: t('text.invalid_value')
-              }
+
+        } else if (!this.inputQty || this.inputQty <= 0) {
+          document.dispatchEvent(new CustomEvent('show-toast', {
+            detail: {
+              type: t('error.VALIDATION_ERROR'),
+              message: t('text.invalid_value')
+            }
           }));
+
         } else if (!this.skuCd) {
-          document.dispatchEvent(new CustomEvent('show-toast',{
-              detail:{
-                type: t('error.VALIDATION_ERROR'),
-                message: t('error.invalid_sku_cd')
-              }
+          document.dispatchEvent(new CustomEvent('show-toast', {
+            detail: {
+              type: t('error.VALIDATION_ERROR'),
+              message: t('error.invalid_sku_cd')
+            }
           }));
         }
       }
 
       /**
-       * 입력 수량 인풋 박스에 포커스
+       * @description 입력 수량 인풋 박스에 포커스
+       *******************
        */
       focusQtyInput() {
         this.$['input-qty'].select();
       }
 
       /**
-       * 변경 로케이션 인풋 박스에 포커스
+       * @description 변경 로케이션 인풋 박스에 포커스
+       *******************
        */
       focusChangeLocInput() {
         this.$['change-loc'].select();
       }
 
       /**
-       * combo box에 구성된 option을 제거
+       * @description combo box에 구성된 option을 제거
        *******************
        * @param {Object} combobox
        */
@@ -669,18 +685,25 @@ Copyright © HatioLab Inc. All rights reserved.
           combobox.removeChild(combobox.firstChild);
         }
       }
-      _stockSuccess(){
-        document.dispatchEvent(new CustomEvent('show-toast',{
-          detail:{
+
+      /**
+       * @description 재고 적치 성공시
+       *******************
+       */
+      _stockSuccess() {
+        document.dispatchEvent(new CustomEvent('show-toast', {
+          detail: {
             type: '',
             message: t('text.stock_load_success')
           }
         }));
         this._clearView();
       }
+
       /**
-       * trx 완료 후 input 필드를 초기화 및 this.skuCd, this.locCd 초기화
+       * @description trx 완료 후 input 필드를 초기화 및 this.skuCd, this.locCd 초기화
        * 초기화 후 _initialSetup 호출
+       ********************
        */
       _clearView() {
         this._clearCombobox(this.$['location']);
@@ -698,42 +721,62 @@ Copyright © HatioLab Inc. All rights reserved.
         this._initialSetup();
       }
 
+      /**
+       * @description 화면 초기화
+       *******************
+       */
       _initialSetup() {
         this.$['sku-barcd']._initialSetup();
       }
 
+      /**
+       * @description 호기 리스트 조회
+       *******************
+       */
       _getRegionItems() {
         const regionGetAjax = this.$['region-get-ajax'];
         regionGetAjax.baseUrl = JSON.parse(localStorage.getItem('setting.baseUrl'));
         regionGetAjax.customParams = {
           query: [{
-            "name":"region_type",
-            "operator":"noteq",
-            "value":"O"
+            "name": "region_type",
+            "operator": "noteq",
+            "value": "O"
           }]
         };
         regionGetAjax.curl = `/region`;
         regionGetAjax.generateRequest();
       }
 
-      _ledOn(){
+      /**
+       * @description LED 점등
+       *******************
+       */
+      _ledOn() {
         const ledOnajax = this.$['led-on-ajax'];
         let regionCd = this.$['region-combo'].value;
         ledOnajax.curl = `/pda_process/dps/led/on/${regionCd}`;
         ledOnajax.generateRequest();
       }
 
-      _ledOff(){
+      /**
+       * @description LED 소등
+       *******************
+       */
+      _ledOff() {
         const ledOffajax = this.$['led-off-ajax'];
         let regionCd = this.$['region-combo'].value;
         ledOffajax.curl = `/pda_process/dps/led/off/${regionCd}`;
         ledOffajax.generateRequest();
       }
 
-      _regionSetting(e){
+      /**
+       * @description 호기 설정
+       *******************
+       */
+      _regionSetting(e) {
         e.detail.items.forEach(region => {
           const option = new Option(region.region_nm, region.region_cd);
-          if(this.regionCode === region.region_cd) {
+          if (this.regionCode === region.region_cd) {
             option.selected = true;
             this.regionName = region.region_nm;
           }
@@ -742,6 +785,6 @@ Copyright © HatioLab Inc. All rights reserved.
       }
     }
 
-    customElements.define(PdaStockLoad.is, PdaStockLoad);
+    customElements.define(CellStockSupplement.is, CellStockSupplement);
   </script>
 </dom-module>

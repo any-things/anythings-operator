@@ -3,15 +3,14 @@
 Copyright © HatioLab Inc. All rights reserved.
 -->
 
-<link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../../../../bower_components/polymer/polymer-element.html">
 
-<link rel="import" href="../../../logis/logis-pda-libs.html">
-<link rel="import" href="../../../components/common/auto-popup-input.html">
+<link rel="import" href="../../../../components/common/auto-popup-input.html">
 
 <!--
-  PDA > 재고 조회 화면
+  B2C 셀 별 재고 조회 화면
 -->
-<dom-module id="pda-loc-stock-lookup">
+<dom-module id="stock-status-by-cell">
   <template>
     <style include="shared-styles">
       :host {
@@ -91,7 +90,7 @@ Copyright © HatioLab Inc. All rights reserved.
       id="company-get-ajax"
       method="GET"
       content-type="application/json"
-      on-sys-ajax-response="_companycSetting">
+      on-sys-ajax-response="_companySetting">
     </sys-ajax>
 
     <!-- 로케이션 리스트에서 선택시에 해당 로케이션의 재고 정보 조회를 위한 Ajax -->
@@ -107,15 +106,14 @@ Copyright © HatioLab Inc. All rights reserved.
 
         <span class="label">[[barcodeLabel]]</span>
         <auto-popup-input
-        hide-keyboard
-        id="barcode"
-        on-before-request = "_customAjaxHandler"
-        resource-url="[[getSkuAjaxUrl]]"
-        popup-title="[[popupTitleLabel]]"
-        button-txt-callback="[[_skuButtonTxtCallback]]"
-        on-item-selected="_searchRecommendLocations">
-      </auto-popup-input>
-        <!-- <input barcode id="barcode" type="text" name="barcode" on-keypress="_checkBarcode"> -->
+          hide-keyboard
+          id="barcode"
+          on-before-request = "_customAjaxHandler"
+          resource-url="[[getSkuAjaxUrl]]"
+          popup-title="[[popupTitleLabel]]"
+          button-txt-callback="[[_skuButtonTxtCallback]]"
+          on-item-selected="_searchRecommendLocations">
+        </auto-popup-input>
 
         <span class="label">[[skuCdLabel]]</span>
         <input id="sku-cd" type="text" name="sku_cd" readonly>
@@ -142,12 +140,15 @@ Copyright © HatioLab Inc. All rights reserved.
   </template>
 
   <script>
-    class PdaLocStockLookup extends BarcodeScannerMixin(Polymer.Element) {
-      static get is() { return 'pda-loc-stock-lookup' }
+    class StockStatusByCell extends BarcodeScannerMixin(Polymer.Element) {
+      static get is() {
+        return 'stock-status-by-cell'
+      }
+
       static get properties() {
         return {
           /**
-           * 상품 코드 라벨
+           * @description 상품 코드 라벨
            ****************
            * @type {String}
            */
@@ -157,7 +158,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 상품 바코드 라벨
+           * @description 상품 바코드 라벨
            ****************
            * @type {String}
            */
@@ -167,7 +168,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 상품명 라벨
+           * @description 상품명 라벨
            ****************
            * @type {String}
            */
@@ -177,7 +178,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 로케이션 라벨
+           * @description 로케이션 라벨
            ****************
            * @type {String}
            */
@@ -187,17 +188,17 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 적치 수량 라벨
+           * @description 적치 수량 라벨
            ****************
            * @type {String}
            */
-           stockQtyLabel: {
+          stockQtyLabel: {
             type: String,
             value: () => t('label.stock_qty')
           },
 
           /**
-           * 점등 버튼 라벨
+           * @description 점등 버튼 라벨
            ****************
            * @type {String}
            */
@@ -205,8 +206,9 @@ Copyright © HatioLab Inc. All rights reserved.
             type: String,
             value: () => t('button.led_on')
           },
+
           /**
-           * 소등 버튼 라벨
+           * @description 소등 버튼 라벨
            ****************
            * @type {String}
            */
@@ -214,8 +216,9 @@ Copyright © HatioLab Inc. All rights reserved.
             type: String,
             value: () => t('button.led_off')
           },
+
           /**
-           * 초기화 버튼 라벨
+           * @description 초기화 버튼 라벨
            ****************
            * @type {String}
            */
@@ -224,90 +227,136 @@ Copyright © HatioLab Inc. All rights reserved.
             value: () => t('button.reset')
           },
 
+          /**
+           * @description 바코드 라벨
+           ****************
+           * @type {String}
+           */
           barcodeLabel: {
             type: String,
             value: () => t('label.barcode')
           },
 
+          /**
+           * @description 상품 조회 URL
+           ****************
+           * @type {String}
+           */
           getSkuAjaxUrl: {
             type: String
           },
 
+          /**
+           * @description 팝업 타이틀 라벨
+           ****************
+           * @type {String}
+           */
           popupTitleLabel: {
             type: String
-          },
+          }
         }
       }
 
+      /**
+       * @description lifecycle
+       **************************
+       */
       connectedCallback() {
         super.connectedCallback();
+
         document.addEventListener(`alert-closed-at-${location.hash.replace('#/', '')}`, event => {
-          if(!event.detail.hasCallback) {
+          if (!event.detail.hasCallback) {
             this._initialSetup();
           }
         });
+
         this._getComCd();
       }
 
+      /**
+       * @description 여러 개의 상품이 조회된 경우 사용자가 선택시 로직
+       **************************
+       * @param {Object} item
+       */
       _skuButtonTxtCallback(item) {
         return `(${item.sku_cd})
                 ${item.sku_nm}`;
       }
 
-      _customAjaxHandler(event){
-          if(/([FR]{1}[0-9]{2}[-]{1}[0-9]{3}[-]{1}[0-9]{2})/g.exec(this.$['barcode'].value)){
-            this._clearCombobox(this.$['location']);
-            this.getSkuAjaxUrl= `/pda_process/dps/find_stock/${LOGIS_UTIL.getRegionCd()}/${this.$['barcode'].value}`
-          }else{
-            this._clearCombobox(this.$['location']);
-            this.getSkuAjaxUrl=`/pda_process/find_stock_sku/${LOGIS_UTIL.getRegionCd()}/:inputValue`
-          }
+      /**
+       * @description
+       **************************
+       * @param {Object} event
+       */
+      _customAjaxHandler(event) {
+        if (/([FR]{1}[0-9]{2}[-]{1}[0-9]{3}[-]{1}[0-9]{2})/g.exec(this.$['barcode'].value)) {
+          this._clearCombobox(this.$['location']);
+          this.getSkuAjaxUrl = `/pda_process/dps/find_stock/${LOGIS_UTIL.getRegionCd()}/${this.$['barcode'].value}`
+        } else {
+          this._clearCombobox(this.$['location']);
+          this.getSkuAjaxUrl = `/pda_process/find_stock_sku/${LOGIS_UTIL.getRegionCd()}/:inputValue`
+        }
       }
 
+      /**
+       * @description 추천 셀 검색
+       **************************
+       * @param {Object} event
+       */
       _searchRecommendLocations(event) {
         let skuInfo = event.detail;
         this.$['sku-cd'].value = skuInfo.sku_cd;
         this.$['sku-nm'].value = skuInfo.sku_nm;
         this.$['sku-barcd'].value = skuInfo.sku_barcd;
         this.comCd = skuInfo.com_cd;
-          if(/([FR]{1}[0-9]{2}[-]{1}[0-9]{3}[-]{1}[0-9]{2})/g.exec(this.$['barcode'].value)){
-            if(skuInfo.stock_qty ==undefined || skuInfo.stock_qty <= 0){
-              document.dispatchEvent(new CustomEvent('show-toast',{
-                detail:{
-                  type: t('text.location_is_null'),
-                  message: t('text.location_is_null')
-                }
-              }));
-              this._clearView();
-            }else{
-              this.$['sku-barcd'].value = skuInfo.box_barcd;
-              this.$['stock-qty'].value = skuInfo.stock_qty;
-              const option = document.createElement('option');
-              option.innerText = skuInfo.loc_cd;
-              option.selected = true;
-              this.$['location'].appendChild(option);
-              this.$['barcode'].select();
-            }
-          }else{
-            // order stock을 조회하기 위해 this.skuCd 초기화
-            this.skuCd = skuInfo.sku_cd;
-            // 적치 대상 로케이션 리스트를 조회
-            const locInfoAjax = this.$['location-ajax'];
-            let regionCd = JSON.parse(localStorage.getItem('setting.regionCode'));
-            locInfoAjax.curl = `/pda_process/dps/load_locs/${regionCd}/${this.skuCd}/${this.comCd}`;
-            locInfoAjax.generateRequest();
+
+        if (/([FR]{1}[0-9]{2}[-]{1}[0-9]{3}[-]{1}[0-9]{2})/g.exec(this.$['barcode'].value)) {
+          if (skuInfo.stock_qty == undefined || skuInfo.stock_qty <= 0) {
+            document.dispatchEvent(new CustomEvent('show-toast', {
+              detail: {
+                type: t('text.location_is_null'),
+                message: t('text.location_is_null')
+              }
+            }));
+            this._clearView();
+
+          } else {
+            this.$['sku-barcd'].value = skuInfo.box_barcd;
+            this.$['stock-qty'].value = skuInfo.stock_qty;
+            const option = document.createElement('option');
+            option.innerText = skuInfo.loc_cd;
+            option.selected = true;
+            this.$['location'].appendChild(option);
+            this.$['barcode'].select();
           }
+
+        } else {
+          // order stock을 조회하기 위해 this.skuCd 초기화
+          this.skuCd = skuInfo.sku_cd;
+          // 적치 대상 로케이션 리스트를 조회
+          const locInfoAjax = this.$['location-ajax'];
+          let regionCd = JSON.parse(localStorage.getItem('setting.regionCode'));
+          locInfoAjax.curl = `/pda_process/dps/load_locs/${regionCd}/${this.skuCd}/${this.comCd}`;
+          locInfoAjax.generateRequest();
+        }
       }
 
+      /**
+       * @description 셀 리스트가 나오는 콤보 박스 렌더링
+       **************************
+       * @param {Object} response
+       */
       _renderLocationCombo(response) {
         const locationCombo = this.$['location'];
         this._clearCombobox(locationCombo);
-        if(/([FR]{1}[0-9]{2}[-]{1}[0-9]{3}[-]{1}[0-9]{2})/g.exec(this.$['barcode'].value)){
+
+        if (/([FR]{1}[0-9]{2}[-]{1}[0-9]{3}[-]{1}[0-9]{2})/g.exec(this.$['barcode'].value)) {
           const option = document.createElement('option');
           option.innerText = this.$['barcode'].value;
           option.setAttribute('loc-id', this.$['barcode'].value);
           locationCombo.appendChild(option);
-        }else{
+
+        } else {
           let locations = response.detail;
           locations.forEach(location => {
             const option = document.createElement('option');
@@ -315,16 +364,18 @@ Copyright © HatioLab Inc. All rights reserved.
             option.setAttribute('loc-id', location);
             locationCombo.appendChild(option);
           });
+
           this.locCd = null;
-          if(locationCombo.options.length <= 0 || locationCombo.options.length ==undefined){
-            document.dispatchEvent(new CustomEvent('show-toast',{
-              detail:{
+          if (locationCombo.options.length <= 0 || locationCombo.options.length == undefined) {
+            document.dispatchEvent(new CustomEvent('show-toast', {
+              detail: {
                 type: t('text.location_is_null'),
                 message: t('text.location_is_null')
               }
             }));
             this._clearView();
-          }else{
+
+          } else {
             this.locCd = locationCombo.selectedOptions[0].getAttribute('loc-id');
             this.getOrderStockInfo();
           }
@@ -332,34 +383,40 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 추천 로케이션 리스트에서 선택시에 해당 로케이션의 재고 정보를 조회한다
+       * @description 추천 로케이션 리스트에서 선택시에 해당 로케이션의 재고 정보를 조회한다
+       **************************
        */
       getOrderStockInfo() {
         try {
-          // this.validateBeforeOrderStockAjax();
           const regionCd = LOGIS_UTIL.getRegionCd();
           const orderStockAjax = this.$['order-stock-ajax'];
           orderStockAjax.curl = `/pda_process/dps/find_order_stock_by_loc/${regionCd}/${this.locCd}/${this.skuCd}`;
           orderStockAjax.generateRequest();
+
         } catch (error) {
-          document.dispatchEvent(new CustomEvent('show-toast',{
-              detail:{
-                type: `${error.title}`,
-                message: `${error.message}`
-              }
+          document.dispatchEvent(new CustomEvent('show-toast', {
+            detail: {
+              type: `${error.title}`,
+              message: `${error.message}`
+            }
           }));
         }
       }
 
-      _fillOrderStockInfo(event){
+      /**
+       * @description 재고 정보 표시
+       **************************
+       * @param {Object} event
+       */
+      _fillOrderStockInfo(event) {
         var items = event.detail;
-        // let inputElements = Array.from(this.shadowRoot.querySelectorAll('input'));
         this.$['stock-qty'].value = items.stock_qty;
         this.$['barcode'].select();
       }
 
       /**
-       * 화면의 정보를 모두 클리어
+       * @description 화면의 정보를 모두 클리어
+       ***************************
        */
       _clearView() {
         this.$['sku-cd'].value = '';
@@ -368,30 +425,41 @@ Copyright © HatioLab Inc. All rights reserved.
         this.$['location'].value = '';
         this.$['stock-qty'].value = '';
         this.$['barcode'].select();
+
         this._clearCombobox(this.$['location']);
         this._initialSetup();
       }
 
-      _getComCd(){
+      /**
+       * @description 고객사 조회
+       ***************************
+       */
+      _getComCd() {
         const companyGetAjax = this.$['company-get-ajax'];
         companyGetAjax.baseUrl = JSON.parse(localStorage.getItem('setting.baseUrl'));
+
         companyGetAjax.customParams = {
-          select: "com_cd",
-          sort : [{
-            "field":"com_cd",
-            "ascending":true
-        }],
+          select: 'com_cd',
+          sort: [{
+            field: 'com_cd',
+            ascending: true
+          }],
           query: [{
-            "name":"belongs_to_site",
-            "operator":"eq",
-            "value":"true"
+            name: 'belongs_to_site',
+            operator: 'eq',
+            value: 'true'
           }],
           belongs_to_domain: true
         };
+
         companyGetAjax.curl = `/company`;
         companyGetAjax.generateRequest();
       }
 
+      /**
+       * @description 셀 선택시
+       ***************************
+       */
       _locationSelected() {
         const locationCombo = this.$['location'];
         this.locCd = null;
@@ -399,10 +467,20 @@ Copyright © HatioLab Inc. All rights reserved.
         this.getOrderStockInfo();
       }
 
-      _companycSetting(event){
+      /**
+       * @description 고객사 설정
+       ***************************
+       * @param {Object} combobox
+       */
+      _companySetting(event) {
         this.comCd = event.detail.items[0].com_cd;
       }
 
+      /**
+       * @description 콤보 박스 정보 클리어
+       **************************
+       * @param {Object} combobox
+       */
       _clearCombobox(combobox) {
         while (combobox.children.length) {
           combobox.removeChild(combobox.firstChild);
@@ -410,11 +488,11 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 메시지 출력
+       * @description 메시지 출력
        **************************
-       * @param String title
-       * @param String message
-       * @param function confirmCallback
+       * @param {String} title
+       * @param {String} message
+       * @param {Function} confirmCallback
        */
       showMessage(title, message, confirmCallback) {
         openAlert({
@@ -424,6 +502,6 @@ Copyright © HatioLab Inc. All rights reserved.
         });
       }
     }
-    customElements.define(PdaLocStockLookup.is, PdaLocStockLookup);
+    customElements.define(StockStatusByCell.is, StockStatusByCell);
   </script>
 </dom-module>
