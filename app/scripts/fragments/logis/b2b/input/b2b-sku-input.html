@@ -292,7 +292,7 @@ Copyright © HatioLab Inc. All rights reserved.
   </template>
 
   <script>
-    class B2bSkuInput extends Polymer.Element {
+    class B2BSkuInput extends Polymer.Element {
       static get is() { return 'b2b-sku-input' }
 
       static get properties() {
@@ -693,7 +693,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
       static get listeners() {
         return {
-          'page-changed-to-kiosk_das_ord_info' : '_routingChanged'
+          'page-changed-to-b2b_sku_input' : '_routingChanged'
         }
       }
 
@@ -731,7 +731,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} e
        */
       _routingChanged(e) {
-        if(e.detail.currentPage == 'kiosk_das_ord_info') {
+        if(e.detail.currentPage == 'b2b_sku_input') {
           this._initialSetup();
           this.enableAutoRefresh = true;
         } else {
@@ -1078,7 +1078,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
     }
 
-    customElements.define(B2bSkuInput.is, B2bSkuInput);
+    customElements.define(B2BSkuInput.is, B2BSkuInput);
   </script>
 
 </dom-module>

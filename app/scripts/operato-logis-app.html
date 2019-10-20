@@ -278,7 +278,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
           <!-- KIOSK View -->
           <b2b-out-middle-assort name="b2b_out_middle_assort"></b2b-out-middle-assort>
-          <b2b-out-middle-assort-with-weight name="b2b_out_middle_assort_with_weight"></b2b-out-middle-assort-with-weight>
+          <b2b-out-middle-assort-with-weight name="b2b_out_middle_assort_weight"></b2b-out-middle-assort-with-weight>
           <b2b-rtn-middle-assort name="b2b_rtn_middle_assort"></b2b-rtn-middle-assort>
           <b2b-qty-inspection name="b2b_qty_inspection"></b2b-qty-inspection>
           <b2b-weight-inspection name="b2b_weight_inspection"></b2b-weight-inspection>
@@ -515,12 +515,12 @@ Copyright © HatioLab Inc. All rights reserved.
           const prevPage = event.detail.prevPage;
           const currentPage = event.detail.currentPage;
 
-          // kiosk_das_ord_info, kiosk_dps_ord_info 화면에서 QR 코드 버튼 활성화를 위한
+          // b2b_sku_input, b2c_box_input 화면에서 QR 코드 버튼 활성화를 위한
           // event handler 등록
-          if(currentPage === 'kiosk_das_ord_info') {
+          if(currentPage === 'b2b_sku_input') {
             this.showCodeButton('DAS');
 
-          } else if (currentPage === 'kiosk_dps_ord_info') {
+          } else if (currentPage === 'b2c_box_input') {
             this.showCodeButton('DPS');
 
           } else {
