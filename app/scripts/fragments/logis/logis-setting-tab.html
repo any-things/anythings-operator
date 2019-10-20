@@ -410,15 +410,14 @@ Copyright © HatioLab Inc. All rights reserved.
           const zoneCombo = this._getZoneCombo()
           const zoneCode = zoneCombo.selectedOptions.length === 1 ? zoneCombo.selectedOptions[0].value : null;
 
-          //if(!regionCode || !zoneCode) {
-          if(!regionCode) {
+          /*if(!regionCode || !zoneCode) {
             throw {
               detail: {
                 code: t('error.SETTING_ERROR'),
                 msg: !regionCode ? t('text.region_code_is_not_set') : t('text.zone_code_is_not_set')
               }
             };
-          }
+          }*/
 
           const updateSettingAjax = this._getUpdateSettingAjax();
           updateSettingAjax.curl = `/${this.deviceType.toLowerCase()}/update/setting`
