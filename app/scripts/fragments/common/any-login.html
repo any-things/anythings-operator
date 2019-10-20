@@ -15,7 +15,7 @@ Copyright © HatioLab Inc. All rights reserved.
 <link rel="import" href="./any-site-selector.html">
 
 <!--
-  로그인 화면
+  공통 > 로그인 화면
 -->
 <dom-module id="any-login">
   <template>
@@ -118,11 +118,10 @@ Copyright © HatioLab Inc. All rights reserved.
 
       static get properties() {
         return {
-
           /**
-           * login request url except basic url
-           ******
-           * @type {Object}
+           * @description login request url except basic url
+           ******************
+           * @type {String}
            */
           loginPath: {
             type: String,
@@ -133,8 +132,8 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 사용자 신청,활성화,비밀번호 초기화 Popup을 open하기 위한 event
-       *****
+       * @description 사용자 신청,활성화,비밀번호 초기화 Popup을 open하기 위한 event
+       ******************
        * @event document.things-open-popup-view
        * @param {Element} view  :things-signup/things-request-active/things-password-init
        * @param {Boolean} modal  :true/false
@@ -142,15 +141,21 @@ Copyright © HatioLab Inc. All rights reserved.
        */
 
       /**
-       * mgrSiteUrl + loginPath를 통해 login API를 계산
+       * @description mgrSiteUrl + loginPath를 통해 login API를 계산
+       ******************
+       * @param {String} mgrSiteUrl
+       * @param {String} loginPath
+       * @return {String}
        */
       _computeLoginUrl(mgrSiteUrl, loginPath) {
         return `${mgrSiteUrl}${loginPath}`;
       }
 
       /**
-       * input-form keyPress event handler
+       * @description input-form keyPress event handler
        * enter 입력시 input form submit
+       ******************
+       * @param {Object} event
        */
       _handlerKeypress(event) {
         if(event.charCode === 13) {
@@ -158,21 +163,38 @@ Copyright © HatioLab Inc. All rights reserved.
         }
       }
 
+      /**
+       * @description 로그인 ajax 객체 리턴
+       ******************
+       * @return {Object}
+       */
       getSignInAjax() {
         return this.$['sign-in-ajax'];
       }
 
+      /**
+       * @description Email Input Value
+       ******************
+       * @return {Object}
+       */
       getEmailInputValue() {
         return this.$['email'].value;
       }
 
+      /**
+       * @description Password Input Value
+       ******************
+       * @return {Object}
+       */
       getPasswordInputValue() {
         return this.$['password'].value;
       }
 
       /**
-       * 입력한 input의 데이터를 validation 수행
+       * @description 입력한 input의 데이터를 validation 수행
        * validation 성공시 보이지 않는 login-form의 input에 바인딩하고 form submit
+       ******************
+       * @param {Object} event
        */
       _handleSubmit(event) {
         event.preventDefault();
@@ -187,16 +209,20 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * login-form submit 이전에 수행하는 validation
+       * @description login-form submit 이전에 수행하는 validation
+       ******************
+       * @return {Boolean}
        */
       validateBeforeSubmit() {
         let result = true;
+
         if(!this.getEmailInputValue()) {
           openAlert({
             title: this.loginFailureLabel,
             message: this.loginNotTypedLabel
           });
           result = false;
+
         } else if (!this.getPasswordInputValue()) {
           openAlert({
             title: this.loginFailureLabel,
@@ -204,13 +230,15 @@ Copyright © HatioLab Inc. All rights reserved.
           });
           result = false;
         }
+
         return result;
       }
 
       /**
-       * 로그인이 성공하여 iron-form-response가 발생하면 해당 함수를 부른다.
+       * @description 로그인이 성공하여 iron-form-response가 발생하면 해당 함수를 부른다.
        * 사용자 정보의 status를 통해 로그인을 통제한다.
-       * @param  {String} event when iron-form-response fire
+       ******************
+       * @param {String} event when iron-form-response fire
        */
       _handleResponseSuccess(event) {
         this.$['submit-btn'].disabled = false;
@@ -224,8 +252,10 @@ Copyright © HatioLab Inc. All rights reserved.
         let siteList = userInfo.site_list;
         if(siteList && siteList.length > 1) {
           this._showSiteSelector(siteList);
+
         } else if (siteList && siteList.length === 1) {
           this._reqSignIn(this._computeReqUrl(siteList[0]), siteList[0].id);
+
         } else {
           openAlert({
             title: t('error.BASEURL_ERROR'),
@@ -238,43 +268,54 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * @description 사용자 정보를 통해
-       * 비밀번호 변경 유도 및 비밀번호 연장 유도
+       * @description 사용자 정보를 통해 비밀번호 변경 유도 및 비밀번호 연장 유도
+       ******************
+       * @param {Object} userInfo
        */
       _checkUserStatus(userInfo) {
         const status = userInfo.status;
         let title; let message;
+
         switch(status) {
           case 'password_change':
             title = t('title.password_need_change');
             message = t('text.ask_password_change');
-            openAlert({
-              title: title,
-              message: message
-            });
+            openAlert({ title: title, message: message });
             break;
 
           case 'password_expired':
             title = t('title.password_expired');
             message = t('text.ask_password_extend');
-            openAlert({
-              title: title,
-              message: message
-            });
+            openAlert({ title: title, message: message });
             break;
         };
       }
 
+      /**
+       * @description 로그인 URL을 계산
+       ******************
+       * @param {Object} selectedSite
+       * @return {String}
+       */
       _computeReqUrl(selectedSite) {
         const prodMode = selectedSite['production_mode'];
         const siteUrl = selectedSite.subdomain;
         return prodMode ? `http://${siteUrl}/rest` : JSON.parse(localStorage.getItem('setting.mgrSiteUrl'));
       }
 
+      /**
+       * @description 설정화면으로 이동
+       ******************
+       */
       _moveToSetting() {
         location.hash = '/logis_setting'
       }
 
+      /**
+       * @description 사이트 셀렉터를 표시
+       ******************
+       * @param {String} siteList
+       */
       _showSiteSelector(siteList) {
         const siteSelector = document.createElement('any-site-selector');
         siteSelector.siteList = siteList;
@@ -297,19 +338,32 @@ Copyright © HatioLab Inc. All rights reserved.
         }));
       }
 
+      /**
+       * @description 로그인 요청
+       ******************
+       * @param {String} selectedSiteUrl
+       * @param {String} selectedDomainId
+       */
       _reqSignIn(selectedSiteUrl, selectedDomainId) {
         this.setBaseUrl(selectedSiteUrl);
         const signInAjax = this.getSignInAjax();
+
         signInAjax.curl = '/login';
         signInAjax.body = {
           email: btoa(this.getEmailInputValue()),
           password: this.sha256(this.getPasswordInputValue()),
           domainId: selectedDomainId
         };
+
         signInAjax.headers['x-domain-id'] = selectedDomainId;
         signInAjax.generateRequest();
       }
 
+      /**
+       * @description 로그인 응답 시
+       ******************
+       * @param {Object} event
+       */
       _signInResponsed(event) {
         setTimeout(() => {
           this._clearForm();
@@ -317,6 +371,11 @@ Copyright © HatioLab Inc. All rights reserved.
         }, 500);
       }
 
+      /**
+       * @description 로그인 에러 표시
+       ******************
+       * @param {Object} event
+       */
       _signInError(event) {
         openAlert({
           title: this.loginFailureLabel,
@@ -324,6 +383,11 @@ Copyright © HatioLab Inc. All rights reserved.
         });
       }
 
+      /**
+       * @description Base URL 설정
+       ******************
+       * @param {String} url
+       */
       setBaseUrl(url) {
         localStorage.setItem('setting.baseUrl', JSON.stringify(url));
         document.dispatchEvent(new CustomEvent('base-url-changed', {
@@ -331,6 +395,10 @@ Copyright © HatioLab Inc. All rights reserved.
         }));
       }
 
+      /**
+       * @description 폼 클리어
+       ******************
+       */
       _clearForm() {
         this.$['email'].value = '';
         this.$['password'].value = '';
@@ -338,8 +406,8 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * After failed sigin in
-       *******
+       * @description After failed sigin in
+       ******************
        * @param {Object} event iron-form-error
        */
       _handleResponseError(event) {
@@ -353,6 +421,11 @@ Copyright © HatioLab Inc. All rights reserved.
         }
       }
 
+      /**
+       * @description UUID 생성
+       ******************
+       * @return {String} UUID
+       */
       _uuidGen() {
         function s4() {
           return Math.floor((1 + Math.random()) * 0x10000)

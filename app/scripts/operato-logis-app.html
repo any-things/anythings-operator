@@ -253,9 +253,10 @@ Copyright © HatioLab Inc. All rights reserved.
 
           <!-- Tablet Views -->
           <b2b-job-assort name="b2b_job_assort"></b2b-job-assort>
+          <b2c-picking-job name="b2c_picking_job"></b2c-picking-job>
+
           <tab-das2-order-info name="tab_das2_ord_info"></tab-das2-order-info>
           <tab-das-order-list name="tab_das_ord_list"></tab-das-order-list>
-          <b2c-picking-job name="b2c_picking_job"></b2c-picking-job>
           <!-- Tablet Views -->
 
           <!-- PDA Views -->
@@ -307,9 +308,7 @@ Copyright © HatioLab Inc. All rights reserved.
             on-session-unauthorized="_sessionUnauthorized">
           </logis-setting>
 
-          <any-home
-            name="home">
-          </any-home>
+          <logis-home name="home"></logis-home>
         </iron-pages>
       </app-header-layout>
     </app-drawer-layout>
@@ -342,7 +341,7 @@ Copyright © HatioLab Inc. All rights reserved.
           /**
            * @description 현재 page hash
            ******************************
-           * @type {Object}
+           * @type {String}
            */
           page: {
             type: String,
@@ -352,7 +351,7 @@ Copyright © HatioLab Inc. All rights reserved.
           /**
            * @description 현재 장비의 타입
            ******************************
-           * @type {Object}
+           * @type {String}
            */
           deviceType: {
             type: String,
@@ -362,7 +361,7 @@ Copyright © HatioLab Inc. All rights reserved.
           /**
            * @description 현재 장비의 타입
            ******************************
-           * @type {Object}
+           * @type {String}
            */
           regionName: {
             type: String,
@@ -372,7 +371,7 @@ Copyright © HatioLab Inc. All rights reserved.
           /**
            * @description 현재 장비의 타입
            ******************************
-           * @type {Object}
+           * @type {String}
            */
           zoneCode: {
             type: String,
@@ -382,7 +381,7 @@ Copyright © HatioLab Inc. All rights reserved.
           /**
            * @description 현재 장비의 타입
            ******************************
-           * @type {Object}
+           * @type {String}
            */
           jobName: {
             type: String,
@@ -392,7 +391,7 @@ Copyright © HatioLab Inc. All rights reserved.
           /**
            * @description 현재 장비의 타입
            ******************************
-           * @type {Object}
+           * @type {Boolean}
            */
           isQps:{
             type: Boolean,
@@ -402,7 +401,7 @@ Copyright © HatioLab Inc. All rights reserved.
           /**
            * @description 현재 장비의 타입
            ******************************
-           * @type {Object}
+           * @type {String}
            */
           kioskWorkLoc: {
             type: String,
@@ -489,11 +488,13 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * sys-ajax에서 발생시키는 sys-unauthorized-session event handler 등록
+       * @description sys-ajax에서 발생시키는 sys-unauthorized-session event handler 등록
        * mobile 환경에서 fix할 innerHeight 초기화
+       ******************************
        */
       connectedCallback() {
         super.connectedCallback();
+
         this.addEventListener('sys-unauthorized-session', this._handleUnauthorized);
         this.screenHeight = window.innerHeight + 'px';
 
@@ -518,8 +519,10 @@ Copyright © HatioLab Inc. All rights reserved.
           // event handler 등록
           if(currentPage === 'kiosk_das_ord_info') {
             this.showCodeButton('DAS');
+
           } else if (currentPage === 'kiosk_dps_ord_info') {
             this.showCodeButton('DPS');
+
           } else {
             if(this.isShowCodeButton) {
               this.hideQRButton();
@@ -529,25 +532,30 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 사이드 메뉴 토글
+       * @description 사이드 메뉴 토글
+       ******************************
        */
       _toggleSideMenu() {
         this.drawerOpened = !this.drawerOpened;
       }
 
       /**
-       * device type check
+       * @description device type check
        * 1. const.js의 IS_DEV_MODE가 true라면 localStorage의 값으로 초기화 함
        *    값이 없을 경우 설정을 통해 초기화
        *
        * 2. const.js의 IS_DEV_MODE가 false라면
        *    const.js의 CONST.MY_DEVICE를 통해 장비를 결정 <apk 빌드시 결정>
+       ******************************
        */
       _checkDeviceType() {
         this.deviceType = '';
 
-        if(CONST.IS_DEV_MODE) { // 개발 모드일 때 localstorage에서 값을 조회 함
-          this.deviceType = JSON.parse(localStorage.getItem('setting.deviceType')) ? JSON.parse(localStorage.getItem('setting.deviceType')) : CONST.MY_DEVICE;
+        // 개발 모드일 때 localstorage에서 값을 조회 함
+        if(CONST.IS_DEV_MODE) {
+          this.deviceType = JSON.parse(localStorage.getItem('setting.deviceType')) ?
+            JSON.parse(localStorage.getItem('setting.deviceType')) : CONST.MY_DEVICE;
+        // 운영 모드일 때
         } else {
           this.deviceType = CONST.MY_DEVICE;
         }
@@ -556,8 +564,9 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * device type change event handler
+       * @description device type change event handler
        * deviceType이 변경되면 _setupIcons를 통해 화면을 구성하는 메뉴/버튼 등을 활성/비활성화 함
+       ******************************
        */
       _deviceTypeChanged(deviceType) {
         if(!deviceType) {
@@ -571,9 +580,11 @@ Copyright © HatioLab Inc. All rights reserved.
             this.isPDA = true;
             this.adjustPDAFontSize();
             break;
+
           case 'TABLET':
             this.isTABLET = true;
             break;
+
           case 'KIOSK':
             this.isKIOSK = true;
             break;
@@ -583,21 +594,22 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * device type이 PDA일 경우 html의 폰트 사이즈를 변경하여
+       * @description device type이 PDA일 경우 html의 폰트 사이즈를 변경하여
        * 화면 전체 폰트 사이즈를 변경함
+       ******************************
        */
        adjustPDAFontSize() {
         document.querySelector('html').style.fontSize = '20px';
       }
 
       /**
-       * device type에 따라 화면의 메뉴/버튼 등을 활성/비활성화 함
-       *
+       * @description device type에 따라 화면의 메뉴/버튼 등을 활성/비활성화 함
        * 1. _deviceTypeChanged 의해 호출 되는 경우
        *    - 앱 재실행, 설정 변경 등의 화면 리프레시 모든 케이스
-       *
        * 2. _sessionResponsed에 의해 호출 되는 경우
        *    - 로그인 되어 있지 않던 상태에서 로그인시 리프레시를 하지 않으므로 _sessionResponsed에서 직접 호출
+       ******************************
+       * @param {String} deviceType
        */
       _setupIcons(deviceType) {
         if(this.isLoginScreen()) {
@@ -619,6 +631,7 @@ Copyright © HatioLab Inc. All rights reserved.
             this.showKioskSettingBtn(true);
             this.showSidebar(false);
           }
+
         } else {
           switch(deviceType) {
             case CONST.DEVICE_TYPE.KIOSK:
@@ -674,8 +687,10 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * session check request가 정상적으로 도착하면 (로그인 되었다면)
+       * @description session check request가 정상적으로 도착하면 (로그인 되었다면)
        * logout 버튼을 활성화 및 _setupIcons를 통해 화면 구성
+       ******************************
+       * @param {Object} event
        */
       _sessionResponsed(event) {
         document.dispatchEvent(new CustomEvent('session-responsed', event));
@@ -693,7 +708,8 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 호기, 존, 작업위치 등의 정보가 설정 되었는지 확인함
+       * @description 호기, 존, 작업위치 등의 정보가 설정 되었는지 확인함
+       ******************************
        */
       checkSetting() {
         try {
@@ -736,8 +752,9 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * session check request가 비정상적으로 도착하면 (base url 불량)
+       * @description session check request가 비정상적으로 도착하면 (base url 불량)
        * setting 화면으로 이동
+       ******************************
        */
       _sessionError() {
         this.hideHeaderButtons();
@@ -751,6 +768,10 @@ Copyright © HatioLab Inc. All rights reserved.
         });
       }
 
+      /**
+       * @description 헤더 버튼 숨김
+       ******************************
+       */
       hideHeaderButtons() {
         this.showRefreshBtn(false);
         this.showLogoutBtn(false);
@@ -760,8 +781,9 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * session check request가 401 에러 발생시
+       * @description session check request가 401 에러 발생시
        * login 화면으로 이동
+       ******************************
        */
       _sessionUnauthorized() {
         document.dispatchEvent(new CustomEvent('session-unauthorized'));
@@ -778,16 +800,15 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 서버에 대한 모든 요청이 인증 에러 발생시
+       * @description 서버에 대한 모든 요청이 인증 에러 발생시
        * 로그인 화면으로 라우팅
+       ******************************
        */
       _handleUnauthorized(e) {
         this.isNotLogin = true;
         let route = location.hash.replace('#/', '');
 
-        if(route === 'login' || route === 'setting') {
-          // do nothing
-        } else {
+        if(route !== 'login' && route !== 'setting') {
           this.toLogin();
           openAlert({
             title: t('error.LOGIN_ERROR'),
@@ -797,11 +818,12 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * login 성공시
+       * @description login 성공시
        * 1. 로그아웃 버튼 활성화
        * 2. 홈 화면으로 이동
        * 3. logis-setting 화면의 region items 조회
        * 4. 사용자 정보 reset
+       ******************************
        */
       _handleLoginSuccess() {
         this.isNotLogin = false;
@@ -812,6 +834,10 @@ Copyright © HatioLab Inc. All rights reserved.
 
       }
 
+      /**
+       * @description 기본 화면으로 이동
+       ******************************
+       */
       _moveToDefaultView() {
         // 로그인 후 현재 장비가 kiosk라면 설정된 kiosk 화면으로 이동 설정된 화면이 없다면 any_setting으로 이동
         if(this.deviceType === CONST.DEVICE_TYPE.KIOSK) {
@@ -826,7 +852,8 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 사용자 정보 재조회
+       * @description 사용자 정보 재조회
+       ******************************
        */
       resetInfo() {
         // get user
@@ -834,7 +861,8 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * logout
+       * @description logout
+       ******************************
        */
       logout() {
         openConfirm({
@@ -848,12 +876,14 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 로그아웃 성공 후 이벤트 핸들러
+       * @description 로그아웃 성공 후 이벤트 핸들러
        * 1. 사용자 정보 삭제 (from localstorage)
        * 2. 로그아웃 버튼 숨기기
        * 3. 키오스크 설정 버튼 숨기기
        * 4. 새로고침 버튼 숨기기
        * 5. 로그인 여부 플래그 변경
+       ******************************
+       * @param {Object} e
        */
       _handleLogOut(e) {
         this.currentSite = 'Operato';
@@ -865,14 +895,16 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 로그아웃 후 사용자 로컬 스토리지의 정보를 삭제함
+       * @description 로그아웃 후 사용자 로컬 스토리지의 정보를 삭제함
+       ******************************
        */
       clearUserInfo() {
         localStorage.removeItem('setting.user');
       }
 
       /**
-       * 현재 화면이 로그인 화면인지 여부를 return
+       * @description 현재 화면이 로그인 화면인지 여부를 return
+       ******************************
        */
       isLoginScreen() {
         let currentHash = location.hash.replace('#/', '');
@@ -880,28 +912,36 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * KIOSK 설정 버튼 활성화/비활성화
+       * @description KIOSK 설정 버튼 활성화/비활성화
+       ******************************
+       * @param {String} value
        */
       showKioskSettingBtn(value) {
         this.$['kiosk-setting-btn'].hidden = !value;
       }
 
       /**
-       * 로그아웃 버튼 활성화/비활성화
+       * @description 로그아웃 버튼 활성화/비활성화
+       ******************************
+       * @param {String} value
        */
       showLogoutBtn(value) {
         this.$['logout-btn'].hidden = !value;
       }
 
       /**
-       * 새로고침 버튼 활성화/비활성화
+       * @description 새로고침 버튼 활성화/비활성화
+       ******************************
+       * @param {String} value
        */
       showRefreshBtn(value) {
         this.$['refresh-btn'].hidden = !value;
       }
 
       /**
-       * 사이드 메뉴 활성화/비활성화
+       * @description 사이드 메뉴 활성화/비활성화
+       ******************************
+       * @param {String} value
        */
       showSidebar(value) {
         const drawerLayout = this.$['drawer-layout'];
@@ -913,26 +953,32 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 호기명 활성화/비활성화
+       * @description 호기명 활성화/비활성화
+       ******************************
+       * @param {String} value
        */
       showRegionName(value) {
         this.$['region-name'].hidden = !value;
       }
 
       /**
-       * 존 코드 활성화/비활성화
+       * @description 존 코드 활성화/비활성화
+       ******************************
+       * @param {String} value
        */
       showZoneCode(value) {
         this.$['zone-code'].hidden = !value;
       }
 
       /**
-       * CASE: true
+       * @description CASE: true
        * 1. PDA, TABLET과 같이 innerHeight 크기를 변경 불가능 할 때 (브라우저 사이즈 변경)
        *    connectedCallback에서 초기화 한 screenHeight로 fix
        *
        * CASE: false
        * 1. kiosk와 같이 innerHeight 변경 (브라우저 사이즈 변경) 가능  할 때 drawer-layout의 height를 제거
+       ******************************
+       * @param {String} value
        */
       fixViewSize(value) {
         if(value) {
@@ -955,7 +1001,9 @@ Copyright © HatioLab Inc. All rights reserved.
       // }
 
       /**
-       * menu button 활성화/비활성화
+       * @description menu button 활성화/비활성화
+       ******************************
+       * @param {String} value
        */
       enableMenuBtn(value) {
         const menuBtn = this.$['menu-btn'];
@@ -968,79 +1016,78 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * page 변경시 event handler
+       * @description page 변경시 event handler
        * page 변경에 따른 버튼 활성/비활성화 작업 등 수행
        ***********************
        * @param {Object} page
        */
       _pageChanged(page) {
-        if (this.narrow) { // side menu narrow
+        if (this.narrow) {
           this.drawerOpened = false;
         }
 
         // this.page = page || 'home';
-        if (!page) {
-          return;
-        }
+        if(page) {
+          switch(page) {
+            case 'login':
+              if(this.isNotLogin) {
+                this.hideHeaderButtons();
+              } else {
+                this._moveToDefaultView();
+              }
 
-        switch(page) {
-          case 'login':
-            if(this.isNotLogin) {
-              this.hideHeaderButtons();
-            } else {
-              this._moveToDefaultView();
-            }
-
-          default:
-            if(this.isNotLogin === undefined) return;
-
-            if (this.isNotLogin && !(page === 'logis_setting' || page === 'login')) {
-              // 로그인 되지 않은 상태에서 setting 화면이나 login 화면이 아닌 다른곳으로 라우팅 시 로그인으로 강제 이동
-              this.toLogin();
-              openAlert({
-                title: t('error.LOGIN_ERROR'),
-                message: t('error.UNAUTHORIZED')
-              });
-            }
+            default:
+              //if(this.isNotLogin === undefined) return;
+              if (this.isNotLogin && !(page === 'logis_setting' || page === 'login')) {
+                // 로그인 되지 않은 상태에서 setting 화면이나 login 화면이 아닌 다른곳으로 라우팅 시 로그인으로 강제 이동
+                this.toLogin();
+                openAlert({ title: t('error.LOGIN_ERROR'), message: t('error.UNAUTHORIZED') });
+              }
+          }
         }
       }
 
       /**
-       * home 화면으로 이동
+       * @description home 화면으로 이동
+       ******************************
        */
       toHome() {
         this.route = { prefix: '/', path: 'home', title: t('menu.Home')};
       }
 
       /**
-       * 로그인 화면으로 이동
+       * @description 로그인 화면으로 이동
+       ******************************
        */
       toLogin() {
         this.route = { prefix: '/', path: 'login', title: t('menu.Login') };
       }
 
       /**
-       * 물류 설정 화면으로 이동
+       * @description 물류 설정 화면으로 이동
+       ******************************
        */
       toSetting() {
         this.route = { prefix: '/', path: 'logis_setting', title: t('menu.Settings') };
       }
 
       /**
-       * system setting 화면으로 이동 (개발용)
+       * @description system setting 화면으로 이동 (개발용)
+       ******************************
        */
       toSysSetting() {
         this.route = { prefix: '/', path: 'setting', title: t('menu.Settings') };
       }
 
       /**
-       * 코드 버튼 활성화
+       * @description 코드 버튼 활성화
+       ******************************
        */
       showCodeButton(viewType) {
         this.$['mpi-on-last-btn'].hidden = false;
         this.$['mpi-off-btn'].hidden = false;
 
-        if(viewType === 'DAS') { // DAS의 경우
+        if(viewType === 'DAS') {
           this.$['batch-full-box-btn'].hidden = false;
         } else {
           this.$['batch-full-box-btn'].hidden = true;
@@ -1050,14 +1097,16 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 키오스크 작업 위치 정보 활성 / 비활성화
+       * @description 키오스크 작업 위치 정보 활성 / 비활성화
+       ******************************
        */
       showKioskWorkLoc(value) {
         this.$['kiosk-work-loc'].hidden = !value;
       }
 
       /**
-       * QR 코드 버튼 비활성화
+       * @description QR 코드 버튼 비활성화
+       ******************************
        */
       hideQRButton() {
         this.$['mpi-on-last-btn'].hidden = true;
@@ -1067,7 +1116,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * KIOSK 상단 버튼 코드 팝업
+       * @description KIOSK 상단 버튼 코드 팝업
        **********************
        * @param {Object} event
        */
@@ -1101,7 +1150,8 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 상단의 refresh 버튼을 클릭시 refresh-view 이벤트를 발생시킴
+       * @description 상단의 refresh 버튼을 클릭시 refresh-view 이벤트를 발생시킴
+       ******************************
        */
       refresh() {
         let route;
@@ -1110,6 +1160,7 @@ Copyright © HatioLab Inc. All rights reserved.
         } else {
           route = location.hash.replace('#/', '');
         }
+
         document.dispatchEvent(new CustomEvent('refresh-view-' + route, {
           detail: route
         }));

@@ -22,11 +22,11 @@ Copyright © HatioLab Inc. All rights reserved.
             }, {
               src: './scripts/fragments/sys/sys-setting.html'
             }, {
-              src: './scripts/fragments/common/any-home.html'
-            }, {
-              src: './scripts/fragments/common/any-login.html'
+              src: './scripts/fragments/logis/logis-home.html'
             }, {
               src: './scripts/fragments/logis/logis-setting.html'
+            }, {
+              src: './scripts/fragments/common/any-login.html'
             }, {
               src: './scripts/components/logis/qrcode-popup.html'
             }]
@@ -36,7 +36,7 @@ Copyright © HatioLab Inc. All rights reserved.
             type: Array,
             value: () => [{
               route: 'home',
-              src: './scripts/fragments/common/any-home.html'
+              src: './scripts/fragments/logis/logis-home.html'
             }, {
               route: 'tab_das_ord_info',
               src: './scripts/fragments/logis/b2b/assort/b2b-job-assort.html'
@@ -141,6 +141,10 @@ Copyright © HatioLab Inc. All rights reserved.
         }
       }
 
+      /**
+       * @description lifecycle
+       **************************
+       */
       connectedCallback() {
         super.connectedCallback();
 
@@ -153,8 +157,7 @@ Copyright © HatioLab Inc. All rights reserved.
           let targetIndex;
 
           this.viewElements.forEach((element, index) => {
-            // viewElements 중 현재 라우팅의 src를 찾아서
-            // targetElement와 targetIndex를 초기화
+            // viewElements 중 현재 라우팅의 src를 찾아서 targetElement와 targetIndex를 초기화
             if(element.route === event.detail.currentPage) {
               targetIndex = index;
               targetElement.push(element);
@@ -172,11 +175,12 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 전달받은 elements.src의 경로를 통해 element를 임포트
+       * @description 전달받은 elements.src의 경로를 통해 element를 임포트
+       **************************
+       * @param {Array} elements
        */
       loadViews(elements) {
         elements.forEach(element => {
-
           /**
            * @description 개발 / 프로덕션 모드에 따라 컴퍼넌트 임포트 방식을 변경함
            * 1. 개발 모드일 경우

@@ -9,7 +9,7 @@ Copyright © HatioLab Inc. All rights reserved.
 <link rel="import" href="./sys-ajax.html">
 
 <!--
-  용어 번역 컴포넌트
+  시스템 > 용어 번역 컴포넌트
 -->
 <dom-module id="sys-translator">
 	<template>
@@ -22,7 +22,9 @@ Copyright © HatioLab Inc. All rights reserved.
 
 			static get properties() {
 				return {
-					src: String,
+					src: {
+						type: String
+					},
 
 					result: {
 						type: String,
@@ -55,10 +57,9 @@ Copyright © HatioLab Inc. All rights reserved.
 			}
 
 			_languageChanged(language) {
-				if (!language) {
-					return;
+				if (language) {
+					this.result = this.makeResult();
 				}
-				this.result = this.makeResult()
 			}
 
 			makeResult() {

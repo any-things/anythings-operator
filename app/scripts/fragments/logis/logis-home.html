@@ -6,9 +6,9 @@ Copyright © HatioLab Inc. All rights reserved.
 <link rel="import" href="../../../bower_components/polymer/polymer-element.html">
 
 <!--
-  홈 화면
+  물류 > 홈 화면
 -->
-<dom-module id="any-home">
+<dom-module id="logis-home">
   <template>
     <style include="shared-styles">
       @media (min-width: 0px) and (max-width: 600px) {
@@ -105,10 +105,13 @@ Copyright © HatioLab Inc. All rights reserved.
         content: "\274c";
       }
     </style>
-    <div class="notification">Notification 1<span class="crossmark"></span>
-    </div>
+
+    <div class="notification">Notification 1<span class="crossmark"></span></div>
+
     <div class="notification">Notification 2<span class="crossmark"></span></div>
+
     <div class="notification">Notification 3<span class="crossmark"></span></div>
+
     <div class="container">
       <div class="grid-container">
         <button class="icon-menu setting">
@@ -151,8 +154,9 @@ Copyright © HatioLab Inc. All rights reserved.
   </template>
 
   <script>
-    class AnyHome extends Polymer.Element {
-      static get is() { return 'any-home' };
+    class LogisHome extends Polymer.Element {
+      static get is() { return 'logis-home' };
+
       static get properties() {
         return {
           header: {
@@ -169,7 +173,6 @@ Copyright © HatioLab Inc. All rights reserved.
                   }
                 },
                 columnWidth: '220px'
-
               }/*, {
                 display: 'ID',
                 fieldname: 'id'
@@ -200,10 +203,12 @@ Copyright © HatioLab Inc. All rights reserved.
         const errorLogAjax = this.$['error-log-ajax'];
         let currentPage = page ? page : 1;
         let currentLimit = limit ? limit : 50;
+
         const sort = JSON.stringify([{
           field: 'issue_date',
           ascending: false
         }]);
+
         errorLogAjax.curl = '/error_logs';
         errorLogAjax.params = {
           page: currentPage,
@@ -232,6 +237,6 @@ Copyright © HatioLab Inc. All rights reserved.
       }
     }
 
-    customElements.define(AnyHome.is, AnyHome);
+    customElements.define(LogisHome.is, LogisHome);
   </script>
 </dom-module>
