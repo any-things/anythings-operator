@@ -17,62 +17,138 @@ Copyright © HatioLab Inc. All rights reserved.
         height: calc(100% - 40px);
         padding: 20px 25px;
       }
+
+      .chart-section {
+        background-color: #5A6377;
+        border-radius: var(--things-default-border-radius);
+        padding: 10px;
+        color: #fff;
+      }
+
+      .chart-row {
+        display: grid;
+        grid-template-columns: 1fr 15% 15%;
+        font-size: .8rem;
+        margin-bottom: 10px;
+      }
+
+      .chart-row .col-header {
+        text-align: right;
+        margin-right: 10px;
+      }
+
+      .chart-row .bar-chart {
+        display: flex;
+        flex-direction: row;
+        margin-top: 0.7em;
+      }
+
+      .chart-row .bar-chart .label {
+        width: 5vw;
+        font-size: .8rem;
+        margin: auto 10px auto auto;
+      }
+
+      .chart-row .bar-chart .bar {
+        display: inline-block;
+        flex: 1;
+        background-color: rgba(0, 0, 0, .2);
+        border-radius: var(--things-default-border-radius);
+      }
+
+      .chart-row .bar-chart .chart-value {
+        display: inline-block;
+        border-radius: var(--things-default-border-radius);
+        margin: 5px;
+        text-align: right;
+      }
+
+      .chart-row .bar-chart #order-bar {
+        background-color: #3cde4b;
+      }
+
+      .chart-row .bar-chart #sku-bar {
+        background-color: #25b2e6
+      }
+
+      .chart-row .bar-chart #pcs-bar {
+        background-color: #01c9c6
+      }
+
+      .chart-row .num-data {
+        text-align: right;
+        margin: auto 0;
+      }
+
       #top-container {
         display: grid;
-        grid-template-columns: 1.4fr 1.4fr 1fr;
+        grid-template-columns: 2.8fr 1fr;
         grid-gap: 20px;
         margin-bottom: 20px;
       }
+
       #middle-container {
         display: grid;
         background-color: #5A6377;
         grid-auto-flow: column;
         grid-gap: 10px;
         padding: 9px;
-        border-radius:var(--things-default-border-radius);
+        border-radius: var(--things-default-border-radius);
         margin-bottom: 20px;
       }
-      #label{
+
+      #label {
         text-align: right;
-        color: rgba(255,255,255,.7);
-        font-size:1rem;
-        margin-top: auto; margin-bottom: auto;
+        color: rgba(255, 255, 255, .7);
+        font-size: 1rem;
+        margin-top: auto;
+        margin-bottom: auto;
       }
-      #label *,#refresh-btn *{
-        vertical-align:middle
+
+      #label *,
+      #refresh-btn * {
+        vertical-align: middle
       }
+
       .input-container {
         display: grid;
         grid-template-columns: auto auto;
-        grid-column-gap:10px;
+        grid-column-gap: 10px;
       }
+
       button {
         @apply --operator-default-btn;
       }
+
       button:active {
         @apply --operator-default-btn-active;
       }
-      button:focus{
-        outline:none
+
+      button:focus {
+        outline: none
       }
+
       input {
-        background-color: rgba(0,0,0,.25);
-        border: 1px solid rgba(255,255,255,.2);
-        height:54px;
+        background-color: rgba(0, 0, 0, .25);
+        border: 1px solid rgba(255, 255, 255, .2);
+        height: 54px;
         color: #fff;
-        font-size:1.3rem;
+        font-size: 1.3rem;
         text-align: center;
         margin: auto;
       }
-      input:focus{
-        outline:none;
+
+      input:focus {
+        outline: none;
       }
+
       .table {
         display: grid;
         grid-template-columns: repeat(6, 1fr);
         font-size: 15pt;
         text-align: center;
       }
+
       .summary-header {
         color: #fff;
         background: linear-gradient(to bottom, #6a7da1 0%, #53627f 100%);
@@ -80,145 +156,160 @@ Copyright © HatioLab Inc. All rights reserved.
         border-radius: 5px;
         margin-bottom: 9px;
       }
+
       .content-container {
         background-color: #3C414B;
         padding: 5px;
         border-radius: 5px;
       }
+
       .summary-content {
         color: #CCCCCE;
         border-bottom: 1px solid #30343C;
         padding: 5px;
       }
+
       #order-no {
         color: #ADCBEB;
       }
-      .chart-section,.order-section,.bucket-section{
-        border-radius:var(--things-default-border-radius);
+
+      .chart-section,
+      .order-section,
+      .bucket-section {
+        border-radius: var(--things-default-border-radius);
         overflow: hidden;
       }
-      .order-section{
-        display:grid;
-        grid-template:1fr 1fr / 1.1fr 1fr;
-        background-color:#5a6378;
+
+      .order-section {
+        display: grid;
+        grid-template: 1fr 1fr / 1.1fr 1fr;
+        background-color: #5a6378;
       }
-      .bucket-section{
-        background-color:#409c4b;
+
+      .bucket-section {
+        background-color: #409c4b;
       }
-      .order-section div{
-        text-align:center;
-        color:#fff;
+
+      .order-section div {
+        text-align: center;
+        color: #fff;
       }
-      .order-section div span{
-        display:block;
+
+      .order-section div span {
+        display: block;
       }
-      .order-section img{
-        display:block;
-        margin:auto;
+
+      .order-section img {
+        display: block;
+        margin: auto;
       }
-      .order-section .order2{
-        padding-top:0;
-        grid-area : 2 / 1 ;
+
+      .order-section .order2 {
+        padding-top: 0;
+        grid-area: 2 / 1;
       }
-      .order-section .order3{
-        border-left:1px solid rgba(0,0,0,.3);
-        border-bottom:1px solid rgba(0,0,0,.3);
+
+      .order-section .order3 {
+        border-left: 1px solid rgba(0, 0, 0, .3);
+        border-bottom: 1px solid rgba(0, 0, 0, .3);
       }
-      .order-section .order4{
-        border-left:1px solid rgba(0,0,0,.3);
+
+      .order-section .order4 {
+        border-left: 1px solid rgba(0, 0, 0, .3);
       }
-      span.bigtitle{
-        margin:20px 0 15px 0;
-        font-size:0.9rem;
+
+      span.bigtitle {
+        margin: 20px 0 15px 0;
+        font-size: 0.9rem;
       }
-      span.smalltitle{
-        margin:20px 0 7px 0;
-        font-size:.9rem;
+
+      span.smalltitle {
+        margin: 20px 0 7px 0;
+        font-size: .9rem;
       }
-      span.bigtitle,span.smalltitle{
-        display:inline-block !important;
-        border-bottom:3px solid var(--things-secondary-color);
+
+      span.bigtitle,
+      span.smalltitle {
+        display: inline-block !important;
+        border-bottom: 3px solid var(--things-secondary-color);
       }
-      span.plan,span.proc{
-        font-size:.7rem;
+
+      span.plan,
+      span.proc {
+        font-size: .7rem;
       }
-      span.plan b,span.proc b{
-        display:inline-block;
-        margin-left:9px;
-        width:85px;
+
+      span.plan b,
+      span.proc b {
+        display: inline-block;
+        margin-left: 9px;
+        width: 85px;
         position: relative;
-        top:5px;
-        font-size:1.1rem;
-        text-align:right;
+        top: 5px;
+        font-size: 1.1rem;
+        text-align: right;
       }
-      .order-section .order2 b{
-        top:10px;
-        font-size:1.7rem;
+
+      .order-section .order2 b {
+        top: 10px;
+        font-size: 1.7rem;
       }
-      span.plan{
-        opacity:.6;
+
+      span.plan {
+        opacity: .6;
       }
-      .bucket-section{
-        text-align:center
+
+      .bucket-section {
+        text-align: center
       }
-      span.bucket{
-        display:block;
-        margin-top:.4rem;
-        color:#fff;
-        font-size:1.1rem;
+
+      span.bucket {
+        display: block;
+        margin-top: .4rem;
+        color: #fff;
+        font-size: 1.1rem;
       }
-      span.bucket img{
+
+      span.bucket img {
         position: relative;
-        top:12px;
-        width:55px;
+        top: 12px;
+        width: 55px;
       }
-      .bucket-section b{
-        display:block;
-        color:#fff;
-        font-size:5rem;
-        text-shadow: 1px 3px 3px rgba(0,0,0,.3);
-        line-height:1.3;
+
+      .bucket-section b {
+        display: block;
+        color: #fff;
+        font-size: 5rem;
+        text-shadow: 1px 3px 3px rgba(0, 0, 0, .3);
+        line-height: 1.3;
       }
-      #scene-board div{
+
+      #scene-board div {
         position: relative !important;
       }
     </style>
 
     <!-- 차트 Scene 모델 정보를 위한 Ajax -->
-    <sys-ajax
-      auto
-      id="chart-scene-ajax"
-      method="GET"
-      content-type="plain/text"
-      last-response="{{chartSceneData}}">
+    <sys-ajax auto id="chart-scene-ajax" method="GET" content-type="plain/text" last-response="{{chartSceneData}}">
     </sys-ajax>
 
     <!-- 주문 정보 표시를 위한 Ajax -->
-    <sys-ajax
-      id="batch-summary-ajax"
-      method="GET"
-      content-type="application/json"
-      last-response="{{orderDataSet}}">
+    <sys-ajax id="batch-summary-ajax" method="GET" content-type="application/json" last-response="{{orderDataSet}}">
     </sys-ajax>
 
     <!-- 공박스 투입을 위한 Ajax -->
-    <sys-ajax
-      id="input-ajax"
-      curl="/kiosk_process/dps/input_bucket/:region_cd/:bucket_cd"
-      method="PUT"
-      content-type="application/json"
-      last-response="{{orderDataSet}}"
-      on-sys-ajax-error="_onBucketCdScanError">
+    <sys-ajax id="input-ajax" curl="/kiosk_process/dps/input_bucket/:region_cd/:bucket_cd" method="PUT"
+      content-type="application/json" last-response="{{orderDataSet}}" on-sys-ajax-error="_onBucketCdScanError">
     </sys-ajax>
 
     <div id="container">
       <div id="top-container">
         <!-- chart begin -->
-        <div id="scene-board" class="chart-section"></div>
+        <!-- <div id="scene-board" class="chart-section"></div> -->
         <!-- chart end -->
 
         <!-- order status begin -->
-        <div class="order-section">
+        <!-- <div class="order-section">
           <div class="order1">
             <span class="bigtitle">[[orderLabel]]</span>
             <img src="./images/icon-dashboard.png">
@@ -237,14 +328,60 @@ Copyright © HatioLab Inc. All rights reserved.
             <span class="proc">[[pickedLabel]]<b>[[pcsPicked]]</b></span>
             <span class="plan">[[pickingLabel]]<b>[[pcsPicking]]</b></span>
           </div>
+        </div> -->
+        <div id="proc-rate-total" class="chart-section">
+          <div class="chart-row">
+            <span>[[totalProcRateLabel]]</span>
+            <span class="col-header">[[pickedLabel]]</span>
+            <span class="col-header">[[pickingLabel]]</span>
+          </div>
+
+          <div class="chart-row">
+            <div class="bar-chart">
+              <span class="label">[[orderLabel]]</span>
+              <div class="bar">
+                <span id="order-bar" class="chart-value"
+                  style="width:calc([[totalProgressRate]]% - 10px)">[[totalProgressRate]]%</span>
+              </div>
+            </div>
+
+            <span class="num-data">[[totalOrderPicked]]</span>
+            <span class="num-data">[[totalOrderPicking]]</span>
+          </div>
+
+          <div class="chart-row">
+            <div class="bar-chart">
+              <span class="label">SKU</span>
+              <div class="bar">
+                <span id="sku-bar" class="chart-value"
+                  style="width:calc([[totalProgressRateBySku]]% - 10px)">[[totalProgressRateBySku]]%</span>
+              </div>
+            </div>
+
+            <span class="num-data">[[totalSkuPicked]]</span>
+            <span class="num-data">[[totalSkuPicking]]</span>
+          </div>
+
+          <div class="chart-row">
+            <div class="bar-chart">
+              <span class="label">Total</span>
+              <div class="bar">
+                <span id="pcs-bar" class="chart-value"
+                  style="width:calc([[totalGaugeRate]]% - 10px)">[[totalGaugeRate]]%</span>
+              </div>
+            </div>
+
+            <span class="num-data">[[totalPcsPicked]]</span>
+            <span class="num-data">[[totalPcsPicking]]</span>
+          </div>
         </div>
         <!-- order status end -->
 
         <!-- bucket status begin -->
         <div class="bucket-section">
           <span class="bucket">
-              <img src="./images/icon-greenbox.png">
-              [[inputableBucketLabel]]
+            <img src="./images/icon-greenbox.png">
+            [[inputableBucketLabel]]
           </span>
           <b>[[inputableBuckets]]</b>
         </div>
@@ -253,28 +390,20 @@ Copyright © HatioLab Inc. All rights reserved.
 
       <div id="middle-container">
         <span id="label">
-          <img src="./images/icon-barcode.png"/>
+          <img src="./images/icon-barcode.png" />
           [[bucketScanLabel]]
         </span>
 
         <input id="input-bucket-cd" on-keypress="_onBucketCdScan">
 
         <button id="refresh-btn" on-click="refresh">
-          <img src="./images/icon-refresh.png"/>
+          <img src="./images/icon-refresh.png" />
           <span>[[refreshLabel]]</span>
         </button>
       </div>
 
-      <item-list
-        id="item-list"
-        header="[[header]]"
-        page="[[page]]"
-        total="[[total]]"
-        limit="[[limit]]"
-        data="[[items]]"
-        show-paginator
-        on-data-list-click="showOrderItems"
-        on-paginator-changed="_pageChanged">
+      <item-list id="item-list" header="[[header]]" page="[[page]]" total="[[total]]" limit="[[limit]]" data="[[items]]"
+        show-paginator on-data-list-click="showOrderItems" on-paginator-changed="_pageChanged">
       </item-list>
     </div>
   </template>
@@ -292,7 +421,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           bucketScanLabel: {
             type: String,
-            value: function() {
+            value: function () {
               return t('label.bucket_cd');
             }
           },
@@ -304,7 +433,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           refreshLabel: {
             type: String,
-            value: function() {
+            value: function () {
               return t('button.refresh');
             }
           },
@@ -316,7 +445,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           inputableBucketLabel: {
             type: String,
-            value: function() {
+            value: function () {
               return t('label.inputable_buckets');
             }
           },
@@ -328,9 +457,19 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           orderLabel: {
             type: String,
-            value: function() {
+            value: function () {
               return t('label.order');
             }
+          },
+
+          /**
+           * 총 진행율 라벨
+           ****************
+           * @type {String}
+           */
+          totalProcRateLabel: {
+            type: String,
+            value: () => t('label.total_proc_rate')
           },
 
           /**
@@ -340,7 +479,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           pickedLabel: {
             type: String,
-            value: function() {
+            value: function () {
               return t('label.picked_qty');
             }
           },
@@ -352,8 +491,8 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           pickingLabel: {
             type: String,
-            value: function() {
-              return t('label.picking_qty');
+            value: function () {
+              return t('label.pick_qty');
             }
           },
 
@@ -413,6 +552,66 @@ Copyright © HatioLab Inc. All rights reserved.
            * @type {Number}
            */
           pcsPicking: {
+            type: Number,
+            value: 0
+          },
+
+          /**
+ * 토탈 주문 확정
+ ****************
+ * @type {Number}
+ */
+          totalOrderPicked: {
+            type: Number,
+            value: 0
+          },
+
+          /**
+           * 주문 예정
+           ****************
+           * @type {Number}
+           */
+          totalOrderPicking: {
+            type: Number,
+            value: 0
+          },
+
+          /**
+           * SKU 확정
+           ****************
+           * @type {Number}
+           */
+          totalSkuPicked: {
+            type: Number,
+            value: 0
+          },
+
+          /**
+           * SKU 예정
+           ****************
+           * @type {Number}
+           */
+          totalSkuPicking: {
+            type: Number,
+            value: 0
+          },
+
+          /**
+           * PCS 확정
+           ****************
+           * @type {Number}
+           */
+          totalPcsPicked: {
+            type: Number,
+            value: 0
+          },
+
+          /**
+           * PCS 예정
+           ****************
+           * @type {Number}
+           */
+          totalPcsPicking: {
             type: Number,
             value: 0
           },
@@ -522,7 +721,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           header: {
             type: Array,
-            value: function() {
+            value: function () {
               return [{
                 display: t('label.input_seq'),
                 fieldname: 'input_seq',
@@ -541,7 +740,7 @@ Copyright © HatioLab Inc. All rights reserved.
                   let boxColor = data['mpi_color'];
                   boxColor = boxColor ? boxColor.toLowerCase() : 'n';
 
-                  if(boxColor === 'r') {
+                  if (boxColor === 'r') {
                     return 'red';
                   } else if (boxColor === 'g') {
                     return 'green';
@@ -664,7 +863,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} e
        */
       _routingChanged(e) {
-        if(e.detail.currentPage == 'b2c_box_input') {
+        if (e.detail.currentPage == 'b2c_box_input') {
           this._initialSetup();
           this.enableAutoRefresh = true;
         } else {
@@ -685,7 +884,7 @@ Copyright © HatioLab Inc. All rights reserved.
        *******************
        */
       startAutoRefresh() {
-        if(this.enableAutoRefresh) {
+        if (this.enableAutoRefresh) {
           try {
             this.refresh();
           } catch (e) {
@@ -698,7 +897,7 @@ Copyright © HatioLab Inc. All rights reserved.
         } catch (e) {
         }
 
-        setTimeout(function() {
+        setTimeout(function () {
           this.startAutoRefresh();
         }.bind(this), interval);
       }
@@ -718,7 +917,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _barcodeInputReset() {
         var inputBucketCd = this.$['input-bucket-cd'];
-        if(this._scannedFlag) {
+        if (this._scannedFlag) {
           inputBucketCd.value = '';
           this._scannedFlag = false;
         }
@@ -744,7 +943,7 @@ Copyright © HatioLab Inc. All rights reserved.
         // 4. Scene 화면 Fit
         this.chartScene.fit('both');
         // 5. 데이터 바인딩
-        this.chartScene.data = {progressRate : 0, gaugeRate : 0};
+        this.chartScene.data = { progressRate: 0, gaugeRate: 0 };
       }
 
       /**
@@ -754,9 +953,9 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} orderDataSet
        */
       _orderDataSetChanged(orderDataSet) {
-        if(orderDataSet) this.enableAutoRefresh = true;
+        if (orderDataSet) this.enableAutoRefresh = true;
 
-        if(orderDataSet) {
+        if (orderDataSet) {
           this.total = orderDataSet.total;
           this.inputableBuckets = orderDataSet.inputable_buckets;
           this.orderPicking = orderDataSet.order_picking_qty;
@@ -769,11 +968,22 @@ Copyright © HatioLab Inc. All rights reserved.
           this.gaugeRate = (!this.pcsPicking || this.pcsPicking == 0 || !this.pcsPicked || this.pcsPicked == 0) ? 0 : ((this.pcsPicked / this.pcsPicking) * 100).toFixed(1);
 
           this.chartScene.data = {
-            progressRate : this.progressRate,
-            gaugeRate : this.gaugeRate
+            progressRate: this.progressRate,
+            gaugeRate: this.gaugeRate
           };
 
           this.items = orderDataSet.items ? orderDataSet.items : [];
+
+          this.totalOrderPicking = orderDataSet.tot_order_picking_qty;
+          this.totalOrderPicked = orderDataSet.tot_order_picked_qty;
+          this.totalSkuPicking = orderDataSet.tot_sku_picking_qty;
+          this.totalSkuPicked = orderDataSet.tot_sku_picked_qty;
+          this.totalPcsPicking = orderDataSet.tot_pcs_picking_qty;
+          this.totalPcsPicked = orderDataSet.tot_pcs_picked_qty;
+
+          this.totalProgressRate = Number((!this.totalOrderPicking || this.totalOrderPicking == 0 || !this.totalOrderPicked || this.totalOrderPicked == 0) ? 0 : ((this.totalOrderPicked / this.totalOrderPicking) * 100).toFixed(1));
+          this.totalProgressRateBySku = Number((!this.totalSkuPicking || this.totalSkuPicking == 0 || !this.totalSkuPicked || this.totalSkuPicked == 0) ? 0 : ((this.totalSkuPicked / this.totalSkuPicking) * 100).toFixed(1));
+          this.totalGaugeRate = Number((!this.totalPcsPicking || this.totalPcsPicking == 0 || !this.totalPcsPicked || this.totalPcsPicked == 0) ? 0 : ((this.totalPcsPicked / this.totalPcsPicking) * 100).toFixed(1));
         }
       }
 
@@ -786,10 +996,10 @@ Copyright © HatioLab Inc. All rights reserved.
         if (event.key === 'Enter') {
           var boxCd = event.currentTarget.value;
 
-          if(/^[bcdfghiBCDFGHI][0-9]{7}$/.exec(boxCd)) {
+          if (/^[bcdfghiBCDFGHI][0-9]{7}$/.exec(boxCd)) {
             event.currentTarget.value = '';
 
-            if(LOGIS_UTIL.getKioskInputType() === 'box') {
+            if (LOGIS_UTIL.getKioskInputType() === 'box') {
               this.inputBox(boxCd);
             } else {
               this.inputBucket(boxCd);
@@ -799,8 +1009,8 @@ Copyright © HatioLab Inc. All rights reserved.
             this._scannedFlag = true;
 
           } else {
-            document.dispatchEvent(new CustomEvent('show-toast',{
-              detail:{
+            document.dispatchEvent(new CustomEvent('show-toast', {
+              detail: {
                 type: t('text.box_form_check'),
                 message: t('text.box_form_check')
               }
@@ -818,7 +1028,7 @@ Copyright © HatioLab Inc. All rights reserved.
         this._barcodeInputReset();
         var regionCd = LOGIS_UTIL.getRegionCd();
 
-        if(regionCd) {
+        if (regionCd) {
           var showOrderAjax = this.$['batch-summary-ajax'];
           var url = '/kiosk_process/dps/batch_summary/' + regionCd;
           url = url + '?page=' + this.page + '&limit=' + this.limit;
@@ -829,13 +1039,13 @@ Copyright © HatioLab Inc. All rights reserved.
         }
       }
 
-     /**
-      * item-list paginator-changed event handler
-      * item-list의 page, limit, total property가 변경 되면 호출 됨
-      * event.detail을 통해 현재 리스트의 page, limit을 초기화 하고
-      ***********************
-      * @param {Object} event
-      */
+      /**
+       * item-list paginator-changed event handler
+       * item-list의 page, limit, total property가 변경 되면 호출 됨
+       * event.detail을 통해 현재 리스트의 page, limit을 초기화 하고
+       ***********************
+       * @param {Object} event
+       */
       _pageChanged(event) {
         this.page = event.detail.page;
         this.limit = event.detail.limit;
@@ -858,10 +1068,10 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {String} bucketCd
        */
       inputBucket(bucketCd) {
-        if(bucketCd && bucketCd.length >= 4) {
+        if (bucketCd && bucketCd.length >= 4) {
           var regionCd = LOGIS_UTIL.getRegionCd();
 
-          if(regionCd) {
+          if (regionCd) {
             var inputBucketAjax = this.$['input-ajax'];
             var url = '/kiosk_process/dps/input_bucket/' + regionCd + '/' + bucketCd;
             url = url + '?page=' + this.page + '&limit=' + this.limit;
@@ -879,10 +1089,10 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {String} boxId
        */
       inputBox(boxId) {
-        if(boxId && boxId.length >= 4) {
+        if (boxId && boxId.length >= 4) {
           var regionCd = LOGIS_UTIL.getRegionCd();
 
-          if(regionCd) {
+          if (regionCd) {
             // 박스 ID의 첫 번째 글자가 박스 타입
             var boxType = boxId.substring(0, 1);
             var inputBucketAjax = this.$['input-ajax'];
@@ -926,7 +1136,7 @@ Copyright © HatioLab Inc. All rights reserved.
               const rows = params.listElement.getRows();
               rows.forEach(row => {
                 const rowData = row.getData();
-                if(parseInt(rowData.pick_qty) === parseInt(rowData.picked_qty)) {
+                if (parseInt(rowData.pick_qty) === parseInt(rowData.picked_qty)) {
                   row.classList.add('complete');
                 }
               })
