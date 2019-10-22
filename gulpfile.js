@@ -30,7 +30,7 @@ gulp.task('serve', () => {
       ignored: '*.txt'
     },
     host: 'mobile.hatiolab.com',
-    port: 4500,
+    port: 4000,
     // https: true,
     server: {
       baseDir: ['app'],

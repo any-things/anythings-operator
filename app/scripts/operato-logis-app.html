@@ -38,44 +38,45 @@ Copyright © HatioLab Inc. All rights reserved.
           background-color:var(--things-primary-background-color)
         }
         --operator-default-btn: {
-          background: #7f95bd;
-          background: linear-gradient(to bottom, #7f95bd 0%, #4e638a 100%);
-          border:none;border-top:.06rem solid #96b2e6;border-bottom:.2rem solid #3a4b69;
+          background: #626262;
+          /* background: linear-gradient(to bottom, #7f95bd 0%, #4e638a 100%); */
+          border: none;
+          /* border:none;border-top:.06rem solid #96b2e6;border-bottom:.2rem solid #3a4b69; */
           border-radius:12px;
           margin:0;padding:.3rem 1rem;
           min-width:100px;
           color: #fff;
-          text-shadow: 0px .03rem .03rem rgba(0, 0, 0, 0.4);
+          /* text-shadow: 0px .03rem .03rem rgba(0, 0, 0, 0.4); */
           font-size:.8rem;
-          font-family: 'cj-font';
+          font-family: "Noto Sans KR";
           outline: none;
         }
         --operator-default-btn-active: {
-          background: #7f95bd;
-          background: linear-gradient(to bottom, #4e638a 0%, #7f95bd 100%);
+          background:#565555;
+          /* background: linear-gradient(to bottom, #4e638a 0%, #7f95bd 100%); */
           text-shadow: .03rem 0rem .03rem rgba(0, 0, 0, 0.4);
         }
         --operator-warn-btn: {
-          background: #ff1414;
-          background: linear-gradient(to bottom, #ff7575 0%, #ff1414 100%);
-          border:none;border-top:.06rem solid #ff1414;border-bottom:.2rem solid #c20000;
+          background: #e54646;
+          /* background: linear-gradient(to bottom, #ff7575 0%, #ff1414 100%); */
+          /* border:none;border-top:.06rem solid #ff1414;border-bottom:.2rem solid #c20000; */
           border-radius:12px;
           margin:0;padding:.3rem 1rem;
           min-width:100px;
           color: #fff;
           text-shadow: 0px .03rem .03rem rgba(0, 0, 0, 0.4);
           font-size:.8rem;
-          font-family: 'cj-font';
+          font-family: "Noto Sans KR";
           outline: none;
         }
         --operator-warn-btn-active: {
-          background: #7f95bd;
-          background: linear-gradient(to bottom, #7f95bd 0%, #4e638a 100%);
+          background: #d13939;
+          /* background: linear-gradient(to bottom, #7f95bd 0%, #4e638a 100%); */
           text-shadow: .03rem 0rem .03rem rgba(0, 0, 0, 0.4);
         }
       }
       app-drawer-layout{
-        background-color:var(--things-secondary-background-color);
+        background-color:var(--things-whitegrey-background-color);
       }
       app-drawer-layout:not([narrow]) [drawer-toggle] {
         display: none;
@@ -110,6 +111,7 @@ Copyright © HatioLab Inc. All rights reserved.
       #menu-btn {
         display: grid;
         grid-template-columns: auto auto;
+        font-family:'Verdana','Helvetica';
       }
       #menu-btn img, #menu-btn span {
         margin: auto;
@@ -140,7 +142,7 @@ Copyright © HatioLab Inc. All rights reserved.
       #buttons iron-icon {
         height: var(--iron-icon-height, 1rem);
         margin: auto;
-        fill:#8cc9e7;
+        fill:rgba(255, 255, 255, .4);
       }
       #buttons iron-icon:active{
         background-color:rgba(0,0,0,.3);

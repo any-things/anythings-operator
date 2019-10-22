@@ -9,7 +9,7 @@
 			PDA: 'PDA',
 			KIOSK: 'KIOSK'
 		},
-		SRC_URL: 'http://localhost:4500',
+		SRC_URL: 'http://localhost:4000',
 		IS_DEV_MODE: true,
 		MY_DEVICE: 'KIOSK',
 	}
