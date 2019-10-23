@@ -5,17 +5,18 @@ Copyright © HatioLab Inc. All rights reserved.
 
 <link rel="import" href="../../../bower_components/polymer/polymer-element.html">
 
+<link rel="import" href="../../mixins/common/network-info-mixin.html">
+
+<link rel="import" href="../../components/common/sound-player.html">
+
 <link rel="import" href="../common/any-setting-common.html">
+
 <link rel="import" href="./logis-setting-tab.html">
 <link rel="import" href="./logis-setting-pda.html">
 <link rel="import" href="./logis-setting-kiosk.html">
 
-<link rel="import" href="../../components/common/sound-player.html">
-
-<link rel="import" href="../../mixins/common/network-info-mixin.html">
-
 <!--
-  물류 > 공통 > 설정 화면
+  물류 > 공통 > 설정 공통 화면
 -->
 <dom-module id="logis-setting">
   <template>
@@ -40,7 +41,6 @@ Copyright © HatioLab Inc. All rights reserved.
       #device-combo {
         width: 20vw;
       }
-
       .version {
         font: 14px arial;
         color: white;
@@ -68,7 +68,7 @@ Copyright © HatioLab Inc. All rights reserved.
         <button id="login-btn" on-click="_moveToLogin">[[loginBtnLabel]]</button>
       </div>
 
-      <!--div class="version">[[version]]</div-->
+      <div class="version">[[version]]</div>
     </div>
 
     <sound-player></sound-player>
@@ -76,22 +76,36 @@ Copyright © HatioLab Inc. All rights reserved.
 
   <script>
     class LogisSetting extends Polymer.Element {
-      static get is() { return 'logis-setting' }
+      static get is() {
+        return 'logis-setting'
+      }
 
       static get properties() {
         return {
+          /**
+           * @description ? 
+           *********************
+           * @type {Boolean}
+           */
           visible: {
             type: Boolean,
             observer: '_visibleChanged'
           },
 
           /**
-           * @description label setup
+           * @description 로그인 라벨 
+           *********************
+           * @type {String}
            */
-          loginBtnLabel: { type: String, value: t('label.login') },
+          loginBtnLabel: {
+            type: String,
+            value: t('label.login')
+          },
 
           /**
            * @description 로그인 여부 flag
+           *********************
+           * @type {Boolean}
            */
           isNotLogin: {
             type: Boolean
@@ -99,6 +113,8 @@ Copyright © HatioLab Inc. All rights reserved.
 
           /**
            * @description 선택한 장비 유형
+           *********************
+           * @type {String}
            */
           deviceType: {
             type: String,
@@ -107,6 +123,8 @@ Copyright © HatioLab Inc. All rights reserved.
 
           /**
            * @description 언어 리스트
+           *********************
+           * @type {String}
            */
           locales: {
             type: Array,
@@ -123,13 +141,20 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * @description 개발모드 여부 flag
+           * @description 개발모드 여부
            * isDevMode에 의해 장비 변경 콤보 박스의 출력 여부를 결정
+           *********************
+           * @type {Boolean}
            */
           isDevMode: {
             type: Boolean
           },
 
+          /**
+           * @description 애플리케이션 버전 
+           *********************
+           * @type {String}
+           */
           version: {
             type: String,
             computed: '_computeVersion()'
@@ -143,6 +168,20 @@ Copyright © HatioLab Inc. All rights reserved.
         ]
       }
 
+      /**
+       * @description lifecycle
+       *********************
+       */
+      connectedCallback() {
+        super.connectedCallback();
+        this.commonSetting = this.$['common-setting'];
+      }
+
+      /**
+       * @description ?
+       *********************
+       * @param {Boolean} visible
+       */
       _visibleChanged(visible) {
         if (visible) {
           var settingPda = this.shadowRoot.querySelector('logis-setting-pda')
@@ -152,11 +191,10 @@ Copyright © HatioLab Inc. All rights reserved.
         }
       }
 
-      connectedCallback() {
-        super.connectedCallback();
-        this.commonSetting = this.$['common-setting'];
-      }
-
+      /**
+       * @description 애플리케이션 버전 
+       *********************
+       */
       _computeVersion() {
         return window.CONST.VERSION;
       }
@@ -165,26 +203,29 @@ Copyright © HatioLab Inc. All rights reserved.
        * @description 설정 화면 initialize
        * 로그인 X => 공통 설정화면만 출력
        * 로그인 O => 공통 설정화면 & 장비에 따른 설정 화면 출력
+       *********************
+       * @param {Boolean} isNotLogin
+       * @param {String} deviceType
        */
       _initViews(isNotLogin, deviceType) {
-        if(isNotLogin === undefined) return;
+        if (isNotLogin === undefined) return;
 
         this._removePrevSetting();
 
-        if(isNotLogin) {
+        if (isNotLogin) {
           this._showLoginBtn();
+
         } else if (!isNotLogin && deviceType) {
           this._hideLoginBtn();
           let viewName;
-          switch(deviceType) {
+
+          switch (deviceType) {
             case 'TABLET':
               viewName = 'logis-setting-tab';
               break;
-
             case 'PDA':
               viewName = 'logis-setting-pda';
               break;
-
             case 'KIOSK':
               viewName = 'logis-setting-kiosk';
               break;
@@ -197,16 +238,19 @@ Copyright © HatioLab Inc. All rights reserved.
       /**
        * @description 이전에 initialize된 장비별 설정화면을 제거
        * 개발 모드에서 장비 변경시 이전 설정을 제거하기 위함
+       *********************
        */
       _removePrevSetting() {
-        if(this.setting) {
+        if (this.setting) {
           this._getContainer().removeChild(this.setting);
           this.setting = null;
         }
       }
 
       /**
-       * @description 장비 유형에 따른 설정 화면을 container에 append
+       * @description 장비 유형에 따른 설정 화면을 컨테이너에 추가
+       *********************
+       * @param {String} viewName
        */
       _appendSetting(viewName) {
         this.setting = document.createElement(viewName);
@@ -216,6 +260,8 @@ Copyright © HatioLab Inc. All rights reserved.
       /**
        * @description 개발 모드에서 장치 콤보의 값이 변경 되었을 경우
        * 화면을 재구성 하기 위해 localStorage 값 변경 및 reload를 실시
+       *********************
+       * @param {Object} event
        */
       _deviceChanged(event) {
         localStorage.setItem('setting.deviceType', JSON.stringify(event.currentTarget.selectedOptions[0].value));
@@ -225,28 +271,39 @@ Copyright © HatioLab Inc. All rights reserved.
       /**
        * @description localStorage에 설정되어 있는 deviceType의 값이 변경되면
        * 개발모드에서 사용하는 장치 변경 콤보에 현재 값을 표시함
+       *********************
+       * @param {String} deviceType
        */
       _deviceTypeChanged(deviceType) {
-        if(this.isDevMode) {
+        if (this.isDevMode) {
           const options = Array.from(this.$['device-combo'].options);
           options.forEach(opt => {
-            if(opt.value === deviceType) {
+            if (opt.value === deviceType) {
               opt.selected = true;
             }
           });
         }
       }
 
+      /**
+       * @description 로그인 버튼 표시
+       *********************
+       */
       _showLoginBtn() {
         this._getLoginBtn().hidden = false;
       }
 
+      /**
+       * @description 로그인 버튼 숨김
+       *********************
+       */
       _hideLoginBtn() {
         this._getLoginBtn().hidden = true;
       }
 
       /**
        * @description 설정 화면이 들어가는 컨테이너 리턴
+       *********************
        */
       _getContainer() {
         return this.$['container'];
@@ -254,6 +311,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description 버튼 컨테이너 리턴
+       *********************
        */
       _getBtnContainer() {
         return this.$['button-container'];
@@ -261,6 +319,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description 로그인 버튼 리턴
+       *********************
        */
       _getLoginBtn() {
         return this.$['login-btn'];
@@ -270,6 +329,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @description 로그인 되지 않은 상태일 때 활성화 되는
        * 로그인 화면으로 이동 버튼 click event halder
        * 로그인 화면으로 이동함
+       *********************
        */
       _moveToLogin() {
         this.commonSetting.saveSetting();
@@ -282,6 +342,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * 관리 도메인의 주소가 유효한지 & 현재 선택한 사이트 도메인에 로그인 되어 있는지를 확인함
        * 관리 도메인의 주소가 유효하며 사이트 도메인에 정상 로그인 된 상태일 때 호출 됨
        * session-responsed 이벤트를 발생시키고 operato-logis-app의 event handler를 통해 화면상 필요한 작업을 수행함
+       *********************
        */
       _sessionResponseHandler(event) {
         this.dispatchEvent(new CustomEvent('session-responsed', {
@@ -300,6 +361,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * 관리 도메인의 주소가 유효한지 & 현재 선택한 사이트 도메인에 로그인 되어 있는지를 확인함
        * 관리 도메인의 주소가 유효하지만 사이트 도메인에 로그인하지 않은 상태 일 때 호출 됨
        * session-unauthorized 이벤트를 발생시키고 operato-logis-app의 event handler를 통해 로그인 화면으로 이동함
+       *********************
        */
       _sessionUnauthHandler() {
         this.dispatchEvent(new CustomEvent('session-unauthorized'));
@@ -310,28 +372,30 @@ Copyright © HatioLab Inc. All rights reserved.
        * 로그인 X => 공통 설정만 저장
        * 로그인 O => 공통 설정 및 장치에 따른 설정 저장
        * localStorage에 저장된 값을 통해 화면을 다시 구성하기 위해 reload
+       *********************
        */
       saveSetting() {
-        if(this.isNotLogin || this.isNotLogin === undefined) {
+        if (this.isNotLogin || this.isNotLogin === undefined) {
           this.commonSetting.saveSetting();
           this.reloadApp();
         } else if (!this.isNotLogin) {
           this.commonSetting.saveSetting();
           this.setting.saveSetting().then(() => {
-            this.reloadApp();
-          })
-          .catch(error => {
-            let title = error.detail ? error.detail.code : 'Error';
-            let message = error.detail ? error.detail.msg : 'Error occured while saving setting.';
-            this._showErrorMessage(title, message, () => {
-              location.hash = '/logis_setting'
+              this.reloadApp();
+            })
+            .catch(error => {
+              let title = error.detail ? error.detail.code : 'Error';
+              let message = error.detail ? error.detail.msg : 'Error occured while saving setting.';
+              this._showErrorMessage(title, message, () => {
+                location.hash = '/logis_setting'
+              });
             });
-          });
         }
       }
 
       /**
        * @description 에러 메시치 출력 공통 method
+       *********************
        */
       _showErrorMessage(title, message, confirmCallback) {
         openAlert({
@@ -341,6 +405,10 @@ Copyright © HatioLab Inc. All rights reserved.
         });
       }
 
+      /**
+       * @description 세션 체크 
+       *********************
+       */
       checkSession() {
         this.commonSetting._checkDomainSiteSession();
       }
@@ -353,7 +421,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * 없을 경우 리로드
        */
       reloadApp() {
-        if('CacheClear' in window) {
+        if ('CacheClear' in window) {
           window.CacheClear(() => {
             location.reload(true);
           });

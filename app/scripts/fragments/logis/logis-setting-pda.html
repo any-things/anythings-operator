@@ -6,7 +6,7 @@ Copyright © HatioLab Inc. All rights reserved.
 <link rel="import" href="../../../bower_components/polymer/polymer-element.html">
 
 <!--
-  물류 > PDA > 설정 화면
+  물류 > PDA > PDA 설정 화면
 -->
 <dom-module id="logis-setting-pda">
   <template>
@@ -126,7 +126,9 @@ Copyright © HatioLab Inc. All rights reserved.
 
   <script>
     class LogisSettingPda extends LoigsSettingMixin(Polymer.Element) {
-      static get is() { return 'logis-setting-pda' }
+      static get is() {
+        return 'logis-setting-pda'
+      }
 
       static get properties() {
         return {
@@ -252,29 +254,29 @@ Copyright © HatioLab Inc. All rights reserved.
       saveSetting() {
         return new Promise((resolve, reject) => {
           this.updateSetting().then(() => {
-            // 호기 코드 값 저장
-            this._setLocalStorage(this.regionCodeLSKey, this._getRegionCombo().selectedOptions[0].value);
-            // 호기 명 값 저장
-            this._setLocalStorage(this.regionNameLSKey, this._getRegionCombo().selectedOptions[0].innerText);
-            // 작업 존 값 저장
-            this._setLocalStorage(this.zoneCodeLSKey, this._getZoneCombo().selectedOptions[0].value);
-            // 작업 유형 값 저장
-            this._setLocalStorage(this.jobNameLSKey, this._getJobCombo().selectedOptions[0].value);
-            // 작업 위치 값 저장
-            this._setLocalStorage(this.workLocLSKey, this._getSelectedOpt(this._getWorkLocationOpts()).value);
-            // 작업 위치 라벨 저장
-            this._setLocalStorage(this.workLocNameLSKey, this._getSelectedOpt(this._getWorkLocationOpts()).getAttribute('work-loc-name'));
-            // 송장 번호 표시를 위한 필드 문자 제한 수
-            const invoiceFieldSubstr = parseInt(this._getInvoiceFieldSubstrInput().value);
-            this._setLocalStorage(this.invoiceFieldSubstrLSKey, invoiceFieldSubstr > 0 ? invoiceFieldSubstr : 0);
-            // 연속 스캔 허용 값 저장
-            const contiScanAllowed = this._getSelectedOpt(this._getContinousScanAllowedOpts()).value;
-            this._setLocalStorage(this.continousScanAllowedLSKey, contiScanAllowed == 'true');
-            resolve();
-          })
-          .catch(error => {
-            reject(error);
-          })
+              // 호기 코드 값 저장
+              this._setLocalStorage(this.regionCodeLSKey, this._getRegionCombo().selectedOptions[0].value);
+              // 호기 명 값 저장
+              this._setLocalStorage(this.regionNameLSKey, this._getRegionCombo().selectedOptions[0].innerText);
+              // 작업 존 값 저장
+              this._setLocalStorage(this.zoneCodeLSKey, this._getZoneCombo().selectedOptions[0].value);
+              // 작업 유형 값 저장
+              this._setLocalStorage(this.jobNameLSKey, this._getJobCombo().selectedOptions[0].value);
+              // 작업 위치 값 저장
+              this._setLocalStorage(this.workLocLSKey, this._getSelectedOpt(this._getWorkLocationOpts()).value);
+              // 작업 위치 라벨 저장
+              this._setLocalStorage(this.workLocNameLSKey, this._getSelectedOpt(this._getWorkLocationOpts()).getAttribute('work-loc-name'));
+              // 송장 번호 표시를 위한 필드 문자 제한 수
+              const invoiceFieldSubstr = parseInt(this._getInvoiceFieldSubstrInput().value);
+              this._setLocalStorage(this.invoiceFieldSubstrLSKey, invoiceFieldSubstr > 0 ? invoiceFieldSubstr : 0);
+              // 연속 스캔 허용 값 저장
+              const contiScanAllowed = this._getSelectedOpt(this._getContinousScanAllowedOpts()).value;
+              this._setLocalStorage(this.continousScanAllowedLSKey, contiScanAllowed == 'true');
+              resolve();
+            })
+            .catch(error => {
+              reject(error);
+            })
         });
       }
 
@@ -289,7 +291,7 @@ Copyright © HatioLab Inc. All rights reserved.
           const zoneCombo = this._getZoneCombo()
           const zoneCode = zoneCombo.selectedOptions.length === 1 ? zoneCombo.selectedOptions[0].value : null;
 
-          if(!regionCode || !zoneCode) {
+          if (!regionCode || !zoneCode) {
             throw {
               detail: {
                 code: t('error.SETTING_ERROR'),
@@ -299,10 +301,11 @@ Copyright © HatioLab Inc. All rights reserved.
           }
 
           const updateSettingAjax = this._getUpdateSettingAjax();
-          updateSettingAjax.curl = `/${this.deviceType.toLowerCase()}/update/setting`
+          updateSettingAjax.curl = `/${this.deviceType.toLowerCase()}s/update/setting`
           updateSettingAjax.params = {
-            region_cd: regionCode,
-            equip_zone_cd: zoneCode
+            equip_type: 'Rack',
+            equip_cd: regionCode,
+            station_cd: zoneCode
           };
 
           updateSettingAjax.addEventListener('sys-ajax-response', () => {
@@ -340,9 +343,9 @@ Copyright © HatioLab Inc. All rights reserved.
       _setContinousScanDefaultValue() {
         const continousScanOpts = this._getContinousScanAllowedOpts();
 
-        if(this.continousScanAllowed) {
+        if (this.continousScanAllowed) {
           continousScanOpts.forEach(continousScanOpt => {
-            if(this.continousScanAllowed.toString() === continousScanOpt.value) {
+            if (this.continousScanAllowed.toString() === continousScanOpt.value) {
               continousScanOpt.checked = true;
             }
           });
@@ -351,7 +354,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
       resetRegionInfo() {
         // 호기 코드 값 저장
-        if(this.$['job-combo'].value != 'QPS' || this.jobName != 'QPS') {
+        if (this.$['job-combo'].value != 'QPS' || this.jobName != 'QPS') {
           var regionCd = JSON.parse(localStorage.getItem(this.regionCodeLSKey))
           var regionNm = JSON.parse(localStorage.getItem(this.regionNameLSKey))
 
@@ -390,11 +393,11 @@ Copyright © HatioLab Inc. All rights reserved.
        ******************
        */
       _hiddenRegion() {
-        if(this._getJobCombo().selectedOptions.length > 0) {
+        if (this._getJobCombo().selectedOptions.length > 0) {
           this.jobName = this._getJobCombo().selectedOptions[0].value;
         }
 
-        if(this.$['job-combo'].value == 'QPS' || this.jobName == 'QPS') {
+        if (this.$['job-combo'].value == 'QPS' || this.jobName == 'QPS') {
           this.$['zone'].style.display = 'none';
           this.$['region'].style.display = 'none';
           this.$['work-loc'].style.display = 'none';
