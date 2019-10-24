@@ -22,8 +22,8 @@ Copyright © HatioLab Inc. All rights reserved.
         border-radius: 12px;
       }
 
-      #status img[active] {
-        background-color: rgba(0, 0, 0, .3);
+      #status img:active {
+        background-color: rgba(0, 0, 0, .2);
         border-radius: 7px;
       }
 
@@ -34,7 +34,7 @@ Copyright © HatioLab Inc. All rights reserved.
       #prod-info {
         display: flex;
         flex-direction: row;
-        background-color: #5a6378;
+        background-color: rgba(255,255,255, .1);
         padding: 10px 20px;
         border-radius: 12px;
         color: rgba(255, 255, 255, .8);
@@ -97,6 +97,7 @@ Copyright © HatioLab Inc. All rights reserved.
       #status #chart {
         font-size: 1.5rem;
         font-weight: bold;
+        color: #333;
       }
 
       #status #chart span {
@@ -120,7 +121,7 @@ Copyright © HatioLab Inc. All rights reserved.
         display: flex;
         flex: 1;
         flex-direction: column;
-        margin-bottom: 15px;
+        margin-top: 20px;
       }
 
       #left-section,
@@ -129,8 +130,12 @@ Copyright © HatioLab Inc. All rights reserved.
         flex: 1;
         display: grid;
         grid-template-columns: auto 1fr;
-        margin-left: 7.5px;
-        margin-right: 7.5px;
+        /* margin-left: 7.5px; */
+        /* margin-right: 7.5px; */
+      }
+
+      #right-section{
+        margin-top: 15px;
       }
 
       #picked-qty,
@@ -138,6 +143,8 @@ Copyright © HatioLab Inc. All rights reserved.
         text-align: right;
         font-size: .5rem;
         line-height: 1.2;
+        color: #333;
+        font-weight: bold;
       }
 
       #picked-qty span,
@@ -165,16 +172,18 @@ Copyright © HatioLab Inc. All rights reserved.
         background: #90cc5d;
         background: linear-gradient(to bottom, #90cc5d 0%, #5a9802 100%);
         border-top: .06rem solid #cdff9a;
-        border-bottom: .2rem solid #2e7b00;
+        /* border-bottom: .2rem solid #2e7b00; */
         border-left: none;
         border-right: none;
         border-radius: 12px;
-        margin: 15px 0;
-        padding: .3rem;
+        /* margin: 15px 0;
+        padding: .3rem; */
+        padding: 22px 10px;
         color: #fff;
         text-shadow: 0px .03rem .03rem rgba(0, 0, 0, 0.4);
         font-size: 1rem;
         outline: 0;
+        margin-right: 15px;
       }
 
       button:active {
@@ -243,10 +252,13 @@ Copyright © HatioLab Inc. All rights reserved.
         border-radius: var(--things-default-border-radius);
         margin: 5px;
         text-align: right;
+        padding: 7px;
+        font-size: 23px;
+        font-weight: bold;
       }
 
       .bar-chart #progress-bar {
-        background-color: #01c9c6
+        background-color: #3f89c9;
       }
     </style>
   </template>

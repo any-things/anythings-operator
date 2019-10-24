@@ -18,17 +18,18 @@ Copyright © HatioLab Inc. All rights reserved.
       }
       menu-tile{
         display:block;
-        margin-bottom:5px;padding:5px 0 15px 0;
-        border-bottom: 1px solid rgba(0,0,0,.2);
+        margin-bottom:5px;
+        padding:5px;
+        /* border-bottom: 1px solid rgba(0,0,0,.2); */
         background: rgba(0,0,0,.2);
         background: linear-gradient(to bottom,#312e2e 20%,#252222 100%);
         text-align:center;
         font-size:.4rem;
         color:rgba(255,255,255,.5);
       }
-      menu-tile[active]{
+      menu-tile:active{
         background-color:var(--things-secondary-background-color);
-        border:1px solid rgba(0,0,0,.2);border-width:1px 0;
+        /* border:1px solid rgba(0,0,0,.2);border-width:1px 0; */
         color:rgba(255,255,255,1);
       }
       menu-tile img{
@@ -37,7 +38,7 @@ Copyright © HatioLab Inc. All rights reserved.
         width:2.5rem;
         opacity:.8;
       }
-      menu-tile[active] img{
+      menu-tile:active img{
         opacity:1
       }
     </style>
