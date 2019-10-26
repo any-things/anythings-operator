@@ -34,17 +34,29 @@ Copyright © HatioLab Inc. All rights reserved.
       on-sys-ajax-response="_ajaxResponsed">
     </sys-ajax>
 
-    <!-- Input Ajax -->
-    <input id="input" max-length="[[maxLength]]" on-keypress="_keypressHandler"
-      on-input="_valueChanged" hidden="[[hidden]]" on-blur="_onValueBlur">
+    <!-- Input Field -->
+    <input 
+      id="input" 
+      max-length="[[maxLength]]" 
+      on-keypress="_keypressHandler"
+      on-input="_valueChanged" 
+      hidden="[[hidden]]" 
+      on-blur="_onValueBlur">
   </template>
 
   <script>
     class AutoPopupInput extends BarcodeScannerMixin(Polymer.Element) {
-      static get is() { return 'auto-popup-input' }
+      static get is() {
+        return 'auto-popup-input'
+      }
 
       static get properties() {
         return {
+          /**
+           * @description 자동 포커스 시간 (ms)
+           **********************
+           * @type {Number}
+           */
           focusTimeout: {
             type: Number,
             value: 2000
@@ -52,7 +64,9 @@ Copyright © HatioLab Inc. All rights reserved.
 
           /**
            * @description 컴포넌트 hidden
+           ***********************
            * @requires false
+           * @type {Boolean}
            */
           hidden: {
             type: Boolean,
@@ -61,23 +75,29 @@ Copyright © HatioLab Inc. All rights reserved.
 
           /**
            * @description 선택 항목들을 조회 하기 위한 url
+           ***********************
            * @requires true
+           * @type {String}
            */
           resourceUrl: {
             type: String
           },
 
           /**
-          * @description 선택 항목들을 조회 할 때 포함 시킬 query string
-          * @requires false
-          */
+           * @description 선택 항목들을 조회 할 때 포함 시킬 query string
+           ***********************
+           * @requires false
+           * @type {Object}
+           */
           params: {
             type: Object
           },
 
           /**
            * @description 복수의 항목이 조회 되었을 경우 팝업에 나타나는 title
+           ***********************
            * @requires false
+           * @type {Number}
            */
           popupTitle: {
             type: String
@@ -86,7 +106,9 @@ Copyright © HatioLab Inc. All rights reserved.
           /**
            * @description 조회 결과에 접근하기 위한 key값
            * @example response의 구조가 { items: [...], total: 150}과 같을 경우 값을 items로 설정함
+           ***********************
            * @requires false
+           * @type {String}
            */
           accessKey: {
             type: String
@@ -94,6 +116,8 @@ Copyright © HatioLab Inc. All rights reserved.
 
           /**
            * @description 팝업에 출력되는 버튼에 표시되는 텍스트의 key
+           ***********************
+           * @type {Number}
            */
           displayKey: {
             type: String,
@@ -102,6 +126,8 @@ Copyright © HatioLab Inc. All rights reserved.
 
           /**
            * @description input field에 입력되어 있는 value
+           ***********************
+           * @type {String}
            */
           value: {
             type: String,
@@ -110,6 +136,8 @@ Copyright © HatioLab Inc. All rights reserved.
 
           /**
            * @description 인풋 박스 글자 수 제한
+           ***********************
+           * @type {Number}
            */
           maxLength: {
             type: Number
@@ -129,19 +157,27 @@ Copyright © HatioLab Inc. All rights reserved.
 
           /**
            * @description 키보드 숨김
+           ***********************
+           * @type {Boolean}
            */
           hideKeyboard: {
             type: Boolean,
             observer: '_hideKeyboardChanged'
           },
 
+          /**
+           * @description 매핑 코드 유형 
+           ***********************
+           * @type {String}
+           */
           mappingCodeType: {
             type: String
           },
 
           /**
-           * _onValueBlur event handler를 통해 focus 고정을 회피하기 위한
-           * property
+           * @description _onValueBlur event handler를 통해 focus 고정을 회피하기 위한 property
+           ************************
+           * @type {Boolean}
            */
           allowedFocusOut: {
             type: Boolean,
@@ -152,9 +188,11 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description 키보드 숨김 이벤트 변경시
+       *************************
+       * @param {Boolean} isHideKeyboard
        */
       _hideKeyboardChanged(isHideKeyboard) {
-        if(isHideKeyboard) {
+        if (isHideKeyboard) {
           this.$['input'].setAttribute('barcode', '');
         } else {
           this.$['input'].removeAttribute('barcode');
@@ -166,11 +204,13 @@ Copyright © HatioLab Inc. All rights reserved.
        * 입력한 키의 코드가 13 (enter 입력)이고 input에 값이 있을 경우 _triggerAjax를 호출함
        * input에 입력한 값이 없을 경우 alert
        * customInputValidation이 정의 되어 있다면 해당 함수를 호출
+       **************************
+       * @param {Object} event
        */
       _keypressHandler(event) {
-        if(event.charCode === 13) {
-          if(event.currentTarget.value) {
-            if(this.customInputValidation && this.customInputValidation === 'function') this.customAjaxHandler(event.currentTarget.value);
+        if (event.charCode === 13) {
+          if (event.currentTarget.value) {
+            if (this.customInputValidation && this.customInputValidation === 'function') this.customAjaxHandler(event.currentTarget.value);
             this._triggerAjax();
           } else {
             openAlert({
@@ -190,6 +230,7 @@ Copyright © HatioLab Inc. All rights reserved.
        *    1) 존재한다면 본 컴퍼넌트에서 요청에 필요한 설정을 진행하지 않고
        *    customAjaxHandler를 통해 input, ajax 엘리먼트에 대한 핸들링을 수행한 뒤 request
        *    2) 존재하지 않으면 _replaceInputValue를 호출하고 해당 함수를 통해 ajax 엘리먼트에 대한 핸들링 수행 한 뒤 request
+       ***************************
        */
       _triggerAjax() {
         const ajax = this.$['ajax'];
@@ -203,12 +244,12 @@ Copyright © HatioLab Inc. All rights reserved.
           cancelable: true
         });
 
-        if(this.dispatchEvent(event)) {
+        if (this.dispatchEvent(event)) {
           if (this.mappingCodeType === 'location' || this.mappingCodeType === 'mpi') {
             return;
           }
 
-          if(this.resourceUrl) {
+          if (this.resourceUrl) {
             this._replaceInputValue(ajax);
           } else {
             throw new Error('resourceUrl is not defined');
@@ -219,10 +260,12 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description 서버로의 조회 요청을 수행하기 전 input에 입력한 값과 resourceUrl과 params의 :inputValue 값을 치환
+       ***************************
+       * @param {Object} ajax
        */
       _replaceInputValue(ajax) {
         ajax.curl = this.resourceUrl.replace(':inputValue', this.$['input'].value);
-        if(this.params) {
+        if (this.params) {
           let strParams = JSON.stringify(this.params);
           ajax.customParams = JSON.parse(strParams.replace(':inputValue', this.$['input'].value));
         }
@@ -235,35 +278,39 @@ Copyright © HatioLab Inc. All rights reserved.
        * 1. 조회 결과가 없다면 alert
        * 2. 1) 조회 결과가 복수라면 _openPopup을 통해 팝업 출력
        *    2) 조회 결과가 단수라면 item-selected 이벤트 출력
+       ***************************
+       * @param {Object} event
        */
       _ajaxResponsed(event) {
         let data = null;
 
-        if(this.accessKey) {
+        if (this.accessKey) {
           data = event.detail[this.accessKey];
         } else {
           data = event.detail;
         }
 
-        if(Array.isArray(data) && data.length === 0 || !data || Object.keys(data).length === 0) {
+        if (Array.isArray(data) && data.length === 0 || !data || Object.keys(data).length === 0) {
           document.dispatchEvent(new CustomEvent('show-toast', {
-              detail: {
-                type: t('error.VALIDATION_ERROR'),
-                message: t('text.cant_find_result_by_input')
-              }
+            detail: {
+              type: t('error.VALIDATION_ERROR'),
+              message: t('text.cant_find_result_by_input')
+            }
           }));
           this.select();
           return;
         }
 
-        if(data.length > 1) {
+        if (data.length > 1) {
           this._openPopup(data);
         } else {
-          if(Array.isArray(data)) {
+          if (Array.isArray(data)) {
             data = data[0];
           }
 
-          this.dispatchEvent(new CustomEvent('item-selected', { detail: data }));
+          this.dispatchEvent(new CustomEvent('item-selected', {
+            detail: data
+          }));
         }
       }
 
@@ -272,6 +319,8 @@ Copyright © HatioLab Inc. All rights reserved.
        * this.displayKey를 바탕으로 (기본값 = name) 화면에 나타날 버튼의 텍스트를 결정함
        * this.popupTitle을 통해 팝업의 상단에 나타날 title을 결정함
        * popup에서 버튼 클릭을 통해 대상 item이 결정되면 closeCallback을 통해 item-selected 이벤트를 발생 시킴
+       ***************************
+       * @param {Object} data
        */
       _openPopup(data) {
         let popup = document.createElement('auto-list-popup')
@@ -286,7 +335,7 @@ Copyright © HatioLab Inc. All rights reserved.
             height: 'fit',
             title: this.popupTitle,
             closeCallback: () => {
-              if(popup.selectedItem) {
+              if (popup.selectedItem) {
                 this.dispatchEvent(new CustomEvent('item-selected', {
                   detail: popup.selectedItem
                 }));
@@ -298,18 +347,26 @@ Copyright © HatioLab Inc. All rights reserved.
         }))
       }
 
+      /**
+       * @description on value blur
+       ***************************
+       * @param {Object} e
+       */
       _onValueBlur(e) {
-        if(this.allowedFocusOut) return;
+        if (this.allowedFocusOut) {
+          var id = e.currentTarget.id;
+          var me = this;
 
-        var id = e.currentTarget.id;
-        var me = this;
-        setTimeout(() => {
-          me.$[id].focus()
-        }, me.focusTimeout);
+          setTimeout(() => {
+            me.$[id].focus()
+          }, me.focusTimeout);
+        }
       }
 
       /**
        * @description input event handler
+       ***************************
+       * @param {Object} event
        */
       _valueChanged(event) {
         this.value = event.currentTarget.value;
@@ -317,6 +374,8 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description value 값 설정
+       ***************************
+       * @param {String} value
        */
       _setInputValue(value) {
         this.$['input'].value = value;
@@ -324,6 +383,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description input으로 focus 함수를 호출
+       ***************************
        */
       focus() {
         this.$['input'].focus();
@@ -331,6 +391,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description input의 select 함수를 호출
+       ***************************
        */
       select() {
         this.$['input'].select();

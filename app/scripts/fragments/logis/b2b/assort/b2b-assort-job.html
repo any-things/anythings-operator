@@ -9,7 +9,6 @@ Copyright © HatioLab Inc. All rights reserved.
 <link rel="import" href="../../../../components/logis/indicator-on-off-popup.html">
 <link rel="import" href="../../../../components/logis/adjust-qty-popup.html">
 
-<!-- 아래 out-assort-transaction 공통 컴포넌트로 교체 -->
 <link rel="import" href="./out-assort-transaction.html">
 
 <!--
@@ -115,16 +114,16 @@ Copyright © HatioLab Inc. All rights reserved.
       on-sys-ajax-response="_initialSetup">
     </sys-ajax>
 
-    <!-- MPI 점등 Ajax -->
+    <!-- 표시기 점등 Ajax -->
     <sys-ajax
-      id="mpi-on-ajax"
+      id="ind-on-ajax"
       method="PUT"
       content-type="application/json">
     </sys-ajax>
 
-    <!-- MPI 소등 Ajax -->
+    <!-- 표시기 소등 Ajax -->
     <sys-ajax
-      id="mpi-off-ajax"
+      id="ind-off-ajax"
       method="PUT"
       content-type="application/json">
     </sys-ajax>
@@ -195,7 +194,9 @@ Copyright © HatioLab Inc. All rights reserved.
 
   <script>
     class B2BAssortJob extends LogisMsgSubscribeMixin(Polymer.Element) {
-      static get is() { return 'b2b-assort-job' }
+      static get is() {
+        return 'b2b-assort-job'
+      }
 
       static get properties() {
         return {
@@ -325,7 +326,7 @@ Copyright © HatioLab Inc. All rights reserved.
                 display: t('label.cust_nm'),
                 fieldname: 'cust_nm_with_seq',
                 displayCallback: (value, rowData) => {
-                  if(rowData.input_seq) {
+                  if (rowData.input_seq) {
                     return `(${rowData.input_seq}) ${rowData.cust_nm}`;
                   } else {
                     return `${rowData.cust_nm}`;
@@ -339,7 +340,7 @@ Copyright © HatioLab Inc. All rights reserved.
                 },
                 columnWidth: '0.33fr',
                 displayCallback: (value, rowData) => {
-                  if(value) {
+                  if (value) {
                     var values = value.split('-');
                     return values.length >= 2 ? values[1] : value;
                   } else {
@@ -456,7 +457,7 @@ Copyright © HatioLab Inc. All rights reserved.
         super.connectedCallback();
 
         document.addEventListener(`alert-closed-at-${location.hash.replace('#/', '')}`, event => {
-          if(!event.detail.hasCallback) {
+          if (!event.detail.hasCallback) {
             this._initialSetup();
           }
         });
@@ -478,6 +479,7 @@ Copyright © HatioLab Inc. All rights reserved.
       /**
        * @description refresh button click event handler
        * 현재 호기, 존 정보를 바탕으로 표시기에 점등 되어 있는 작업 리스트를 화면에 출력함
+       ********************
        */
       _getCurrentJobList() {
         this.refresh();
@@ -495,9 +497,10 @@ Copyright © HatioLab Inc. All rights reserved.
         const list = event.detail.contentElements;
         let totalPickedQty = 0;
         let totalPickQty = 0;
+
         list.forEach(row => {
           const data = row.getData();
-          if(data.status && data.status === 'F' || data.status && data.status === 'B') {
+          if (data.status && data.status === 'F' || data.status && data.status === 'B') {
             row.classList.add('complete');
           } else if (data.status && data.status === 'C') {
             row.classList.add('canceled');
@@ -521,7 +524,7 @@ Copyright © HatioLab Inc. All rights reserved.
         this.totalPickQty = totalPickQty;
         let boxInQty = this.getBoxInQty();
 
-        if(!boxInQty || boxInQty <= 0) {
+        if (!boxInQty || boxInQty <= 0) {
           this.totalPickedBoxPcsQty = '0-' + totalPickQty;
           this.totalPickBoxPcsQty = '0-' + totalPickedQty;
 
@@ -541,7 +544,7 @@ Copyright © HatioLab Inc. All rights reserved.
       _calcBoxPcsQty(pcsQty, boxInQty) {
         var boxPcsStr = '';
 
-        if(!pcsQty || pcsQty == 0) {
+        if (!pcsQty || pcsQty == 0) {
           boxPcsStr = '0-0';
 
         } else {
@@ -555,6 +558,8 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description sku-barcd Input Box의 값을 리턴
+       *******************
+       * @return {Object} sku-barcd input-field
        */
       getSkuBarcode() {
         return this.$['sku-barcd'].value;
@@ -562,6 +567,8 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description sku-cd Input Box의 값을 리턴
+       *******************
+       * @return {Object} sku-cd input-field
        */
       getSkuCd() {
         return this.$['sku-cd'].value;
@@ -569,6 +576,8 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description com-cd Input Box의 값을 리턴
+       *******************
+       * @return {Object} com-cd input-field
        */
       getComCd() {
         return this.$['com-cd'].value;
@@ -576,6 +585,8 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description box-in-qty Input Box의 값을 리턴
+       *******************
+       * @return {Object} box-in-qty input-field
        */
       getBoxInQty() {
         var boxInQty = this.$['box-in-qty'].value;
@@ -614,7 +625,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} closeParam
        */
       refresh(closeParam) {
-        if(closeParam && closeParam.type === 'adjust-qty') {
+        if (closeParam && closeParam.type === 'adjust-qty') {
           const adjustPopup = document.createElement('adjust-qty-popup');
 
           setTimeout(() => {
@@ -628,7 +639,7 @@ Copyright © HatioLab Inc. All rights reserved.
           const comCd = this.getComCd();
           const skuCd = this.getSkuCd();
 
-          if(comCd && skuCd) {
+          if (comCd && skuCd) {
             const ajax = this.$['search-job-ajax'];
             const regionCd = LOGIS_UTIL.getRegionCd();
             const sideCd = LOGIS_UTIL.getSideCd();
@@ -645,7 +656,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Array} jobList
        */
       _jobListChanged(jobList) {
-        if(!jobList || !jobList.length) return;
+        if (!jobList || !jobList.length) return;
 
         // 1차 로케이션으로 소팅
         jobList.sort(function(a, b) {
@@ -672,6 +683,7 @@ Copyright © HatioLab Inc. All rights reserved.
           let zoneCd = LOGIS_UTIL.getZoneCd();
           inputAjax.curl = `/pda_process/input_sku/${regionCd}/${sideCd}/${zoneCd}/${comCd}/${skuCd}`;
           inputAjax.generateRequest();
+
         } catch (error) {
           openAlert({
             title: t('error.VALIDATION_ERROR'),
@@ -698,6 +710,7 @@ Copyright © HatioLab Inc. All rights reserved.
           const inspectAjax = this._getInspectAjax();
           inspectAjax.curl = `/pda_process/inspection_by_mpi/${regionCd}/${sideCd}/${zoneCd}/${comCd}/${skuCd}`
           inspectAjax.generateRequest();
+
         } catch (error) {
           openAlert({
             title: t('error.VALIDATION_ERROR'),
@@ -711,6 +724,8 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description 상품 투입을 위한 ajax 오브젝트 리턴
+       ******************
+       * @return {Object} input-sku-ajax
        */
       _getInputAjax() {
         return this.$['input-sku-ajax'];
@@ -718,6 +733,8 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description 검수 투입을 위한 ajax 오브젝트 리턴
+       ******************
+       * @return {Object} inspect-sku-ajax
        */
       _getInspectAjax() {
         return this.$['inspect-sku-ajax'];
@@ -725,11 +742,12 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description 상품 정보 조회 전 수행하는 validation
+       ******************
        */
       validateBeforeRequest() {
         let skuCd = this.getSkuCd();
 
-        if(!skuCd || skuCd.length < 4) {
+        if (!skuCd || skuCd.length < 4) {
           throw t('error.sku_barcd_invalid');
         }
       }
@@ -740,7 +758,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} jobResult
        */
       _jobResultChanged(jobResult) {
-        if(jobResult) {
+        if (jobResult) {
           this.$['relay-seq'].value = jobResult.input_seq;
           this.jobList = jobResult.items;
           this._initialSetup();
@@ -755,7 +773,7 @@ Copyright © HatioLab Inc. All rights reserved.
       _onAjaxErrorHandler(event) {
         var detail = event.detail ? event.detail : event.detail.body;
 
-        if(detail && detail.msg == 'already-input-sku') {
+        if (detail && detail.msg == 'already-input-sku') {
           openConfirm({
             title: t('text.checking_inspection'),
             message: t('text.check_inspection'),
@@ -781,14 +799,15 @@ Copyright © HatioLab Inc. All rights reserved.
         }
       }
 
-       /**
-        * @description 작업 처리를 위한 팝업을 표시
-        *******************
-        * @param {Object} event
-        */
+      /**
+       * @description 작업 처리를 위한 팝업을 표시
+       *******************
+       * @param {Object} event
+       */
       _showProcessPopup(event) {
         const status = event.detail.data.status;
-        if(status === 'P') {
+
+        if (status === 'P') {
           const popup = document.createElement('out-assort-transaction');
           const data = event.detail.data;
           popup.jobId = data.id;
@@ -798,6 +817,7 @@ Copyright © HatioLab Inc. All rights reserved.
           popup.pickQty = data.pick_qty;
           popup.totalQty = data.total_qty;
           LOGIS_UTIL.showPopup(t('title.job_select'), popup, '70%', 'fit', null, this.refresh.bind(this));
+
         } else if (status !== 'F' && status !== 'P') {
           openAlert({
             title: t('error.VALIDATION_ERROR'),
@@ -811,15 +831,17 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description currentMode switching button click event handler
+       ******************
        */
       _switchMode() {
         this.currentMode = this.currentMode === 'input-mode' ? 'inspection-mode' : 'input-mode';
         this._initialSetup();
       }
 
-       /**
-        * @description 버튼 표시를 위한 팝업을 표시
-        */
+      /**
+       * @description 버튼 표시를 위한 팝업을 표시
+       ******************
+       */
       _showButtonsPopup() {
         const buttonPopup = document.createElement('indicator-on-off-popup');
         buttonPopup.addEventListener('btn-click', event => {
@@ -839,13 +861,13 @@ Copyright © HatioLab Inc. All rights reserved.
         }))
       }
 
-       /**
-        * @description 버튼 표시 팝업 버튼을 클릭시
-        *******************
-        * @param {String} buttonId
-        */
+      /**
+       * @description 버튼 표시 팝업 버튼을 클릭시
+       *******************
+       * @param {String} buttonId
+       */
       _popupButtonClick(buttonId) {
-        switch(buttonId) {
+        switch (buttonId) {
           case 'mpi-on':
             this._mpiOnRequest();
             break;
@@ -860,6 +882,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description mpi 점등 버튼 클릭 이벤트 핸들러
+       ******************
        */
       _mpiOnRequest() {
         openConfirm({
@@ -880,6 +903,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description mpi 소등 버튼 클릭 이벤트 핸들러
+       ******************
        */
       _mpiOffRequest() {
         openConfirm({
@@ -900,6 +924,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description 투입 취소 버튼 이벤트 핸들러
+       ******************
        */
       _cancelInputRequest() {
         openConfirm({
@@ -917,20 +942,25 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description 표시기 점등을 위한 Ajax 오브젝트 리턴
+       ******************
+       * @return {Object} ind-on-ajax
        */
       _getMpiOnAjax() {
-        return this.$['mpi-on-ajax'];
+        return this.$['ind-on-ajax'];
       }
 
       /**
        * @description 표시기 소등을 위한 Ajax 오브젝트 리턴
+       ******************
+       * @return {Object} ind-off-ajax
        */
       _getMpiOffAjax() {
-        return this.$['mpi-off-ajax'];
+        return this.$['ind-off-ajax'];
       }
 
       /**
        * @description 화면의 정보를 모두 클리어
+       ******************
        */
       clearView() {
         this.$['sku-barcd'].value = '';
@@ -953,6 +983,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description 초기 셋업
+       ******************
        */
       _initialSetup() {
         this.$['sku-barcd']._initialSetup();

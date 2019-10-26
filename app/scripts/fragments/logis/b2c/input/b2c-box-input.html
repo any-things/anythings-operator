@@ -304,31 +304,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
     <div id="container">
       <div id="top-container">
-        <!-- chart begin -->
-        <!-- <div id="scene-board" class="chart-section"></div> -->
-        <!-- chart end -->
-
-        <!-- order status begin -->
-        <!-- <div class="order-section">
-          <div class="order1">
-            <span class="bigtitle">[[orderLabel]]</span>
-            <img src="./images/icon-dashboard.png">
-          </div>
-          <div class="order2">
-            <span class="proc">[[pickedLabel]]<b>[[orderPicked]]</b></span>
-            <span class="plan">[[pickingLabel]]<b>[[orderPicking]]</b></span>
-          </div>
-          <div class="order3">
-            <span class="smalltitle">SKU</span>
-            <span class="proc">[[pickedLabel]]<b>[[skuPicked]]</b></span>
-            <span class="plan">[[pickingLabel]]<b>[[skuPicking]]</b></span>
-          </div>
-          <div class="order4">
-            <span class="smalltitle">PCS</span>
-            <span class="proc">[[pickedLabel]]<b>[[pcsPicked]]</b></span>
-            <span class="plan">[[pickingLabel]]<b>[[pcsPicking]]</b></span>
-          </div>
-        </div> -->
+        <!-- 전체 진행율 -->
         <div id="proc-rate-total" class="chart-section">
           <div class="chart-row">
             <span>[[totalProcRateLabel]]</span>
@@ -336,6 +312,7 @@ Copyright © HatioLab Inc. All rights reserved.
             <span class="col-header">[[pickingLabel]]</span>
           </div>
 
+          <!-- 주문 진행율 -->
           <div class="chart-row">
             <div class="bar-chart">
               <span class="label">[[orderLabel]]</span>
@@ -349,6 +326,7 @@ Copyright © HatioLab Inc. All rights reserved.
             <span class="num-data">[[totalOrderPicking]]</span>
           </div>
 
+          <!-- SKU 진행율 -->
           <div class="chart-row">
             <div class="bar-chart">
               <span class="label">SKU</span>
@@ -362,6 +340,7 @@ Copyright © HatioLab Inc. All rights reserved.
             <span class="num-data">[[totalSkuPicking]]</span>
           </div>
 
+          <!-- Total 진행율 -->
           <div class="chart-row">
             <div class="bar-chart">
               <span class="label">Total</span>
@@ -375,9 +354,8 @@ Copyright © HatioLab Inc. All rights reserved.
             <span class="num-data">[[totalPcsPicking]]</span>
           </div>
         </div>
-        <!-- order status end -->
 
-        <!-- bucket status begin -->
+        <!-- 투입 가능 박스 수 -->
         <div class="bucket-section">
           <span class="bucket">
             <img src="./images/icon-greenbox.png">
@@ -385,9 +363,9 @@ Copyright © HatioLab Inc. All rights reserved.
           </span>
           <b>[[inputableBuckets]]</b>
         </div>
-        <!-- bucket status end -->
       </div>
 
+      <!-- 박스 투입 Input Field -->
       <div id="middle-container">
         <span id="label">
           <img src="./images/icon-barcode.png" />
@@ -402,6 +380,7 @@ Copyright © HatioLab Inc. All rights reserved.
         </button>
       </div>
 
+      <!-- 투입 박스 리스트 -->
       <item-list id="item-list" header="[[header]]" page="[[page]]" total="[[total]]" limit="[[limit]]" data="[[items]]"
         show-paginator on-data-list-click="showOrderItems" on-paginator-changed="_pageChanged">
       </item-list>
@@ -410,7 +389,9 @@ Copyright © HatioLab Inc. All rights reserved.
 
   <script>
     class B2CBoxInput extends Polymer.Element {
-      static get is() { return 'b2c-box-input' }
+      static get is() {
+        return 'b2c-box-input'
+      }
 
       static get properties() {
         return {
@@ -421,7 +402,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           bucketScanLabel: {
             type: String,
-            value: function () {
+            value: function() {
               return t('label.bucket_cd');
             }
           },
@@ -433,20 +414,20 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           refreshLabel: {
             type: String,
-            value: function () {
+            value: function() {
               return t('button.refresh');
             }
           },
 
           /**
-           * 투입 가능 버킷 수 라벨
+           * 투입 가능 박스 수 라벨
            ****************
            * @type {String}
            */
           inputableBucketLabel: {
             type: String,
-            value: function () {
-              return t('label.inputable_buckets');
+            value: function() {
+              return t('label.inputable_boxes');
             }
           },
 
@@ -457,7 +438,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           orderLabel: {
             type: String,
-            value: function () {
+            value: function() {
               return t('label.order');
             }
           },
@@ -479,7 +460,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           pickedLabel: {
             type: String,
-            value: function () {
+            value: function() {
               return t('label.picked_qty');
             }
           },
@@ -491,7 +472,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           pickingLabel: {
             type: String,
-            value: function () {
+            value: function() {
               return t('label.pick_qty');
             }
           },
@@ -557,10 +538,10 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
- * 토탈 주문 확정
- ****************
- * @type {Number}
- */
+           * 토탈 주문 확정
+           ****************
+           * @type {Number}
+           */
           totalOrderPicked: {
             type: Number,
             value: 0
@@ -637,7 +618,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 투입가능 버킷수
+           * 투입가능 박스수
            ****************
            * @type {Number}
            */
@@ -721,7 +702,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           header: {
             type: Array,
-            value: function () {
+            value: function() {
               return [{
                 display: t('label.input_seq'),
                 fieldname: 'input_seq',
@@ -887,17 +868,15 @@ Copyright © HatioLab Inc. All rights reserved.
         if (this.enableAutoRefresh) {
           try {
             this.refresh();
-          } catch (e) {
-          }
+          } catch (e) {}
         }
 
         let interval = 20 * 1000;
         try {
           interval = LOGIS_UTIL.getRefreshInterval();
-        } catch (e) {
-        }
+        } catch (e) {}
 
-        setTimeout(function () {
+        setTimeout(function() {
           this.startAutoRefresh();
         }.bind(this), interval);
       }
@@ -943,7 +922,10 @@ Copyright © HatioLab Inc. All rights reserved.
         // 4. Scene 화면 Fit
         this.chartScene.fit('both');
         // 5. 데이터 바인딩
-        this.chartScene.data = { progressRate: 0, gaugeRate: 0 };
+        this.chartScene.data = {
+          progressRate: 0,
+          gaugeRate: 0
+        };
       }
 
       /**

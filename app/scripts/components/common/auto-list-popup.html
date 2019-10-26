@@ -6,7 +6,7 @@ Copyright © HatioLab Inc. All rights reserved.
 <link rel="import" href="../../../bower_components/polymer/polymer-element.html">
 
 <!--
-  자동 리스트 팝업
+  자동 리스트 팝업 > 리스트를 출력하기 위한 팝업 (사용하는 측에서 리스트 데이터를 넘겨주면 이 화면에서 동적으로 추가해준다.)
 -->
 <dom-module id="auto-list-popup">
   <template>
@@ -47,8 +47,10 @@ Copyright © HatioLab Inc. All rights reserved.
       }
     </style>
 
+    <!-- 팝업의 내용을 채울 컨테이너 -->
     <div id="container"></div>
 
+    <!-- 팝업의 버튼들을 표시할 컨테이너 -->
     <div id="btn-container">
       <button id="close-btn" on-click="_closeDialog">[[closeBtnLabel]]</button>
     </div>
@@ -56,12 +58,16 @@ Copyright © HatioLab Inc. All rights reserved.
 
   <script>
     class AutoListPopup extends Polymer.Element {
-      static get is() { return 'auto-list-popup' }
+      static get is() {
+        return 'auto-list-popup'
+      }
 
       static get properties() {
         return {
           /**
-           * 화면에 출력될 대상 아이템 리스트
+           * @description 화면에 출력될 대상 아이템 리스트
+           **********************
+           * @type {Array}
            */
           items: {
             type: Array,
@@ -69,14 +75,18 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 화면에 출력될 대상 아이템의 텍스트
+           * @description 화면에 출력될 대상 아이템의 텍스트
+           **********************
+           * @type {String}
            */
           displayKey: {
             type: String,
           },
 
           /**
-           * 닫기 버튼 라벨
+           * @description 닫기 버튼 라벨
+           **********************
+           * @type {String}
            */
           closeBtnLabel: {
             type: String,
@@ -86,27 +96,31 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * items의 값이 변경되면 화면에 출력 대상들을 생성함
+       * @description items의 값이 변경되면 화면에 출력 대상들을 생성함
+       *********************
        */
       _itemsChanged(items) {
-        if (!items) {
-          return;
+        if (items) {
+          const container = this.$['container'];
+
+          items.forEach(item => {
+            const button = document.createElement('button');
+            button.innerText = this.buttonTxtCallback && typeof this.buttonTxtCallback === 'function' ? this.buttonTxtCallback(item) : item[this.displayKey];
+
+            button.onclick = event => {
+              this.selectedItem = item;
+              this._closeDialog();
+            }
+
+            container.append(button);
+          });
         }
-
-        const container = this.$['container'];
-        items.forEach(item => {
-          const button = document.createElement('button');
-          button.innerText = this.buttonTxtCallback && typeof this.buttonTxtCallback === 'function' ? this.buttonTxtCallback(item) : item[this.displayKey];
-
-          button.onclick = event => {
-            this.selectedItem = item;
-            this._closeDialog();
-          }
-
-          container.append(button);
-        })
       }
 
+      /**
+       * @description 팝업 닫기
+       *********************
+       */
       _closeDialog() {
         document.dispatchEvent(new CustomEvent('close-dialog'));
       }

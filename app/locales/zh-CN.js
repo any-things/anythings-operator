@@ -53,7 +53,7 @@ window.locales['zh-CN'] = {
   'label.region_nm': '机组名',
   'label.zone_cd': '作业区域',
   'label.order': '订单',
-  'label.inputable_buckets': '可投货桶数',
+  'label.inputable_boxes': '可投货桶数',
   'label.picked_qty': '实计',
   'label.picking_qty': '处理中',
   'label.pick_qty': '预计',
