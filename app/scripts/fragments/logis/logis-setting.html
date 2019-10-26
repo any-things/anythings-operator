@@ -9,8 +9,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
 <link rel="import" href="../../components/common/sound-player.html">
 
-<link rel="import" href="../common/any-setting-common.html">
-
+<link rel="import" href="./logis-setting-common.html">
 <link rel="import" href="./logis-setting-tab.html">
 <link rel="import" href="./logis-setting-pda.html">
 <link rel="import" href="./logis-setting-kiosk.html">
@@ -51,26 +50,31 @@ Copyright © HatioLab Inc. All rights reserved.
     </style>
 
     <div id="container">
-      <any-setting-common
+      <!-- 물류 공통 설정 화면 조각 -->
+      <logis-setting-common
         id="common-setting"
         locales="[[locales]]"
         on-session-responsed="_sessionResponseHandler"
         on-session-unauthorized="_sessionUnauthHandler">
-      </any-setting-common>
+      </logis-setting-common>
 
       <div id="button-container">
+        <!-- KIOSK, TABLET, PDA 설정 셀렉터 (개발 모드인 경우에만 활성화) -->
         <select id="device-combo" on-change="_deviceChanged" hidden$="[[!isDevMode]]">
           <option>TABLET</option>
           <option>PDA</option>
           <option>KIOSK</option>
         </select>
 
+        <!-- 로그인 버튼 -->
         <button id="login-btn" on-click="_moveToLogin">[[loginBtnLabel]]</button>
       </div>
 
+      <!-- 버전 정보 -->
       <div class="version">[[version]]</div>
     </div>
 
+    <!-- 경고음을 위한 사운드 플레이어 -->
     <sound-player></sound-player>
   </template>
 
@@ -83,7 +87,7 @@ Copyright © HatioLab Inc. All rights reserved.
       static get properties() {
         return {
           /**
-           * @description ? 
+           * @description ?
            *********************
            * @type {Boolean}
            */
@@ -93,7 +97,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * @description 로그인 라벨 
+           * @description 로그인 라벨
            *********************
            * @type {String}
            */
@@ -151,7 +155,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * @description 애플리케이션 버전 
+           * @description 애플리케이션 버전
            *********************
            * @type {String}
            */
@@ -192,7 +196,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * @description 애플리케이션 버전 
+       * @description 애플리케이션 버전
        *********************
        */
       _computeVersion() {
@@ -338,7 +342,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * @description any-setting-common은 현재 사용자가
+       * @description logis-setting-common은 현재 사용자가
        * 관리 도메인의 주소가 유효한지 & 현재 선택한 사이트 도메인에 로그인 되어 있는지를 확인함
        * 관리 도메인의 주소가 유효하며 사이트 도메인에 정상 로그인 된 상태일 때 호출 됨
        * session-responsed 이벤트를 발생시키고 operato-logis-app의 event handler를 통해 화면상 필요한 작업을 수행함
@@ -357,7 +361,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * @description any-setting-common은 현재 사용자가
+       * @description logis-setting-common은 현재 사용자가
        * 관리 도메인의 주소가 유효한지 & 현재 선택한 사이트 도메인에 로그인 되어 있는지를 확인함
        * 관리 도메인의 주소가 유효하지만 사이트 도메인에 로그인하지 않은 상태 일 때 호출 됨
        * session-unauthorized 이벤트를 발생시키고 operato-logis-app의 event handler를 통해 로그인 화면으로 이동함
@@ -369,8 +373,8 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description 저장 버튼 클릭 이벤트 핸들러
-       * 로그인 X => 공통 설정만 저장
-       * 로그인 O => 공통 설정 및 장치에 따른 설정 저장
+       * 로그인 이전 => 공통 설정만 저장
+       * 로그인 이후 => 공통 설정 및 장치에 따른 설정 저장
        * localStorage에 저장된 값을 통해 화면을 다시 구성하기 위해 reload
        *********************
        */
@@ -378,6 +382,7 @@ Copyright © HatioLab Inc. All rights reserved.
         if (this.isNotLogin || this.isNotLogin === undefined) {
           this.commonSetting.saveSetting();
           this.reloadApp();
+
         } else if (!this.isNotLogin) {
           this.commonSetting.saveSetting();
           this.setting.saveSetting().then(() => {
@@ -406,7 +411,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * @description 세션 체크 
+       * @description 세션 체크
        *********************
        */
       checkSession() {

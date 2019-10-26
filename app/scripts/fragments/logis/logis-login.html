@@ -12,12 +12,12 @@ Copyright © HatioLab Inc. All rights reserved.
 
 <link rel="import" href="../../mixins/common/things-encrypt.html">
 
-<link rel="import" href="./any-site-selector.html">
+<link rel="import" href="./logis-site-selector.html">
 
 <!--
-  공통 > 로그인 화면
+  물류 > 로그인 화면
 -->
-<dom-module id="any-login">
+<dom-module id="logis-login">
   <template>
     <style include="shared-styles">
       #login-form {
@@ -113,8 +113,10 @@ Copyright © HatioLab Inc. All rights reserved.
   </template>
 
   <script>
-    class AnyLogin extends mix(Polymer.Element).with(Things.Encrypt) {
-      static get is() { return 'any-login' }
+    class LogisLogin extends mix(Polymer.Element).with(Things.Encrypt) {
+      static get is() {
+        return 'logis-login'
+      }
 
       static get properties() {
         return {
@@ -158,7 +160,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} event
        */
       _handlerKeypress(event) {
-        if(event.charCode === 13) {
+        if (event.charCode === 13) {
           this._handleSubmit(event);
         }
       }
@@ -198,7 +200,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _handleSubmit(event) {
         event.preventDefault();
-        if(this.validateBeforeSubmit()) {
+        if (this.validateBeforeSubmit()) {
           this.$['submit-btn'].disabled = true;
           this.$['email-input'].value = btoa(this.getEmailInputValue());
           this.$['password-input'].value = this.sha256(this.getPasswordInputValue());
@@ -216,7 +218,7 @@ Copyright © HatioLab Inc. All rights reserved.
       validateBeforeSubmit() {
         let result = true;
 
-        if(!this.getEmailInputValue()) {
+        if (!this.getEmailInputValue()) {
           openAlert({
             title: this.loginFailureLabel,
             message: this.loginNotTypedLabel
@@ -244,13 +246,13 @@ Copyright © HatioLab Inc. All rights reserved.
         this.$['submit-btn'].disabled = false;
         const userInfo = event.currentTarget.request.lastResponse;
 
-        if(userInfo && userInfo.status && userInfo.status !== 'ok') {
+        if (userInfo && userInfo.status && userInfo.status !== 'ok') {
           this._checkUserStatus(userInfo);
           return;
         }
 
         let siteList = userInfo.site_list;
-        if(siteList && siteList.length > 1) {
+        if (siteList && siteList.length > 1) {
           this._showSiteSelector(siteList);
 
         } else if (siteList && siteList.length === 1) {
@@ -274,19 +276,26 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _checkUserStatus(userInfo) {
         const status = userInfo.status;
-        let title; let message;
+        let title;
+        let message;
 
-        switch(status) {
+        switch (status) {
           case 'password_change':
             title = t('title.password_need_change');
             message = t('text.ask_password_change');
-            openAlert({ title: title, message: message });
+            openAlert({
+              title: title,
+              message: message
+            });
             break;
 
           case 'password_expired':
             title = t('title.password_expired');
             message = t('text.ask_password_extend');
-            openAlert({ title: title, message: message });
+            openAlert({
+              title: title,
+              message: message
+            });
             break;
         };
       }
@@ -317,7 +326,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {String} siteList
        */
       _showSiteSelector(siteList) {
-        const siteSelector = document.createElement('any-site-selector');
+        const siteSelector = document.createElement('logis-site-selector');
         siteSelector.siteList = siteList;
 
         document.dispatchEvent(new CustomEvent('open-dialog', {
@@ -330,7 +339,7 @@ Copyright © HatioLab Inc. All rights reserved.
               siteSelector._getSiteSelectElement().focus();
             },
             closeCallback: () => {
-              if(siteSelector.selectedSiteUrl) {
+              if (siteSelector.selectedSiteUrl) {
                 this._reqSignIn(siteSelector.selectedSiteUrl, siteSelector.selectedDomainId);
               }
             }
@@ -413,7 +422,7 @@ Copyright © HatioLab Inc. All rights reserved.
       _handleResponseError(event) {
         this.$['submit-btn'].disabled = false;
         var response = event.detail.request.xhr.response
-        if(response) {
+        if (response) {
           openAlert({
             title: this.loginFailureLabel,
             message: response.msg ? response.msg : response.message
@@ -437,6 +446,6 @@ Copyright © HatioLab Inc. All rights reserved.
       }
     }
 
-    customElements.define(AnyLogin.is, AnyLogin);
+    customElements.define(LogisLogin.is, LogisLogin);
   </script>
 </dom-module>

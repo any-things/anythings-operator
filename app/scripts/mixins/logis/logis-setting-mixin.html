@@ -286,7 +286,7 @@ Copyright © HatioLab Inc. All rights reserved.
        *******************************
        */
       _setBrokerAddress(response) {
-        if(response && response.detail) {
+        if (response && response.detail) {
           localStorage.setItem('setting.brokerAddress', response.detail.value);
         }
       }
@@ -306,18 +306,18 @@ Copyright © HatioLab Inc. All rights reserved.
        *******************************
        */
       _setBrokerSite(response) {
-        if(response && response.detail) {
+        if (response && response.detail) {
           localStorage.setItem('setting.brokerSite', response.detail.value);
         }
       }
 
       /**
-       * @description 호기 리스트를 조회
+       * @description 랙 리스트를 조회
        *******************************
        * @return
        */
       _getRegionItems() {
-        const regionItemAjax = this._getRegionItemAjax();
+        const regionItemAjax = this._getRackItemAjax();
         regionItemAjax.curl = `/racks?limit=1000`;
         regionItemAjax.baseUrl = this._getLocalStorage('setting.baseUrl');
         regionItemAjax.generateRequest();
@@ -330,7 +330,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _getZoneItems() {
         const selectedOption = this._getRegionCombo().selectedOptions[0];
-        if(selectedOption && selectedOption.value) {
+        if (selectedOption && selectedOption.value) {
           const regionCode = selectedOption.value;
           const zoneItemAjax = this._getZoneItemAjax();
           zoneItemAjax.curl = `/racks/${regionCode}/stations`;
@@ -356,7 +356,7 @@ Copyright © HatioLab Inc. All rights reserved.
        *******************************
        */
       _clearCombo(combo) {
-        while(combo.childElementCount) {
+        while (combo.childElementCount) {
           combo.removeChild(combo.firstElementChild);
         }
       }
@@ -390,11 +390,11 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * @description 호기 리스트 Ajax
+       * @description 랙 리스트 조회 Ajax
        *******************************
        */
-      _getRegionItemAjax() {
-        return this.$['region-items-ajax'];
+      _getRackItemAjax() {
+        return this.$['rack-items-ajax'];
       }
 
       /**
@@ -465,7 +465,7 @@ Copyright © HatioLab Inc. All rights reserved.
       _setWorkLocDefaultValue() {
         const workLocationOpts = this._getWorkLocationOpts();
         workLocationOpts.forEach(workLocationOpt => {
-          if(this.workLoc === workLocationOpt.value) {
+          if (this.workLoc === workLocationOpt.value) {
             workLocationOpt.checked = true;
           }
         });
@@ -479,10 +479,10 @@ Copyright © HatioLab Inc. All rights reserved.
         const regionCombo = this._getRegionCombo();
         this._clearCombo(regionCombo);
 
-        if(event && event.detail) {
+        if (event && event.detail) {
           event.detail.items.forEach(region => {
             const option = new Option(region.rack_nm, region.rack_cd);
-            if(this.regionCode === region.rack_cd) {
+            if (this.regionCode === region.rack_cd) {
               option.selected = true;
               this.regionName = region.rack_nm;
             }
@@ -491,7 +491,7 @@ Copyright © HatioLab Inc. All rights reserved.
           });
         }
 
-        if(this.deviceType !== 'KIOSK') {
+        if (this.deviceType !== 'KIOSK') {
           this._getZoneItems();
         }
       }
@@ -504,10 +504,10 @@ Copyright © HatioLab Inc. All rights reserved.
         const zoneCombo = this._getZoneCombo();
         this._clearCombo(zoneCombo);
 
-        if(event && event.detail) {
+        if (event && event.detail) {
           event.detail.forEach(zone => {
             const option = new Option(zone, zone);
-            if(this.zoneCode === zone) {
+            if (this.zoneCode === zone) {
               option.selected = true;
             }
 
@@ -527,7 +527,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
         event.detail.items.forEach(job => {
           const option = new Option(job.description, job.name);
-          if(this.jobName === job.name) {
+          if (this.jobName === job.name) {
             option.selected = true;
             this.jobName = job.name;
           }

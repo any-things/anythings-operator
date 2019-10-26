@@ -6,7 +6,7 @@ Copyright © HatioLab Inc. All rights reserved.
 <link rel="import" href="../../../bower_components/polymer/polymer-element.html">
 
 <!--
-  메뉴 타일
+  공통 > 메뉴 타일
 -->
 <dom-module id="menu-tile">
   <template>
@@ -17,7 +17,9 @@ Copyright © HatioLab Inc. All rights reserved.
 
   <script>
     class MpsMenuTile extends Polymer.Element {
-      static get is() { return 'menu-tile' };
+      static get is() {
+        return 'menu-tile'
+      };
 
       static get properties() {
         return {

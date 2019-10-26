@@ -14,6 +14,7 @@ Copyright © HatioLab Inc. All rights reserved.
   <template>
     <style include="shared-styles any-setting-styles"></style>
 
+    <!-- 메시지 브로커 주소 조회 Ajax -->
     <sys-ajax
       id="broker-addrs-ajax"
       method="GET"
@@ -21,6 +22,7 @@ Copyright © HatioLab Inc. All rights reserved.
       on-sys-ajax-response="_setBrokerAddress">
     </sys-ajax>
 
+    <!-- 메시지 브로커 포트 조회 Ajax -->
     <sys-ajax
       id="broker-port-ajax"
       method="GET"
@@ -28,6 +30,7 @@ Copyright © HatioLab Inc. All rights reserved.
       on-sys-ajax-response="_setBrokerPort">
     </sys-ajax>
 
+    <!-- 메시지 브로커 사이트 코드 조회 Ajax -->
     <sys-ajax
       id="broker-site-ajax"
       method="GET"
@@ -35,6 +38,7 @@ Copyright © HatioLab Inc. All rights reserved.
       on-sys-ajax-response="_setBrokerSite">
     </sys-ajax>
 
+    <!-- 작업 위치 (앞, 뒤, 앞/뒤, 전체 등) 조회 Ajax -->
     <sys-ajax
       auto
       method="GET"
@@ -43,8 +47,9 @@ Copyright © HatioLab Inc. All rights reserved.
       last-response="{{sideSetResponse}}">
     </sys-ajax>
 
+    <!-- 랙 리스트 조회 Ajax -->
     <sys-ajax
-      id="region-items-ajax"
+      id="rack-items-ajax"
       method="GET"
       content-type="application/json"
       on-sys-ajax-response="_renderRegionCombo">
@@ -518,7 +523,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * @description div 숨기기 
+       * @description div 숨기기
        *******************
        */
       _hiddenDiv() {

@@ -6,7 +6,7 @@ Copyright © HatioLab Inc. All rights reserved.
 <link rel="import" href="../../../bower_components/polymer/polymer-element.html">
 
 <!--
-  메뉴 타일스
+  공통 > 메뉴 타일스
 -->
 <dom-module id="menu-tiles">
   <template>
@@ -63,7 +63,9 @@ Copyright © HatioLab Inc. All rights reserved.
 
   <script>
     class MpsMenuTiles extends Polymer.Element {
-      static get is() { return 'menu-tiles' };
+      static get is() {
+        return 'menu-tiles'
+      };
 
       static get properties() {
         return {
@@ -76,7 +78,10 @@ Copyright © HatioLab Inc. All rights reserved.
             notify: true
           },
 
-          settingLabel: {type: String, value: () => t('menu.Settings')}
+          settingLabel: {
+            type: String,
+            value: () => t('menu.Settings')
+          }
         }
       }
 
@@ -94,7 +99,8 @@ Copyright © HatioLab Inc. All rights reserved.
         menuAjax.curl = `/menus/user_menus/${this.deviceType}`;
         menuAjax.customParams = {
           query: [{
-            name: 'hidden_flag', operator: 'is_not_true'
+            name: 'hidden_flag',
+            operator: 'is_not_true'
           }]
         };
         menuAjax.generateRequest();
@@ -106,7 +112,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * 중복되는 이미지가 있어서 name 필드를 통해 구분할 수 없음
        */
       _computeImgSrc(iconName) {
-        if(!iconName || !iconName.endsWith('.png')) {
+        if (!iconName || !iconName.endsWith('.png')) {
           iconName = 'menuicon-prodinfo.png';
         }
         return `./static/assets/menu-icons/${iconName}`;

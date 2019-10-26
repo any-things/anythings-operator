@@ -3,18 +3,19 @@
 Copyright © HatioLab Inc. All rights reserved.
 -->
 
-<!--
-  Operato 설정 공통 화면
- -->
-
 <link rel="import" href="../../../bower_components/polymer/polymer-element.html">
 
-<link rel="import" href="./any-setting-styles.html">
+<link rel="import" href="../common/any-setting-styles.html">
 
-<dom-module id="any-setting-common">
+<!--
+  물류 > 설정 화면
+ -->
+
+<dom-module id="logis-setting-common">
   <template>
     <style include="shared-styles any-setting-styles"></style>
 
+    <!-- 관리 사이트 세션 체크 Ajax -->
     <sys-ajax
       id="mgr-site-session-check-ajax"
       method="GET"
@@ -24,6 +25,7 @@ Copyright © HatioLab Inc. All rights reserved.
       timeout="10000">
     </sys-ajax>
 
+    <!-- 사이트 세션 체크 Ajax -->
     <sys-ajax
       id="domain-session-check-ajax"
       method="GET"
@@ -34,16 +36,19 @@ Copyright © HatioLab Inc. All rights reserved.
       timeout="10000">
     </sys-ajax>
 
+    <!-- 애플리케이션 서버 접속 IP -->
     <div id="mgr-ip" class="input-container">
       <label>[[ipLabel]]</label>
       <input id="ip" placeholder="IP Address (ex: 127.0.0.1)">
     </div>
 
+    <!-- 애플리케이션 서버 접속 포트 -->
     <div id="mgr-port" class="input-container">
       <label>[[portLabel]]</label>
       <input id="port" type="number" min="0" placeholder="Port (ex: 8080)">
     </div>
 
+    <!-- 언어 선택 -->
     <div id="locales" class="input-container">
       <label>[[localeLabel]]</label>
       <select id="locale"></select>
@@ -51,20 +56,47 @@ Copyright © HatioLab Inc. All rights reserved.
   </template>
 
   <script>
-    class AnySettingCommon extends Polymer.Element {
-      static get is() { return 'any-setting-common' }
+    class LogisSettingCommon extends Polymer.Element {
+      static get is() {
+        return 'logis-setting-common'
+      }
 
       static get properties() {
         return {
           /**
-           * @description label setup
+           * @description 애플리케이션 접속 서버 IP 라벨
+           ********************
+           * @type {String}
            */
-          ipLabel: { type: String, value: () => t('label.ip_address')},
-          portLabel: { type: String, value: () => t('label.port')},
-          localeLabel: { type: String, value: () => t('label.language')},
+          ipLabel: {
+            type: String,
+            value: () => t('label.ip_address')
+          },
+
+          /**
+           * @description 애플리케이션 접속 포트 라벨
+           ********************
+           * @type {String}
+           */
+          portLabel: {
+            type: String,
+            value: () => t('label.port')
+          },
+
+          /**
+           * @description 언어 선택 라벨
+           ********************
+           * @type {String}
+           */
+          localeLabel: {
+            type: String,
+            value: () => t('label.language')
+          },
 
           /**
            * @description 현재 선택한 언어
+           ********************
+           * @type {String}
            */
           locale: {
             type: String,
@@ -75,6 +107,8 @@ Copyright © HatioLab Inc. All rights reserved.
 
           /**
            * @description 선택 가능한 언어 리스트
+           ********************
+           * @type {Array}
            */
           locales: {
             type: Array,
@@ -83,6 +117,8 @@ Copyright © HatioLab Inc. All rights reserved.
 
           /**
            * @description 세션 확인을 위한 서비스 URL
+           ********************
+           * @type {String}
            */
           sessionUrl: {
             type: String,
@@ -91,6 +127,10 @@ Copyright © HatioLab Inc. All rights reserved.
         }
       }
 
+      /**
+       * @description lifecycle callback
+       *********************
+       */
       connectedCallback() {
         super.connectedCallback();
         this._setDefaultValues();
@@ -99,11 +139,12 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description 현재 설정되어 있는 설정 항목의 값들 또는 초기 값을 나타내기 위함
+       *********************
        */
       _setDefaultValues() {
         let mgrSiteUrl = JSON.parse(localStorage.getItem('setting.mgrSiteUrl'));
 
-        if(!mgrSiteUrl) {
+        if (!mgrSiteUrl) {
           mgrSiteUrl = location.origin + '/rest';
           localStorage.setItem('setting.mgrSiteUrl', JSON.stringify(mgrSiteUrl));
         }
@@ -116,11 +157,12 @@ Copyright © HatioLab Inc. All rights reserved.
       /**
        * @description locales 값이 변경될 때 호출
        * 현재 언어 리스트를 통해 언어 선택 콤보를 출력
+       **********************
        */
       _renderLocaleOptions(locales) {
         const localeSelector = this._getLocaleSelector();
 
-        while(localeSelector.childElementCount) {
+        while (localeSelector.childElementCount) {
           localeSelector.removeChild(localeSelector.firstElementChild);
         }
 
@@ -134,11 +176,12 @@ Copyright © HatioLab Inc. All rights reserved.
       /**
        * @description 관리 도메인의 URL이 정상적인지 확인하기 위한 ajax 호출
        * 관리 도메인 URL이 유효한지 확인
+       **********************
        */
       _checkMgrSiteSession() {
         const mgrSiteUrl = JSON.parse(localStorage.getItem('setting.mgrSiteUrl'));
 
-        if(mgrSiteUrl) {
+        if (mgrSiteUrl) {
           const mgrSiteSessionAjax = this._getMgrSiteSessionAjax();
           mgrSiteSessionAjax.url = `${mgrSiteUrl}${this.sessionUrl}`;
           mgrSiteSessionAjax.generateRequest();
@@ -150,6 +193,7 @@ Copyright © HatioLab Inc. All rights reserved.
       /**
        * @description 관리 도메인 URL이 정상적으로 설정되었는지 확인하기 위한 호출의 response
        * 정상 설정 되었을 경우 호출 되며 사이트 도메인의 session check를 수행함
+       **********************
        */
       _mgrSiteSessionResponsed() {
         this._checkDomainSiteSession();
@@ -159,9 +203,11 @@ Copyright © HatioLab Inc. All rights reserved.
        * @description 사이트 도메인의 URL이 비정상적으로 설정 되었을 경우에 호출됨
        * ** 401 에러의 경우 관리 도메인이 정상적으로 설정 되어 있는 것이기 때문에
        * 사이트 도메인 session check를 수행함
+       **********************
+       * @param {Object} event
        */
       _mgrSiteSessionError(event) {
-        if(event.detail && event.detail.status === 401) {
+        if (event.detail && event.detail.status === 401) {
           this._checkDomainSiteSession();
         } else {
           this._showUrlInvalidAlert();
@@ -169,12 +215,13 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * @description 사이트 도메인의 session check를 위한 ajax호출
+       * @description 사이트 도메인의 session check를 위한 ajax 호출
+       **********************
        */
       _checkDomainSiteSession() {
         const baseUrl = JSON.parse(localStorage.getItem('setting.baseUrl'));
 
-        if(baseUrl) {
+        if (baseUrl) {
           const domainSessionAjax = this._getDomainsSessionAjax();
           domainSessionAjax.url = `${baseUrl}${this.sessionUrl}`;
           domainSessionAjax.generateRequest();
@@ -186,6 +233,7 @@ Copyright © HatioLab Inc. All rights reserved.
       /**
        * @description 사이트 도메인의 session check가 정상 처리 되었을 경우 호출 됨
        * session-responsed 이벤트를 발생시켜 화면 구성을 다시 수행함 (로그아웃 버튼 활성화, 사용자 정보 표시 등)
+       **********************
        */
       _domainSessionResponsed(event) {
         localStorage.setItem('setting.user', JSON.stringify(event.detail));
@@ -199,6 +247,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @description 사이트 도메인의 URL이 비정상적으로 설정 되었을 경우 호출 됨
        * 로그인 화면에서의 check_user 호출을 통해 다시 사이트 도메인의 URL을 설정하기 때문에
        * _sessionUnauthorized를 호출함
+       **********************
        */
       _domainSessionError() {
         this._sessionUnauthorized();
@@ -208,6 +257,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @description 사이트 도메인의 URL이 정상적으로 설정 되었지만 현재 로그인 되어 있지 않은 상태
        * _domainSessionError와 마찬가지로 로그인 화면에서 check_user 호출을 통해 다시 사이트 도메인의 URL을 설정하기 때문에
        * _sessionUnauthorized를 호출함
+       **********************
        */
       _domainUnauthorized() {
         this._sessionUnauthorized();
@@ -216,6 +266,7 @@ Copyright © HatioLab Inc. All rights reserved.
       /**
        * @description 관리 도메인의 URL이 유효하며 사이트 도메인의 URL이 비정상 혹은 로그인되지 않은 상태 일 때 호출되며
        * session-unauthorized 이벤트를 발생시켜 화면에서 필요한 작업을 수행함 (로그아웃 버튼 제거 등)
+       **********************
        */
       _sessionUnauthorized() {
         this.dispatchEvent(new CustomEvent('session-unauthorized'));
@@ -223,6 +274,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description 관리 & 사이트 도메인의 URL이 비정상적으로 설정되었을 경우 호출되며 message 출력
+       **********************
        */
       _showUrlInvalidAlert() {
         openAlert({
@@ -238,18 +290,20 @@ Copyright © HatioLab Inc. All rights reserved.
       /**
        * @description 관리 및 사이트 도메인의 URL이 정상적으로 설정 되었으나
        * 로그인 되지 않은 상태일 때 로그인 화면으로 이동하기 위한 함수
+       **********************
        */
-       _moveToLogin() {
-        if(location.hash.indexOf('login') < 0) {
+      _moveToLogin() {
+        if (location.hash.indexOf('login') < 0) {
           location.hash = '/login';
         }
       }
 
       /**
        * @description 설정 화면으로 이동
+       **********************
        */
       _moveToSetting() {
-        if(location.hash.indexOf('logis_setting') < 0) {
+        if (location.hash.indexOf('logis_setting') < 0) {
           location.hash = '/logis_setting';
         }
       }
@@ -264,36 +318,47 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description 관리 도메인의 서비스 URL을 저장
+       **********************
        */
       _saveMgrSiteUrl() {
         const ip = this._getIpInput().value;
         const port = this._getPortInput().value;
         let mgrSiteUrl;
 
-        if(port) {
+        if (port) {
           mgrSiteUrl = `http://${ip}:${port}/rest`;
         } else {
           mgrSiteUrl = `http://${ip}/rest`;
         }
 
-        if(this.isMgrSiteUrlChanged(mgrSiteUrl)) {
+        if (this.isMgrSiteUrlChanged(mgrSiteUrl)) {
           this._clearBaseUrl();
         }
 
         localStorage.setItem('setting.mgrSiteUrl', JSON.stringify(mgrSiteUrl));
       }
 
+      /**
+       * @description 애플리케이션 서버 접속 URL이 변경된 이 후 ...
+       **********************
+       * @param {String} mgrSiteUrl
+       */
       isMgrSiteUrlChanged(mgrSiteUrl) {
         const currentMgrSiteUrl = JSON.parse(localStorage.getItem('setting.mgrSiteUrl'));
         return mgrSiteUrl !== currentMgrSiteUrl;
       }
 
+      /**
+       * @description 설정의 애플리케이션 서버 접속 URL 클리어
+       ***********************
+       */
       _clearBaseUrl() {
         localStorage.removeItem('setting.baseUrl');
       }
 
       /**
        * @description 언어 설정 localStorage에 저장
+       ***********************
        */
       _saveLocale() {
         localStorage.setItem('setting.locale', JSON.stringify(this._getLocaleSelector().selectedOptions[0].value));
@@ -301,6 +366,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description return ip input element
+       ***********************
        */
       _getIpInput() {
         return this.$['ip'];
@@ -308,6 +374,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description return port input element
+       ***********************
        */
       _getPortInput() {
         return this.$['port'];
@@ -322,6 +389,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description return domain-session-check-ajax
+       ***********************
        */
       _getDomainsSessionAjax() {
         return this.$['domain-session-check-ajax'];
@@ -329,12 +397,13 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description return mgr-site-session-check-ajax
+       ***********************
        */
       _getMgrSiteSessionAjax() {
         return this.$['mgr-site-session-check-ajax'];
       }
     }
 
-    customElements.define(AnySettingCommon.is, AnySettingCommon);
+    customElements.define(LogisSettingCommon.is, LogisSettingCommon);
   </script>
 </dom-module>
