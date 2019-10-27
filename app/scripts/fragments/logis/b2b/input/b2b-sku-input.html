@@ -159,7 +159,7 @@ Copyright © HatioLab Inc. All rights reserved.
     </style>
 
     <!-- KIOSK 스캔 Ajax -->
-    <sys-ajax id="input-sku-ajax" curl="/kiosk_process/das/input/:region_cd/:side_cd/:com_cd/:sku_cd" method="POST"
+    <sys-ajax id="input-sku-ajax" curl="/kiosk_process/das/input/:rack_cd/:side_cd/:com_cd/:sku_cd" method="POST"
       content-type="application/json" last-response="{{orderDataSet}}" custom-error-handler
       on-sys-ajax-error="_onInputSkuError">
     </sys-ajax>
@@ -225,10 +225,10 @@ Copyright © HatioLab Inc. All rights reserved.
           </div>
         </div>
 
-        <!-- 호기별 진행율 -->
-        <div id="region-proc-rate" class="barchart-section">
+        <!-- 랙별 진행율 -->
+        <div id="rack-proc-rate" class="barchart-section">
           <div class="chart-row">
-            <span>[[regionProcRateLabel]]</span>
+            <span>[[rackProcRateLabel]]</span>
             <span class="col-header">[[pickedLabel]]</span>
             <span class="col-header">[[pickingLabel]]</span>
           </div>
@@ -304,7 +304,9 @@ Copyright © HatioLab Inc. All rights reserved.
 
   <script>
     class B2BSkuInput extends Polymer.Element {
-      static get is() { return 'b2b-sku-input' }
+      static get is() {
+        return 'b2b-sku-input'
+      }
 
       static get properties() {
         return {
@@ -335,7 +337,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           custCntLabel: {
             type: String,
-            value: function () {
+            value: function() {
               return t('label.cust_cnt');
             }
           },
@@ -347,7 +349,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           skuBarcdLabel: {
             type: String,
-            value: function () {
+            value: function() {
               return t('label.sku_barcd');
             }
           },
@@ -359,7 +361,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           unfinishedLabel: {
             type: String,
-            value: function () {
+            value: function() {
               return t('label.unfinished');
             }
           },
@@ -371,7 +373,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           refreshLabel: {
             type: String,
-            value: function () {
+            value: function() {
               return t('button.refresh');
             }
           },
@@ -387,13 +389,13 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 호기별 진행율 라벨
+           * 랙 별 진행율 라벨
            ****************
            * @type {String}
            */
-          regionProcRateLabel: {
+          rackProcRateLabel: {
             type: String,
-            value: () => t('label.region_proc_rate')
+            value: () => t('label.rack_proc_rate')
           },
 
           /**
@@ -403,7 +405,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           orderLabel: {
             type: String,
-            value: function () {
+            value: function() {
               return t('label.customer');
             }
           },
@@ -415,7 +417,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           pickedLabel: {
             type: String,
-            value: function () {
+            value: function() {
               return t('label.picked_qty');
             }
           },
@@ -427,7 +429,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           pickingLabel: {
             type: String,
-            value: function () {
+            value: function() {
               return t('label.pick_qty');
             }
           },
@@ -448,7 +450,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           header: {
             type: Array,
-            value: function () {
+            value: function() {
               return [{
                 display: t('label.input_seq'),
                 fieldname: 'input_seq',
@@ -662,42 +664,44 @@ Copyright © HatioLab Inc. All rights reserved.
           detailListFields: {
             type: Array,
             value: () => [{
-              display: t('label.cust_cd'),
-              fieldname: 'cust_cd',
-              columnWidth: '1fr',
-            }, {
-              display: t('label.cust_nm'),
-              fieldname: 'cust_nm',
-              columnWidth: '1fr',
-            }, {
-              display: t('label.location'),
-              fieldname: 'loc_cd',
-              columnWidth: '1fr',
-              style: {
-                textAlign: 'center'
+                display: t('label.cust_cd'),
+                fieldname: 'cust_cd',
+                columnWidth: '1fr',
+              }, {
+                display: t('label.cust_nm'),
+                fieldname: 'cust_nm',
+                columnWidth: '1fr',
+              }, {
+                display: t('label.location'),
+                fieldname: 'loc_cd',
+                columnWidth: '1fr',
+                style: {
+                  textAlign: 'center'
+                }
+              }, {
+                display: t('label.picked_qty'),
+                fieldname: 'picked_qty',
+                columnWidth: '.2fr',
+                style: {
+                  textAlign: 'right'
+                }
+              }, {
+                display: t('label.pick_qty'),
+                fieldname: 'pick_qty',
+                columnWidth: '.2fr',
+                style: {
+                  textAlign: 'right'
+                }
               }
-            }, {
-              display: t('label.picked_qty'),
-              fieldname: 'picked_qty',
-              columnWidth: '.2fr',
-              style: {
-                textAlign: 'right'
-              }
-            }, {
-              display: t('label.pick_qty'),
-              fieldname: 'pick_qty',
-              columnWidth: '.2fr',
-              style: {
-                textAlign: 'right'
-              }
-            }/*, {
-              display: t('label.status'),
-              fieldname: 'status',
-              columnWidth: '.3fr',
-              style: {
-                textAlign: 'center'
-              }
-            }*/]
+              /*, {
+                            display: t('label.status'),
+                            fieldname: 'status',
+                            columnWidth: '.3fr',
+                            style: {
+                              textAlign: 'center'
+                            }
+                          }*/
+            ]
           }
         }
       }
@@ -724,9 +728,9 @@ Copyright © HatioLab Inc. All rights reserved.
           this._routingChanged(e);
         });
 
-        // 3. 호기 선택 체크
-        if (!LOGIS_UTIL.getRegionCd()) {
-          LOGIS_UTIL.showMessage(t('text.selecting_region'), t('text.select_region'));
+        // 3. 랙 선택 체크
+        if (!LOGIS_UTIL.getRackCd()) {
+          LOGIS_UTIL.showMessage(t('text.selecting_rack'), t('text.select_rack'));
         }
 
         document.addEventListener(`alert-closed-at-${location.hash.replace('#/', '')}`, event => {
@@ -767,7 +771,7 @@ Copyright © HatioLab Inc. All rights reserved.
           this.refresh();
         }
 
-        setTimeout(function () {
+        setTimeout(function() {
           this.startAutoRefresh();
         }.bind(this), LOGIS_UTIL.getRefreshInterval());
       }
@@ -836,11 +840,11 @@ Copyright © HatioLab Inc. All rights reserved.
        ***********************
        */
       getBatchSummary() {
-        const regionCd = LOGIS_UTIL.getRegionCd();
-        if (regionCd) {
+        const rackCd = LOGIS_UTIL.getRackCd();
+        if (rackCd) {
           const batchSummaryAjax = this.$['batch-summary-ajax'];
           let status = this.$['unfinished-only'].checked == true ? 'U' : '';
-          batchSummaryAjax.curl = `/kiosk_process/das/batch_summary/${regionCd}?status=${status}`;
+          batchSummaryAjax.curl = `/kiosk_process/das/batch_summary/${rackCd}?status=${status}`;
           batchSummaryAjax.params = {
             page: this.page,
             limit: this.limit
@@ -935,12 +939,12 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       inputSku(comCd, skuCd, skuBarcd) {
         if (skuCd && skuCd.length >= 3) {
-          var regionCd = LOGIS_UTIL.getRegionCd();
-          var workLoc = LOGIS_UTIL.getWorkLoc();
+          var rackCd = LOGIS_UTIL.getRackCd();
+          var workLoc = LOGIS_UTIL.getRackSide();
           var startAssortAjax = this.$['input-sku-ajax'];
           let status = this.$['unfinished-only'].checked == true ? 'U' : '';
 
-          var url = `/kiosk_process/das/input/${regionCd}/${workLoc}/${comCd}/${skuCd}`;
+          var url = `/kiosk_process/das/input/${rackCd}/${workLoc}/${comCd}/${skuCd}`;
           url = url + '?page=' + this.page + '&limit=' + this.limit;
           if (status && status.length > 0) {
             url = url + '&status=' + status;
@@ -972,7 +976,7 @@ Copyright © HatioLab Inc. All rights reserved.
         const input = event.detail.input;
         const ajax = event.detail.ajax;
         const skuCd = input.value;
-        ajax.curl = `/kiosk_process/find_sku/${LOGIS_UTIL.getRegionCd()}/${skuCd}`;
+        ajax.curl = `/kiosk_process/find_sku/${LOGIS_UTIL.getRackCd()}/${skuCd}`;
         ajax.generateRequest();
       }
 
@@ -1002,12 +1006,12 @@ Copyright © HatioLab Inc. All rights reserved.
             title: t('text.checking_inspection'),
             message: t('text.check_inspection'),
             confirmCallback: () => {
-              const regionCd = LOGIS_UTIL.getRegionCd();
-              const sideCd = LOGIS_UTIL.getSideCd();
-              let zoneCd = LOGIS_UTIL.getZoneCd();
+              const rackCd = LOGIS_UTIL.getRackCd();
+              const sideCd = LOGIS_UTIL.getRackSide();
+              let zoneCd = LOGIS_UTIL.getEquipZone();
               let comCd = this.sku.com_cd;
               let skuCd = this.sku.sku_cd;
-              this.doInspectTransaction(regionCd, sideCd, zoneCd, comCd, skuCd);
+              this.doInspectTransaction(rackCd, sideCd, zoneCd, comCd, skuCd);
               this._initialSetup();
               this._scannedFlag = false;
             },
@@ -1035,19 +1039,19 @@ Copyright © HatioLab Inc. All rights reserved.
       /**
        * @description 상품 검수 api 호출
        ******************
-       * @param {String} regionCd
+       * @param {String} rackCd
        * @param {String} sideCd
        * @param {String} zoneCd
        * @param {String} comCd
        * @param {String} skuCd
        */
-      doInspectTransaction(regionCd, sideCd, zoneCd, comCd, skuCd) {
+      doInspectTransaction(rackCd, sideCd, zoneCd, comCd, skuCd) {
         try {
           if (!skuCd || skuCd.length < 4) {
             throw t('error.sku_barcd_invalid');
           }
           const inspectAjax = this.$['inspect-sku-ajax'];
-          inspectAjax.curl = `/pda_process/inspection_by_mpi/${regionCd}/${sideCd}/${zoneCd}/${comCd}/${skuCd}`
+          inspectAjax.curl = `/pda_process/inspection_by_mpi/${rackCd}/${sideCd}/${zoneCd}/${comCd}/${skuCd}`
           inspectAjax.generateRequest();
         } catch (error) {
           openAlert({
@@ -1066,13 +1070,13 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} event
        */
       showDetailList(event) {
-        const regionCd = LOGIS_UTIL.getRegionCd();
+        const rackCd = LOGIS_UTIL.getRackCd();
         const inputSeq = event.detail.data.input_seq;
         document.dispatchEvent(new CustomEvent('open-form-list-dialog', {
           detail: {
             title: t('title.das_order_info_detail') + ' [' + event.detail.data.sku_nm + ']',
             listFields: this.detailListFields,
-            listDataReqUrl: `/kiosk_process/das/input_details/${regionCd}/${inputSeq}`,
+            listDataReqUrl: `/kiosk_process/das/input_details/${rackCd}/${inputSeq}`,
             handleListDataAfterSet: params => {
               const rows = params.listElement.getRows();
               rows.forEach(row => {

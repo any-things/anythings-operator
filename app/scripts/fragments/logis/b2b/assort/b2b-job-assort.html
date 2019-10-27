@@ -69,18 +69,18 @@ Copyright © HatioLab Inc. All rights reserved.
 
     <!-- 투입 이벤트의 거래처 작업 리스트 -->
     <sys-ajax id="input-job-details-ajax" method="GET"
-      curl="/tablet_process/input_details/:region_cd/:job_input_seq_id/:side_cd/:zone_cd"
+      curl="/tablet_process/input_details/:rack_cd/:job_input_seq_id/:side_cd/:zone_cd"
       content-type="application/json" last-response="{{inputDetails}}">
     </sys-ajax>
 
     <!-- 태블릿 작업 존의 처리 안된 혹은 처리 완료된 작업을 조회하여 표시기에 점등 -->
     <sys-ajax id="mpi-on-jobs-ajax" method="PUT"
-      curl="/tablet_process/das/mpi_on/:job_input_seq_id/:region_cd/:zone_cd/:side_cd/:done_or_todo"
+      curl="/tablet_process/das/mpi_on/:job_input_seq_id/:rack_cd/:zone_cd/:side_cd/:done_or_todo"
       content-type="application/json">
     </sys-ajax>
 
     <!-- 부족한 상품을 채우기 위해 표시기에 불을 켜는 요청 -->
-    <sys-ajax id="mpi-off-my-zone-ajax" method="PUT" curl="/tablet_process/mpi_off/:region_cd/:zone_cd/:side_cd"
+    <sys-ajax id="mpi-off-my-zone-ajax" method="PUT" curl="/tablet_process/mpi_off/:rack_cd/:zone_cd/:side_cd"
       content-type="application/json">
     </sys-ajax>
 
@@ -282,7 +282,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           getSkuAjaxUrl: {
             type: String,
-            value: `/tablet_process/find_sku/${LOGIS_UTIL.getRegionCd()}/:inputValue`
+            value: `/tablet_process/find_sku/${LOGIS_UTIL.getRackCd()}/:inputValue`
           },
 
           /**
@@ -455,10 +455,10 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       mpiOffByTabletZone() {
         const mpiOffAjax = this.$['mpi-off-my-zone-ajax'];
-        let regionCd = LOGIS_UTIL.getRegionCd();
-        let zoneCd = LOGIS_UTIL.getZoneCd();
-        let sideCd = LOGIS_UTIL.getSideCd();
-        mpiOffAjax.curl = `/tablet_process/mpi_off/${regionCd}/${zoneCd}/${sideCd}`;
+        let rackCd = LOGIS_UTIL.getRackCd();
+        let zoneCd = LOGIS_UTIL.getEquipZone();
+        let sideCd = LOGIS_UTIL.getRackSide();
+        mpiOffAjax.curl = `/tablet_process/mpi_off/${rackCd}/${zoneCd}/${sideCd}`;
         mpiOffAjax.generateRequest();
       }
 
@@ -470,10 +470,10 @@ Copyright © HatioLab Inc. All rights reserved.
       mpiOnByTabletZone(mode) {
         const mpiOnAjax = this.$['mpi-on-jobs-ajax'];
         let inputSeqId = this.selectedInput.id;
-        let regionCd = LOGIS_UTIL.getRegionCd();
-        let zoneCd = LOGIS_UTIL.getZoneCd();
-        let sideCd = LOGIS_UTIL.getSideCd();
-        mpiOnAjax.curl = `/tablet_process/das/mpi_on/${inputSeqId}/${regionCd}/${zoneCd}/${sideCd}/${mode}`;
+        let rackCd = LOGIS_UTIL.getRackCd();
+        let zoneCd = LOGIS_UTIL.getEquipZone();
+        let sideCd = LOGIS_UTIL.getRackSide();
+        mpiOnAjax.curl = `/tablet_process/das/mpi_on/${inputSeqId}/${rackCd}/${zoneCd}/${sideCd}/${mode}`;
         mpiOnAjax.generateRequest();
       }
 
@@ -539,12 +539,12 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {String} upDownMode UP / DOWN
        */
       paginateInputList(startInputSeq, upDownMode) {
-        let regionCd = LOGIS_UTIL.getRegionCd();
-        let zoneCd = LOGIS_UTIL.getZoneCd();
-        let sideCd = LOGIS_UTIL.getSideCd();
+        let rackCd = LOGIS_UTIL.getRackCd();
+        let zoneCd = LOGIS_UTIL.getEquipZone();
+        let sideCd = LOGIS_UTIL.getRackSide();
         let pageAjax = this.$['input-list-pages-ajax'];
         pageAjax.customParams = { show_others_order: LOGIS_UTIL.getShowOthersOrder() };
-        pageAjax.curl = `/tablet_process/input_pages/${regionCd}/${zoneCd}/${sideCd}/${upDownMode}/${startInputSeq}`;
+        pageAjax.curl = `/tablet_process/input_pages/${rackCd}/${zoneCd}/${sideCd}/${upDownMode}/${startInputSeq}`;
         pageAjax.generateRequest();
       }
 
@@ -570,15 +570,15 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       inputSku(event) {
         let skuInfo = event.detail;
-        const regionCd = LOGIS_UTIL.getRegionCd();
-        const sideCd = LOGIS_UTIL.getSideCd();
-        let zoneCd = LOGIS_UTIL.getZoneCd();
+        const rackCd = LOGIS_UTIL.getRackCd();
+        const sideCd = LOGIS_UTIL.getRackSide();
+        let zoneCd = LOGIS_UTIL.getEquipZone();
         let comCd = skuInfo.com_cd;
         let skuCd = skuInfo.sku_cd;
 
         try {
           const inputAjax = this.$['input-sku-ajax'];
-          inputAjax.curl = `/tablet_process/input_sku/${regionCd}/${sideCd}/${zoneCd}/${comCd}/${skuCd}`;
+          inputAjax.curl = `/tablet_process/input_sku/${rackCd}/${sideCd}/${zoneCd}/${comCd}/${skuCd}`;
           inputAjax.generateRequest();
         } catch (error) {
           openAlert({ title: t('error.VALIDATION_ERROR'), message: error });

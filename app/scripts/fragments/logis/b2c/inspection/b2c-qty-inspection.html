@@ -647,7 +647,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
            getSkuAjaxUrl: {
             type: String,
-            value : `/pda_process/find_sku/${LOGIS_UTIL.getRegionCd()}/:inputValue`
+            value : `/pda_process/find_sku/${LOGIS_UTIL.getRackCd()}/:inputValue`
           },
           /**
            * SKU 정보 조회 후 복수개가 조회된 경우 사용자가 고를 수 있는 팝업이 실행되는데 그 팝업에 표시할 타이틀
@@ -715,7 +715,7 @@ Copyright © HatioLab Inc. All rights reserved.
           this.bucketCd = bucketCd;
           this.validateBeforeBucketScan();
           var ajaxLabel = this.$['inspection-items-ajax'];
-          var inputType = LOGIS_UTIL.getKioskInputType();
+          var inputType = LOGIS_UTIL.getB2CInputBoxType();
           ajaxLabel.curl = '/kiosk_process/dps/inspection/by_qty/ready/by_box/' + inputType + '/' + this.bucketCd;
           ajaxLabel.generateRequest();
         } catch (error) {
@@ -1065,7 +1065,7 @@ Copyright © HatioLab Inc. All rights reserved.
           var completeAjax = this.$['inspection-complete-ajax'];
           completeAjax.curl = '/kiosk_process/dps/inspection/by_qty/finish/' + this.currentOrderId;
           completeAjax.customParams = {
-            printer_id: LOGIS_UTIL.getKioskPrinterId()
+            printer_id: LOGIS_UTIL.getPrinterId()
           };
           completeAjax.generateRequest();
         }
@@ -1167,7 +1167,7 @@ Copyright © HatioLab Inc. All rights reserved.
           var reprintAjax = this.$['reprint-invoice-ajax'];
           reprintAjax.curl = '/kiosk_process/dps/inspection/print/' + this.currentOrderId;
           reprintAjax.customParams = {
-            printer_id: LOGIS_UTIL.getKioskPrinterId()
+            printer_id: LOGIS_UTIL.getPrinterId()
           };
           reprintAjax.generateRequest();
         } else {
@@ -1286,7 +1286,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
       changeInspectionStatus(){
         var boxId = this.$['bucket-cd'].value;
-        var inputType = LOGIS_UTIL.getKioskInputType();
+        var inputType = LOGIS_UTIL.getB2CInputBoxType();
         var changeStatusAjax = this.$['change-status-ajax'];
         changeStatusAjax.curl = '/kiosk_process/dps/inspection/by_qty/again/'+inputType+'/'+boxId;
         changeStatusAjax.generateRequest();

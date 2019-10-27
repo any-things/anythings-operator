@@ -85,7 +85,7 @@ Copyright © HatioLab Inc. All rights reserved.
     <sys-ajax
       id="input-job-details-ajax"
       method="GET"
-      curl="/tablet_process/job_details/:region_cd/:side_cd/:zone_cd/:com_cd/:sku_cd"
+      curl="/tablet_process/job_details/:rack_cd/:side_cd/:zone_cd/:com_cd/:sku_cd"
       content-type="application/json"
       last-response="{{inputDetails}}">
     </sys-ajax>
@@ -94,7 +94,7 @@ Copyright © HatioLab Inc. All rights reserved.
     <sys-ajax
       id="mpi-on-jobs-ajax"
       method="PUT"
-      curl="/tablet_process/mpi_on/:region_cd/:zone_cd/:side_cd"
+      curl="/tablet_process/mpi_on/:rack_cd/:zone_cd/:side_cd"
       content-type="application/json">
     </sys-ajax>
 
@@ -102,7 +102,7 @@ Copyright © HatioLab Inc. All rights reserved.
     <sys-ajax
       id="mpi-off-my-zone-ajax"
       method="PUT"
-      curl="/tablet_process/mpi_off/:region_cd/:zone_cd/:side_cd"
+      curl="/tablet_process/mpi_off/:rack_cd/:zone_cd/:side_cd"
       content-type="application/json">
     </sys-ajax>
 
@@ -110,7 +110,7 @@ Copyright © HatioLab Inc. All rights reserved.
     <sys-ajax
       id="box-info-ajax"
       method="POST"
-      curl="/tablet_process/find_box/:region_cd/:box_id/:box_detail_flag"
+      curl="/tablet_process/find_box/:rack_cd/:box_id/:box_detail_flag"
       content-type="application/json"
       on-sys-ajax-response="_fullboxInspectionSuccess"
       custom-error-handler
@@ -412,7 +412,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           getSkuAjaxUrl: {
             type: String,
-            value: `/tablet_process/find_sku/${LOGIS_UTIL.getRegionCd()}/:inputValue`
+            value: `/tablet_process/find_sku/${LOGIS_UTIL.getRackCd()}/:inputValue`
           },
 
           /**
@@ -576,8 +576,8 @@ Copyright © HatioLab Inc. All rights reserved.
       queryBatchSummary() {
         var ajax = this.$['query-batch-sum'];
         var baseUrl = ajax.baseUrl || JSON.parse(localStorage.getItem('setting.baseUrl'));
-        var regionCd = LOGIS_UTIL.getRegionCd();
-        ajax.url = `${baseUrl}/tablet_process/batch/progress_rate/${regionCd}`;
+        var rackCd = LOGIS_UTIL.getRackCd();
+        ajax.url = `${baseUrl}/tablet_process/batch/progress_rate/${rackCd}`;
         ajax.generateRequest();
       }
 
@@ -623,7 +623,7 @@ Copyright © HatioLab Inc. All rights reserved.
         this.custCdQty = custCds.length;
         this._updateStatus(inputDetails);
 
-        let sideCd = LOGIS_UTIL.getSideCd();
+        let sideCd = LOGIS_UTIL.getRackSide();
         if (sideCd === 'F' || sideCd === 'f') {
           this.frontDetailList = this.sortByStatus(inputDetails);
 
@@ -764,10 +764,10 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       mpiOffByTabletZone() {
         const mpiOffAjax = this.$['mpi-off-my-zone-ajax'];
-        let regionCd = LOGIS_UTIL.getRegionCd();
-        let zoneCd = LOGIS_UTIL.getZoneCd();
-        let sideCd = LOGIS_UTIL.getSideCd();
-        mpiOffAjax.curl = `/tablet_process/mpi_off/${regionCd}/${zoneCd}/${sideCd}`;
+        let rackCd = LOGIS_UTIL.getRackCd();
+        let zoneCd = LOGIS_UTIL.getEquipZone();
+        let sideCd = LOGIS_UTIL.getRackSide();
+        mpiOffAjax.curl = `/tablet_process/mpi_off/${rackCd}/${zoneCd}/${sideCd}`;
         mpiOffAjax.generateRequest();
       }
 
@@ -778,10 +778,10 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       mpiOnByTabletZone(mode) {
         const mpiOnAjax = this.$['mpi-on-jobs-ajax'];
-        let regionCd = LOGIS_UTIL.getRegionCd();
-        let zoneCd = LOGIS_UTIL.getZoneCd();
-        let sideCd = LOGIS_UTIL.getSideCd();
-        mpiOnAjax.curl = `/tablet_process/mpi_on/${regionCd}/${zoneCd}/${sideCd}`;
+        let rackCd = LOGIS_UTIL.getRackCd();
+        let zoneCd = LOGIS_UTIL.getEquipZone();
+        let sideCd = LOGIS_UTIL.getRackSide();
+        mpiOnAjax.curl = `/tablet_process/mpi_on/${rackCd}/${zoneCd}/${sideCd}`;
         mpiOnAjax.generateRequest();
       }
 
@@ -899,9 +899,9 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       inputSku(event) {
         let skuInfo = event.detail;
-        const regionCd = LOGIS_UTIL.getRegionCd();
-        const sideCd = LOGIS_UTIL.getSideCd();
-        let zoneCd = LOGIS_UTIL.getZoneCd();
+        const rackCd = LOGIS_UTIL.getRackCd();
+        const sideCd = LOGIS_UTIL.getRackSide();
+        let zoneCd = LOGIS_UTIL.getEquipZone();
         let comCd = skuInfo.com_cd;
         let skuCd = skuInfo.sku_cd;
         let skuBarcd = skuInfo.sku_barcd;
@@ -910,7 +910,7 @@ Copyright © HatioLab Inc. All rights reserved.
         let inputAjax = this.$['input-sku-ajax'];
 
         if(this._isInspectionMode()) {
-            inputAjax.curl = `/pda_process/inspection_by_mpi/${regionCd}/${sideCd}/${zoneCd}/${comCd}/${sku}`;
+            inputAjax.curl = `/pda_process/inspection_by_mpi/${rackCd}/${sideCd}/${zoneCd}/${comCd}/${sku}`;
         } else {
           // 투입 모드
           let inputMode = null;
@@ -926,13 +926,13 @@ Copyright © HatioLab Inc. All rights reserved.
 
           if(inputMode === 'box_inspection') {
             inputAjax = this.$['box-info-ajax'];
-            inputAjax.curl = `/tablet_process/find_box/${regionCd}/${sku}/false`;
+            inputAjax.curl = `/tablet_process/find_box/${rackCd}/${sku}/false`;
 
           } else if(inputMode === 'box_input') {
-            inputAjax.curl = `/tablet_process/box_input/${regionCd}/${sideCd}/${zoneCd}/${comCd}/${sku}`;
+            inputAjax.curl = `/tablet_process/box_input/${rackCd}/${sideCd}/${zoneCd}/${comCd}/${sku}`;
 
           } else {
-            inputAjax.curl = `/tablet_process/input_sku/${regionCd}/${sideCd}/${zoneCd}/${comCd}/${sku}`;
+            inputAjax.curl = `/tablet_process/input_sku/${rackCd}/${sideCd}/${zoneCd}/${comCd}/${sku}`;
           }
         }
 
@@ -1043,8 +1043,8 @@ Copyright © HatioLab Inc. All rights reserved.
         try {
           this.validateBeforeMapping(code, boxId);
           const assignBoxAjax = this.$['assign-box-to-loc'];
-          var regionCd = LOGIS_UTIL.getRegionCd();
-          assignBoxAjax.curl = `/pda_process/assign/${codeType}_box/${regionCd}/${code}/${boxId}`;
+          var rackCd = LOGIS_UTIL.getRackCd();
+          assignBoxAjax.curl = `/pda_process/assign/${codeType}_box/${rackCd}/${code}/${boxId}`;
           assignBoxAjax.generateRequest();
         } catch (error) {
           MsgAlert.webAlert({
@@ -1101,9 +1101,9 @@ Copyright © HatioLab Inc. All rights reserved.
        * @Override
        */
       refreshInputDetails(mpiOnFlag) {
-        let regionCd = LOGIS_UTIL.getRegionCd();
-        let zoneCd = LOGIS_UTIL.getZoneCd();
-        let sideCd = LOGIS_UTIL.getSideCd();
+        let rackCd = LOGIS_UTIL.getRackCd();
+        let zoneCd = LOGIS_UTIL.getEquipZone();
+        let sideCd = LOGIS_UTIL.getRackSide();
         let comCd = this.comCd ? this.comCd : '_na_';
         let skuCd = this.skuCd ? this.skuCd : '_na_';
         let headerColor = this.selectedInput ? this.selectedInput.mpi_color : 'Y';
@@ -1114,7 +1114,7 @@ Copyright © HatioLab Inc. All rights reserved.
           try {
             this.validationBeforeRefreshDetail(zoneCd, sideCd);
             let detailAjax = this.$['input-job-details-ajax'];
-            detailAjax.curl = `/tablet_process/job_details/${regionCd}/${sideCd}/${zoneCd}/${comCd}/${skuCd}`;
+            detailAjax.curl = `/tablet_process/job_details/${rackCd}/${sideCd}/${zoneCd}/${comCd}/${skuCd}`;
             detailAjax.generateRequest();
           } catch (error) {
             LOGIS_UTIL.showMessage(error.title, error.message, error.callback);

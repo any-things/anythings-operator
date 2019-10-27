@@ -256,10 +256,10 @@ Copyright © HatioLab Inc. All rights reserved.
             }
           },
 
-          regionCd: {
+          rackCd: {
             type: String,
             value: function() {
-              return JSON.parse(localStorage.getItem('setting.regionCode'));
+              return JSON.parse(localStorage.getItem('setting.rackCd'));
             }
           },
 
@@ -376,7 +376,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           getSkuAjaxUrl: {
             type: String,
-            value: `/pda_process/find_sku/${LOGIS_UTIL.getRegionCd()}/:inputValue`
+            value: `/pda_process/find_sku/${LOGIS_UTIL.getRackCd()}/:inputValue`
           },
 
           /**
@@ -532,9 +532,9 @@ Copyright © HatioLab Inc. All rights reserved.
             let skuCode = self.skuCode = event.detail.sku_cd
             self.skuBarcd = event.detail.sku_barcd;
             if (self.boxId) {
-              self._getSkuAjax().curl = `/kiosk_process/dps/single_packaging/${self.regionCd}/${skuCode}/S/${self.boxId}`;
+              self._getSkuAjax().curl = `/kiosk_process/dps/single_packaging/${self.rackCd}/${skuCode}/S/${self.boxId}`;
             } else {
-              self._getSkuAjax().curl = `/kiosk_process/dps/single_packaging/${self.regionCd}/${skuCode}/S/NA`;
+              self._getSkuAjax().curl = `/kiosk_process/dps/single_packaging/${self.rackCd}/${skuCode}/S/NA`;
             }
             self._getSkuAjax().generateRequest();
           }
@@ -548,9 +548,9 @@ Copyright © HatioLab Inc. All rights reserved.
           self._getSkuCdInput().value = self.skuBarcd;
           self._getSkuCdInput().select();
           if (self.boxId) {
-            self._getSkuAjax().curl = `/kiosk_process/dps/single_packaging/${self.regionCd}/${self.skuBarcd}/S/${self.boxId}`;
+            self._getSkuAjax().curl = `/kiosk_process/dps/single_packaging/${self.rackCd}/${self.skuBarcd}/S/${self.boxId}`;
           } else {
-            self._getSkuAjax().curl = `/kiosk_process/dps/single_packaging/${self.regionCd}/${self.skuBarcd}/S/NA`;
+            self._getSkuAjax().curl = `/kiosk_process/dps/single_packaging/${self.rackCd}/${self.skuBarcd}/S/NA`;
           }
         }, function() {
           let skuCode = self.skuCode = skuCd
@@ -561,7 +561,7 @@ Copyright © HatioLab Inc. All rights reserved.
           self.boxId = "";
           self._getBoxIdInput().value = "";
           self.skuBarcd = skuBarcd;
-          self._getSkuAjax().curl = `/kiosk_process/dps/single_packaging/${self.regionCd}/${skuCode}/S/NA`;
+          self._getSkuAjax().curl = `/kiosk_process/dps/single_packaging/${self.rackCd}/${skuCode}/S/NA`;
           self._getSkuAjax().generateRequest();
         });
 
@@ -608,7 +608,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
         } else if (this.skuItem) {
           if (this.skuItem.bucket_cd && this._getBoxIdInput().value != '' && this._getSkuNmInput().value != '') {
-            this._getBoxAjax().curl = `/kiosk_process/dps/start_single_packaging/${this.regionCd}/${this.skuItem.sku_cd}/${this.skuItem.bucket_cd}/1/${this.skuItem.box_type_cd}`;
+            this._getBoxAjax().curl = `/kiosk_process/dps/start_single_packaging/${this.rackCd}/${this.skuItem.sku_cd}/${this.skuItem.bucket_cd}/1/${this.skuItem.box_type_cd}`;
             this._getBoxAjax().generateRequest();
 
           } else {
@@ -630,7 +630,7 @@ Copyright © HatioLab Inc. All rights reserved.
         if (e.key == 'Enter' && this.$['redo-check'].checked) {
           var box = this._getBoxIdInput().value;
           var sku = this.skuCode;
-          this._getSkuAjax().curl = `/kiosk_process/dps/single_packaging/${this.regionCd}/${sku}/S/${box}`;
+          this._getSkuAjax().curl = `/kiosk_process/dps/single_packaging/${this.rackCd}/${sku}/S/${box}`;
           this._getSkuAjax().generateRequest();
           return;
         }
@@ -668,7 +668,7 @@ Copyright © HatioLab Inc. All rights reserved.
                 this.boxId = boxId;
                 if (boxId.slice(0, 1) == this.boxType) {
                   if (this.currentSkuInfo && this.currentSkuInfo.picking_qty == 0) {
-                    this._getBoxAjax().curl = `/kiosk_process/dps/start_single_packaging/${this.regionCd}/${skuCode}/${boxId}/1/${this.boxType}`;
+                    this._getBoxAjax().curl = `/kiosk_process/dps/start_single_packaging/${this.rackCd}/${skuCode}/${boxId}/1/${this.boxType}`;
                     this._getBoxAjax().generateRequest();
                   } else {
                     this._getSkuCdInput().select();
@@ -784,7 +784,7 @@ Copyright © HatioLab Inc. All rights reserved.
           var reprintAjax = this.$['reprint-invoice-ajax'];
           reprintAjax.curl = '/kiosk_process/dps/packing/print/' + this._getBoxIdInput().value;
           reprintAjax.customParams = {
-            printer_id: LOGIS_UTIL.getKioskPrinterId()
+            printer_id: LOGIS_UTIL.getPrinterId()
           };
           reprintAjax.generateRequest();
         }

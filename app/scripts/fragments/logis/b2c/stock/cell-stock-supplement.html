@@ -90,12 +90,12 @@ Copyright © HatioLab Inc. All rights reserved.
       content-type="application/json">
     </sys-ajax>
 
-    <!-- 호기 정보 조회 Ajax -->
+    <!-- 랙 정보 조회 Ajax -->
     <sys-ajax
-      id="region-get-ajax"
+      id="rack-get-ajax"
       method="GET"
       content-type="application/json"
-      on-sys-ajax-response="_regionSetting">
+      on-sys-ajax-response="_rackSetting">
     </sys-ajax>
 
     <div id="container">
@@ -146,7 +146,7 @@ Copyright © HatioLab Inc. All rights reserved.
     </div>
 
     <div id = "bottom-container">
-      <select id="region-combo" on-change="_getZoneItems"></select>
+      <select id="rack-combo" on-change="_getZoneItems"></select>
       <button id = "on-btn" class= 'btn' on-click="_ledOn">[[ledOnBtnLabel]]</button>
       <button id = "off-btn" class= 'btn' on-click="_ledOff">[[ledOffBtnLabel]]</button>
     </div>
@@ -287,7 +287,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           getSkuAjaxUrl: {
             type: String,
-            value: `/pda_process/find_stock_sku/${LOGIS_UTIL.getRegionCd()}/:inputValue`
+            value: `/pda_process/find_stock_sku/${LOGIS_UTIL.getRackCd()}/:inputValue`
           },
 
           /**
@@ -349,8 +349,8 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _getSkuInfo(skuBarcd) {
         const skuInfoAjax = this.$['sku-info-ajax'];
-        let regionCd = LOGIS_UTIL.getRegionCd();
-        skuInfoAjax.curl = `/pda_process/find_stock_sku/${regionCd}/${skuBarcd}`;
+        let rackCd = LOGIS_UTIL.getRackCd();
+        skuInfoAjax.curl = `/pda_process/find_stock_sku/${rackCd}/${skuBarcd}`;
         skuInfoAjax.generateRequest();
       }
 
@@ -379,8 +379,8 @@ Copyright © HatioLab Inc. All rights reserved.
         if (skuInfo) {
           if (skuInfo.sku_cd && skuInfo.sku_cd.length >= 4) {
             const locationAjax = this.$['location-ajax'];
-            let regionCd = LOGIS_UTIL.getRegionCd();
-            locationAjax.curl = `/pda_process/dps/recommend_load_locs/${regionCd}/${skuInfo.sku_cd}/${skuInfo.com_cd}`;
+            let rackCd = LOGIS_UTIL.getRackCd();
+            locationAjax.curl = `/pda_process/dps/recommend_load_locs/${rackCd}/${skuInfo.sku_cd}/${skuInfo.com_cd}`;
             locationAjax.generateRequest();
           }
         }
@@ -435,9 +435,9 @@ Copyright © HatioLab Inc. All rights reserved.
       getOrderStockInfo() {
         try {
           this.validateBeforeOrderStockAjax();
-          const regionCd = LOGIS_UTIL.getRegionCd();
+          const rackCd = LOGIS_UTIL.getRackCd();
           const orderStockAjax = this.$['order-stock-ajax'];
-          orderStockAjax.curl = `/pda_process/dps/find_order_stock/${regionCd}/${this.locCd}/${this.skuCd}`;
+          orderStockAjax.curl = `/pda_process/dps/find_order_stock/${rackCd}/${this.locCd}/${this.skuCd}`;
           orderStockAjax.generateRequest();
         } catch (error) {
           document.dispatchEvent(new CustomEvent('show-toast', {
@@ -567,11 +567,11 @@ Copyright © HatioLab Inc. All rights reserved.
           try {
             // 재고 적치전 validation 수행
             this.validateBeforeLoadStock();
-            let regionCd = LOGIS_UTIL.getRegionCd();
+            let rackCd = LOGIS_UTIL.getRackCd();
             let loadQty = this.inputQty;
             let qtyUnit = 'P';
             const loadStockAjax = this.$['load-stock-ajax'];
-            loadStockAjax.curl = `/pda_process/dps/load_stock/${regionCd}/${this.$['change-loc'].value}/${this.skuCd}/${loadQty}/${qtyUnit}/${this.comCd}`;
+            loadStockAjax.curl = `/pda_process/dps/load_stock/${rackCd}/${this.$['change-loc'].value}/${this.skuCd}/${loadQty}/${qtyUnit}/${this.comCd}`;
             loadStockAjax.generateRequest();
 
           } catch (error) {
@@ -730,21 +730,21 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * @description 호기 리스트 조회
+       * @description 랙 리스트 조회
        *******************
        */
       _getRegionItems() {
-        const regionGetAjax = this.$['region-get-ajax'];
-        regionGetAjax.baseUrl = JSON.parse(localStorage.getItem('setting.baseUrl'));
-        regionGetAjax.customParams = {
+        const rackGetAjax = this.$['rack-get-ajax'];
+        rackGetAjax.baseUrl = JSON.parse(localStorage.getItem('setting.baseUrl'));
+        rackGetAjax.customParams = {
           query: [{
-            "name": "region_type",
+            "name": "rack_type",
             "operator": "noteq",
             "value": "O"
           }]
         };
-        regionGetAjax.curl = `/region`;
-        regionGetAjax.generateRequest();
+        rackGetAjax.curl = `/rack`;
+        rackGetAjax.generateRequest();
       }
 
       /**
@@ -753,8 +753,8 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _ledOn() {
         const ledOnajax = this.$['led-on-ajax'];
-        let regionCd = this.$['region-combo'].value;
-        ledOnajax.curl = `/pda_process/dps/led/on/${regionCd}`;
+        let rackCd = this.$['rack-combo'].value;
+        ledOnajax.curl = `/pda_process/dps/led/on/${rackCd}`;
         ledOnajax.generateRequest();
       }
 
@@ -764,23 +764,23 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _ledOff() {
         const ledOffajax = this.$['led-off-ajax'];
-        let regionCd = this.$['region-combo'].value;
-        ledOffajax.curl = `/pda_process/dps/led/off/${regionCd}`;
+        let rackCd = this.$['rack-combo'].value;
+        ledOffajax.curl = `/pda_process/dps/led/off/${rackCd}`;
         ledOffajax.generateRequest();
       }
 
       /**
-       * @description 호기 설정
+       * @description 랙 설정
        *******************
        */
-      _regionSetting(e) {
-        e.detail.items.forEach(region => {
-          const option = new Option(region.region_nm, region.region_cd);
-          if (this.regionCode === region.region_cd) {
+      _rackSetting(e) {
+        e.detail.items.forEach(rack => {
+          const option = new Option(rack.rack_nm, rack.rack_cd);
+          if (this.rackCode === rack.rack_cd) {
             option.selected = true;
-            this.regionName = region.region_nm;
+            this.rackName = rack.rack_nm;
           }
-          this.$['region-combo'].appendChild(option);
+          this.$['rack-combo'].appendChild(option);
         })
       }
     }

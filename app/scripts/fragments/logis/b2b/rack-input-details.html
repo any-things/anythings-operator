@@ -6,7 +6,7 @@ Copyright © HatioLab Inc. All rights reserved.
 <link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
 
 <!--
-  물류 > 출고, 반품 > 호기별 상품 정보 > 상품별 거래처 상세 정보
+  물류 > 출고, 반품 > 랙별 상품 정보 > 상품별 거래처 상세 정보
 -->
 <dom-module id="rack-input-details">
   <template>
@@ -271,10 +271,10 @@ Copyright © HatioLab Inc. All rights reserved.
           this.skuName = data.sku_nm;
           this.inputSeq = data.input_seq;
 
-          let regionCd = LOGIS_UTIL.getRegionCd();
-          let zoneCd = LOGIS_UTIL.getZoneCd();
+          let rackCd = LOGIS_UTIL.getRackCd();
+          let zoneCd = LOGIS_UTIL.getEquipZone();
           const inputDetailsAjax = this.$['input-details-ajax'];
-          inputDetailsAjax.curl = `/tablet_process/das/input_status_details/${regionCd}/${zoneCd}/ALL/${this.comCd}/${this.skuCd}`;
+          inputDetailsAjax.curl = `/tablet_process/das/input_status_details/${rackCd}/${zoneCd}/ALL/${this.comCd}/${this.skuCd}`;
         }
       }
 

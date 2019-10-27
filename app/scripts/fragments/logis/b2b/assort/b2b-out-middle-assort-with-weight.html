@@ -78,13 +78,13 @@ Copyright © HatioLab Inc. All rights reserved.
       .input-container span {
         margin: auto;
       }
-      .region-container {
+      .rack-container {
         overflow: auto;
         flex: 1;
         grid-gap:15px;
         margin-bottom:20px;
       }
-      .region {
+      .rack {
         flex: 1;
         margin: 0 10px;
         display: flex;
@@ -96,12 +96,12 @@ Copyright © HatioLab Inc. All rights reserved.
         overflow:hidden;
         min-height: 28vh;
       }
-      .region div{
+      .rack div{
         border-bottom:1px solid rgba(0,0,0,.2);
         color:#fff;
         font-size:1.1rem;
       }
-      .region .title{
+      .rack .title{
         background-color:#3f91cc;
         border-bottom: 2px solid rgba(0,0,0,.5);
         padding:5px 0 3px 0;
@@ -115,11 +115,11 @@ Copyright © HatioLab Inc. All rights reserved.
         justify-content: center;
         align-content: center;
       }
-      .region div span.tile {
+      .rack div span.tile {
         color:#fff;
         font-size: 2rem;
       }
-      /* .region div span{
+      /* .rack div span{
         display:inline-block;
         float:left;
         padding:8px 10px 0 15px;
@@ -128,10 +128,10 @@ Copyright © HatioLab Inc. All rights reserved.
         font-size:.7rem;
         text-align:left;
       } */
-      .region.sum div{
+      .rack.sum div{
         color:#fffbd7
       }
-      .region.sum .title{
+      .rack.sum .title{
         background-color:#ee6e30;
       }
       .weight-section{
@@ -256,11 +256,11 @@ Copyright © HatioLab Inc. All rights reserved.
         </div>
       </div>
 
-      <div id="regions" class="region-container">
-        <dom-repeat id="region-dom-repeat" items="[[regionList]]" as="item">
+      <div id="racks" class="rack-container">
+        <dom-repeat id="rack-dom-repeat" items="[[rackList]]" as="item">
           <template>
-            <div class="region">
-              <div class="title">[[item.region_nm]]</div>
+            <div class="rack">
+              <div class="title">[[item.rack_nm]]</div>
               <template is="dom-if" if="[[item.pcs_qty]]">
                 <div class="tile-container"><span class="tile">[[_calcRegionDisplay(item)]]</span></div>
               </template>
@@ -546,11 +546,11 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 호기별 분류 정보 리스트
+           * 랙별 분류 정보 리스트
            ****************
            * @type {Array}
            */
-          regionList: {
+          rackList: {
             type: Array
           },
 
@@ -682,16 +682,16 @@ Copyright © HatioLab Inc. All rights reserved.
       connectedCallback() {
         super.connectedCallback();
 
-        // dom-repeat을 통해 regions list가 그려지고 뒤 dom-change event handler
-        // this.$['region-dom-repeat'].addEventListener('dom-change', event => {
-        //   // regions div 내부의 region div를 모두 추출
-        //   let regions = this.$['regions'].querySelectorAll('div.region');
-        //   // 마지막 region에는 sum class를 추가 나머지는 sum class를 제거
-        //   regions.forEach((region, idx) => {
-        //     if(regions.length - 1 === idx) {
-        //       region.classList.add('sum');
+        // dom-repeat을 통해 racks list가 그려지고 뒤 dom-change event handler
+        // this.$['rack-dom-repeat'].addEventListener('dom-change', event => {
+        //   // racks div 내부의 rack div를 모두 추출
+        //   let racks = this.$['racks'].querySelectorAll('div.rack');
+        //   // 마지막 rack에는 sum class를 추가 나머지는 sum class를 제거
+        //   racks.forEach((rack, idx) => {
+        //     if(racks.length - 1 === idx) {
+        //       rack.classList.add('sum');
         //     } else {
-        //       region.classList.remove('sum');
+        //       rack.classList.remove('sum');
         //     }
         //   });
         // });
@@ -848,9 +848,9 @@ Copyright © HatioLab Inc. All rights reserved.
         const middleClass = event.detail;
         this.skuNm = middleClass.sku_nm;
         this.boxInQty = middleClass.box_in_qty;
-        this.regionList = middleClass.items;
-        this.adjustRegionSectionStyle(this.regionList.length); // 호기 수량에 따라 컨테이너의 스타일을 수정함
-        this.computeTotal(this.regionList);
+        this.rackList = middleClass.items;
+        this.adjustRegionSectionStyle(this.rackList.length); // 랙 수량에 따라 컨테이너의 스타일을 수정함
+        this.computeTotal(this.rackList);
         this.$['master-weight'].textContent = middleClass.sku_wt;
         this.$['current-weight'].value = '';
 
@@ -929,7 +929,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * @description 호기 수량 정보 표시
+       * @description 랙 수량 정보 표시
        ***********************
        * @param {Object} item
        */
@@ -944,59 +944,59 @@ Copyright © HatioLab Inc. All rights reserved.
       /**
        * @description 총 수량 계산
        ***********************
-       * @param {Array} regionList
+       * @param {Array} rackList
        */
-      computeTotal(regionList) {
+      computeTotal(rackList) {
         this.totalPallet = 0;
         this.totalBox = 0;
         this.totalPcs = 0;
 
-        regionList.forEach(region => {
-          this.totalPallet = this.totalPallet + region.pallet_qty;
-          this.totalBox = this.totalBox + region.box_qty;
-          this.totalPcs = this.totalPcs + region.pcs_qty;
+        rackList.forEach(rack => {
+          this.totalPallet = this.totalPallet + rack.pallet_qty;
+          this.totalBox = this.totalBox + rack.box_qty;
+          this.totalPcs = this.totalPcs + rack.pcs_qty;
         });
       }
 
       /**
-       * @description 호기 수량에 따라 컨테이너의 스타일을 수정함
+       * @description 랙 수량에 따라 컨테이너의 스타일을 수정함
        ************************
        */
-      adjustRegionSectionStyle(regionCount) {
-        if(regionCount <= 0) {
+      adjustRegionSectionStyle(rackCount) {
+        if(rackCount <= 0) {
           return;
-        } else if(regionCount < 5) { // 호기 수량이 5개 미만일 경우
+        } else if(rackCount < 5) { // 랙 수량이 5개 미만일 경우
           this._flexColumnStyle(); // flex 스타일 적용 (한개의 로우가 전체 화면을 커버함)
-        } else { // 호기 수량이 5개 이상일 경우
+        } else { // 랙 수량이 5개 이상일 경우
           this._setFiveColumnStyle(); // grid 스타일 적용 (5개의 컬럼으로 로우가 증가함)
         }
       }
 
       /**
-       * @description 호기 5개씩 한 로우에 표시하는 스타일을 컨테이너에 적용
+       * @description 랙 5개씩 한 로우에 표시하는 스타일을 컨테이너에 적용
        ************************
        */
       _setFiveColumnStyle() {
-        const regionContainer = this._getRegionContainer();
-        regionContainer.style.display = 'grid';
-        regionContainer.style.gridTemplateColumns = 'repeat(5, 1fr)';
+        const rackContainer = this._getRegionContainer();
+        rackContainer.style.display = 'grid';
+        rackContainer.style.gridTemplateColumns = 'repeat(5, 1fr)';
       }
 
       /**
-       * @description 단일 로우에 호기들을 flex 스타일로 표현함
+       * @description 단일 로우에 랙들을 flex 스타일로 표현함
        ************************
        */
       _flexColumnStyle() {
-        const regionContainer = this._getRegionContainer();
-        regionContainer.style.display = 'flex';
+        const rackContainer = this._getRegionContainer();
+        rackContainer.style.display = 'flex';
       }
 
       /**
-       * @description 호기 정보 표시 컨테이너 뷰
+       * @description 랙 정보 표시 컨테이너 뷰
        ************************
        */
       _getRegionContainer() {
-        return this.$['regions'];
+        return this.$['racks'];
       }
 
       /**

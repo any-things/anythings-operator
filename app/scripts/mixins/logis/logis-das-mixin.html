@@ -70,7 +70,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * 1. 화면 구성에 필요한 라벨을 초기화
        * 2. 처음 로드할 때를 위해 작업 사이드 적용
        * 3. 해더의 refresh button 클릭시 발생하는 refresh-view-[route] event handler
-       * 4. 호기 선택 체크
+       * 4. 랙 선택 체크
        */
       connectedCallback() {
         super.connectedCallback();
@@ -88,13 +88,13 @@ Copyright © HatioLab Inc. All rights reserved.
         }
 
         let inputListAjax = this.$['input-list-ajax'];
-        let regionCd = LOGIS_UTIL.getRegionCd();
-        let zoneCd = LOGIS_UTIL.getZoneCd();
-        let sideCd = LOGIS_UTIL.getSideCd();
+        let rackCd = LOGIS_UTIL.getRackCd();
+        let zoneCd = LOGIS_UTIL.getEquipZone();
+        let sideCd = LOGIS_UTIL.getRackSide();
         let showOthersOrder = LOGIS_UTIL.getShowOthersOrder();
 
         inputListAjax.curl =
-          `/tablet_process/input_list/${regionCd}/${zoneCd}/${sideCd}`;
+          `/tablet_process/input_list/${rackCd}/${zoneCd}/${sideCd}`;
         // 대상 외 작업 조회 여부 param setting
         inputListAjax.customParams = {
           show_others_order: showOthersOrder
@@ -109,19 +109,19 @@ Copyright © HatioLab Inc. All rights reserved.
       refreshInputDetails(mpiOnFlag) {
         this.setListHeaderColor(this.selectedInput.mpi_color);
         let inputSeqId = this.selectedInput.id;
-        let regionCd = LOGIS_UTIL.getRegionCd();
-        let zoneCd = LOGIS_UTIL.getZoneCd();
-        let sideCd = LOGIS_UTIL.getSideCd();
+        let rackCd = LOGIS_UTIL.getRackCd();
+        let zoneCd = LOGIS_UTIL.getEquipZone();
+        let sideCd = LOGIS_UTIL.getRackSide();
         try {
           this.validationBeforeRefreshDetail(zoneCd, sideCd);
           let detailAjax = this.$['input-job-details-ajax'];
 
           if (this.jobType === 'DAS') {
             detailAjax.curl =
-              `/tablet_process/input_details/${regionCd}/${inputSeqId}/${sideCd}/${zoneCd}`;
+              `/tablet_process/input_details/${rackCd}/${inputSeqId}/${sideCd}/${zoneCd}`;
           } else if (this.jobType === 'DPS') {
             detailAjax.curl =
-              `/tablet_process/${this.jobType.toLowerCase()}/input_details/${inputSeqId}/${regionCd}/${zoneCd}/${sideCd}`;
+              `/tablet_process/${this.jobType.toLowerCase()}/input_details/${inputSeqId}/${rackCd}/${zoneCd}/${sideCd}`;
             detailAjax.customParams = {
               mpi_on_flag: mpiOnFlag
             };
@@ -137,7 +137,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @description 상품 정보 상세 정보 리프레쉬 전 Validation Check
        *********************
        * @param {Boolean} zoneCd 표시기 점등 여부
-       * @param {Boolean} sideCd 호기 사이드 코드
+       * @param {Boolean} sideCd 랙 사이드 코드
        */
       validationBeforeRefreshDetail(zoneCd, sideCd) {
         /*if (!zoneCd) {
@@ -238,7 +238,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _inputDetailsChanged(inputDetails) {
         if (inputDetails == null) return;
-        let sideCd = LOGIS_UTIL.getSideCd();
+        let sideCd = LOGIS_UTIL.getRackSide();
 
         if (sideCd === 'F') {
           this._updateStatus(inputDetails[sideCd]);

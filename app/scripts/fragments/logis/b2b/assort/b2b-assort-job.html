@@ -212,7 +212,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           getSkuAjaxUrl: {
             type: String,
-            value: `/pda_process/find_sku/${LOGIS_UTIL.getRegionCd()}/:inputValue`
+            value: `/pda_process/find_sku/${LOGIS_UTIL.getRackCd()}/:inputValue`
           },
 
           /**
@@ -478,7 +478,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description refresh button click event handler
-       * 현재 호기, 존 정보를 바탕으로 표시기에 점등 되어 있는 작업 리스트를 화면에 출력함
+       * 현재 랙, 존 정보를 바탕으로 표시기에 점등 되어 있는 작업 리스트를 화면에 출력함
        ********************
        */
       _getCurrentJobList() {
@@ -607,14 +607,14 @@ Copyright © HatioLab Inc. All rights reserved.
         this.$['sku-nm'].value = skuInfo.sku_nm;
         this.$['com-cd'].value = comCd;
         this.$['box-in-qty'].value = skuInfo.box_in_qty;
-        const regionCd = LOGIS_UTIL.getRegionCd();
-        const sideCd = LOGIS_UTIL.getSideCd();
-        this.doInputTransaction(regionCd, sideCd, comCd, skuCd);
+        const rackCd = LOGIS_UTIL.getRackCd();
+        const sideCd = LOGIS_UTIL.getRackSide();
+        this.doInputTransaction(rackCd, sideCd, comCd, skuCd);
 
         // if(this.currentMode === 'input-mode') {
-        //   this.doInputTransaction(regionCd, sideCd, comCd, skuCd);
+        //   this.doInputTransaction(rackCd, sideCd, comCd, skuCd);
         // } else if (this.currentMode === 'inspection-mode') {
-        //   this.doInspectTransaction(regionCd, sideCd, comCd, skuCd);
+        //   this.doInspectTransaction(rackCd, sideCd, comCd, skuCd);
         // }
         // this.doTransaction('input-sku-ajax', url);
       }
@@ -641,10 +641,10 @@ Copyright © HatioLab Inc. All rights reserved.
 
           if (comCd && skuCd) {
             const ajax = this.$['search-job-ajax'];
-            const regionCd = LOGIS_UTIL.getRegionCd();
-            const sideCd = LOGIS_UTIL.getSideCd();
-            let zoneCd = LOGIS_UTIL.getZoneCd();
-            ajax.curl = `/pda_process/search_jobs/${regionCd}/${sideCd}/${zoneCd}/${comCd}/${skuCd}`;
+            const rackCd = LOGIS_UTIL.getRackCd();
+            const sideCd = LOGIS_UTIL.getRackSide();
+            let zoneCd = LOGIS_UTIL.getEquipZone();
+            ajax.curl = `/pda_process/search_jobs/${rackCd}/${sideCd}/${zoneCd}/${comCd}/${skuCd}`;
             ajax.generateRequest();
           }
         }
@@ -671,17 +671,17 @@ Copyright © HatioLab Inc. All rights reserved.
       /**
        * @description 상품 투입 api 호출
        ******************
-       * @param {String} regionCd
+       * @param {String} rackCd
        * @param {String} sideCd
        * @param {String} comCd
        * @param {String} skuCd
        */
-      doInputTransaction(regionCd, sideCd, comCd, skuCd) {
+      doInputTransaction(rackCd, sideCd, comCd, skuCd) {
         try {
           this.validateBeforeRequest();
           const inputAjax = this._getInputAjax();
-          let zoneCd = LOGIS_UTIL.getZoneCd();
-          inputAjax.curl = `/pda_process/input_sku/${regionCd}/${sideCd}/${zoneCd}/${comCd}/${skuCd}`;
+          let zoneCd = LOGIS_UTIL.getEquipZone();
+          inputAjax.curl = `/pda_process/input_sku/${rackCd}/${sideCd}/${zoneCd}/${comCd}/${skuCd}`;
           inputAjax.generateRequest();
 
         } catch (error) {
@@ -698,17 +698,17 @@ Copyright © HatioLab Inc. All rights reserved.
       /**
        * @description 상품 검수 api 호출
        ******************
-       * @param {String} regionCd
+       * @param {String} rackCd
        * @param {String} sideCd
        * @param {String} zoneCd
        * @param {String} comCd
        * @param {String} skuCd
        */
-      doInspectTransaction(regionCd, sideCd, zoneCd, comCd, skuCd) {
+      doInspectTransaction(rackCd, sideCd, zoneCd, comCd, skuCd) {
         try {
           this.validateBeforeRequest();
           const inspectAjax = this._getInspectAjax();
-          inspectAjax.curl = `/pda_process/inspection_by_mpi/${regionCd}/${sideCd}/${zoneCd}/${comCd}/${skuCd}`
+          inspectAjax.curl = `/pda_process/inspection_by_mpi/${rackCd}/${sideCd}/${zoneCd}/${comCd}/${skuCd}`
           inspectAjax.generateRequest();
 
         } catch (error) {
@@ -778,12 +778,12 @@ Copyright © HatioLab Inc. All rights reserved.
             title: t('text.checking_inspection'),
             message: t('text.check_inspection'),
             confirmCallback: () => {
-              const regionCd = LOGIS_UTIL.getRegionCd();
-              const sideCd = LOGIS_UTIL.getSideCd();
-              let zoneCd = LOGIS_UTIL.getZoneCd();
+              const rackCd = LOGIS_UTIL.getRackCd();
+              const sideCd = LOGIS_UTIL.getRackSide();
+              let zoneCd = LOGIS_UTIL.getEquipZone();
               let comCd = this.getComCd();
               let skuCd = this.getSkuCd();
-              this.doInspectTransaction(regionCd, sideCd, zoneCd, comCd, skuCd);
+              this.doInspectTransaction(rackCd, sideCd, zoneCd, comCd, skuCd);
               this._initialSetup();
             },
             cancelCallback: () => {
@@ -889,9 +889,9 @@ Copyright © HatioLab Inc. All rights reserved.
           title: t('button.led_on'),
           message: t('text.Sure to process'),
           confirmCallback: () => {
-            const regionCd = LOGIS_UTIL.getRegionCd();
+            const rackCd = LOGIS_UTIL.getRackCd();
             const mpiOnAjax = this._getMpiOnAjax();
-            mpiOnAjax.curl = `/kiosk_process/restore_mpi/${regionCd}`;
+            mpiOnAjax.curl = `/kiosk_process/restore_mpi/${rackCd}`;
             mpiOnAjax.generateRequest();
             this._initialSetup();
           },
@@ -910,9 +910,9 @@ Copyright © HatioLab Inc. All rights reserved.
           title: t('button.led_off'),
           message: t('text.Sure to process'),
           confirmCallback: () => {
-            const regionCd = LOGIS_UTIL.getRegionCd();
+            const rackCd = LOGIS_UTIL.getRackCd();
             const mpiOffAjax = this._getMpiOffAjax();
-            mpiOffAjax.curl = `/kiosk_process/mpi_off_all/${regionCd}`;
+            mpiOffAjax.curl = `/kiosk_process/mpi_off_all/${rackCd}`;
             mpiOffAjax.generateRequest();
             this._initialSetup();
           },

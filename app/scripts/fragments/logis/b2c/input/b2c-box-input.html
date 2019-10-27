@@ -298,7 +298,7 @@ Copyright © HatioLab Inc. All rights reserved.
     </sys-ajax>
 
     <!-- 공박스 투입을 위한 Ajax -->
-    <sys-ajax id="input-ajax" curl="/kiosk_process/dps/input_bucket/:region_cd/:bucket_cd" method="PUT"
+    <sys-ajax id="input-ajax" curl="/kiosk_process/dps/input_bucket/:rack_cd/:bucket_cd" method="PUT"
       content-type="application/json" last-response="{{orderDataSet}}" on-sys-ajax-error="_onBucketCdScanError">
     </sys-ajax>
 
@@ -981,7 +981,7 @@ Copyright © HatioLab Inc. All rights reserved.
           if (/^[bcdfghiBCDFGHI][0-9]{7}$/.exec(boxCd)) {
             event.currentTarget.value = '';
 
-            if (LOGIS_UTIL.getKioskInputType() === 'box') {
+            if (LOGIS_UTIL.getB2CInputBoxType() === 'box') {
               this.inputBox(boxCd);
             } else {
               this.inputBucket(boxCd);
@@ -1008,16 +1008,16 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       refresh(event) {
         this._barcodeInputReset();
-        var regionCd = LOGIS_UTIL.getRegionCd();
+        var rackCd = LOGIS_UTIL.getRackCd();
 
-        if (regionCd) {
+        if (rackCd) {
           var showOrderAjax = this.$['batch-summary-ajax'];
-          var url = '/kiosk_process/dps/batch_summary/' + regionCd;
+          var url = '/kiosk_process/dps/batch_summary/' + rackCd;
           url = url + '?page=' + this.page + '&limit=' + this.limit;
           showOrderAjax.curl = url;
           showOrderAjax.generateRequest();
         } else {
-          LOGIS_UTIL.showMessage(t('title.selecting_region'), t('text.select_region'));
+          LOGIS_UTIL.showMessage(t('title.selecting_rack'), t('text.select_rack'));
         }
       }
 
@@ -1051,16 +1051,16 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       inputBucket(bucketCd) {
         if (bucketCd && bucketCd.length >= 4) {
-          var regionCd = LOGIS_UTIL.getRegionCd();
+          var rackCd = LOGIS_UTIL.getRackCd();
 
-          if (regionCd) {
+          if (rackCd) {
             var inputBucketAjax = this.$['input-ajax'];
-            var url = '/kiosk_process/dps/input_bucket/' + regionCd + '/' + bucketCd;
+            var url = '/kiosk_process/dps/input_bucket/' + rackCd + '/' + bucketCd;
             url = url + '?page=' + this.page + '&limit=' + this.limit;
             inputBucketAjax.curl = url;
             inputBucketAjax.generateRequest();
           } else {
-            LOGIS_UTIL.showMessage(t('title.selecting_region'), t('text.select_region'));
+            LOGIS_UTIL.showMessage(t('title.selecting_rack'), t('text.select_rack'));
           }
         }
       }
@@ -1072,18 +1072,18 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       inputBox(boxId) {
         if (boxId && boxId.length >= 4) {
-          var regionCd = LOGIS_UTIL.getRegionCd();
+          var rackCd = LOGIS_UTIL.getRackCd();
 
-          if (regionCd) {
+          if (rackCd) {
             // 박스 ID의 첫 번째 글자가 박스 타입
             var boxType = boxId.substring(0, 1);
             var inputBucketAjax = this.$['input-ajax'];
-            var url = '/kiosk_process/dps/input_box/' + regionCd + '/' + boxId + '/' + boxType;
+            var url = '/kiosk_process/dps/input_box/' + rackCd + '/' + boxId + '/' + boxType;
             url = url + '?page=' + this.page + '&limit=' + this.limit;
             inputBucketAjax.curl = url;
             inputBucketAjax.generateRequest();
           } else {
-            LOGIS_UTIL.showMessage(t('title.selecting_region'), t('text.select_region'));
+            LOGIS_UTIL.showMessage(t('title.selecting_rack'), t('text.select_rack'));
           }
         }
       }

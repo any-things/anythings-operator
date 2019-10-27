@@ -284,18 +284,18 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * @description 현재 호기의 로케이션 목록 ajax 호출
+       * @description 현재 랙의 로케이션 목록 ajax 호출
        *********************
        */
       refreshList() {
         const refreshAjax = this.$['refresh-ajax'];
-        var regionCd = LOGIS_UTIL.getRegionCd();
-        var equipZoneCd = LOGIS_UTIL.getZoneCd();
+        var rackCd = LOGIS_UTIL.getRackCd();
+        var equipZoneCd = LOGIS_UTIL.getEquipZone();
         var params = {
           query: JSON.stringify([{
-            name: 'region_cd',
+            name: 'rack_cd',
             operator: 'eq',
-            value: regionCd
+            value: rackCd
           }, {
             name: 'com_cd',
             operator: 'is_not_null'
@@ -339,8 +339,8 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       clearJobMapping(locationCode) {
         let ajax = this.$['clear-job-mapping'];
-        var regionCd = LOGIS_UTIL.getRegionCd();
-        ajax.curl = `/pda_process/unassign/location_box/${regionCd}/${locationCode}`;
+        var rackCd = LOGIS_UTIL.getRackCd();
+        ajax.curl = `/pda_process/unassign/location_box/${rackCd}/${locationCode}`;
         ajax.generateRequest();
       }
 
@@ -378,8 +378,8 @@ Copyright © HatioLab Inc. All rights reserved.
           const execJobMappingAjax = this.$['exec-job-mapping'];
           const locCd = this.$['loc-cd'].value;
           const boxId = this.$['box-id'].value;
-          var regionCd = LOGIS_UTIL.getRegionCd();
-          execJobMappingAjax.curl = `/pda_process/assign/location_box/${regionCd}/${locCd}/${boxId}`;
+          var rackCd = LOGIS_UTIL.getRackCd();
+          execJobMappingAjax.curl = `/pda_process/assign/location_box/${rackCd}/${locCd}/${boxId}`;
           execJobMappingAjax.generateRequest();
 
         } catch (error) {

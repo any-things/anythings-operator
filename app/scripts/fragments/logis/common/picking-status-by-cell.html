@@ -55,10 +55,10 @@ Copyright © HatioLab Inc. All rights reserved.
     </sys-ajax>
 
     <div id="container">
-      <!-- 호기 Input Box -->
+      <!-- 랙 Input Box -->
       <div id="input-container">
         <span class="label">[[chuteLabel]]</span>
-        <input barcode id="chute-no" type="text" name="chute_no" on-keypress="_regionInputKeypress">
+        <input barcode id="chute-no" type="text" name="chute_no" on-keypress="_rackInputKeypress">
       </div>
 
       <!-- 로케이션 별 확정 수량 정보 리스트 -->
@@ -200,8 +200,8 @@ Copyright © HatioLab Inc. All rights reserved.
 
         // 현재 페이지의 URL을 저장
         this.routingUrl = location.hash.replace('#/', '');
-        // 호기 코드를 현재 호기 코드로 설정
-        this.chuteNo = LOGIS_UTIL.getZoneCd();
+        // 랙 코드를 현재 랙 코드로 설정
+        this.chuteNo = LOGIS_UTIL.getEquipZone();
         this.$['chute-no'].value = this.chuteNo;
 
         document.addEventListener(`alert-closed-at-${this.routingUrl}`, event => {
@@ -237,7 +237,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * @description 현재 호기의 로케이션 목록 ajax 호출
+       * @description 현재 랙의 로케이션 목록 ajax 호출
        ********************************************
        */
       refreshList() {
@@ -274,11 +274,11 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description chute-no input keypress event handler
-       * chute-no 바코드 스캔시 호기 코드로 데이터 조회
+       * chute-no 바코드 스캔시 랙 코드로 데이터 조회
        *********************
        * @param {Object} event
        */
-      _regionInputKeypress(event) {
+      _rackInputKeypress(event) {
         if(event.charCode === 13) {
           this.chuteNo = this.$['chute-no'].value;
           this.refreshList();

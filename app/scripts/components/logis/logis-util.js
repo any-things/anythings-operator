@@ -7,8 +7,7 @@
  *
  ******************************************************************************/
 
-LOGIS_UTIL = {
-};
+LOGIS_UTIL = {};
 
 /**
  * 디바이스 타입 조회
@@ -25,38 +24,31 @@ LOGIS_UTIL.getShowOthersOrder = function() {
 };
 
 /**
- * 현재 태블릿의 호기 코드 리턴
+ * 현재 설정에서 선택한 랙 코드를 리턴
  */
-LOGIS_UTIL.getRegionCd = function() {
-  return JSON.parse(localStorage.getItem('setting.regionCode'));
+LOGIS_UTIL.getRackCd = function() {
+  return JSON.parse(localStorage.getItem('setting.rackCd'));
 };
 
 /**
- * 현재 태블릿의 호기명을 리턴
+ * 현재 설정에서 선택한 랙 명을 리턴
  */
-LOGIS_UTIL.getRegionNm = function() {
-  return JSON.parse(localStorage.getItem('setting.regionName'));
+LOGIS_UTIL.getRackNm = function() {
+  return JSON.parse(localStorage.getItem('setting.rackNm'));
 };
 
 /**
- * 현재 태블릿의 조회 범위 존을 리턴
+ * 현재 설정에서 선택한 장비 조회 범위 존을 리턴
  */
-LOGIS_UTIL.getZoneCd = function() {
-  return JSON.parse(localStorage.getItem('setting.zoneCode'));
+LOGIS_UTIL.getEquipZone = function() {
+  return JSON.parse(localStorage.getItem('setting.equipZone'));
 };
 
 /**
- * 현재 태블릿의 작업 위치를 리턴
+ * 랙의 작업 사이드를 리턴
  */
-LOGIS_UTIL.getSideCd = function() {
-  return JSON.parse(localStorage.getItem('setting.workLocation'));
-};
-
-/**
- * 작업 위치를 로컬 스토리지에서 조회
- */
-LOGIS_UTIL.getWorkLoc = function() {
-  return JSON.parse(localStorage.getItem('setting.workLocation'));
+LOGIS_UTIL.getRackSide = function() {
+  return JSON.parse(localStorage.getItem('setting.rackSide'));
 };
 
 /**
@@ -76,72 +68,72 @@ LOGIS_UTIL.getShowFullCode = function() {
 /**
  * 표시할 송장 번호 문자열의 시작 인덱스를 리턴
  */
-LOGIS_UTIL.getInvoiceFieldSubstr = function () {
+LOGIS_UTIL.getInvoiceFieldSubstr = function() {
   return parseInt(JSON.parse(localStorage.getItem('setting.invoiceFieldSubstr')));
 };
 
 /**
  * 작업 유형 리턴
  */
-LOGIS_UTIL.getJobName = function () {
-  return JSON.parse(localStorage.getItem('setting.jobName'));
+LOGIS_UTIL.getJobType = function() {
+  return JSON.parse(localStorage.getItem('setting.jobType'));
 };
 
 /**
- * 데이터 조회 주기
+ * 화면에서 데이터 리프레쉬 주기
  */
 LOGIS_UTIL.getRefreshInterval = function() {
-  let interval = JSON.parse(localStorage.getItem('setting.kioskInterval'));
+  let interval = JSON.parse(localStorage.getItem('setting.refreshInterval'));
   interval = Number(interval) * 1000;
   return interval;
 };
 
 /**
- * 현재 키오스크 코드 타입을 리턴
+ * 사용하는 바코드 유형을 리턴
  */
-LOGIS_UTIL.getKioskCodeType = function() {
-  return JSON.parse(localStorage.getItem('setting.kioskCodeType'));
+LOGIS_UTIL.getBarcodeType = function() {
+  return JSON.parse(localStorage.getItem('setting.barcodeType'));
 };
 
 /**
- * 현재 키오스크 Input 타입을 리턴
+ * B2C 투입 박스 유형
  */
-LOGIS_UTIL.getKioskInputType = function() {
-  return JSON.parse(localStorage.getItem('setting.kioskInputType'));
+LOGIS_UTIL.getB2CInputBoxType = function() {
+  return JSON.parse(localStorage.getItem('setting.b2cKioskInputType'));
 };
 
 /**
- * 현재 키오스크 프린트 아이디 리턴
+ * 사용할 프린터 아이디 리턴
  */
-LOGIS_UTIL.getKioskPrinterId = function() {
-  return JSON.parse(localStorage.getItem('setting.kioskPrinterId'));
+LOGIS_UTIL.getPrinterId = function() {
+  return JSON.parse(localStorage.getItem('setting.printerId'));
 };
 
 /**
- * 브로커 사이트 조회
+ * 메시지 브로커의 사이트 코드 조회
  */
 LOGIS_UTIL.getBrokerSiteCd = function() {
   return localStorage.getItem('setting.brokerSite');
 };
 
 /**
- * 브로커 주소 조회
+ * 메시지 브로커 주소 조회
  */
 LOGIS_UTIL.getBrokerAddress = function() {
   return localStorage.getItem('setting.brokerAddress');
 };
 
 /**
- * 브로커 포트 조회
+ * 메시지 브로커 포트 조회
  */
-LOGIS_UTIL.getBrokerPort = function () {
+LOGIS_UTIL.getBrokerPort = function() {
   return localStorage.getItem('setting.brokerPort');
 };
 
 /**
  * 연속 스캔 허용 여부 조회
  */
-LOGIS_UTIL.isContinousScanAllowed = function () {
+LOGIS_UTIL.isContinousScanAllowed = function() {
   let continousScanAllowed = localStorage.getItem('setting.continousScanAllowed');
   return continousScanAllowed === null ? false : continousScanAllowed;
 };
@@ -181,16 +173,16 @@ LOGIS_UTIL.showConfirm = function(title, message, cancelCallback, confirmCallbac
  * 설정이 비어있는 경우 핸들러
  */
 LOGIS_UTIL.handleRequiredSettingEmpty = function() {
-  LOGIS_UTIL.showMessage(t('text.selecting_region'), t('text.select_region'), function() {
+  LOGIS_UTIL.showMessage(t('text.selecting_rack'), t('text.select_rack'), function() {
     location.hash = '/logis_setting';
   });
 };
 
 /**
- * 설정에 호기 설정이 비어있는 지 체크
+ * 설정에 랙 설정이 비어있는 지 체크
  */
 LOGIS_UTIL.checkRequiredSettingEmpty = function() {
-  if(!LOGIS_UTIL.getRegionCd()) {
+  if (!LOGIS_UTIL.getRackCd()) {
     LOGIS_UTIL.handleRequiredSettingEmpty();
     return false;
   } else {
@@ -216,12 +208,12 @@ LOGIS_UTIL.showPopup = function(title, popup, width, height, openCallback, close
       width: width,
       height: height,
       openCallback: () => {
-        if(openCallback && typeof(openCallback) == 'function') {
+        if (openCallback && typeof(openCallback) == 'function') {
           openCallback();
         }
       },
       closeCallback: () => {
-        if(closeCallback && typeof(closeCallback) == 'function') {
+        if (closeCallback && typeof(closeCallback) == 'function') {
           closeCallback(event.detail);
         }
       }
@@ -232,25 +224,25 @@ LOGIS_UTIL.showPopup = function(title, popup, width, height, openCallback, close
 /**
  * 현재 작업 위치 변경시
  ******************
- * @param {String} sideCd
+ * @param {String} rackSideCd
  * @param {String} screen
  */
-LOGIS_UTIL.setSideCd = function(sideCd, screen) {
-  if(!sideCd) sideCd = 'F';
+LOGIS_UTIL.setRackSide = function(rackSideCd, screen) {
+  if (!rackSideCd) rackSideCd = 'F';
 
   screen.showFront = false;
   screen.showRear = false;
   screen.showTotal = false;
 
-  if (sideCd === 'F' || sideCd === 'ALL' || sideCd === 'f' || sideCd === 'all') {
+  if (rackSideCd === 'F' || rackSideCd === 'ALL' || rackSideCd === 'f' || rackSideCd === 'all') {
     screen.showFront = true;
   }
 
-  if (sideCd === 'R' || sideCd === 'ALL' || sideCd === 'r' || sideCd === 'all') {
+  if (rackSideCd === 'R' || rackSideCd === 'ALL' || rackSideCd === 'r' || rackSideCd === 'all') {
     screen.showRear = true;
   }
 
-  if(sideCd === 'T') {
+  if (rackSideCd === 'T') {
     screen.showTotal = true;
   }
 };
@@ -278,8 +270,8 @@ LOGIS_UTIL.getUnfinishedStatusName = function() {
  */
 LOGIS_UTIL.sortByLeftQty = function(items) {
   items.sort(function(a, b) {
-    if(a.left_qty == b.left_qty) return 0;
-    else if(a.left_qty > 0 && b.left_qty == 0) return -1;
+    if (a.left_qty == b.left_qty) return 0;
+    else if (a.left_qty > 0 && b.left_qty == 0) return -1;
     else return 1;
   });
 

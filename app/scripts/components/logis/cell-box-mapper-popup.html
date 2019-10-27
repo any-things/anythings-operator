@@ -165,11 +165,11 @@ Copyright © HatioLab Inc. All rights reserved.
         }
 
         var ajax = this.$['assign-box-to-loc'];
-        var regionCd = this.regionCd || LOGIS_UTIL.getRegionCd();
-        ajax.curl = `/pda_process/assign/location_box/${regionCd}/${lcCode}/${boxId}`;
+        var rackCd = this.rackCd || LOGIS_UTIL.getRackCd();
+        ajax.curl = `/pda_process/assign/location_box/${rackCd}/${lcCode}/${boxId}`;
 
         // 요청 직전 AJAX 핸들링을 위한 이벤트
-        var detail = { ajax, params: { regionCd, lcCode, boxId }};
+        var detail = { ajax, params: { rackCd, lcCode, boxId }};
         var event = new CustomEvent('before-assign-request', { detail });
         this.dispatchEvent(event);
         ajax.generateRequest();

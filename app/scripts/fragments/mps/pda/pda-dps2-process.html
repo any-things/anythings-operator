@@ -37,12 +37,12 @@ Copyright © HatioLab Inc. All rights reserved.
         border-radius: var(--things-default-border-radius);
         color: rgba(255,255,255,.8);
       }
-      #region-info-container {
+      #rack-info-container {
         display: flex;
         font-size: .8rem;
         border-bottom: 1px solid rgba(255,255,255,.2);
       }
-      #region-info-container label, #region-info-container span{
+      #rack-info-container label, #rack-info-container span{
         flex: 1;
         text-align: center;
       }
@@ -136,7 +136,7 @@ Copyright © HatioLab Inc. All rights reserved.
     <sys-ajax
       id="input-job-details-ajax"
       method="GET"
-      curl="/tablet_process/job_details/:region_cd/:side_cd/:zone_cd/:com_cd/:sku_cd"
+      curl="/tablet_process/job_details/:rack_cd/:side_cd/:zone_cd/:com_cd/:sku_cd"
       content-type="application/json"
       last-response="{{inputDetails}}">
     </sys-ajax>
@@ -151,10 +151,10 @@ Copyright © HatioLab Inc. All rights reserved.
 
     <!-- 화면 컨테이너 -->
     <div id="container">
-      <!-- 호기 정보 -->
-      <div id="region-info-container" class="input-row">
-        <label>[[regionNmLabel]]</label>
-        <span id="view-region-nm">[[regionNm]]</span>
+      <!-- 랙 정보 -->
+      <div id="rack-info-container" class="input-row">
+        <label>[[rackNmLabel]]</label>
+        <span id="view-rack-nm">[[rackNm]]</span>
         <label>[[zoneCdLabel]]</label>
         <span id="view-zone-nm">[[zoneCd]]</span>
       </div>
@@ -211,12 +211,12 @@ Copyright © HatioLab Inc. All rights reserved.
     <!-- 박스 검수 컴포넌트 -->
     <box-process-checker
       id="inspect-box"
-      region-cd="[[regionCd]]">
+      rack-cd="[[rackCd]]">
     </box-process-checker>
 
     <!-- 로케이션 - 박스 매핑 컴포넌트 -->
     <cell-box-mapper-popup
-      region-cd="[[regionCd]]"
+      rack-cd="[[rackCd]]"
       input-value="{{inputValue}}"
       on-need-inspect-box="_handleNeedInspectBox">
     </cell-box-mapper-popup>
@@ -233,7 +233,9 @@ Copyright © HatioLab Inc. All rights reserved.
 
   <script>
     class PdaDps2Process extends LogisMsgSubscribeMixin(Polymer.Element) {
-      static get is() { return 'pda-dps2-process' }
+      static get is() {
+        return 'pda-dps2-process'
+      }
 
       static get properties() {
         return {
@@ -368,7 +370,7 @@ Copyright © HatioLab Inc. All rights reserved.
                 display: t('label.cust_nm'),
                 fieldname: 'cust_nm_with_seq',
                 displayCallback: (rowData) => {
-                  if(rowData.input_seq) {
+                  if (rowData.input_seq) {
                     return `(${rowData.input_seq}) ${rowData.cust_nm}`;
                   } else {
                     return `${rowData.cust_nm}`;
@@ -490,11 +492,11 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * @description 호기 코드 라벨
+           * @description 랙 코드 라벨
            */
-          regionNmLabel: {
+          rackNmLabel: {
             type: String,
-            value: () =>  t('label.region_nm'),
+            value: () => t('label.rack_nm'),
           },
 
           /**
@@ -564,26 +566,26 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * @description 작업할 호기 코드 표시값
+           * @description 작업할 랙 코드 표시값
            ****************
            * @type {String}
            */
-          regionCd: {
+          rackCd: {
             type: String,
-            value: LOGIS_UTIL.getRegionCd(),
-            observer: '_regionCdChanged'
+            value: LOGIS_UTIL.getRackCd(),
+            observer: '_rackCdChanged'
           },
 
           /**
-           * @description 작업할 호기 명 표시값
+           * @description 작업할 랙 명 표시값
            ****************
            * @type {String}
            */
-          regionNm: {
+          rackNm: {
             type: String,
             notify: true,
-            value: LOGIS_UTIL.getRegionNm(),
-            observer: '_regionNmChanged'
+            value: LOGIS_UTIL.getRackNm(),
+            observer: '_rackNmChanged'
           },
 
           /**
@@ -594,7 +596,7 @@ Copyright © HatioLab Inc. All rights reserved.
           zoneCd: {
             type: String,
             notify: true,
-            value: LOGIS_UTIL.getZoneCd(),
+            value: LOGIS_UTIL.getEquipZone(),
             observer: '_zoneCdChanged'
           }
         }
@@ -631,7 +633,7 @@ Copyright © HatioLab Inc. All rights reserved.
         super.connectedCallback();
 
         document.addEventListener(`alert-closed-at-${location.hash.replace('#/', '')}`, event => {
-          if(!event.detail.hasCallback) {
+          if (!event.detail.hasCallback) {
             this._initFocus();
           }
         });
@@ -641,24 +643,24 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * @description 호기 코드 변경 시
+       * @description 랙 코드 변경 시
        *********************
-       * @param {String} regionCd
+       * @param {String} rackCd
        */
-      _regionCdChanged(regionCd) {
-        if (regionCd) {
-          window.localStorage.setItem('setting.regionCode', JSON.stringify(regionCd));
+      _rackCdChanged(rackCd) {
+        if (rackCd) {
+          window.localStorage.setItem('setting.rackCd', JSON.stringify(rackCd));
         }
       }
 
       /**
-       * @description 호기 명 변경 시
+       * @description 랙 명 변경 시
        *********************
-       * @param {String} regionNm
+       * @param {String} rackNm
        */
-      _regionNmChanged(regionNm) {
-        if (regionNm) {
-          window.localStorage.setItem('setting.regionName', JSON.stringify(regionNm));
+      _rackNmChanged(rackNm) {
+        if (rackNm) {
+          window.localStorage.setItem('setting.rackNm', JSON.stringify(rackNm));
         }
       }
 
@@ -668,9 +670,9 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {String} zoneCd
        */
       _zoneCdChanged(zoneCd) {
-        if (zoneCd && this.regionCd) {
-          WEB_MQTT.reset(this.regionCd, zoneCd);
-          window.localStorage.setItem('setting.zoneCode', JSON.stringify(zoneCd));
+        if (zoneCd && this.rackCd) {
+          WEB_MQTT.reset(this.rackCd, zoneCd);
+          window.localStorage.setItem('setting.equipZone', JSON.stringify(zoneCd));
         }
       }
 
@@ -695,14 +697,14 @@ Copyright © HatioLab Inc. All rights reserved.
 
         // 표시기 코드 (01로 시작하고 22자) or 로케이션 코드 (- 다음 네자리 숫자) or 박스 ID(16자리) 스캔시 ...
         if ((inputValue.startsWith('01') && inputValue.length === 22) ||
-            inputValue.length === 16 ||
-            inputValue.search(/-[0-9][0-9][0-9][0-9]$/) >= 0) {
+          inputValue.length === 16 ||
+          inputValue.search(/-[0-9][0-9][0-9][0-9]$/) >= 0) {
           this._initFocus();
 
-        // 그 외 값은 상품 정보로 판단하여 상품 조회
+          // 그 외 값은 상품 정보로 판단하여 상품 조회
         } else {
           let ajax = this.$['find-sku-ajax'];
-          ajax.curl = `/tablet_process/find_sku/${this.regionCd}/${inputValue}`;
+          ajax.curl = `/tablet_process/find_sku/${this.rackCd}/${inputValue}`;
           ajax.generateRequest();
         }
       }
@@ -736,7 +738,7 @@ Copyright © HatioLab Inc. All rights reserved.
         if (!this.inspectBtnActive) {
           // 검수 모드가 아니면 투입 처리
           this.doInputTransaction({
-            regionCd: this.regionCd,
+            rackCd: this.rackCd,
             sideCd: this.sideCd,
             comCd: selectedInput.com_cd,
             skuCd: selectedInput.sku_cd,
@@ -833,9 +835,14 @@ Copyright © HatioLab Inc. All rights reserved.
           this.forceRefresh = true;
         }
 
-        var { regionCd, zoneCd, sideCd, showOthersOrder } = this;
+        var {
+          rackCd,
+          zoneCd,
+          sideCd,
+          showOthersOrder
+        } = this;
         var ajax = this.$['input-list-ajax'];
-        ajax.curl = `/tablet_process/input_list/${regionCd}/${zoneCd}/${sideCd}`;
+        ajax.curl = `/tablet_process/input_list/${rackCd}/${zoneCd}/${sideCd}`;
         // 대상 외 작업 조회 여부 param setting
         ajax.customParams = {
           show_others_order: showOthersOrder
@@ -849,9 +856,9 @@ Copyright © HatioLab Inc. All rights reserved.
        * @Override
        */
       refreshInputDetails(mpiOnFlag) {
-        let regionCd = this.regionCd;
+        let rackCd = this.rackCd;
         let zoneCd = this.zoneCd;
-        let sideCd = LOGIS_UTIL.getSideCd();
+        let sideCd = LOGIS_UTIL.getRackSide();
         let comCd = this.comCd ? this.comCd : '_na_';
         let skuCd = this.skuCd ? this.skuCd : '_na_';
         let headerColor = this.selectedInput ? this.selectedInput.mpi_color : 'Y';
@@ -862,7 +869,7 @@ Copyright © HatioLab Inc. All rights reserved.
         try {
           this.validationBeforeRefreshDetail(zoneCd, sideCd);
           let detailAjax = this.$['input-job-details-ajax'];
-          detailAjax.curl = `/tablet_process/job_details/${regionCd}/${sideCd}/${zoneCd}/${comCd}/${skuCd}`;
+          detailAjax.curl = `/tablet_process/job_details/${rackCd}/${sideCd}/${zoneCd}/${comCd}/${skuCd}`;
           detailAjax.generateRequest();
         } catch (error) {
           LOGIS_UTIL.showMessage(error.title, error.message, error.callback);
@@ -923,14 +930,14 @@ Copyright © HatioLab Inc. All rights reserved.
         }, this);
 
         this.custCdQty = custCds.length;
-        let totalPickQty = 0;     // 총 주문 수량
-        let totalPickedQty = 0;   // 총 확정 수량
-        let canceledQty = 0;      // 작업 취소된 상품 수량
+        let totalPickQty = 0; // 총 주문 수량
+        let totalPickedQty = 0; // 총 확정 수량
+        let canceledQty = 0; // 작업 취소된 상품 수량
 
         inputDetails.forEach(item => {
           totalPickQty += item.pick_qty;
           totalPickedQty += item.picked_qty;
-          if (item.status === 'C') {  // FIXME
+          if (item.status === 'C') { // FIXME
             canceledQty += item.pick_qty;
           }
         });
@@ -945,7 +952,13 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Array} params
        */
       doInputTransaction(params) {
-        var { regionCd, sideCd, comCd, skuCd, boxBarcd } = params || this;
+        var {
+          rackCd,
+          sideCd,
+          comCd,
+          skuCd,
+          boxBarcd
+        } = params || this;
 
         try {
           this.validateBeforeRequest();
@@ -966,10 +979,10 @@ Copyright © HatioLab Inc. All rights reserved.
 
         // 마지막으로 스캔한 코드가 박스 바코드이면 박스째 투입으로 처리
         if (this.inputValue === boxBarcd) {
-          inputAjax.curl = `/pda_process/box_input/${regionCd}/${sideCd}/${this.zoneCd}/${comCd}/${skuCd}?allow_continous_scan=${isContinousScanAllowed}`;
-        // 그렇지 않으면 단일 상품 투입
+          inputAjax.curl = `/pda_process/box_input/${rackCd}/${sideCd}/${this.zoneCd}/${comCd}/${skuCd}?allow_continous_scan=${isContinousScanAllowed}`;
+          // 그렇지 않으면 단일 상품 투입
         } else {
-          inputAjax.curl = `/pda_process/input_sku/${regionCd}/${sideCd}/${this.zoneCd}/${comCd}/${skuCd}?allow_continous_scan=${isContinousScanAllowed}`;
+          inputAjax.curl = `/pda_process/input_sku/${rackCd}/${sideCd}/${this.zoneCd}/${comCd}/${skuCd}?allow_continous_scan=${isContinousScanAllowed}`;
         }
 
         inputAjax.generateRequest();
@@ -989,7 +1002,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @description 상품 정보 상세 정보 리프레쉬 전 Validation Check
        *********************
        * @param {Boolean} zoneCd 표시기 점등 여부
-       * @param {Boolean} sideCd 호기 사이드 코드
+       * @param {Boolean} sideCd 랙 사이드 코드
        */
       validationBeforeRefreshDetail(zoneCd, sideCd) {
         if (!zoneCd) {
@@ -1016,7 +1029,7 @@ Copyright © HatioLab Inc. All rights reserved.
       validateBeforeRequest() {
         let skuCd = this.skuCd;
 
-        if(!skuCd || skuCd.length < 4) {
+        if (!skuCd || skuCd.length < 4) {
           throw t('error.sku_barcd_invalid');
         }
       }
@@ -1031,7 +1044,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
         // 슈트 넘버 스캔시 처리
         var value = this.$.input.getValue();
-        if(/^\d{3}$/.test(value)) {
+        if (/^\d{3}$/.test(value)) {
           this.chuteNumberScanned(value);
         } else {
           this.inputValue = null;
@@ -1056,8 +1069,8 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} event
        */
       _chuteInfoResponse(event) {
-        this.regionNm = event.detail.region_nm;
-        this.regionCd = event.detail.region_cd;
+        this.rackNm = event.detail.rack_nm;
+        this.rackCd = event.detail.rack_cd;
         this.zoneCd = event.detail.chute_no;
         showToast('info', `${t('text.chute_changed')}`);
         this._reset();
@@ -1102,13 +1115,20 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       showMessage(type, title, message, confirmCallback) {
         switch (type) {
-          case 'error': {
-            MsgAlert.webAlert({ title: title, message: message, confirmText: t('button.cancel') });
-          } break;
+          case 'error':
+            {
+              MsgAlert.webAlert({
+                title: title,
+                message: message,
+                confirmText: t('button.cancel')
+              });
+            }
+            break;
           case 'info':
-          default: {
-            showToast(type, message);
-          }
+          default:
+            {
+              showToast(type, message);
+            }
         }
 
         window.SOUND.playInfoSound();
@@ -1132,9 +1152,9 @@ Copyright © HatioLab Inc. All rights reserved.
        ******************
        */
       _reset(isItemReset) {
-        this.regionCd = this.regionCd;
+        this.rackCd = this.rackCd;
         this.zoneCd = this.zoneCd;
-        this.sideCd = LOGIS_UTIL.getSideCd();
+        this.sideCd = LOGIS_UTIL.getRackSide();
         this.showOthersOrder = false;
 
         this.skuBarcd = '';

@@ -165,7 +165,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       searchBoxList() {
         var ajax = this.$['box-list-ajax'];
-        ajax.curl = '/tablet_process/boxed_list/' + LOGIS_UTIL.getRegionCd() + '/' + LOGIS_UTIL.getZoneCd() + '/' + LOGIS_UTIL.getSideCd();
+        ajax.curl = '/tablet_process/boxed_list/' + LOGIS_UTIL.getRackCd() + '/' + LOGIS_UTIL.getEquipZone() + '/' + LOGIS_UTIL.getRackSide();
 
         // 최초 조회 이후 baseUrl이 초기화 되었다면 명시적으로 generateRequest를 호출함
         if(ajax.baseUrl) {

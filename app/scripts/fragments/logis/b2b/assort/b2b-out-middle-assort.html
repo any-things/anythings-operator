@@ -60,13 +60,13 @@ Copyright © HatioLab Inc. All rights reserved.
         color:#fff;
         align-items: center;
       }
-      .region-container {
+      .rack-container {
         flex: 1;
         display: grid;
         grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
         grid-gap:15px;
       }
-      .region {
+      .rack {
         display: flex;
         flex-direction: column;
         border:1px solid rgba(0,0,0,.3);
@@ -75,12 +75,12 @@ Copyright © HatioLab Inc. All rights reserved.
         background: linear-gradient(to bottom, rgba(255,255,255,.1) 0%, rgba(0,0,0,.3) 100%);
         overflow:hidden
       }
-      .region div{
+      .rack div{
         border-bottom:1px solid rgba(0,0,0,.2);
         color:#fff;
         font-size:1.1rem;
       }
-      .region .title{
+      .rack .title{
         background-color:#3f91cc;
         border-bottom: 2px solid rgba(0,0,0,.5);
         padding:5px 0 3px 0;
@@ -94,11 +94,11 @@ Copyright © HatioLab Inc. All rights reserved.
         justify-content: center;
         align-content: center;
       }
-      .region div span.tile {
+      .rack div span.tile {
         color:#fff;
         font-size: 6.6vw;
       }
-      /*.region div span{
+      /*.rack div span{
         display:inline-block;
         padding:8px 10px 0 15px;
         width:30%;
@@ -106,10 +106,10 @@ Copyright © HatioLab Inc. All rights reserved.
         font-size:.7rem;
         text-align:left;
       }*/
-      .region.sum div{
+      .rack.sum div{
         color:#fffbd7
       }
-      .region.sum .title{
+      .rack.sum .title{
         background-color:#ee6e30;
       }
       #date-picker {
@@ -136,7 +136,7 @@ Copyright © HatioLab Inc. All rights reserved.
     </style>
 
     <!--
-      * description : 중분류 시 상품스캔후 호기별 수량 검색
+      * description : 중분류 시 상품스캔후 랙별 수량 검색
       * params : @PathVariable(batch_id), @PathVariable(skubarcode)
       * response :
      -->
@@ -204,11 +204,11 @@ Copyright © HatioLab Inc. All rights reserved.
         </div>
       </div>
 
-      <div id="regions" class="region-container">
-        <dom-repeat id="region-dom-repeat" items="[[regionList]]" as="item">
+      <div id="racks" class="rack-container">
+        <dom-repeat id="rack-dom-repeat" items="[[rackList]]" as="item">
           <template>
-            <div class="region">
-              <div class="title"><span>[[item.region_nm]]</span></div>
+            <div class="rack">
+              <div class="title"><span>[[item.rack_nm]]</span></div>
               <!-- <template is="dom-if" if="[[item.pallet_qty]]">
                 <div class="tile-container"><span class="tile">[[item.pallet_qty]]</span></div>
               </template>
@@ -314,11 +314,11 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 호기별 분류 정보 리스트
+           * 랙별 분류 정보 리스트
            ****************
            * @type {Array}
            */
-          regionList: {
+          rackList: {
             type: Array
           },
 
@@ -471,16 +471,16 @@ Copyright © HatioLab Inc. All rights reserved.
       connectedCallback() {
         super.connectedCallback();
 
-        // dom-repeat을 통해 regions list가 그려지고 뒤 dom-change event handler
-        // this.$['region-dom-repeat'].addEventListener('dom-change', event => {
-        //   // regions div 내부의 region div를 모두 추출
-        //   let regions = this.$['regions'].querySelectorAll('div.region');
-        //   // 마지막 region에는 sum class를 추가 나머지는 sum class를 제거
-        //   regions.forEach((region, idx) => {
-        //     if(regions.length - 1 === idx) {
-        //       region.classList.add('sum');
+        // dom-repeat을 통해 racks list가 그려지고 뒤 dom-change event handler
+        // this.$['rack-dom-repeat'].addEventListener('dom-change', event => {
+        //   // racks div 내부의 rack div를 모두 추출
+        //   let racks = this.$['racks'].querySelectorAll('div.rack');
+        //   // 마지막 rack에는 sum class를 추가 나머지는 sum class를 제거
+        //   racks.forEach((rack, idx) => {
+        //     if(racks.length - 1 === idx) {
+        //       rack.classList.add('sum');
         //     } else {
-        //       region.classList.remove('sum');
+        //       rack.classList.remove('sum');
         //     }
         //   });
         // });
@@ -562,14 +562,14 @@ Copyright © HatioLab Inc. All rights reserved.
         this.skuNm = middleClass.sku_nm;
         this.pltInBoxQty = middleClass.plt_box_qty;
         this.boxInQty = middleClass.box_in_qty;
-        this.regionList = middleClass.items;
-        this.totalPcsQty = this.computeTotalPcsQty(this.regionList);
+        this.rackList = middleClass.items;
+        this.totalPcsQty = this.computeTotalPcsQty(this.rackList);
         this.computeTotalValues(this.pltInBoxQty, this.boxInQty, this.totalPcsQty);
         this._initialSetup();
       }
 
       /**
-       * @description 호기 수량 정보 표시
+       * @description 랙 수량 정보 표시
        ***********************
        * @param {Object} item
        */
@@ -584,13 +584,13 @@ Copyright © HatioLab Inc. All rights reserved.
       /**
        * 중분류 대상 상품 총 수량을 계산하여 return
        ***********************
-       * @param {Array} regions 중분류 대상 호기 리스트
+       * @param {Array} racks 중분류 대상 랙 리스트
        * @return {Number} totalPcsQty 중분류 대상 상품 총 수량
        */
-      computeTotalPcsQty(regions) {
+      computeTotalPcsQty(racks) {
         let totalPcsQty = 0;
-        regions.forEach(region => {
-          totalPcsQty = totalPcsQty + region.pcs_qty;
+        racks.forEach(rack => {
+          totalPcsQty = totalPcsQty + rack.pcs_qty;
         });
 
         return totalPcsQty;

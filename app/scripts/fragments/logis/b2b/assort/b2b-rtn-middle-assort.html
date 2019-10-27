@@ -64,7 +64,7 @@ Copyright © HatioLab Inc. All rights reserved.
         /* display: grid; */
         /* grid-template-columns: repeat(5, 1fr); */
       }
-      .seq-region-block {
+      .seq-rack-block {
         display: grid;
         margin: auto;
         border-radius: 15px;
@@ -144,12 +144,12 @@ Copyright © HatioLab Inc. All rights reserved.
       </div>
 
       <div class="bottom-container">
-        <div class="seq-region-block">
+        <div class="seq-rack-block">
           <span>[[displayValue]]</span>
         </div>
         <template is="dom-repeat" items="[[midAssortResp.items]]">
-          <div class="seq-region-block">
-            <span>[[item.job_batch_seq]] - [[item.region_nm]]</span>
+          <div class="seq-rack-block">
+            <span>[[item.job_batch_seq]] - [[item.rack_nm]]</span>
           </div>
         </template>
       </div>
@@ -228,11 +228,11 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 호기 리스트
+           * 랙 리스트
            ****************
            * @type {Array}
            */
-          regionList: {
+          rackList: {
             type: Array
           },
 
@@ -255,11 +255,11 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 호기 존
+           * 랙 존
            ****************
            * @type {String}
            */
-          regionZone: {
+          rackZone: {
             type: String
           },
 
@@ -433,7 +433,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _lastBarcodeRespChanged(response) {
         if(response) {
-          this.regionList = response;
+          this.rackList = response;
         }
       }
 
@@ -460,7 +460,7 @@ Copyright © HatioLab Inc. All rights reserved.
         try {
           const skuCd = input.value;
           this.validateBeforeAssort(skuCd);
-          ajax.curl = `/kiosk_process/find_sku/${LOGIS_UTIL.getRegionCd()}/${skuCd}`;
+          ajax.curl = `/kiosk_process/find_sku/${LOGIS_UTIL.getRackCd()}/${skuCd}`;
           // TODO 아래 형식으로 변경
           //ajax.curl = `/kiosk_process/middle_assort/find_sku/${배치 그룹 ID}/${skuCd}`;
           ajax.generateRequest();
@@ -490,8 +490,8 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _middleAssortRtnAjaxResponsed(event) {
         this.midAssortResp = event.detail
-        var regionCd = LOGIS_UTIL.getRegionCd();
-        var workLoc = LOGIS_UTIL.getWorkLoc();
+        var rackCd = LOGIS_UTIL.getRackCd();
+        var workLoc = LOGIS_UTIL.getRackSide();
         this.skuNm = this.midAssortResp && this.midAssortResp.sku_nm;
         this.boxInQty = this.midAssortResp && this.midAssortResp.box_in_qty;
       }

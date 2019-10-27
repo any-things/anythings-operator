@@ -8,7 +8,7 @@ Copyright © HatioLab Inc. All rights reserved.
 <link rel="import" href="./rack-input-details.html">
 
 <!--
-  물류 > 출고, 반품 > 호기별 상품 정보
+  물류 > 출고, 반품 > 랙별 상품 정보
 -->
 <dom-module id="rack-input-list">
   <template>
@@ -34,7 +34,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
     </style>
 
-    <!-- 호기별 상품 투입 리스트 Ajax -->
+    <!-- 랙별 상품 투입 리스트 Ajax -->
     <sys-ajax
       auto
       id="input-list-ajax"
@@ -44,7 +44,7 @@ Copyright © HatioLab Inc. All rights reserved.
     </sys-ajax>
 
     <div id="container">
-      <!-- 호기별 투입 상품 투입 리스트 표시 영역 -->
+      <!-- 랙별 투입 상품 투입 리스트 표시 영역 -->
       <item-list
         id="sku-list"
         header="[[header]]"
@@ -169,14 +169,14 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * @description 설정을 통해 선택한 호기와 존 영역내의 상품 리스트 조회
+       * @description 설정을 통해 선택한 랙와 존 영역내의 상품 리스트 조회
        ****************
        */
       refresh() {
-        let regionCd = LOGIS_UTIL.getRegionCd();
-        let zoneCd = LOGIS_UTIL.getZoneCd();
+        let rackCd = LOGIS_UTIL.getRackCd();
+        let zoneCd = LOGIS_UTIL.getEquipZone();
         const inputListAjax = this.$['input-list-ajax'];
-        inputListAjax.curl = `/tablet_process/input_status/${regionCd}/${zoneCd}/ALL`;
+        inputListAjax.curl = `/tablet_process/input_status/${rackCd}/${zoneCd}/ALL`;
         inputListAjax.generateRequest();
       }
 

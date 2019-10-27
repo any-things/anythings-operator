@@ -223,11 +223,11 @@ Copyright © HatioLab Inc. All rights reserved.
        * 검색 조건을 바탕으로 데이터 조회
        */
       refresh() {
-        const regionCd = LOGIS_UTIL.getRegionCd();
+        const rackCd = LOGIS_UTIL.getRackCd();
         const locCd = this.$['loc-cd'].value;
         const skuCd = this.$['sku-cd'].value;
         const searchAjax = this._getSearchAjax();
-        searchAjax.curl = `/kiosk_process/unboxed_job_list/${regionCd}`;
+        searchAjax.curl = `/kiosk_process/unboxed_job_list/${rackCd}`;
         searchAjax.params = {
           page: this.page,
           limit: this.limit,
@@ -287,13 +287,13 @@ Copyright © HatioLab Inc. All rights reserved.
           critical: true,
           confirmCallback: () => {
             const selectedData = this.selectedItem.getData();
-            const regionCd =  LOGIS_UTIL.getRegionCd();
+            const rackCd =  LOGIS_UTIL.getRackCd();
             const locCd = selectedData.loc_cd;
             const comCd = selectedData.com_cd;
             const skuCd = selectedData.sku_cd;
             const cancelAjax = this._getCancelAjax();
 
-            cancelAjax.curl = `/tablet_process/cancel_picked/${regionCd}/${locCd}/${comCd}/${skuCd}`;
+            cancelAjax.curl = `/tablet_process/cancel_picked/${rackCd}/${locCd}/${comCd}/${skuCd}`;
             cancelAjax.generateRequest();
             this.selectedItem = null;
           }

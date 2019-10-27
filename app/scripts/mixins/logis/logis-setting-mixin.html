@@ -13,9 +13,9 @@ Copyright © HatioLab Inc. All rights reserved.
            ****************
            * @type {String}
            */
-          regionLabel: {
+          rackLabel: {
             type: String,
-            value: () => t('label.region_nm')
+            value: () => t('label.rack_nm')
           },
 
           /**
@@ -103,9 +103,9 @@ Copyright © HatioLab Inc. All rights reserved.
            ****************
            * @type {String}
            */
-          regionCode: {
+          rackCode: {
             type: String,
-            value: () => JSON.parse(localStorage.getItem('setting.regionCode'))
+            value: () => JSON.parse(localStorage.getItem('setting.rackCd'))
           },
 
           /**
@@ -113,9 +113,9 @@ Copyright © HatioLab Inc. All rights reserved.
            ****************
            * @type {String}
            */
-          regionCodeLSKey: {
+          rackCodeLSKey: {
             type: String,
-            value: 'setting.regionCode'
+            value: 'setting.rackCd'
           },
 
           /**
@@ -123,7 +123,7 @@ Copyright © HatioLab Inc. All rights reserved.
            ****************
            * @type {String}
            */
-          regionName: {
+          rackName: {
             type: String
           },
 
@@ -132,9 +132,9 @@ Copyright © HatioLab Inc. All rights reserved.
            ****************
            * @type {String}
            */
-          regionNameLSKey: {
+          rackNameLSKey: {
             type: String,
-            value: 'setting.regionName'
+            value: 'setting.rackNm'
           },
 
           /**
@@ -144,7 +144,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           zoneCode: {
             type: String,
-            value: () => JSON.parse(localStorage.getItem('setting.zoneCode'))
+            value: () => JSON.parse(localStorage.getItem('setting.equipZone'))
           },
 
           /**
@@ -154,7 +154,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           zoneCodeLSKey: {
             type: String,
-            value: 'setting.zoneCode'
+            value: 'setting.equipZone'
           },
 
           /**
@@ -164,7 +164,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           jobName: {
             type: String,
-            value: () => JSON.parse(localStorage.getItem('setting.jobName'))
+            value: () => JSON.parse(localStorage.getItem('setting.jobType'))
           },
 
           /**
@@ -174,7 +174,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           jobNameLSKey: {
             type: String,
-            value: 'setting.jobName'
+            value: 'setting.jobType'
           },
 
           /**
@@ -184,7 +184,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           workLoc: {
             type: String,
-            value: () => JSON.parse(localStorage.getItem('setting.workLocation'))
+            value: () => JSON.parse(localStorage.getItem('setting.rackSide'))
           },
 
           /**
@@ -194,7 +194,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           workLocLSKey: {
             type: String,
-            value: 'setting.workLocation'
+            value: 'setting.rackSide'
           },
 
           /**
@@ -213,7 +213,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           workLocNameLSKey: {
             type: String,
-            value: 'setting.workLocationLabel'
+            value: 'setting.rackSideLabel'
           }
         }
       }
@@ -317,10 +317,10 @@ Copyright © HatioLab Inc. All rights reserved.
        * @return
        */
       _getRegionItems() {
-        const regionItemAjax = this._getRackItemAjax();
-        regionItemAjax.curl = `/racks?limit=1000`;
-        regionItemAjax.baseUrl = this._getLocalStorage('setting.baseUrl');
-        regionItemAjax.generateRequest();
+        const rackItemAjax = this._getRackItemAjax();
+        rackItemAjax.curl = `/racks?limit=1000`;
+        rackItemAjax.baseUrl = this._getLocalStorage('setting.baseUrl');
+        rackItemAjax.generateRequest();
       }
 
       /**
@@ -329,11 +329,11 @@ Copyright © HatioLab Inc. All rights reserved.
        * @return
        */
       _getZoneItems() {
-        const selectedOption = this._getRegionCombo().selectedOptions[0];
+        const selectedOption = this._getRackCombo().selectedOptions[0];
         if (selectedOption && selectedOption.value) {
-          const regionCode = selectedOption.value;
+          const rackCode = selectedOption.value;
           const zoneItemAjax = this._getZoneItemAjax();
-          zoneItemAjax.curl = `/racks/${regionCode}/stations`;
+          zoneItemAjax.curl = `/racks/${rackCode}/stations`;
           zoneItemAjax.baseUrl = this._getLocalStorage('setting.baseUrl');
           zoneItemAjax.generateRequest();
         }
@@ -428,8 +428,8 @@ Copyright © HatioLab Inc. All rights reserved.
        *******************************
        * @return
        */
-      _getRegionCombo() {
-        return this.$['region-combo'];
+      _getRackCombo() {
+        return this.$['rack-combo'];
       }
 
       /**
@@ -472,22 +472,22 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * @description 호기 콤보 렌더링
+       * @description 랙 콤보 렌더링
        *******************************
        */
       _renderRegionCombo(event) {
-        const regionCombo = this._getRegionCombo();
-        this._clearCombo(regionCombo);
+        const rackCombo = this._getRackCombo();
+        this._clearCombo(rackCombo);
 
         if (event && event.detail) {
-          event.detail.items.forEach(region => {
-            const option = new Option(region.rack_nm, region.rack_cd);
-            if (this.regionCode === region.rack_cd) {
+          event.detail.items.forEach(rack => {
+            const option = new Option(rack.rack_nm, rack.rack_cd);
+            if (this.rackCode === rack.rack_cd) {
               option.selected = true;
-              this.regionName = region.rack_nm;
+              this.rackName = rack.rack_nm;
             }
 
-            regionCombo.appendChild(option);
+            rackCombo.appendChild(option);
           });
         }
 

@@ -106,7 +106,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * @description 호기 내 표시기 전체 소등 액션 키
+           * @description 랙 내 표시기 전체 소등 액션 키
            ****************
            * @type {String}
            */
@@ -116,7 +116,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * @description 호기 내 로케이션 모두 Fullbox 명령
+           * @description 랙 내 로케이션 모두 Fullbox 명령
            ****************
            * @type {String}
            */
@@ -126,7 +126,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * @description 호기 내 로케이션 마지막 작업에 대한 표시기 복원
+           * @description 랙 내 로케이션 마지막 작업에 대한 표시기 복원
            ****************
            * @type {String}
            */
@@ -153,7 +153,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @returns {String} qrImgSrc
        */
       _computeQRImgSrc(actionType) {
-        const kioskCodeType = LOGIS_UTIL.getKioskCodeType();
+        const kioskCodeType = LOGIS_UTIL.getBarcodeType();
         const basePath = './static/assets/kiosk_codes/';
 
         if(actionType === 'mpi-off') {
@@ -195,15 +195,15 @@ Copyright © HatioLab Inc. All rights reserved.
             message: t('text.Sure to process'),
             confirmCallback: () => {
               const trxAjax = this.$['trx-ajax'];
-              let regionCd = LOGIS_UTIL.getRegionCd();
-              let sideCd = LOGIS_UTIL.getSideCd();
+              let rackCd = LOGIS_UTIL.getRackCd();
+              let sideCd = LOGIS_UTIL.getRackSide();
 
               if(this.actionType === 'mpi-off') {
-                trxAjax.curl = '/kiosk_process/mpi_off_all/' + regionCd;
+                trxAjax.curl = '/kiosk_process/mpi_off_all/' + rackCd;
               } else if(this.actionType == 'batch-full-box') {
-                trxAjax.curl = '/kiosk_process/das/fullbox_all/' + regionCd + '/' + sideCd;
+                trxAjax.curl = '/kiosk_process/das/fullbox_all/' + rackCd + '/' + sideCd;
               } else if(this.actionType == 'mpi-on-last') {
-                trxAjax.curl = '/kiosk_process/restore_mpi/' + regionCd;
+                trxAjax.curl = '/kiosk_process/restore_mpi/' + rackCd;
               }
 
               trxAjax.generateRequest();

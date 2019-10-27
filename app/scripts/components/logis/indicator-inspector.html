@@ -17,7 +17,7 @@ Copyright © HatioLab Inc. All rights reserved.
     <sys-ajax
       id="mpi-on-jobs-ajax"
       method="PUT"
-      curl="/tablet_process/mpi_on/:region_cd/:zone_cd/:side_cd"
+      curl="/tablet_process/mpi_on/:rack_cd/:zone_cd/:side_cd"
       content-type="application/json">
     </sys-ajax>
 
@@ -25,7 +25,7 @@ Copyright © HatioLab Inc. All rights reserved.
     <sys-ajax
       id="mpi-off-my-zone-ajax"
       method="PUT"
-      curl="/tablet_process/mpi_off/:region_cd/:zone_cd/:side_cd"
+      curl="/tablet_process/mpi_off/:rack_cd/:zone_cd/:side_cd"
       content-type="application/json">
     </sys-ajax>
 
@@ -118,11 +118,11 @@ Copyright © HatioLab Inc. All rights reserved.
           return;
         }
 
-        let regionCode = LOGIS_UTIL.getRegionCd();
-        let sideCode = LOGIS_UTIL.getSideCd();
-        let zoneCode = LOGIS_UTIL.getZoneCd();
+        let rackCd = LOGIS_UTIL.getRackCd();
+        let sideCode = LOGIS_UTIL.getRackSide();
+        let zoneCode = LOGIS_UTIL.getEquipZone();
         let inspectAjax = this.$['inspect-sku-ajax'];
-        inspectAjax.curl = `/pda_process/inspection_by_mpi/${regionCode}/${sideCode}/${zoneCd}/${this.comCode}/${skuCode}`;
+        inspectAjax.curl = `/pda_process/inspection_by_mpi/${rackCd}/${sideCode}/${zoneCd}/${this.comCode}/${skuCode}`;
         inspectAjax.generateRequest();
         this.skuCode = null;
       }
@@ -144,10 +144,10 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _mpiOffByTabletZone() {
         const mpiOffAjax = this.$['mpi-off-my-zone-ajax'];
-        let regionCd = LOGIS_UTIL.getRegionCd();
-        let zoneCd = LOGIS_UTIL.getZoneCd();
-        let sideCd = LOGIS_UTIL.getSideCd();
-        mpiOffAjax.curl = `/tablet_process/mpi_off/${regionCd}/${zoneCd}/${sideCd}`;
+        let rackCd = LOGIS_UTIL.getRackCd();
+        let zoneCd = LOGIS_UTIL.getEquipZone();
+        let sideCd = LOGIS_UTIL.getRackSide();
+        mpiOffAjax.curl = `/tablet_process/mpi_off/${rackCd}/${zoneCd}/${sideCd}`;
         mpiOffAjax.generateRequest();
       }
 
@@ -158,10 +158,10 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _mpiOnByTabletZone(mode) {
         const mpiOnAjax = this.$['mpi-on-jobs-ajax'];
-        let regionCd = LOGIS_UTIL.getRegionCd();
-        let zoneCd = LOGIS_UTIL.getZoneCd();
-        let sideCd = LOGIS_UTIL.getSideCd();
-        mpiOnAjax.curl = `/tablet_process/mpi_on/${regionCd}/${zoneCd}/${sideCd}`;
+        let rackCd = LOGIS_UTIL.getRackCd();
+        let zoneCd = LOGIS_UTIL.getEquipZone();
+        let sideCd = LOGIS_UTIL.getRackSide();
+        mpiOnAjax.curl = `/tablet_process/mpi_on/${rackCd}/${zoneCd}/${sideCd}`;
         mpiOnAjax.generateRequest();
       }
     }

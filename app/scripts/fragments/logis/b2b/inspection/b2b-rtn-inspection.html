@@ -31,12 +31,12 @@ Copyright © HatioLab Inc. All rights reserved.
         border-radius: var(--things-default-border-radius);
         color: rgba(255,255,255,.8);
       }
-      #region-info-container {
+      #rack-info-container {
         display: flex;
         font-size: .8rem;
         border-bottom: 1px solid rgba(255,255,255,.2);
       }
-      #region-info-container label, #region-info-container span{
+      #rack-info-container label, #rack-info-container span{
         flex: 1;
         text-align: center;
       }
@@ -408,11 +408,11 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 호기 코드 값
+           * 랙 코드 값
            ****************
            * @type {String}
            */
-          regionCd: {
+          rackCd: {
             type: String
           },
 
@@ -515,7 +515,7 @@ Copyright © HatioLab Inc. All rights reserved.
           this.batchId = boxInfo.batch_id;
           this.comCd = boxInfo.com_cd;
           this.locCd = boxInfo.loc_cd;
-          this.regionCd = boxInfo.region_cd;
+          this.rackCd = boxInfo.rack_cd;
           this.boxQty = boxInfo.picked_qty;
           this.boxId = boxInfo.box_id;
           let skuCd = null, skuNm = null;
@@ -609,13 +609,13 @@ Copyright © HatioLab Inc. All rights reserved.
 
         // 1. 스캔 유형이 박스 ID 이면 ...
         if(scanType === 'BOX_ID') {
-          if(this.regionCd && this.skuCd && this.locCd) {
+          if(this.rackCd && this.skuCd && this.locCd) {
             // 박스 정보 조회
             if(this.boxId && this.boxId.trim().length == 16) {
               this._findBoxInfo(inputId);
             // 로케이션 - 박스 매핑
             } else {
-              this.locationBoxIdMapping(this.regionCd, this.locCd, inputId);
+              this.locationBoxIdMapping(this.rackCd, this.locCd, inputId);
             }
           } else {
             // 박스 정보 조회
@@ -726,7 +726,7 @@ Copyright © HatioLab Inc. All rights reserved.
         this.batchId = '';
         this.boxId = '';
         this.comCd = '';
-        this.regionCd = '';
+        this.rackCd = '';
         this.locCd = '';
         this.skuCd = '';
         this.skuNm = '';
@@ -744,13 +744,13 @@ Copyright © HatioLab Inc. All rights reserved.
       /**
        * @description 로케이션 - 박스 ID 매핑 요청
        *********************
-       * @param {String} regionCd
+       * @param {String} rackCd
        * @param {String} locCd
        * @param {String} boxId
        */
-      locationBoxIdMapping(regionCd, locCd, boxId) {
+      locationBoxIdMapping(rackCd, locCd, boxId) {
         var ajax = this.$['box-mapping-ajax'];
-        ajax.curl = `/pda_process/assign/location_box/${regionCd}/${locCd}/${boxId}?skip_region_check=true&skip_box_mapping=true`;
+        ajax.curl = `/pda_process/assign/location_box/${rackCd}/${locCd}/${boxId}?skip_rack_check=true&skip_box_mapping=true`;
         ajax.generateRequest();
       }
 

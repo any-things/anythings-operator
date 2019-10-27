@@ -6,7 +6,7 @@ Copyright © HatioLab Inc. All rights reserved.
 <link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
 
 <!--
-  PDA > 호기별 상품 정보
+  PDA > 랙별 상품 정보
 -->
 
 <dom-module id="pda-region-sku-info">
@@ -33,7 +33,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
     </style>
 
-    <!-- 호기별 상품 투입 리스트 Ajax -->
+    <!-- 랙별 상품 투입 리스트 Ajax -->
     <sys-ajax
       auto
       id="input-list-ajax"
@@ -43,7 +43,7 @@ Copyright © HatioLab Inc. All rights reserved.
     </sys-ajax>
 
     <div id="container">
-      <!-- 호기별 투입 상품 투입 리스트 표시 영역 -->
+      <!-- 랙별 투입 상품 투입 리스트 표시 영역 -->
       <item-list
         id="sku-list"
         header="[[header]]"
@@ -72,7 +72,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           jobType: {
             type: String,
-            value: () => LOGIS_UTIL.getJobName('setting.jobName')
+            value: () => LOGIS_UTIL.getJobName('setting.jobType')
           },
 
           /**
@@ -98,14 +98,14 @@ Copyright © HatioLab Inc. All rights reserved.
                 fieldname: 'sku_cd_widt_seq',
                 displayCallback: (value, rowData) => {
                   // 작업 유형에 따라 가변, 반품 작업일 때 투입 순서 없음
-                  return LOGIS_UTIL.getJobName() === 'RTN' ?
+                  return LOGIS_UTIL.getJobType() === 'RTN' ?
                     `${rowData['sku_nm']}` :
                     `(${rowData['input_seq']}) ${rowData['sku_nm']}`
                 }
               }, (() => {
                 // 작업 유형에 따라 가변
                 // 반품 작업일 때 거래처 대신 로케이션 표시
-                return LOGIS_UTIL.getJobName() === 'RTN' ?
+                return LOGIS_UTIL.getJobType() === 'RTN' ?
                 {
                   display: t('label.location'),
                   fieldname: 'loc_cd',
@@ -262,13 +262,13 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * @description 설정을 통해 선택한 호기와 존 영역내의 상품 리스트 조회
+       * @description 설정을 통해 선택한 랙와 존 영역내의 상품 리스트 조회
        */
       refresh() {
-        let regionCd = LOGIS_UTIL.getRegionCd();
-        let zoneCd = LOGIS_UTIL.getZoneCd();
+        let rackCd = LOGIS_UTIL.getRackCd();
+        let zoneCd = LOGIS_UTIL.getEquipZone();
         const inputListAjax = this.$['input-list-ajax'];
-        inputListAjax.curl = `/tablet_process/input_status/${regionCd}/${zoneCd}/ALL`;
+        inputListAjax.curl = `/tablet_process/input_status/${rackCd}/${zoneCd}/ALL`;
         inputListAjax.generateRequest();
       }
 
@@ -297,18 +297,18 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _skuSelected(event) {
         // 반품 작업일 때 상세 화면 없음
-        if (LOGIS_UTIL.getJobName() === 'RTN') return;
+        if (LOGIS_UTIL.getJobType() === 'RTN') return;
 
         const inputSeq = event.detail.data.input_seq;
-        const regionCd = LOGIS_UTIL.getRegionCd();
-        const zoneCd = LOGIS_UTIL.getZoneCd();
+        const rackCd = LOGIS_UTIL.getRackCd();
+        const zoneCd = LOGIS_UTIL.getEquipZone();
 
         document.dispatchEvent(new CustomEvent('open-form-list-dialog', {
           detail: {
             formFields: this.detailFormFields,
             listFields: this.detailListFields,
             formData: event.detail.data,
-            listDataReqUrl: `/tablet_process/${this.jobType.toLowerCase()}/input_status_details/${regionCd}/${zoneCd}/ALL/${inputSeq}`,
+            listDataReqUrl: `/tablet_process/${this.jobType.toLowerCase()}/input_status_details/${rackCd}/${zoneCd}/ALL/${inputSeq}`,
             handleListDataAfterSet: params => {
               const items = params.listData;
               const popupElement = params.popupElement;

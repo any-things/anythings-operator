@@ -48,12 +48,12 @@ Copyright © HatioLab Inc. All rights reserved.
         flex-direction: column;
         flex: 1;
       }
-      #region-info-container {
+      #rack-info-container {
         display: flex;
         font-size: .8rem;
         border-bottom: 1px solid rgba(255,255,255,.2);
       }
-      #region-info-container label, #region-info-container span{
+      #rack-info-container label, #rack-info-container span{
         flex: 1;
         text-align: center;
       }
@@ -142,7 +142,7 @@ Copyright © HatioLab Inc. All rights reserved.
     <sys-ajax
       id="box-info-ajax"
       method="GET"
-      curl="/pda_process/is_usable_box/:region_cd/:box_id"
+      curl="/pda_process/is_usable_box/:rack_cd/:box_id"
       content-type="application/json"
       on-sys-ajax-response="_boxInfoResponse"
       on-sys-ajax-error="_boxInfoError"
@@ -170,10 +170,10 @@ Copyright © HatioLab Inc. All rights reserved.
     </sys-ajax>
 
     <div id="container">
-      <!-- 상단 선택 호기 및 작업 존 표시 영역 -->
-      <div id="region-info-container" class="input-row">
-        <label>[[regionNmLabel]]</label>
-        <span id="view-region-nm">[[regionNm]]</span>
+      <!-- 상단 선택 랙 및 작업 존 표시 영역 -->
+      <div id="rack-info-container" class="input-row">
+        <label>[[rackNmLabel]]</label>
+        <span id="view-rack-nm">[[rackNm]]</span>
         <label>[[zoneCdLabel]]</label>
         <span id="view-zone-nm">[[zoneCd]]</span>
       </div>
@@ -215,7 +215,9 @@ Copyright © HatioLab Inc. All rights reserved.
 
   <script>
     class B2BRemainsFullbox extends Polymer.Element {
-      static get is() { return 'b2b-remains-fullbox' }
+      static get is() {
+        return 'b2b-remains-fullbox'
+      }
       static get properties() {
         return {
           /**
@@ -239,13 +241,13 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * @description 호기 코드 라벨
+           * @description 랙 코드 라벨
            ****************
            * @type {String}
            */
-          regionNmLabel: {
+          rackNmLabel: {
             type: String,
-            value: () =>  t('label.region_nm'),
+            value: () => t('label.rack_nm'),
           },
 
           /**
@@ -424,26 +426,26 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * @description 호기 코드
+           * @description 랙 코드
            ****************
            * @type {String}
            */
-          regionCd: {
+          rackCd: {
             type: String,
-            value: LOGIS_UTIL.getRegionCd(),
-            observer: '_regionCdChanged'
+            value: LOGIS_UTIL.getRackCd(),
+            observer: '_rackCdChanged'
           },
 
           /**
-           * @description 호기 명
+           * @description 랙 명
            ****************
            * @type {String}
            */
-          regionNm: {
+          rackNm: {
             type: String,
             notify: true,
-            value: LOGIS_UTIL.getRegionNm(),
-            observer: '_regionNmChanged'
+            value: LOGIS_UTIL.getRackNm(),
+            observer: '_rackNmChanged'
           },
 
           /**
@@ -467,7 +469,7 @@ Copyright © HatioLab Inc. All rights reserved.
         super.connectedCallback();
 
         document.addEventListener(`alert-closed-at-${location.hash.replace('#/', '')}`, event => {
-          if(!event.detail.hasCallback) {
+          if (!event.detail.hasCallback) {
             this._reset();
           }
         });
@@ -480,28 +482,27 @@ Copyright © HatioLab Inc. All rights reserved.
        *********************
        * @param {Boolean} visible
        */
-      _visibleChanged(visible) {
-      }
+      _visibleChanged(visible) {}
 
       /**
-       * @description 호기 코드 변경 시
+       * @description 랙 코드 변경 시
        *********************
-       * @param {String} regionCd
+       * @param {String} rackCd
        */
-      _regionCdChanged(regionCd) {
-        if (regionCd) {
-          window.localStorage.setItem('setting.regionCode', JSON.stringify(regionCd));
+      _rackCdChanged(rackCd) {
+        if (rackCd) {
+          window.localStorage.setItem('setting.rackCd', JSON.stringify(rackCd));
         }
       }
 
       /**
-       * @description 호기 명 변경 시
+       * @description 랙 명 변경 시
        *********************
-       * @param {String} regionNm
+       * @param {String} rackNm
        */
-      _regionNmChanged(regionNm) {
-        if (regionNm) {
-          window.localStorage.setItem('setting.regionName', JSON.stringify(regionNm));
+      _rackNmChanged(rackNm) {
+        if (rackNm) {
+          window.localStorage.setItem('setting.rackNm', JSON.stringify(rackNm));
         }
       }
 
@@ -512,7 +513,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _zoneCdChanged(zoneCd) {
         if (zoneCd) {
-          window.localStorage.setItem('setting.zoneCode', JSON.stringify(zoneCd));
+          window.localStorage.setItem('setting.equipZone', JSON.stringify(zoneCd));
         }
       }
 
@@ -528,16 +529,16 @@ Copyright © HatioLab Inc. All rights reserved.
         if (inputValue.search(/^[A-Z0-9]{1}[A-Z,\s]{4}[0-9]{11}$/) >= 0) {
           this._checkBoxId(inputValue);
 
-        // 2. 표시기 코드인 경우
-        } else if(inputValue.startsWith('01') && inputValue.length === 22) {
+          // 2. 표시기 코드인 경우
+        } else if (inputValue.startsWith('01') && inputValue.length === 22) {
           var mpiCd = inputValue.substring(2, 8);
           this._checkMpiCd(mpiCd);
 
-        // 3. 로케이션 코드인 경우
-        } else if(inputValue.search(/^[A-Z]{1}[0-9]{3}-[0-9][0-9][0-9][0-9]$/) >= 0) {
+          // 3. 로케이션 코드인 경우
+        } else if (inputValue.search(/^[A-Z]{1}[0-9]{3}-[0-9][0-9][0-9][0-9]$/) >= 0) {
           this._checkLocCd(inputValue);
 
-        // 4. 기타
+          // 4. 기타
         } else {
           this._setErrorMessage(t('text.invalid_input_data'));
         }
@@ -551,12 +552,12 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {String} boxId
        */
       _checkBoxId(boxId) {
-        if(this.boxId) {
+        if (this.boxId) {
           this._setErrorMessage(t('text.already_scan'));
         } else {
           this.boxId = boxId;
           var ajax = this.$['box-info-ajax'];
-          ajax.curl = `/pda_process/is_usable_box/${this.regionCd}/${boxId}`;
+          ajax.curl = `/pda_process/is_usable_box/${this.rackCd}/${boxId}`;
           ajax.generateRequest();
         }
       }
@@ -587,17 +588,17 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {String} locCd
        */
       _checkLocCd(locCd) {
-        if(!this.boxId) {
+        if (!this.boxId) {
           this._setErrorMessage(t('text.scan_first'));
         } else {
-          if(this.data.length >= 5) {
+          if (this.data.length >= 5) {
             this._setErrorMessage(t('text.location_upto_5'));
           } else {
             var found = this.data.find(function(item) {
               return item.loc_cd === locCd;
             });
 
-            if(found) {
+            if (found) {
               this._setErrorMessage(t('text.location_already_add'));
             } else {
               this.locCd = locCd;
@@ -615,17 +616,17 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {String} locCd
        */
       _checkMpiCd(mpiCd) {
-        if(!this.boxId) {
+        if (!this.boxId) {
           this._setErrorMessage(t('text.scan_first'));
         } else {
-          if(this.data.length >= 5) {
+          if (this.data.length >= 5) {
             this._setErrorMessage(t('text.location_upto_5'));
           } else {
             var found = this.data.find(function(item) {
               return item.mpi_cd === mpiCd;
             });
 
-            if(found) {
+            if (found) {
               this._setErrorMessage(t('text.location_already_add'));
             } else {
               this.mpiCd = mpiCd;
@@ -667,7 +668,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} event
        */
       _locInfoError(event) {
-        if(event && event.detail && event.detail.msg) {
+        if (event && event.detail && event.detail.msg) {
           this.message = t('text.error-') + event.detail.msg;
         } else {
           this.message = t('text.error-msg');
@@ -700,11 +701,11 @@ Copyright © HatioLab Inc. All rights reserved.
        *********************
        */
       validateBeforeRequest() {
-        if(!this.boxId) {
+        if (!this.boxId) {
           throw t('text.box_id_empty');
         }
 
-        if(!this.data || this.data.length == 0) {
+        if (!this.data || this.data.length == 0) {
           throw t('text.no_process_location');
         }
       }
@@ -746,8 +747,8 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} event
        */
       _chuteInfoResponse(event) {
-        this.regionNm = event.detail.region_nm;
-        this.regionCd = event.detail.region_cd;
+        this.rackNm = event.detail.rack_nm;
+        this.rackCd = event.detail.rack_cd;
         this.zoneCd = event.detail.chute_no;
         showToast('info', `${t('text.chute_changed')}`);
         this._reset();
@@ -811,7 +812,14 @@ Copyright © HatioLab Inc. All rights reserved.
 
               } else {
                 // 그리드 데이터 업데이트
-                this._updateGridData({ region_cd : locInfo.region_cd, loc_cd : locInfo.loc_cd, mpi_cd : locInfo.mpi_cd, sku_cd : locInfo.sku_cd, picked_qty : adjustQty, status : 'W' });
+                this._updateGridData({
+                  rack_cd: locInfo.rack_cd,
+                  loc_cd: locInfo.loc_cd,
+                  mpi_cd: locInfo.mpi_cd,
+                  sku_cd: locInfo.sku_cd,
+                  picked_qty: adjustQty,
+                  status: 'W'
+                });
                 // 팝업 닫기
                 adjustPopup.closeDialog();
               }
@@ -835,7 +843,7 @@ Copyright © HatioLab Inc. All rights reserved.
         this.set('data', data);
         this._showFullboxButton();
 
-        if(data.length >= 5) {
+        if (data.length >= 5) {
           this.message = t('text.[fullbox]_process_rest');
         } else {
           this.message = t('text.scan_next_location');
@@ -850,7 +858,11 @@ Copyright © HatioLab Inc. All rights reserved.
         var ajax = this.$['fullbox-remains-ajax']
         ajax.curl = `/pda_process/rtn/fullbox_remains/${this.boxId}`;
         ajax.body = this.data.map(function(item) {
-          return { region_cd : item.region_cd, loc_cd : item.loc_cd, max_stock_qty : item.picked_qty };
+          return {
+            rack_cd: item.rack_cd,
+            loc_cd: item.loc_cd,
+            max_stock_qty: item.picked_qty
+          };
         });
         ajax.generateRequest();
       }
@@ -888,10 +900,10 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} event
        */
       _fullboxRemainsError(event) {
-        if(!event || !event.detail) return;
+        if (!event || !event.detail) return;
 
         const response = event.detail;
-        if(response.msg) {
+        if (response.msg) {
           this.message = response.msg;
 
           openAlert({

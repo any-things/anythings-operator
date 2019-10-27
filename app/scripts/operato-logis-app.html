@@ -189,135 +189,117 @@ Copyright © HatioLab Inc. All rights reserved.
         <template is="dom-if" if="[[!isKIOSK]]">
           <menu-tiles route="{{route}}" device-type="[[deviceType]]"></menu-tiles>
         </template>
-      </app-drawer>
+  </app-drawer>
 
-      <!-- Main content -->
-      <app-header-layout has-scrolling-region>
-        <app-header
-          slot="header"
-          fixed reveals
-          effects="waterfall">
+  <!-- Main content -->
+  <app-header-layout has-scrolling-region>
+    <app-header slot="header" fixed reveals effects="waterfall">
 
-          <app-toolbar>
-            <!--dom-if if="[[isDevMode]]">
+      <app-toolbar>
+        <!--dom-if if="[[isDevMode]]">
               <template>
                 <iron-icon icon="settings" on-click="toSysSetting"></iron-icon>
               </template>
             </dom-if-->
 
-            <div id="top-bar">
-              <span id="header">
+        <div id="top-bar">
+          <span id="header">
                 <div id="menu-btn">
                   <img src="./images/icon-brand.png" />
                   <!--span>MPS</span-->
                   <span>[[currentSite]]</span>
-                </div>
-                <span id="title">[[title]]</span>
-              </span>
+        </div>
+        <span id="title">[[title]]</span>
+        </span>
 
-              <div id="input-container">
-                <span id="region-name" is-kiosk$="[[isKIOSK]]">[[regionName]]</span>
-                <span id="zone-code">[[zoneCode]]</span>
-                <span id="kiosk-work-loc" is-kiosk$="[[isKIOSK]]" hidden>[[kioskWorkLocLabel]]</span>
-              </div>
+        <div id="input-container">
+          <span id="rack-name" is-kiosk$="[[isKIOSK]]">[[rackName]]</span>
+          <span id="zone-code">[[zoneCode]]</span>
+          <span id="kiosk-work-loc" is-kiosk$="[[isKIOSK]]" hidden>[[kioskWorkLocLabel]]</span>
+        </div>
 
-              <div id="buttons">
-                <iron-icon id="refresh-btn" icon="refresh" on-click="refresh" hidden></iron-icon>
-                <iron-icon id="mpi-off-btn" icon="lightbulb-outline" on-click="showCodePopup" hidden></iron-icon>
-                <iron-icon id="mpi-on-last-btn" icon="list" on-click="showCodePopup" hidden></iron-icon>
-                <iron-icon id="batch-full-box-btn" icon="move-to-inbox" on-click="showCodePopup" hidden></iron-icon>
-                <iron-icon id="kiosk-setting-btn" icon="settings" on-click="toSetting" hidden></iron-icon>
-                <iron-icon id="logout-btn" icon="power-settings-new" on-click="logout" hidden></iron-icon>
-              </div>
-            </div>
-          </app-toolbar>
-        </app-header>
+        <div id="buttons">
+          <iron-icon id="refresh-btn" icon="refresh" on-click="refresh" hidden></iron-icon>
+          <iron-icon id="mpi-off-btn" icon="lightbulb-outline" on-click="showCodePopup" hidden></iron-icon>
+          <iron-icon id="mpi-on-last-btn" icon="list" on-click="showCodePopup" hidden></iron-icon>
+          <iron-icon id="batch-full-box-btn" icon="move-to-inbox" on-click="showCodePopup" hidden></iron-icon>
+          <iron-icon id="kiosk-setting-btn" icon="settings" on-click="toSetting" hidden></iron-icon>
+          <iron-icon id="logout-btn" icon="power-settings-new" on-click="logout" hidden></iron-icon>
+        </div>
+        </div>
+      </app-toolbar>
+    </app-header>
 
-        <iron-pages
-          id="main"
-          role="main"
-          selected="[[page]]"
-          attr-for-selected="name"
-          selected-attribute="visible">
+    <iron-pages id="main" role="main" selected="[[page]]" attr-for-selected="name" selected-attribute="visible">
 
-          <!-- Common Views -->
-          <cell-box-mapping-status name="cell_box_mapping_status" is-pda="[[isPDA]]"></cell-box-mapping-status>
-          <picking-status name="picking_status" is-kiosk="[[isKIOSK]]"></picking-status>
-          <picking-status-by-cell name="picking_status_by_cell" is-pda="[[isPDA]]"></picking-status-by-cell>
-          <box-list name="box_list" is-kiosk="[[isKIOSK]]"></box-list>
-          <label-list name="label_list" is-pda="[[isPDA]]"></label-list>
-          <!-- Common Views -->
+      <!-- Common Views -->
+      <cell-box-mapping-status name="cell_box_mapping_status" is-pda="[[isPDA]]"></cell-box-mapping-status>
+      <picking-status name="picking_status" is-kiosk="[[isKIOSK]]"></picking-status>
+      <picking-status-by-cell name="picking_status_by_cell" is-pda="[[isPDA]]"></picking-status-by-cell>
+      <box-list name="box_list" is-kiosk="[[isKIOSK]]"></box-list>
+      <label-list name="label_list" is-pda="[[isPDA]]"></label-list>
+      <!-- Common Views -->
 
-          <!-- DAS Views -->
-          <rack-input-list name="rack_input_list" is-pda="[[isPDA]]"></rack-input-list>
-          <!-- DAS Views -->
+      <!-- DAS Views -->
+      <rack-input-list name="rack_input_list" is-pda="[[isPDA]]"></rack-input-list>
+      <!-- DAS Views -->
 
-          <!-- Tablet Views -->
-          <b2b-job-assort name="b2b_job_assort"></b2b-job-assort>
-          <b2c-picking-job name="b2c_picking_job"></b2c-picking-job>
+      <!-- Tablet Views -->
+      <b2b-job-assort name="b2b_job_assort"></b2b-job-assort>
+      <b2c-picking-job name="b2c_picking_job"></b2c-picking-job>
 
-          <tab-das2-order-info name="tab_das2_ord_info"></tab-das2-order-info>
-          <tab-das-order-list name="tab_das_ord_list"></tab-das-order-list>
-          <!-- Tablet Views -->
+      <tab-das2-order-info name="tab_das2_ord_info"></tab-das2-order-info>
+      <tab-das-order-list name="tab_das_ord_list"></tab-das-order-list>
+      <!-- Tablet Views -->
 
-          <!-- PDA Views -->
-          <stock-status-by-cell name="stock_status_by_cell"></stock-status-by-cell>
-          <cell-stock-supplement name="cell_stock_supplement"></cell-stock-supplement>
-          <fixed-cell-stock-supplement name="fixed_cell_stock_supplement"></fixed-cell-stock-supplement>
-          <b2c-one-sku-order name="b2c_one_sku_order"></b2c-one-sku-order>
+      <!-- PDA Views -->
+      <stock-status-by-cell name="stock_status_by_cell"></stock-status-by-cell>
+      <cell-stock-supplement name="cell_stock_supplement"></cell-stock-supplement>
+      <fixed-cell-stock-supplement name="fixed_cell_stock_supplement"></fixed-cell-stock-supplement>
+      <b2c-one-sku-order name="b2c_one_sku_order"></b2c-one-sku-order>
 
-          <b2b-cell-box-mapping-status name="b2b_cell_box_mapping_status"></b2b-cell-box-mapping-status>
-          <b2b-assort-job name="b2b_assort_job"></b2b-assort-job>
-          <b2b-rtn-assort-job name="b2b_rtn_assort_job" region-nm="{{regionName}}" zone-cd="{{zoneCode}}"></b2b-rtn-assort-job>
-          <b2b-rtn-inspection name="b2b_rtn_inspection" region-nm="{{regionName}}" zone-cd="{{zoneCode}}"></b2b-rtn-inspection>
-          <b2b-remains-fullbox name="b2b_remains_fullbox" region-nm="{{regionName}}" zone-cd="{{zoneCode}}"></b2b-remains-fullbox>
+      <b2b-cell-box-mapping-status name="b2b_cell_box_mapping_status"></b2b-cell-box-mapping-status>
+      <b2b-assort-job name="b2b_assort_job"></b2b-assort-job>
+      <b2b-rtn-assort-job name="b2b_rtn_assort_job" rack-nm="{{rackName}}" zone-cd="{{zoneCode}}"></b2b-rtn-assort-job>
+      <b2b-rtn-inspection name="b2b_rtn_inspection" rack-nm="{{rackName}}" zone-cd="{{zoneCode}}"></b2b-rtn-inspection>
+      <b2b-remains-fullbox name="b2b_remains_fullbox" rack-nm="{{rackName}}" zone-cd="{{zoneCode}}"></b2b-remains-fullbox>
 
-          <pda-region-sku-info name="pda_region_sku_info"></pda-region-sku-info>
-          <pda-das2-process name="pda_das2_process" region-nm="{{regionName}}" zone-cd="{{zoneCode}}"></pda-das2-process>
-          <pda-dps2-process name="pda_dps2_process" region-nm="{{regionName}}" zone-cd="{{zoneCode}}"></pda-dps2-process>
-          <!-- PDA Views -->
+      <pda-region-sku-info name="pda_region_sku_info"></pda-region-sku-info>
+      <pda-das2-process name="pda_das2_process" rack-nm="{{rackName}}" zone-cd="{{zoneCode}}"></pda-das2-process>
+      <pda-dps2-process name="pda_dps2_process" rack-nm="{{rackName}}" zone-cd="{{zoneCode}}"></pda-dps2-process>
+      <!-- PDA Views -->
 
-          <!-- KIOSK View -->
-          <b2b-out-middle-assort name="b2b_out_middle_assort"></b2b-out-middle-assort>
-          <b2b-out-middle-assort-with-weight name="b2b_out_middle_assort_weight"></b2b-out-middle-assort-with-weight>
-          <b2b-rtn-middle-assort name="b2b_rtn_middle_assort"></b2b-rtn-middle-assort>
-          <b2b-qty-inspection name="b2b_qty_inspection"></b2b-qty-inspection>
-          <b2b-weight-inspection name="b2b_weight_inspection"></b2b-weight-inspection>
-          <b2b-sku-input name="b2b_sku_input"></b2b-sku-input>
-          <b2c-box-input name="b2c_box_input"></b2c-box-input>
-          <b2c-pick-single-pack name = "b2c_pick_single_pack"></b2c-pick-single-pack>
-          <b2c-packing-check name = "b2c_packing_check"></b2c-packing-check>
-          <b2c-packing-popup name = "b2c_packing_popup"></b2c-packing-popup>
-          <b2c-qty-inspection name="b2c_qty_inspection"></b2c-qty-inspection>
-          <!-- KIOSK View -->
+      <!-- KIOSK View -->
+      <b2b-out-middle-assort name="b2b_out_middle_assort"></b2b-out-middle-assort>
+      <b2b-out-middle-assort-with-weight name="b2b_out_middle_assort_weight"></b2b-out-middle-assort-with-weight>
+      <b2b-rtn-middle-assort name="b2b_rtn_middle_assort"></b2b-rtn-middle-assort>
+      <b2b-qty-inspection name="b2b_qty_inspection"></b2b-qty-inspection>
+      <b2b-weight-inspection name="b2b_weight_inspection"></b2b-weight-inspection>
+      <b2b-sku-input name="b2b_sku_input"></b2b-sku-input>
+      <b2c-box-input name="b2c_box_input"></b2c-box-input>
+      <b2c-pick-single-pack name="b2c_pick_single_pack"></b2c-pick-single-pack>
+      <b2c-packing-check name="b2c_packing_check"></b2c-packing-check>
+      <b2c-packing-popup name="b2c_packing_popup"></b2c-packing-popup>
+      <b2c-qty-inspection name="b2c_qty_inspection"></b2c-qty-inspection>
+      <!-- KIOSK View -->
 
-          <logis-login
-            name="login"
-            resources="[[resources]]"
-            language="[[language]]"
-            is-dev-mode="[[_computeIsDev()]]"
-            on-login-succeed="_handleLoginSuccess">
-          </logis-login>
+      <logis-login name="login" resources="[[resources]]" language="[[language]]" is-dev-mode="[[_computeIsDev()]]" on-login-succeed="_handleLoginSuccess">
+      </logis-login>
 
-          <logis-setting
-            id="logis-setting"
-            name="logis_setting"
-            device-type="[[deviceType]]"
-            is-dev-mode="[[isDevMode]]"
-            is-not-login="[[isNotLogin]]"
-            on-session-responsed="_sessionResponsed"
-            on-session-unauthorized="_sessionUnauthorized">
-          </logis-setting>
+      <logis-setting id="logis-setting" name="logis_setting" device-type="[[deviceType]]" is-dev-mode="[[isDevMode]]" is-not-login="[[isNotLogin]]" on-session-responsed="_sessionResponsed" on-session-unauthorized="_sessionUnauthorized">
+      </logis-setting>
 
-          <logis-home name="home"></logis-home>
-        </iron-pages>
-      </app-header-layout>
-    </app-drawer-layout>
+      <logis-home name="home"></logis-home>
+    </iron-pages>
+  </app-header-layout>
+  </app-drawer-layout>
   </template>
 
   <script>
     class OperatoLogisApp extends Polymer.Element {
-      static get is() { return 'operato-logis-app'; }
+      static get is() {
+        return 'operato-logis-app';
+      }
 
       static get properties() {
         return {
@@ -327,7 +309,7 @@ Copyright © HatioLab Inc. All rights reserved.
            * @type {String}
            */
           title: {
-            type : String
+            type: String
           },
 
           /**
@@ -364,9 +346,9 @@ Copyright © HatioLab Inc. All rights reserved.
            ******************************
            * @type {String}
            */
-          regionName: {
+          rackName: {
             type: String,
-            value: () => JSON.parse(localStorage.getItem('setting.regionName'))
+            value: () => JSON.parse(localStorage.getItem('setting.rackNm'))
           },
 
           /**
@@ -376,7 +358,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           zoneCode: {
             type: String,
-            value: () => JSON.parse(localStorage.getItem('setting.zoneCode'))
+            value: () => JSON.parse(localStorage.getItem('setting.equipZone'))
           },
 
           /**
@@ -386,7 +368,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           jobName: {
             type: String,
-            value: () => JSON.parse(localStorage.getItem('setting.jobName'))
+            value: () => JSON.parse(localStorage.getItem('setting.jobType'))
           },
 
           /**
@@ -394,7 +376,7 @@ Copyright © HatioLab Inc. All rights reserved.
            ******************************
            * @type {Boolean}
            */
-          isQps:{
+          isQps: {
             type: Boolean,
             value: () => JSON.parse(localStorage.getItem('setting.isQps'))
           },
@@ -406,7 +388,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           kioskWorkLoc: {
             type: String,
-            value: () => JSON.parse(localStorage.getItem('setting.workLocation'))
+            value: () => JSON.parse(localStorage.getItem('setting.rackSide'))
           },
 
           /**
@@ -417,7 +399,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           kioskWorkLocLabel: {
             type: String,
-            value: () => JSON.parse(localStorage.getItem('setting.workLocationLabel'))
+            value: () => JSON.parse(localStorage.getItem('setting.rackSideLabel'))
           },
 
           /**
@@ -506,7 +488,7 @@ Copyright © HatioLab Inc. All rights reserved.
           // 설정 화면에서 다른 화면으로 이동할 경우
           // 기존의 페이지 이동 이벤트를 prevent 하고 설정을 저장함
           // 설정을 저장하면 최종적으로 location.repload 수행
-          if(prevPage === 'logis_setting') {
+          if (prevPage === 'logis_setting') {
             event.preventDefault();
             this.$['logis-setting'].saveSetting();
           }
@@ -518,14 +500,14 @@ Copyright © HatioLab Inc. All rights reserved.
 
           // b2b_sku_input, b2c_box_input 화면에서 QR 코드 버튼 활성화를 위한
           // event handler 등록
-          if(currentPage === 'b2b_sku_input') {
+          if (currentPage === 'b2b_sku_input') {
             this.showCodeButton('DAS');
 
           } else if (currentPage === 'b2c_box_input') {
             this.showCodeButton('DPS');
 
           } else {
-            if(this.isShowCodeButton) {
+            if (this.isShowCodeButton) {
               this.hideQRButton();
             }
           }
@@ -553,10 +535,10 @@ Copyright © HatioLab Inc. All rights reserved.
         this.deviceType = '';
 
         // 개발 모드일 때 localstorage에서 값을 조회 함
-        if(CONST.IS_DEV_MODE) {
+        if (CONST.IS_DEV_MODE) {
           this.deviceType = JSON.parse(localStorage.getItem('setting.deviceType')) ?
             JSON.parse(localStorage.getItem('setting.deviceType')) : CONST.MY_DEVICE;
-        // 운영 모드일 때
+          // 운영 모드일 때
         } else {
           this.deviceType = CONST.MY_DEVICE;
         }
@@ -570,13 +552,13 @@ Copyright © HatioLab Inc. All rights reserved.
        ******************************
        */
       _deviceTypeChanged(deviceType) {
-        if(!deviceType) {
+        if (!deviceType) {
           return;
         }
 
         this.isPDA = this.isTABLET = this.isKIOSK = false;
 
-        switch(deviceType) {
+        switch (deviceType) {
           case 'PDA':
             this.isPDA = true;
             this.adjustPDAFontSize();
@@ -599,7 +581,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * 화면 전체 폰트 사이즈를 변경함
        ******************************
        */
-       adjustPDAFontSize() {
+      adjustPDAFontSize() {
         document.querySelector('html').style.fontSize = '20px';
       }
 
@@ -613,7 +595,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {String} deviceType
        */
       _setupIcons(deviceType) {
-        if(this.isLoginScreen()) {
+        if (this.isLoginScreen()) {
           this.showLogoutBtn(false);
           this.showRefreshBtn(false);
           this.showRegionName(false);
@@ -621,7 +603,7 @@ Copyright © HatioLab Inc. All rights reserved.
           this.enableMenuBtn(true);
           this.showKioskWorkLoc(false);
 
-          if(deviceType === CONST.DEVICE_TYPE.TABLET || deviceType === CONST.DEVICE_TYPE.PDA) {
+          if (deviceType === CONST.DEVICE_TYPE.TABLET || deviceType === CONST.DEVICE_TYPE.PDA) {
             this.fixViewSize(true);
             this.showKioskSettingBtn(false);
             this.showSidebar(true);
@@ -634,7 +616,7 @@ Copyright © HatioLab Inc. All rights reserved.
           }
 
         } else {
-          switch(deviceType) {
+          switch (deviceType) {
             case CONST.DEVICE_TYPE.KIOSK:
               this.showKioskSettingBtn(true);
               this.showLogoutBtn(true);
@@ -648,7 +630,7 @@ Copyright © HatioLab Inc. All rights reserved.
               break;
 
             case CONST.DEVICE_TYPE.PDA:
-              if(this.isQps) {
+              if (this.isQps) {
                 this.showKioskSettingBtn(false);
                 this.showLogoutBtn(true);
                 this.showRefreshBtn(true);
@@ -696,7 +678,7 @@ Copyright © HatioLab Inc. All rights reserved.
       _sessionResponsed(event) {
         document.dispatchEvent(new CustomEvent('session-responsed', event));
 
-        if(this.jobName = 'QPS') {
+        if (this.jobName = 'QPS') {
           this.currentSite = event.detail.domain.brandName;
         } else {
           this.currentSite = event.detail.domain.name;
@@ -709,19 +691,19 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * @description 호기, 존, 작업위치 등의 정보가 설정 되었는지 확인함
+       * @description 랙, 존, 작업위치 등의 정보가 설정 되었는지 확인함
        ******************************
        */
       checkSetting() {
         try {
-          switch(this.deviceType) {
+          switch (this.deviceType) {
             case CONST.DEVICE_TYPE.KIOSK:
-              if(!JSON.parse(localStorage.getItem('setting.regionCode'))) {
+              if (!JSON.parse(localStorage.getItem('setting.rackCd'))) {
                 throw {
                   title: t('error.SETTING_ERROR'),
-                  message: t('text.region_code_is_not_set')
+                  message: t('text.rack_code_is_not_set')
                 };
-              } else if (!JSON.parse(localStorage.getItem('setting.workLocation'))) {
+              } else if (!JSON.parse(localStorage.getItem('setting.rackSide'))) {
                 throw {
                   title: t('error.SETTING_ERROR'),
                   message: t('text.side_code_is_not_set')
@@ -729,19 +711,19 @@ Copyright © HatioLab Inc. All rights reserved.
               }
               break;
 
-            /*default:
-              if(!JSON.parse(localStorage.getItem('setting.regionCode'))) {
-                throw {
-                  title: t('error.SETTING_ERROR'),
-                  message: t('text.region_code_is_not_set')
-                };
-              } else if (!JSON.parse(localStorage.getItem('setting.zoneCode'))) {
-                throw {
-                  title: t('error.SETTING_ERROR'),
-                  message: t('text.zone_code_is_not_set')
-                };
-              }
-              break;*/
+              /*default:
+                if(!JSON.parse(localStorage.getItem('setting.rackCd'))) {
+                  throw {
+                    title: t('error.SETTING_ERROR'),
+                    message: t('text.rack_code_is_not_set')
+                  };
+                } else if (!JSON.parse(localStorage.getItem('setting.equipZone'))) {
+                  throw {
+                    title: t('error.SETTING_ERROR'),
+                    message: t('text.zone_code_is_not_set')
+                  };
+                }
+                break;*/
           }
         } catch (error) {
           openAlert({
@@ -789,7 +771,7 @@ Copyright © HatioLab Inc. All rights reserved.
       _sessionUnauthorized() {
         document.dispatchEvent(new CustomEvent('session-unauthorized'));
 
-        if(location.hash.indexOf('login') < 0) {
+        if (location.hash.indexOf('login') < 0) {
           openAlert({
             title: t('error.LOGIN_ERROR'),
             message: t('error.UNAUTHORIZED'),
@@ -809,7 +791,7 @@ Copyright © HatioLab Inc. All rights reserved.
         this.isNotLogin = true;
         let route = location.hash.replace('#/', '');
 
-        if(route !== 'login' && route !== 'setting') {
+        if (route !== 'login' && route !== 'setting') {
           this.toLogin();
           openAlert({
             title: t('error.LOGIN_ERROR'),
@@ -841,7 +823,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _moveToDefaultView() {
         // 로그인 후 현재 장비가 kiosk라면 설정된 kiosk 화면으로 이동 설정된 화면이 없다면 any_setting으로 이동
-        if(this.deviceType === CONST.DEVICE_TYPE.KIOSK) {
+        if (this.deviceType === CONST.DEVICE_TYPE.KIOSK) {
           const kioskScreen = JSON.parse(localStorage.getItem('setting.kioskScreen'));
           this.route = {
             prefix: '/',
@@ -946,7 +928,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       showSidebar(value) {
         const drawerLayout = this.$['drawer-layout'];
-        if(value) {
+        if (value) {
           drawerLayout.removeAttribute('force-narrow');
         } else {
           drawerLayout.setAttribute('force-narrow', '');
@@ -954,12 +936,12 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * @description 호기명 활성화/비활성화
+       * @description 랙명 활성화/비활성화
        ******************************
        * @param {String} value
        */
       showRegionName(value) {
-        this.$['region-name'].hidden = !value;
+        this.$['rack-name'].hidden = !value;
       }
 
       /**
@@ -982,7 +964,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {String} value
        */
       fixViewSize(value) {
-        if(value) {
+        if (value) {
           this.$['drawer-layout'].style.height = this.screenHeight;
         } else {
           this.$['drawer-layout'].style.height = '';
@@ -1009,7 +991,7 @@ Copyright © HatioLab Inc. All rights reserved.
       enableMenuBtn(value) {
         const menuBtn = this.$['menu-btn'];
 
-        if(value) {
+        if (value) {
           menuBtn.onclick = this._toggleSideMenu.bind(this);
         } else {
           menuBtn.onclick = null;
@@ -1028,10 +1010,10 @@ Copyright © HatioLab Inc. All rights reserved.
         }
 
         // this.page = page || 'home';
-        if(page) {
-          switch(page) {
+        if (page) {
+          switch (page) {
             case 'login':
-              if(this.isNotLogin) {
+              if (this.isNotLogin) {
                 this.hideHeaderButtons();
               } else {
                 this._moveToDefaultView();
@@ -1042,7 +1024,10 @@ Copyright © HatioLab Inc. All rights reserved.
               if (this.isNotLogin && !(page === 'logis_setting' || page === 'login')) {
                 // 로그인 되지 않은 상태에서 setting 화면이나 login 화면이 아닌 다른곳으로 라우팅 시 로그인으로 강제 이동
                 this.toLogin();
-                openAlert({ title: t('error.LOGIN_ERROR'), message: t('error.UNAUTHORIZED') });
+                openAlert({
+                  title: t('error.LOGIN_ERROR'),
+                  message: t('error.UNAUTHORIZED')
+                });
               }
           }
         }
@@ -1053,7 +1038,11 @@ Copyright © HatioLab Inc. All rights reserved.
        ******************************
        */
       toHome() {
-        this.route = { prefix: '/', path: 'home', title: t('menu.Home')};
+        this.route = {
+          prefix: '/',
+          path: 'home',
+          title: t('menu.Home')
+        };
       }
 
       /**
@@ -1061,7 +1050,11 @@ Copyright © HatioLab Inc. All rights reserved.
        ******************************
        */
       toLogin() {
-        this.route = { prefix: '/', path: 'login', title: t('menu.Login') };
+        this.route = {
+          prefix: '/',
+          path: 'login',
+          title: t('menu.Login')
+        };
       }
 
       /**
@@ -1069,7 +1062,11 @@ Copyright © HatioLab Inc. All rights reserved.
        ******************************
        */
       toSetting() {
-        this.route = { prefix: '/', path: 'logis_setting', title: t('menu.Settings') };
+        this.route = {
+          prefix: '/',
+          path: 'logis_setting',
+          title: t('menu.Settings')
+        };
       }
 
       /**
@@ -1077,7 +1074,11 @@ Copyright © HatioLab Inc. All rights reserved.
        ******************************
        */
       toSysSetting() {
-        this.route = { prefix: '/', path: 'setting', title: t('menu.Settings') };
+        this.route = {
+          prefix: '/',
+          path: 'setting',
+          title: t('menu.Settings')
+        };
       }
 
       /**
@@ -1088,7 +1089,7 @@ Copyright © HatioLab Inc. All rights reserved.
         this.$['mpi-on-last-btn'].hidden = false;
         this.$['mpi-off-btn'].hidden = false;
 
-        if(viewType === 'DAS') {
+        if (viewType === 'DAS') {
           this.$['batch-full-box-btn'].hidden = false;
         } else {
           this.$['batch-full-box-btn'].hidden = true;
@@ -1126,11 +1127,11 @@ Copyright © HatioLab Inc. All rights reserved.
         const popup = document.createElement('qrcode-popup');
         let title;
 
-        if(buttonId.indexOf('mpi-off-btn') >= 0) {
+        if (buttonId.indexOf('mpi-off-btn') >= 0) {
           popup.actionType = 'mpi-off';
           title = t('title.mpi_off_all');
 
-        } else if(buttonId.indexOf('batch-full-box-btn') >= 0) {
+        } else if (buttonId.indexOf('batch-full-box-btn') >= 0) {
           popup.actionType = 'batch-full-box';
           title = t('title.batch_full_box');
 
@@ -1140,7 +1141,7 @@ Copyright © HatioLab Inc. All rights reserved.
         }
 
         document.dispatchEvent(new CustomEvent('open-dialog', {
-          detail:{
+          detail: {
             content: popup,
             width: 'fit',
             height: 'fit',
@@ -1156,7 +1157,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       refresh() {
         let route;
-        if(this.route && this.route.path) {
+        if (this.route && this.route.path) {
           route = this.route.path;
         } else {
           route = location.hash.replace('#/', '');

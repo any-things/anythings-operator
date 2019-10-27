@@ -19,7 +19,7 @@ Copyright © HatioLab Inc. All rights reserved.
     <sys-ajax
       id="box-info-ajax"
       method="POST"
-      curl="/tablet_process/find_box/:region_cd/:box_id/:box_detail_flag"
+      curl="/tablet_process/find_box/:rack_cd/:box_id/:box_detail_flag"
       content-type="application/json"
       custom-error-handler
       on-sys-ajax-response="_handleBoxInfoResponse"
@@ -34,11 +34,11 @@ Copyright © HatioLab Inc. All rights reserved.
       static get properties() {
         return {
           /**
-           * @description 호기 코드
+           * @description 랙 코드
            ****************
            * @type {String}
            */
-          regionCd: {
+          rackCd: {
             type: String
           },
 
@@ -60,9 +60,9 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {String} boxId
        */
       getBoxInfo(boxId) {
-        if (boxId && this.regionCd) {
+        if (boxId && this.rackCd) {
           var ajax = this.$['box-info-ajax'];
-          ajax.curl = `/tablet_process/find_box/${this.regionCd}/${boxId}/false`;
+          ajax.curl = `/tablet_process/find_box/${this.rackCd}/${boxId}/false`;
           ajax.generateRequest();
         }
       }

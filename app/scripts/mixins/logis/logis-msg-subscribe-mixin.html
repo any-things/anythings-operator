@@ -37,8 +37,8 @@ Copyright © HatioLab Inc. All rights reserved.
 
         // MQTT 연결
         WEB_MQTT.startConnectionMonitor(
-          LOGIS_UTIL.getRegionCd(),
-          LOGIS_UTIL.getZoneCd(),
+          LOGIS_UTIL.getRackCd(),
+          LOGIS_UTIL.getEquipZone(),
           LOGIS_UTIL.getDeviceType(),
           LOGIS_UTIL.getBrokerAddress(),
           LOGIS_UTIL.getBrokerPort(),
@@ -55,7 +55,7 @@ Copyright © HatioLab Inc. All rights reserved.
             var {
               equip_type: equipType,
               job_type: jobType,
-              region_cd: regionCd,
+              rack_cd: rackCd,
               action,
               message
             } = event.detail;

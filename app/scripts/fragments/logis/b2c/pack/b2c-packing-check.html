@@ -378,7 +378,7 @@ Copyright © HatioLab Inc. All rights reserved.
                     var reprintAjax = this.$['reprint-invoice-ajax'];
                     reprintAjax.curl = '/kiosk_process/dps/packing/print/' + this.$['box-id'].value;
                     reprintAjax.customParams = {
-                        printer_id: LOGIS_UTIL.getKioskPrinterId()
+                        printer_id: LOGIS_UTIL.getPrinterId()
                     };
                     reprintAjax.generateRequest();
                 }
