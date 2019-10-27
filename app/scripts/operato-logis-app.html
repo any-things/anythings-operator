@@ -17,6 +17,9 @@ Copyright © HatioLab Inc. All rights reserved.
 
 <link rel="import" href="../styles/mobile-theme.html">
 
+<!--
+  물류 메인 앱
+-->
 <dom-module id="operato-logis-app">
   <template>
     <style>
@@ -184,7 +187,6 @@ Copyright © HatioLab Inc. All rights reserved.
       <msg-spinner></msg-spinner>
       <!-- Drawer content -->
       <app-drawer id="appDrawer" opened="{{drawerOpened}}" slot="drawer" swipe-open>
-        <!--app-toolbar>SIDEBAR HEADER</app-toolbar-->
 
         <template is="dom-if" if="[[!isKIOSK]]">
           <menu-tiles route="{{route}}" device-type="[[deviceType]]"></menu-tiles>
@@ -196,17 +198,10 @@ Copyright © HatioLab Inc. All rights reserved.
     <app-header slot="header" fixed reveals effects="waterfall">
 
       <app-toolbar>
-        <!--dom-if if="[[isDevMode]]">
-              <template>
-                <iron-icon icon="settings" on-click="toSysSetting"></iron-icon>
-              </template>
-            </dom-if-->
-
         <div id="top-bar">
           <span id="header">
                 <div id="menu-btn">
                   <img src="./images/icon-brand.png" />
-                  <!--span>MPS</span-->
                   <span>[[currentSite]]</span>
         </div>
         <span id="title">[[title]]</span>
@@ -215,13 +210,13 @@ Copyright © HatioLab Inc. All rights reserved.
         <div id="input-container">
           <span id="rack-name" is-kiosk$="[[isKIOSK]]">[[rackName]]</span>
           <span id="zone-code">[[zoneCode]]</span>
-          <span id="kiosk-work-loc" is-kiosk$="[[isKIOSK]]" hidden>[[kioskWorkLocLabel]]</span>
+          <span id="rack-side" is-kiosk$="[[isKIOSK]]" hidden>[[rackSideLabel]]</span>
         </div>
 
         <div id="buttons">
           <iron-icon id="refresh-btn" icon="refresh" on-click="refresh" hidden></iron-icon>
-          <iron-icon id="mpi-off-btn" icon="lightbulb-outline" on-click="showCodePopup" hidden></iron-icon>
-          <iron-icon id="mpi-on-last-btn" icon="list" on-click="showCodePopup" hidden></iron-icon>
+          <iron-icon id="ind-off-btn" icon="lightbulb-outline" on-click="showCodePopup" hidden></iron-icon>
+          <iron-icon id="ind-on-last-btn" icon="list" on-click="showCodePopup" hidden></iron-icon>
           <iron-icon id="batch-full-box-btn" icon="move-to-inbox" on-click="showCodePopup" hidden></iron-icon>
           <iron-icon id="kiosk-setting-btn" icon="settings" on-click="toSetting" hidden></iron-icon>
           <iron-icon id="logout-btn" icon="power-settings-new" on-click="logout" hidden></iron-icon>
@@ -342,7 +337,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * @description 현재 장비의 타입
+           * @description 설정한 랙 코드
            ******************************
            * @type {String}
            */
@@ -352,7 +347,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * @description 현재 장비의 타입
+           * @description 현재 작업 존 코드
            ******************************
            * @type {String}
            */
@@ -362,17 +357,17 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * @description 현재 장비의 타입
+           * @description 현재 작업 유형
            ******************************
            * @type {String}
            */
-          jobName: {
+          jobType: {
             type: String,
             value: () => JSON.parse(localStorage.getItem('setting.jobType'))
           },
 
           /**
-           * @description 현재 장비의 타입
+           * @description QPS 여부
            ******************************
            * @type {Boolean}
            */
@@ -382,22 +377,22 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * @description 현재 장비의 타입
+           * @description 랙 사이드 설정
            ******************************
            * @type {String}
            */
-          kioskWorkLoc: {
+          kioskRackSide: {
             type: String,
             value: () => JSON.parse(localStorage.getItem('setting.rackSide'))
           },
 
           /**
            * @description KIOSK 환경에서 상단에 표시되는 작업 위치
-           * logis-setting에 의해 workLoc이 결정되면 workLoc을 바탕으로 화면에 표시할 값을 결정함
+           * logis-setting에 의해 rackSide이 결정되면 rackSide을 바탕으로 화면에 표시할 값을 결정함
            ******************************
            * @type {String}
            */
-          kioskWorkLocLabel: {
+          rackSideLabel: {
             type: String,
             value: () => JSON.parse(localStorage.getItem('setting.rackSideLabel'))
           },
@@ -449,7 +444,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * @description KIOSK 환경에서 QR 코드 버튼이 활성화 되어 있는지 여부를 확인하기 위한 flag
+           * @description QR 코드 버튼이 활성화 되어 있는지 여부를 확인하기 위한 flag
            ******************************
            * @type {Boolean}
            */
@@ -601,7 +596,7 @@ Copyright © HatioLab Inc. All rights reserved.
           this.showRegionName(false);
           this.showZoneCode(false);
           this.enableMenuBtn(true);
-          this.showKioskWorkLoc(false);
+          this.showKioskRackSide(false);
 
           if (deviceType === CONST.DEVICE_TYPE.TABLET || deviceType === CONST.DEVICE_TYPE.PDA) {
             this.fixViewSize(true);
@@ -626,7 +621,7 @@ Copyright © HatioLab Inc. All rights reserved.
               this.showZoneCode(false);
               this.fixViewSize(false);
               this.enableMenuBtn(false);
-              this.showKioskWorkLoc(true);
+              this.showKioskRackSide(true);
               break;
 
             case CONST.DEVICE_TYPE.PDA:
@@ -678,7 +673,7 @@ Copyright © HatioLab Inc. All rights reserved.
       _sessionResponsed(event) {
         document.dispatchEvent(new CustomEvent('session-responsed', event));
 
-        if (this.jobName = 'QPS') {
+        if (this.jobType = 'QPS') {
           this.currentSite = event.detail.domain.brandName;
         } else {
           this.currentSite = event.detail.domain.name;
@@ -706,7 +701,7 @@ Copyright © HatioLab Inc. All rights reserved.
               } else if (!JSON.parse(localStorage.getItem('setting.rackSide'))) {
                 throw {
                   title: t('error.SETTING_ERROR'),
-                  message: t('text.side_code_is_not_set')
+                  message: t('text.rack_side_is_not_set')
                 };
               }
               break;
@@ -760,7 +755,7 @@ Copyright © HatioLab Inc. All rights reserved.
         this.showLogoutBtn(false);
         this.showRegionName(false);
         this.showZoneCode(false);
-        this.showKioskWorkLoc(false);
+        this.showKioskRackSide(false);
       }
 
       /**
@@ -1086,8 +1081,8 @@ Copyright © HatioLab Inc. All rights reserved.
        ******************************
        */
       showCodeButton(viewType) {
-        this.$['mpi-on-last-btn'].hidden = false;
-        this.$['mpi-off-btn'].hidden = false;
+        this.$['ind-on-last-btn'].hidden = false;
+        this.$['ind-off-btn'].hidden = false;
 
         if (viewType === 'DAS') {
           this.$['batch-full-box-btn'].hidden = false;
@@ -1102,8 +1097,8 @@ Copyright © HatioLab Inc. All rights reserved.
        * @description 키오스크 작업 위치 정보 활성 / 비활성화
        ******************************
        */
-      showKioskWorkLoc(value) {
-        this.$['kiosk-work-loc'].hidden = !value;
+      showKioskRackSide(value) {
+        this.$['rack-side'].hidden = !value;
       }
 
       /**
@@ -1111,8 +1106,8 @@ Copyright © HatioLab Inc. All rights reserved.
        ******************************
        */
       hideQRButton() {
-        this.$['mpi-on-last-btn'].hidden = true;
-        this.$['mpi-off-btn'].hidden = true;
+        this.$['ind-on-last-btn'].hidden = true;
+        this.$['ind-off-btn'].hidden = true;
         this.$['batch-full-box-btn'].hidden = true;
         this.isShowCodeButton = false;
       }
@@ -1127,7 +1122,7 @@ Copyright © HatioLab Inc. All rights reserved.
         const popup = document.createElement('qrcode-popup');
         let title;
 
-        if (buttonId.indexOf('mpi-off-btn') >= 0) {
+        if (buttonId.indexOf('ind-off-btn') >= 0) {
           popup.actionType = 'mpi-off';
           title = t('title.mpi_off_all');
 
@@ -1135,7 +1130,7 @@ Copyright © HatioLab Inc. All rights reserved.
           popup.actionType = 'batch-full-box';
           title = t('title.batch_full_box');
 
-        } else if (buttonId.indexOf('mpi-on-last-btn') >= 0) {
+        } else if (buttonId.indexOf('ind-on-last-btn') >= 0) {
           popup.actionType = 'mpi-on-last';
           title = t('title.mpi_on_last');
         }

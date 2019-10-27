@@ -25,7 +25,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           jobLabel: {
             type: String,
-            value: () => t('label.job_nm')
+            value: () => t('label.job_type')
           },
 
           /**
@@ -43,9 +43,9 @@ Copyright © HatioLab Inc. All rights reserved.
            ****************
            * @type {String}
            */
-          workLocLabel: {
+          rackSideLabel: {
             type: String,
-            value: () => t('label.work_location')
+            value: () => t('label.rack_side')
           },
 
           /**
@@ -158,11 +158,11 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * @description 작업 이름
+           * @description 작업 유형
            ****************
            * @type {String}
            */
-          jobName: {
+          jobType: {
             type: String,
             value: () => JSON.parse(localStorage.getItem('setting.jobType'))
           },
@@ -172,7 +172,7 @@ Copyright © HatioLab Inc. All rights reserved.
            ****************
            * @type {String}
            */
-          jobNameLSKey: {
+          jobTypeLSKey: {
             type: String,
             value: 'setting.jobType'
           },
@@ -182,7 +182,7 @@ Copyright © HatioLab Inc. All rights reserved.
            ****************
            * @type {String}
            */
-          workLoc: {
+          rackSide: {
             type: String,
             value: () => JSON.parse(localStorage.getItem('setting.rackSide'))
           },
@@ -192,7 +192,7 @@ Copyright © HatioLab Inc. All rights reserved.
            ****************
            * @type {String}
            */
-          workLocLSKey: {
+          rackSideLSKey: {
             type: String,
             value: 'setting.rackSide'
           },
@@ -202,7 +202,7 @@ Copyright © HatioLab Inc. All rights reserved.
            ****************
            * @type {String}
            */
-          workLocName: {
+          rackSideName: {
             type: String
           },
 
@@ -211,7 +211,7 @@ Copyright © HatioLab Inc. All rights reserved.
            ****************
            * @type {String}
            */
-          workLocNameLSKey: {
+          rackSideNameLSKey: {
             type: String,
             value: 'setting.rackSideLabel'
           }
@@ -454,19 +454,19 @@ Copyright © HatioLab Inc. All rights reserved.
        *******************************
        * @return
        */
-      _getWorkLocationOpts() {
-        return Array.from(this.$['work-loc'].querySelectorAll('input[name=work-location]'));
+      _getRackSideOpts() {
+        return Array.from(this.$['work-loc'].querySelectorAll('input[name=rack-side]'));
       }
 
       /**
        * @description 작업 위치 (사이드 코드) 콤보 렌더링
        *******************************
        */
-      _setWorkLocDefaultValue() {
-        const workLocationOpts = this._getWorkLocationOpts();
-        workLocationOpts.forEach(workLocationOpt => {
-          if (this.workLoc === workLocationOpt.value) {
-            workLocationOpt.checked = true;
+      _setRackSideDefaultValue() {
+        const rackSideOpts = this._getRackSideOpts();
+        rackSideOpts.forEach(rackSideOpt => {
+          if (this.rackSide === rackSideOpt.value) {
+            rackSideOpt.checked = true;
           }
         });
       }
@@ -527,9 +527,9 @@ Copyright © HatioLab Inc. All rights reserved.
 
         event.detail.items.forEach(job => {
           const option = new Option(job.description, job.name);
-          if (this.jobName === job.name) {
+          if (this.jobType === job.name) {
             option.selected = true;
-            this.jobName = job.name;
+            this.jobType = job.name;
           }
 
           jobCombo.appendChild(option);

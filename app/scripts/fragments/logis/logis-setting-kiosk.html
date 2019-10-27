@@ -110,15 +110,15 @@ Copyright © HatioLab Inc. All rights reserved.
 
     <!-- 랙 위치 설정 -->
     <div id="work-loc" class="radio-btn-container">
-      <label>[[workLocLabel]]</label>
+      <label>[[rackSideLabel]]</label>
       <div class="buttons">
-        <input value="F" name="work-location" type="radio" work-loc-name$="[[frontLabel]]">
+        <input value="F" name="rack-side" type="radio" rack-side-name$="[[frontLabel]]">
         <label>[[frontLabel]]</label>
 
-        <input value="R" name="work-location" type="radio" work-loc-name$="[[rearLabel]]">
+        <input value="R" name="rack-side" type="radio" rack-side-name$="[[rearLabel]]">
         <label>[[rearLabel]]</label>
 
-        <input value="ALL" name="work-location" type="radio" work-loc-name$="[[frontLabel]]/[[rearLabel]]" checked>
+        <input value="ALL" name="rack-side" type="radio" rack-side-name$="[[frontLabel]]/[[rearLabel]]" checked>
         <label>[[frontLabel]]/[[rearLabel]]</label>
       </div>
     </div>
@@ -429,7 +429,7 @@ Copyright © HatioLab Inc. All rights reserved.
        **********************
        */
       _setDefaultValues() {
-        this._setWorkLocDefaultValue();
+        this._setRackSideDefaultValue();
       }
 
       /**
@@ -549,8 +549,8 @@ Copyright © HatioLab Inc. All rights reserved.
               this._setLocalStorage(this.kioskIntervalLSKey, kioskInterval >= 30 ? kioskInterval : 30);
               this._setLocalStorage(this.kioskCodeTypeLSKey, this._getCodeTypeCombo().selectedOptions[0].value);
               this._setLocalStorage(this.kioskInputTypeLSKey, this._getInputTypeCombo().selectedOptions[0].value);
-              this._setLocalStorage(this.workLocLSKey, this._getSelectedOpt(this._getWorkLocationOpts()).value);
-              this._setLocalStorage(this.workLocNameLSKey, this._getSelectedOpt(this._getWorkLocationOpts()).getAttribute('work-loc-name'));
+              this._setLocalStorage(this.rackSideLSKey, this._getSelectedOpt(this._getRackSideOpts()).value);
+              this._setLocalStorage(this.rackSideNameLSKey, this._getSelectedOpt(this._getRackSideOpts()).getAttribute('rack-side-name'));
               resolve();
             })
             .catch(error => {
@@ -567,13 +567,13 @@ Copyright © HatioLab Inc. All rights reserved.
         return new Promise((resolve, reject) => {
           const rackCombo = this._getRackCombo();
           const rackCode = rackCombo.selectedOptions.length === 1 ? rackCombo.selectedOptions[0].value : null;
-          const workLocation = this._getSelectedOpt(this._getWorkLocationOpts()).value;
+          const rackSide = this._getSelectedOpt(this._getRackSideOpts()).value;
 
-          if (!rackCode || !workLocation) {
+          if (!rackCode || !rackSide) {
             throw {
               detail: {
                 code: t('error.SETTING_ERROR'),
-                msg: !rackCode ? t('text.rack_code_is_not_set') : t('text.side_code_is_not_set')
+                msg: !rackCode ? t('text.rack_code_is_not_set') : t('text.rack_side_is_not_set')
               }
             };
           }
@@ -583,7 +583,7 @@ Copyright © HatioLab Inc. All rights reserved.
           updateSettingAjax.params = {
             equip_type: 'Rack',
             equip_cd: rackCode,
-            side_cd: workLocation
+            side_cd: rackSide
           };
 
           updateSettingAjax.addEventListener('sys-ajax-response', () => {

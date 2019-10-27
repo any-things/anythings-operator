@@ -103,37 +103,37 @@ Copyright © HatioLab Inc. All rights reserved.
     </div>
 
     <div id="work-loc" class="radio-btn-container">
-      <label>[[workLocLabel]]</label>
+      <label>[[rackSideLabel]]</label>
 
       <div class="buttons">
         <!-- TODO: template로 처리해야 됨. -->
         <dom-if if="[[isLeftRight]]">
           <template>
-            <input value="f" name="work-location" type="radio" work-loc-name$="[[frontLabel]]">
+            <input value="f" name="rack-side" type="radio" rack-side-name$="[[frontLabel]]">
             <label>[[leftLabel]]</label>
 
-            <input value="r" name="work-location" type="radio" work-loc-name$="[[rearLabel]]">
+            <input value="r" name="rack-side" type="radio" rack-side-name$="[[rearLabel]]">
             <label>[[rightLabel]]</label>
 
-            <input value="all" name="work-location" type="radio" work-loc-name$="[[leftLabel]]/[[rightLabel]]" checked>
+            <input value="all" name="rack-side" type="radio" rack-side-name$="[[leftLabel]]/[[rightLabel]]" checked>
             <label>[[leftLabel]]/[[rightLabel]]</label>
           </template>
   </dom-if>
 
   <dom-if if="[[!isLeftRight]]">
     <template>
-            <input value="F" name="work-location" type="radio" work-loc-name$="[[frontLabel]]">
+            <input value="F" name="rack-side" type="radio" rack-side-name$="[[frontLabel]]">
             <label>[[frontLabel]]</label>
 
-            <input value="R" name="work-location" type="radio" work-loc-name$="[[rearLabel]]">
+            <input value="R" name="rack-side" type="radio" rack-side-name$="[[rearLabel]]">
             <label>[[rearLabel]]</label>
 
-            <input value="ALL" name="work-location" type="radio" work-loc-name$="[[frontLabel]]/[[rearLabel]]" checked>
+            <input value="ALL" name="rack-side" type="radio" rack-side-name$="[[frontLabel]]/[[rearLabel]]" checked>
             <label>[[frontLabel]]/[[rearLabel]]</label>
           </template>
   </dom-if>
 
-  <input value="T" name="work-location" type="radio" work-loc-name$="[[allLabel]]">
+  <input value="T" name="rack-side" type="radio" rack-side-name$="[[allLabel]]">
   <label>[[allLabel]]</label>
   </div>
   </div>
@@ -390,7 +390,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _setDefaultValues() {
         this._setShowOthersOrderDefaultValue();
-        this._setWorkLocDefaultValue();
+        this._setRackSideDefaultValue();
         this._setFullCodeDefaultValue();
         this._setAutoPickingDefaultValue();
       }
@@ -445,12 +445,12 @@ Copyright © HatioLab Inc. All rights reserved.
               this._setLocalStorage(this.rackCodeLSKey, this._getRackCombo().selectedOptions[0].value);
               this._setLocalStorage(this.rackNameLSKey, this._getRackCombo().selectedOptions[0].innerText);
               this._setLocalStorage(this.zoneCodeLSKey, this._getZoneCombo().selectedOptions[0].value);
-              this._setLocalStorage(this.workLocLSKey, this._getSelectedOpt(this._getWorkLocationOpts()).value);
-              this._setLocalStorage(this.workLocNameLSKey, this._getSelectedOpt(this._getWorkLocationOpts()).getAttribute('work-loc-name'));
+              this._setLocalStorage(this.rackSideLSKey, this._getSelectedOpt(this._getRackSideOpts()).value);
+              this._setLocalStorage(this.rackSideNameLSKey, this._getSelectedOpt(this._getRackSideOpts()).getAttribute('rack-side-name'));
               this._setLocalStorage(this.showOthersOrderLSKey, JSON.parse(this._getSelectedOpt(this._getShowOthersOrderOpts()).value));
               this._setLocalStorage(this.showFullCodeLSKey, JSON.parse(this._getSelectedOpt(this._getShowFullCodeOpts()).value));
               this._setLocalStorage(this.autoPickingLSKey, this._getAutoPickingInput().checked);
-              this._setLocalStorage(this.jobNameLSKey, this._getJobCombo().selectedOptions[0].value);
+              this._setLocalStorage(this.jobTypeLSKey, this._getJobCombo().selectedOptions[0].value);
               resolve();
             })
             .catch(error => {
@@ -527,7 +527,7 @@ Copyright © HatioLab Inc. All rights reserved.
        *******************
        */
       _hiddenDiv() {
-        if (this.$['job-combo'].value == 'QPS' || this.jobName == 'QPS') {
+        if (this.$['job-combo'].value == 'QPS' || this.jobType == 'QPS') {
           this._setLocalStorage('setting.isQps', true);
           this.$['other-order'].setAttribute('style', `display: none`);
           this.$['auto-pick'].setAttribute('style', `display: none`);

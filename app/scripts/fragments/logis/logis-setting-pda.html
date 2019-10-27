@@ -87,19 +87,19 @@ Copyright © HatioLab Inc. All rights reserved.
 
     <!-- 작업 위치 (앞/뒤/앞,뒤/전체 등) 설정 -->
     <div id="work-loc" class="radio-btn-container">
-      <label>[[workLocLabel]]</label>
+      <label>[[rackSideLabel]]</label>
 
       <div class="buttons">
-        <input value="F" name="work-location" type="radio" work-loc-name$="[[frontLabel]]">
+        <input value="F" name="rack-side" type="radio" rack-side-name$="[[frontLabel]]">
         <label>[[frontLabel]]</label>
 
-        <input value="R" name="work-location" type="radio" work-loc-name$="[[rearLabel]]">
+        <input value="R" name="rack-side" type="radio" rack-side-name$="[[rearLabel]]">
         <label>[[rearLabel]]</label>
 
-        <input value="ALL" name="work-location" type="radio" work-loc-name$="[[frontLabel]]/[[rearLabel]]" checked>
+        <input value="ALL" name="rack-side" type="radio" rack-side-name$="[[frontLabel]]/[[rearLabel]]" checked>
         <label>[[frontLabel]]/[[rearLabel]]</label>
 
-        <input value="T" name="work-location" type="radio" work-loc-name$="[[allLabel]]">
+        <input value="T" name="rack-side" type="radio" rack-side-name$="[[allLabel]]">
         <label>[[allLabel]]</label>
       </div>
     </div>
@@ -241,7 +241,7 @@ Copyright © HatioLab Inc. All rights reserved.
        ******************
        */
       _setDefaultValues() {
-        this._setWorkLocDefaultValue();
+        this._setRackSideDefaultValue();
         this._setContinousScanDefaultValue();
       }
 
@@ -261,11 +261,11 @@ Copyright © HatioLab Inc. All rights reserved.
               // 작업 존 값 저장
               this._setLocalStorage(this.zoneCodeLSKey, this._getZoneCombo().selectedOptions[0].value);
               // 작업 유형 값 저장
-              this._setLocalStorage(this.jobNameLSKey, this._getJobCombo().selectedOptions[0].value);
+              this._setLocalStorage(this.jobTypeLSKey, this._getJobCombo().selectedOptions[0].value);
               // 작업 위치 값 저장
-              this._setLocalStorage(this.workLocLSKey, this._getSelectedOpt(this._getWorkLocationOpts()).value);
+              this._setLocalStorage(this.rackSideLSKey, this._getSelectedOpt(this._getRackSideOpts()).value);
               // 작업 위치 라벨 저장
-              this._setLocalStorage(this.workLocNameLSKey, this._getSelectedOpt(this._getWorkLocationOpts()).getAttribute('work-loc-name'));
+              this._setLocalStorage(this.rackSideNameLSKey, this._getSelectedOpt(this._getRackSideOpts()).getAttribute('rack-side-name'));
               // 송장 번호 표시를 위한 필드 문자 제한 수
               const invoiceFieldSubstr = parseInt(this._getInvoiceFieldSubstrInput().value);
               this._setLocalStorage(this.invoiceFieldSubstrLSKey, invoiceFieldSubstr > 0 ? invoiceFieldSubstr : 0);
@@ -354,7 +354,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
       resetRegionInfo() {
         // 랙 코드 값 저장
-        if (this.$['job-combo'].value != 'QPS' || this.jobName != 'QPS') {
+        if (this.$['job-combo'].value != 'QPS' || this.jobType != 'QPS') {
           var rackCd = JSON.parse(localStorage.getItem(this.rackCodeLSKey))
           var rackNm = JSON.parse(localStorage.getItem(this.rackNameLSKey))
 
@@ -394,10 +394,10 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _hiddenRegion() {
         if (this._getJobCombo().selectedOptions.length > 0) {
-          this.jobName = this._getJobCombo().selectedOptions[0].value;
+          this.jobType = this._getJobCombo().selectedOptions[0].value;
         }
 
-        if (this.$['job-combo'].value == 'QPS' || this.jobName == 'QPS') {
+        if (this.$['job-combo'].value == 'QPS' || this.jobType == 'QPS') {
           this.$['zone'].style.display = 'none';
           this.$['rack'].style.display = 'none';
           this.$['work-loc'].style.display = 'none';

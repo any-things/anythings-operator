@@ -940,11 +940,11 @@ Copyright © HatioLab Inc. All rights reserved.
       inputSku(comCd, skuCd, skuBarcd) {
         if (skuCd && skuCd.length >= 3) {
           var rackCd = LOGIS_UTIL.getRackCd();
-          var workLoc = LOGIS_UTIL.getRackSide();
+          var rackSide = LOGIS_UTIL.getRackSide();
           var startAssortAjax = this.$['input-sku-ajax'];
           let status = this.$['unfinished-only'].checked == true ? 'U' : '';
 
-          var url = `/kiosk_process/das/input/${rackCd}/${workLoc}/${comCd}/${skuCd}`;
+          var url = `/kiosk_process/das/input/${rackCd}/${rackSide}/${comCd}/${skuCd}`;
           url = url + '?page=' + this.page + '&limit=' + this.limit;
           if (status && status.length > 0) {
             url = url + '&status=' + status;
