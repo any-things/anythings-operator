@@ -5,9 +5,8 @@ Copyright © HatioLab Inc. All rights reserved.
 
 <link rel="import" href="../../../bower_components/polymer/polymer-element.html">
 
-<!--
-  물류 > KIOSK > KIOSK 설정 화면
- -->
+<!-- 물류> KIOSK > KIOSK 설정 화면
+-->
 <dom-module id="logis-setting-kiosk">
   <template>
     <style include="shared-styles any-setting-styles">
@@ -17,115 +16,86 @@ Copyright © HatioLab Inc. All rights reserved.
     </style>
 
     <!-- 메시지 통신을 위한 메시지 브로커 주소 조회 -->
-    <sys-ajax
-      id="broker-addrs-ajax"
-      method="GET"
-      content-type="application/json"
+    <sys-ajax id="broker-addrs-ajax" method="GET" content-type="application/json"
       on-sys-ajax-response="_setBrokerAddress">
     </sys-ajax>
 
     <!-- 메시지 통신을 위한 메시지 브로커 포트 조회 -->
-    <sys-ajax
-      id="broker-port-ajax"
-      method="GET"
-      content-type="application/json"
-      on-sys-ajax-response="_setBrokerPort">
+    <sys-ajax id="broker-port-ajax" method="GET" content-type="application/json" on-sys-ajax-response="_setBrokerPort">
     </sys-ajax>
 
     <!-- 메시지 통신을 위한 사이트 코드 조회 -->
-    <sys-ajax
-      id="broker-site-ajax"
-      method="GET"
-      content-type="application/json"
-      on-sys-ajax-response="_setBrokerSite">
+    <sys-ajax id="broker-site-ajax" method="GET" content-type="application/json" on-sys-ajax-response="_setBrokerSite">
     </sys-ajax>
 
     <!-- 랙 리스트 조회 -->
-    <sys-ajax
-      id="rack-items-ajax"
-      method="GET"
-      content-type="application/json"
+    <sys-ajax id="rack-items-ajax" method="GET" content-type="application/json"
       on-sys-ajax-response="_renderRegionCombo">
     </sys-ajax>
 
     <!-- KIOSK 메뉴 리스트 조회 -->
-    <sys-ajax
-      id="kiosk-menu-ajax"
-      last-response="{{kioskMenuList}}">
+    <sys-ajax id="kiosk-menu-ajax" last-response="{{kioskMenuList}}">
     </sys-ajax>
 
-    <!-- 프린터 리스트 조회 -->
-    <sys-ajax
-      id="printer-ajax"
-      method="GET"
-      on-sys-ajax-response="_renderPrinterCombo">
+    <!-- 업데이트 내역 조회 -->
+    <sys-ajax id="update-ajax" method="GET" last-response="{{updatedList}}">
     </sys-ajax>
 
     <!-- 설정 사항 저장 -->
-    <sys-ajax
-      id="update-setting-ajax"
-      method="PUT"
-      content-type="application/json">
+    <sys-ajax id="update-setting-ajax" method="PUT" content-type="application/json">
     </sys-ajax>
 
-    <!-- 랙 설정 -->
+    <!-- 스테이션 설정 -->
+    <div id="station" class="input-container">
+      <label style="text-align: left">[[stationLabel]]</label>
+    </div>
+    <div class="input-container">
+      <select id="station-combo"></select>
+    </div>
+
+    <!-- 설비 유형 설정 -->
+    <div id="equipment" class="input-container">
+      <label style="text-align: left">[[equipmentLabel]]</label>
+    </div>
+    <div class="input-container">
+      <select id="equipment-combo"></select>
+    </div>
+
+    <!-- 설비 이름 설정 -->
     <div id="rack" class="input-container">
-      <label>[[rackLabel]]</label>
-      <select id="rack-combo" ></select>
+      <label style="text-align: left">[[rackLabel]]</label>
+    </div>
+    <div class="input-container">
+      <select id="rack-combo"></select>
     </div>
 
     <!-- 메뉴 이동 -->
     <div id="screen" class="input-container">
-      <label>[[screenLabel]]</label>
+      <label style="text-align: left">[[screenLabel]]</label>
+    </div>
+    <div class="input-container">
       <select id="screen-combo"></select>
-
       <div class="button-container">
         <button id="move-btn" on-click="_moveToScreen">[[moveBtnLabel]]</button>
       </div>
     </div>
 
-    <!-- 프린터 설정 -->
-    <div id="printer" class="input-container">
-      <label>[[printLabel]]</label>
-      <select id="printers-combo"></select>
+    <!-- 업데이트 -->
+    <div id="update-operato" class="input-container">
+      <label style="text-align: left">[[updateLabel]]</label>
+    </div>
+    <div class="button-container">
+      <button id="move-btn" on-click="_viewUpdateContent">[[detailedContentBtnLabel]]</button>
+      <button id="move-btn" on-click="_moveToScreen">[[updateBtnLabel]]</button>
     </div>
 
-    <!-- 화면에서 서비스 요청 주기 (초) 설정 -->
-    <div id="interval" class="input-container">
-      <label>[[intervalLabel]]</label>
-      <input type="number" id="interval-input" min="30" value="[[kioskInterval]]">
-    </div>
-
-    <!-- 바코드 설정 -->
-    <div id="code-type" class="input-container">
-      <label for="code-type">[[codeTypeLabel]]</label>
-      <select id="code-type-combo"></select>
-    </div>
-
-    <!-- 박스 투입 유형 설정 -->
-    <div id="input-type" class="input-container">
-      <label for="input_type">[[inputTypeLabel]]</label>
-      <select id="input-type-combo"></select>
-    </div>
-
-    <!-- 랙 위치 설정 -->
-    <div id="work-loc" class="radio-btn-container">
-      <label>[[rackSideLabel]]</label>
-      <div class="buttons">
-        <input value="F" name="rack-side" type="radio" rack-side-name$="[[frontLabel]]">
-        <label>[[frontLabel]]</label>
-
-        <input value="R" name="rack-side" type="radio" rack-side-name$="[[rearLabel]]">
-        <label>[[rearLabel]]</label>
-
-        <input value="ALL" name="rack-side" type="radio" rack-side-name$="[[frontLabel]]/[[rearLabel]]" checked>
-        <label>[[frontLabel]]/[[rearLabel]]</label>
-      </div>
+    <div class="button-container">
+      <button id="update-btn" on-click="_moveToScreen" style="float: right;">[[refreshBtnLabel]]</button>
     </div>
   </template>
 
   <script>
-    class LogisSettingKiosk extends LoigsSettingMixin(Polymer.Element) {
+    class LogisSettingKiosk extends LogisSettingMixin(Polymer.Element) {
       static get is() {
         return 'logis-setting-kiosk'
       }
@@ -143,6 +113,46 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
+           * @description 스테이션 라벨
+           *********************
+           * @type {String}
+           */
+          stationLabel: {
+            type: String,
+            value: () => t('label.station')
+          },
+
+          /**
+           * @description 설비 유형 라벨
+           *********************
+           * @type {String}
+           */
+          equipmentLabel: {
+            type: String,
+            value: () => t('label.equipment')
+          },
+
+          /**
+           * @description 내역 보기 버튼 라벨
+           *********************
+           * @type {String}
+           */
+          detailedContentBtnLabel: {
+            type: String,
+            value: () => t('button.detailed_content')
+          },
+
+          /**
+           * @description 업데이트 버튼 라벨
+           *********************
+           * @type {String}
+           */
+          updateBtnLabel: {
+            type: String,
+            value: () => t('button.update')
+          },
+
+          /**
            * @description 이동 버튼 라벨
            *********************
            * @type {String}
@@ -152,44 +162,35 @@ Copyright © HatioLab Inc. All rights reserved.
             value: () => t('button.move')
           },
 
+
           /**
-           * @description 요청 주기 (초) 라벨
+           * @description 새로 고침 버튼 라벨
            *********************
            * @type {String}
            */
-          intervalLabel: {
+          refreshBtnLabel: {
             type: String,
-            value: () => t('label.req_interval')
+            value: () => t('button.refresh')
           },
 
           /**
-           * @description 바코드 유형 라벨
+           * @description 설비 이름 라벨
            *********************
            * @type {String}
            */
-          codeTypeLabel: {
+          rackLabel: {
             type: String,
-            value: () => t('label.code_type')
+            value: () => t('label.equipment_name')
           },
 
           /**
-           * @description 투입 유형 라벨
+           * @description 업데이트 라벨
            *********************
            * @type {String}
            */
-          inputTypeLabel: {
+          updateLabel: {
             type: String,
-            value: () => t('label.input_type')
-          },
-
-          /**
-           * @description 프린터 라벨
-           *********************
-           * @type {String}
-           */
-          printLabel: {
-            type: String,
-            value: () => t('label.default_printer')
+            value: () => t('label.update')
           },
 
           /**
@@ -220,63 +221,6 @@ Copyright © HatioLab Inc. All rights reserved.
           kioskScreenLSKey: {
             type: String,
             value: 'setting.kioskScreen'
-          },
-
-          /**
-           * @description 키오스크 프린터 아이디 설정 값
-           *********************
-           * @type {String}
-           */
-          kioskPrinterId: {
-            type: String,
-            value: () => JSON.parse(localStorage.getItem('setting.printerId'))
-          },
-
-          /**
-           * @description 키오스크 프린터 아이디 설정 값 저장을 위한 localStorage의 key
-           *********************
-           * @type {String}
-           */
-          kioskPrinterIdLSKey: {
-            type: String,
-            value: 'setting.printerId'
-          },
-
-          /**
-           * @description 키오스크 데이터 조회 주기
-           *********************
-           * @type {String}
-           */
-          kioskInterval: {
-            type: Number,
-            value: () => {
-              let kioskInterval = parseInt(JSON.parse(localStorage.getItem('setting.refreshInterval')));
-              if (!kioskInterval) {
-                kioskInterval = 5;
-                localStorage.setItem('setting.refreshInterval', JSON.stringify(kioskInterval));
-              }
-              return kioskInterval;
-            }
-          },
-
-          /**
-           * @description 키오스크 데이터 조회 주기 값 저장을 위한 localStorage key
-           *********************
-           * @type {String}
-           */
-          kioskIntervalLSKey: {
-            type: String,
-            value: 'setting.refreshInterval'
-          },
-
-          /**
-           * @description 키오스크 코드 타입
-           *********************
-           * @type {String}
-           */
-          kioskCodeType: {
-            type: String,
-            value: () => JSON.parse(localStorage.getItem('setting.barcodeType'))
           },
 
           /**
@@ -319,42 +263,9 @@ Copyright © HatioLab Inc. All rights reserved.
             observer: '_renderScreenCombo'
           },
 
-          /**
-           * @description 키오스크 코드 유형 리스트
-           *********************
-           * @type {Array}
-           */
-          kioskCodeTypes: {
+          updatedList: {
             type: Array,
-            value: () => {
-              return [{
-                name: t('label.barcode'),
-                value: 'barcode'
-              }, {
-                name: t('label.qrcode'),
-                value: 'qrcode'
-              }];
-            },
-            observer: '_renderCodeCombo'
-          },
-
-          /**
-           * @description 키오스크 투입 유형 리스트
-           *********************
-           * @type {Array}
-           */
-          kioskInputTypes: {
-            type: Array,
-            value: () => {
-              return [{
-                name: t('label.box'),
-                value: 'box'
-              }, {
-                name: t('label.bucket'),
-                value: 'bucket'
-              }];
-            },
-            observer: '_renderInputTypeCombo'
+            observer: '_updatedListChanged'
           }
         }
       }
@@ -367,7 +278,6 @@ Copyright © HatioLab Inc. All rights reserved.
         super.connectedCallback();
         this._getRegionItems();
         this._getKioskMenus();
-        this._getPrinters();
         this._setDefaultValues();
       }
 
@@ -390,17 +300,6 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * @description 프린터 리스트 조회
-       *********************
-       */
-      _getPrinters() {
-        const printersAjax = this._getPrintersAjax();
-        printersAjax.curl = '/printers';
-        printersAjax.baseUrl = this._getLocalStorage('setting.baseUrl');
-        printersAjax.generateRequest();
-      }
-
-      /**
        * @description 키오스크 메뉴 Ajax 리턴
        *********************
        */
@@ -409,49 +308,11 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * @description 키오스크 프린터 Ajax 리턴
-       *********************
-       */
-      _getPrintersAjax() {
-        return this.$['printer-ajax'];
-      }
-
-      /**
-       * @description 프린터 콤보 박스 리턴
-       *********************
-       */
-      _getPrintersCombo() {
-        return this.$['printers-combo'];
-      }
-
-      /**
        * @description 설정 항목들의 기본값을 저장하기 위한 함수
        **********************
        */
       _setDefaultValues() {
         this._setRackSideDefaultValue();
-      }
-
-      /**
-       * @description 설정 항목들의 기본값을 저장하기 위한 함수
-       **********************
-       * @param {Object} event
-       */
-      _renderPrinterCombo(event) {
-        const printers = event.detail;
-        const printersCombo = this._getPrintersCombo();
-
-        if (event && event.detail) {
-          event.detail.items.forEach(printer => {
-            const option = new Option(printer.printer_nm, printer.id);
-
-            if (this.kioskPrinterId === printer.id) {
-              option.selected = true;
-            }
-
-            printersCombo.appendChild(option);
-          })
-        }
       }
 
       /**
@@ -523,13 +384,35 @@ Copyright © HatioLab Inc. All rights reserved.
         });
       }
 
-      _moveToScreen(event) {
-        if (this._getScreenCombo().selectedOptions[0] && this._getScreenCombo().selectedOptions[0].value) {
-          const selectedKioskScreen = this._getScreenCombo().selectedOptions[0].value
-          if (selectedKioskScreen) {
-            location.hash = `/${selectedKioskScreen}`;
+      _viewUpdateContent(event) {
+        const deviceType = localStorage.getItem('setting.deviceType');
+
+        const updatedListAjax = this._getUpdatedList();
+        updatedListAjax.curl = '/device_process/release_notes/' + deviceType;
+        updatedListAjax.baseUrl = this._getLocalStorage('setting.baseUrl');
+        updatedListAjax.generateRequest();
+
+      }
+
+      _updatedListChanged(updatedList) {
+        document.dispatchEvent(new CustomEvent('open-form-list-dialog', {
+          detail: {
+            title: t('title.patch_notes'),
+            listFields: [{
+              display: 'Seq.',
+              fieldname: 'seq',
+              columnWidth: '0.7fr',
+              style: {
+                textAlign: 'center'
+              }
+            }, {
+              display: 'Content',
+              fieldname: 'content',
+              columnWidth: '2fr'
+            }],
+            listData: updatedList
           }
-        }
+        }));
       }
 
       /**
@@ -541,18 +424,17 @@ Copyright © HatioLab Inc. All rights reserved.
       saveSetting() {
         return new Promise((resolve, reject) => {
           this.updateSetting().then(() => {
-              this._setLocalStorage(this.rackCodeLSKey, this._getRackCombo().selectedOptions[0].value)
-              this._setLocalStorage(this.rackNameLSKey, this._getRackCombo().selectedOptions[0].innerText);
-              this._setLocalStorage(this.kioskScreenLSKey, this._getScreenCombo().selectedOptions[0] ? this._getScreenCombo().selectedOptions[0].value : 'logis_setting');
-              this._setLocalStorage(this.kioskPrinterIdLSKey, this._getPrintersCombo().selectedOptions[0] ? this._getPrintersCombo().selectedOptions[0].value : null);
-              const kioskInterval = parseInt(this._getKioskIntervalInput().value);
-              this._setLocalStorage(this.kioskIntervalLSKey, kioskInterval >= 30 ? kioskInterval : 30);
-              this._setLocalStorage(this.kioskCodeTypeLSKey, this._getCodeTypeCombo().selectedOptions[0].value);
-              this._setLocalStorage(this.kioskInputTypeLSKey, this._getInputTypeCombo().selectedOptions[0].value);
-              this._setLocalStorage(this.rackSideLSKey, this._getSelectedOpt(this._getRackSideOpts()).value);
-              this._setLocalStorage(this.rackSideNameLSKey, this._getSelectedOpt(this._getRackSideOpts()).getAttribute('rack-side-name'));
-              resolve();
-            })
+            this._setLocalStorage(this.rackCodeLSKey, this._getRackCombo().selectedOptions[0].value)
+            this._setLocalStorage(this.rackNameLSKey, this._getRackCombo().selectedOptions[0].innerText);
+            this._setLocalStorage(this.kioskScreenLSKey, this._getScreenCombo().selectedOptions[0] ? this._getScreenCombo().selectedOptions[0].value : 'logis_setting');
+            const kioskInterval = parseInt(this._getKioskIntervalInput().value);
+            this._setLocalStorage(this.kioskIntervalLSKey, kioskInterval >= 30 ? kioskInterval : 30);
+            this._setLocalStorage(this.kioskCodeTypeLSKey, this._getCodeTypeCombo().selectedOptions[0].value);
+            this._setLocalStorage(this.kioskInputTypeLSKey, this._getInputTypeCombo().selectedOptions[0].value);
+            this._setLocalStorage(this.rackSideLSKey, this._getSelectedOpt(this._getRackSideOpts()).value);
+            this._setLocalStorage(this.rackSideNameLSKey, this._getSelectedOpt(this._getRackSideOpts()).getAttribute('rack-side-name'));
+            resolve();
+          })
             .catch(error => {
               reject(error);
             });
@@ -631,6 +513,10 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _getInputTypeCombo() {
         return this.$['input-type-combo'];
+      }
+
+      _getUpdatedList() {
+        return this.$['update-ajax'];
       }
     }
 

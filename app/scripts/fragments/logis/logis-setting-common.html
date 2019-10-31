@@ -16,41 +16,43 @@ Copyright © HatioLab Inc. All rights reserved.
     <style include="shared-styles any-setting-styles"></style>
 
     <!-- 관리 사이트 세션 체크 Ajax -->
-    <sys-ajax
-      id="mgr-site-session-check-ajax"
-      method="GET"
-      on-sys-ajax-response="_mgrSiteSessionResponsed"
-      on-sys-ajax-error="_mgrSiteSessionError"
-      custom-error-handler
-      timeout="10000">
+    <sys-ajax id="mgr-site-session-check-ajax" method="GET" on-sys-ajax-response="_mgrSiteSessionResponsed"
+      on-sys-ajax-error="_mgrSiteSessionError" custom-error-handler timeout="10000">
     </sys-ajax>
 
     <!-- 사이트 세션 체크 Ajax -->
-    <sys-ajax
-      id="domain-session-check-ajax"
-      method="GET"
-      on-sys-ajax-response="_domainSessionResponsed"
-      on-sys-ajax-error="_domainSessionError"
-      on-sys-ajax-unauthorized="_domainUnauthorized"
-      custom-error-handler
+    <sys-ajax id="domain-session-check-ajax" method="GET" on-sys-ajax-response="_domainSessionResponsed"
+      on-sys-ajax-error="_domainSessionError" on-sys-ajax-unauthorized="_domainUnauthorized" custom-error-handler
       timeout="10000">
     </sys-ajax>
 
     <!-- 애플리케이션 서버 접속 IP -->
     <div id="mgr-ip" class="input-container">
-      <label>[[ipLabel]]</label>
+      <label>
+        <!-- <img src="../../../images/icon-brand.png" /> -->
+        <label style="text-align: left">[[ipLabel]]</label>
+      </label>
+    </div>
+    <div class="input-container">
       <input id="ip" placeholder="IP Address (ex: 127.0.0.1)">
     </div>
 
+
     <!-- 애플리케이션 서버 접속 포트 -->
     <div id="mgr-port" class="input-container">
-      <label>[[portLabel]]</label>
+      <label style="text-align: left">[[portLabel]]</label>
+      <!-- <input id="port" type="number" min="0" placeholder="Port (ex: 8080)"> -->
+    </div>
+    <div class="input-container">
       <input id="port" type="number" min="0" placeholder="Port (ex: 8080)">
     </div>
 
     <!-- 언어 선택 -->
     <div id="locales" class="input-container">
-      <label>[[localeLabel]]</label>
+      <label style="text-align: left">[[localeLabel]]</label>
+      <!-- <select id="locale"></select> -->
+    </div>
+    <div class="input-container">
       <select id="locale"></select>
     </div>
   </template>

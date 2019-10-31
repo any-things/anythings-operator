@@ -129,6 +129,10 @@ window.locales['en-US'] = {
   'label.order_cnt': 'Order Count',
   'label.com_cnt': 'Complete Count',
   'label.redo': 'Rework',
+  'label.update': 'Update',
+  'label.station': 'Station',
+  'label.equipment': 'Equipment',
+  'label.equipment_name': 'Equipment Code',
 
   // menu list
   'menu.Settings': 'Setting',
@@ -219,6 +223,8 @@ window.locales['en-US'] = {
   'button.retry_inspection': 'Retry Inspection',
   'button.collect_remains': 'Remains Collection',
   'button.cancel_full': 'Cancel Fullbox',
+  'button.detailed_content': 'View Contents',
+  'button.update': 'Update',
 
   // text list
   'text.login_failure': 'Failed to Login',
@@ -363,6 +369,7 @@ window.locales['en-US'] = {
   'title.password_expired': 'Password is expired.',
   'title.cancel_confirmation': 'Cancel Confirmation',
   'title.selecting_rack': 'Selecting Rack',
+  'title.patch_notes': 'Patch Notes',
 
   // error list
   'error.VALIDATION_ERROR': 'Validation Error!',

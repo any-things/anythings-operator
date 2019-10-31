@@ -129,6 +129,10 @@ window.locales['ko-KR'] = {
   'label.order_cnt': '주문 건수',
   'label.com_cnt': '완료 건수',
   'label.redo': '재 작업',
+  'label.update': '업데이트',
+  'label.station': '스테이션',
+  'label.equipment': '설비 유형',
+  'label.equipment_name': '설비 이름',
 
   // menu list
   'menu.Settings': '설정',
@@ -219,6 +223,8 @@ window.locales['ko-KR'] = {
   'button.retry_inspection': '재 검수',
   'button.collect_remains': '잔량처리',
   'button.cancel_full': '풀박스 취소',
+  'button.detailed_content': '내역보기',
+  'button.update': '업데이트',
 
   // text list
   'text.login_failure': '로그인 실패',
@@ -363,6 +369,7 @@ window.locales['ko-KR'] = {
   'title.password_expired': '비밀번호 연장 필요',
   'title.cancel_confirmation': '확정 취소',
   'title.selecting_rack': '랙 선택',
+  'title.patch_notes': '업데이트 내역',
 
   // error list
   'error.VALIDATION_ERROR': '유효성 검사 오류!',

@@ -15,154 +15,77 @@ Copyright © HatioLab Inc. All rights reserved.
     <style include="shared-styles any-setting-styles"></style>
 
     <!-- 메시지 브로커 주소 조회 Ajax -->
-    <sys-ajax
-      id="broker-addrs-ajax"
-      method="GET"
-      content-type="application/json"
+    <sys-ajax id="broker-addrs-ajax" method="GET" content-type="application/json"
       on-sys-ajax-response="_setBrokerAddress">
     </sys-ajax>
 
     <!-- 메시지 브로커 포트 조회 Ajax -->
-    <sys-ajax
-      id="broker-port-ajax"
-      method="GET"
-      content-type="application/json"
-      on-sys-ajax-response="_setBrokerPort">
+    <sys-ajax id="broker-port-ajax" method="GET" content-type="application/json" on-sys-ajax-response="_setBrokerPort">
     </sys-ajax>
 
     <!-- 메시지 브로커 사이트 코드 조회 Ajax -->
-    <sys-ajax
-      id="broker-site-ajax"
-      method="GET"
-      content-type="application/json"
-      on-sys-ajax-response="_setBrokerSite">
+    <sys-ajax id="broker-site-ajax" method="GET" content-type="application/json" on-sys-ajax-response="_setBrokerSite">
     </sys-ajax>
 
     <!-- 작업 위치 (앞, 뒤, 앞/뒤, 전체 등) 조회 Ajax -->
-    <sys-ajax
-      auto
-      method="GET"
-      curl="/settings/show_by_name?name=operator.side.set"
-      content-type="application/json"
+    <sys-ajax auto method="GET" curl="/settings/show_by_name?name=operator.side.set" content-type="application/json"
       last-response="{{sideSetResponse}}">
     </sys-ajax>
 
     <!-- 랙 리스트 조회 Ajax -->
-    <sys-ajax
-      id="rack-items-ajax"
-      method="GET"
-      content-type="application/json"
+    <sys-ajax id="rack-items-ajax" method="GET" content-type="application/json"
       on-sys-ajax-response="_renderRegionCombo">
     </sys-ajax>
 
-    <sys-ajax
-      id="zone-items-ajax"
-      method="GET"
-      content-type="application/json"
-      on-sys-ajax-response="_renderZoneCombo">
+    <sys-ajax id="zone-items-ajax" method="GET" content-type="application/json" on-sys-ajax-response="_renderZoneCombo">
     </sys-ajax>
 
-    <sys-ajax
-      id="update-setting-ajax"
-      method="PUT"
-      content-type="application/json">
+    <sys-ajax id="update-setting-ajax" method="PUT" content-type="application/json">
     </sys-ajax>
 
-    <sys-ajax
-      id="job-combo-ajax"
-      method="GET"
-      content-type="application/json"
-      on-sys-ajax-response="_renderJobCombo">
+    <sys-ajax id="job-combo-ajax" method="GET" content-type="application/json" on-sys-ajax-response="_renderJobCombo">
     </sys-ajax>
 
+    <!-- 스테이션 설정 -->
+    <div id="station" class="input-container">
+      <label style="text-align: left">[[stationLabel]]</label>
+    </div>
+    <div class="input-container">
+      <select id="station-combo"></select>
+    </div>
+
+    <!-- 설비 유형 설정 -->
+    <div id="equipment" class="input-container">
+      <label style="text-align: left">[[equipmentLabel]]</label>
+    </div>
+    <div class="input-container">
+      <select id="equipment-combo"></select>
+    </div>
+
+    <!-- 설비 이름 설정 -->
     <div id="rack" class="input-container">
-      <label>[[rackLabel]]</label>
-      <select id="rack-combo" on-change="_getZoneItems"></select>
+      <label style="text-align: left">[[rackLabel]]</label>
+    </div>
+    <div class="input-container">
+      <select id="rack-combo"></select>
     </div>
 
-    <div id="zone" class="input-container">
-      <label>[[zoneLabel]]</label>
-      <select id="zone-combo"></select>
+    <!-- 업데이트 -->
+    <div id="update-operato" class="input-container">
+      <label style="text-align: left">[[updateLabel]]</label>
+    </div>
+    <div class="button-container">
+      <button id="move-btn" on-click="_viewUpdateContent">[[detailedContentBtnLabel]]</button>
+      <button id="move-btn" on-click="_moveToScreen">[[updateBtnLabel]]</button>
     </div>
 
-    <div id="center" class="input-container">
-      <label>[[jobLabel]]</label>
-      <select id="job-combo" on-change="_hiddenDiv"></select>
+    <div class="button-container">
+      <button id="update-btn" on-click="_moveToScreen" style="float: right;">[[refreshBtnLabel]]</button>
     </div>
-
-    <div id="other-order" class="radio-btn-container">
-      <label>[[othersOrdLabel]]</label>
-
-      <div class="buttons">
-        <input name="others-order" value="true" type="radio" checked>
-        <label>[[showLabel]]</label>
-
-        <input name="others-order" value="false" type="radio">
-        <label>[[hideLabel]]</label>
-      </div>
-    </div>
-
-    <div id="work-loc" class="radio-btn-container">
-      <label>[[rackSideLabel]]</label>
-
-      <div class="buttons">
-        <!-- TODO: template로 처리해야 됨. -->
-        <dom-if if="[[isLeftRight]]">
-          <template>
-            <input value="f" name="rack-side" type="radio" rack-side-name$="[[frontLabel]]">
-            <label>[[leftLabel]]</label>
-
-            <input value="r" name="rack-side" type="radio" rack-side-name$="[[rearLabel]]">
-            <label>[[rightLabel]]</label>
-
-            <input value="all" name="rack-side" type="radio" rack-side-name$="[[leftLabel]]/[[rightLabel]]" checked>
-            <label>[[leftLabel]]/[[rightLabel]]</label>
-          </template>
-  </dom-if>
-
-  <dom-if if="[[!isLeftRight]]">
-    <template>
-            <input value="F" name="rack-side" type="radio" rack-side-name$="[[frontLabel]]">
-            <label>[[frontLabel]]</label>
-
-            <input value="R" name="rack-side" type="radio" rack-side-name$="[[rearLabel]]">
-            <label>[[rearLabel]]</label>
-
-            <input value="ALL" name="rack-side" type="radio" rack-side-name$="[[frontLabel]]/[[rearLabel]]" checked>
-            <label>[[frontLabel]]/[[rearLabel]]</label>
-          </template>
-  </dom-if>
-
-  <input value="T" name="rack-side" type="radio" rack-side-name$="[[allLabel]]">
-  <label>[[allLabel]]</label>
-  </div>
-  </div>
-
-  <div id="show-full-code" class="radio-btn-container">
-    <label>[[showFullCodeLabel]]</label>
-
-    <div class="buttons">
-      <input name="show-full-code" type="radio" value="true" checked>
-      <label>[[yesLabel]]</label>
-
-      <input name="show-full-code" type="radio" value="false">
-      <label>[[noLabel]]</label>
-    </div>
-  </div>
-
-  <div id="auto-pick" class="checkbox-container">
-    <label>[[autoPickingLabel]]</label>
-    <input type="checkbox" id="auto-pick-input">
-  </div>
-
-  <div id="ble-mode" class="ble-container" style="display: none">
-    <label>BLEMODE</label>
-    <img id="ble-img" style="height: 150px; width: 150px"></img>
-  </div>
   </template>
 
   <script>
-    class LogisSettingTab extends LoigsSettingMixin(NetworkInfoMixin(Polymer.Element)) {
+    class LogisSettingTab extends LogisSettingMixin(NetworkInfoMixin(Polymer.Element)) {
       static get is() {
         return 'logis-setting-tab'
       }
@@ -337,6 +260,56 @@ Copyright © HatioLab Inc. All rights reserved.
           srcUrl: {
             type: String,
             value: JSON.parse(localStorage.getItem('setting.srcUrl'))
+          },
+
+          /**
+           * @description 스테이션 라벨
+           *********************
+           * @type {String}
+           */
+          stationLabel: {
+            type: String,
+            value: () => t('label.station')
+          },
+
+          /**
+           * @description 설비 유형 라벨
+           *********************
+           * @type {String}
+           */
+          equipmentLabel: {
+            type: String,
+            value: () => t('label.equipment')
+          },
+
+          /**
+           * @description 내역 보기 버튼 라벨
+           *********************
+           * @type {String}
+           */
+          detailedContentBtnLabel: {
+            type: String,
+            value: () => t('button.detailed_content')
+          },
+
+          /**
+           * @description 업데이트 버튼 라벨
+           *********************
+           * @type {String}
+           */
+          updateBtnLabel: {
+            type: String,
+            value: () => t('button.update')
+          },
+
+          /**
+           * @description 새로 고침 버튼 라벨
+           *********************
+           * @type {String}
+           */
+          refreshBtnLabel: {
+            type: String,
+            value: () => t('button.refresh')
           }
         }
       }
@@ -442,17 +415,17 @@ Copyright © HatioLab Inc. All rights reserved.
       saveSetting() {
         return new Promise((resolve, reject) => {
           this.updateSetting().then(() => {
-              this._setLocalStorage(this.rackCodeLSKey, this._getRackCombo().selectedOptions[0].value);
-              this._setLocalStorage(this.rackNameLSKey, this._getRackCombo().selectedOptions[0].innerText);
-              this._setLocalStorage(this.zoneCodeLSKey, this._getZoneCombo().selectedOptions[0].value);
-              this._setLocalStorage(this.rackSideLSKey, this._getSelectedOpt(this._getRackSideOpts()).value);
-              this._setLocalStorage(this.rackSideNameLSKey, this._getSelectedOpt(this._getRackSideOpts()).getAttribute('rack-side-name'));
-              this._setLocalStorage(this.showOthersOrderLSKey, JSON.parse(this._getSelectedOpt(this._getShowOthersOrderOpts()).value));
-              this._setLocalStorage(this.showFullCodeLSKey, JSON.parse(this._getSelectedOpt(this._getShowFullCodeOpts()).value));
-              this._setLocalStorage(this.autoPickingLSKey, this._getAutoPickingInput().checked);
-              this._setLocalStorage(this.jobTypeLSKey, this._getJobCombo().selectedOptions[0].value);
-              resolve();
-            })
+            this._setLocalStorage(this.rackCodeLSKey, this._getRackCombo().selectedOptions[0].value);
+            this._setLocalStorage(this.rackNameLSKey, this._getRackCombo().selectedOptions[0].innerText);
+            this._setLocalStorage(this.zoneCodeLSKey, this._getZoneCombo().selectedOptions[0].value);
+            this._setLocalStorage(this.rackSideLSKey, this._getSelectedOpt(this._getRackSideOpts()).value);
+            this._setLocalStorage(this.rackSideNameLSKey, this._getSelectedOpt(this._getRackSideOpts()).getAttribute('rack-side-name'));
+            this._setLocalStorage(this.showOthersOrderLSKey, JSON.parse(this._getSelectedOpt(this._getShowOthersOrderOpts()).value));
+            this._setLocalStorage(this.showFullCodeLSKey, JSON.parse(this._getSelectedOpt(this._getShowFullCodeOpts()).value));
+            this._setLocalStorage(this.autoPickingLSKey, this._getAutoPickingInput().checked);
+            this._setLocalStorage(this.jobTypeLSKey, this._getJobCombo().selectedOptions[0].value);
+            resolve();
+          })
             .catch(error => {
               reject(error);
             })

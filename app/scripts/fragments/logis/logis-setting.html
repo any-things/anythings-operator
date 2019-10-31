@@ -26,6 +26,7 @@ Copyright © HatioLab Inc. All rights reserved.
         padding: 20px;
         min-height: calc(100% - 40px);
       }
+
       #container {
         padding: 20px;
         flex: 1;
@@ -34,12 +35,15 @@ Copyright © HatioLab Inc. All rights reserved.
         background-color: var(--things-white-opacity-background-color);
         border-radius: var(--things-default-border-radius);
       }
+
       #button-container {
         margin: auto 0 0 auto;
       }
+
       #device-combo {
         width: 20vw;
       }
+
       .version {
         font: 14px arial;
         color: white;
@@ -51,14 +55,11 @@ Copyright © HatioLab Inc. All rights reserved.
 
     <div id="container">
       <!-- 물류 공통 설정 화면 조각 -->
-      <logis-setting-common
-        id="common-setting"
-        locales="[[locales]]"
-        on-session-responsed="_sessionResponseHandler"
+      <logis-setting-common id="common-setting" locales="[[locales]]" on-session-responsed="_sessionResponseHandler"
         on-session-unauthorized="_sessionUnauthHandler">
       </logis-setting-common>
 
-      <div id="button-container">
+      <div id="button-container" style="padding-top: 1em">
         <!-- KIOSK, TABLET, PDA 설정 셀렉터 (개발 모드인 경우에만 활성화) -->
         <select id="device-combo" on-change="_deviceChanged" hidden$="[[!isDevMode]]">
           <option>TABLET</option>
@@ -386,8 +387,8 @@ Copyright © HatioLab Inc. All rights reserved.
         } else if (!this.isNotLogin) {
           this.commonSetting.saveSetting();
           this.setting.saveSetting().then(() => {
-              this.reloadApp();
-            })
+            this.reloadApp();
+          })
             .catch(error => {
               let title = error.detail ? error.detail.code : 'Error';
               let message = error.detail ? error.detail.msg : 'Error occured while saving setting.';
