@@ -8,7 +8,7 @@
     "browser-sync": "^2.18.13",
     "connect-history-api-fallback": "^1.1.0",
     "del": "^3.0.0",
-    "eslint": "^3.19.0",
+    "eslint": "^4.18.2",
     "eslint-config-google": "^0.7.0",
     "eslint-plugin-html": "^2.0.0",
     "gulp": "^3.9.1",
