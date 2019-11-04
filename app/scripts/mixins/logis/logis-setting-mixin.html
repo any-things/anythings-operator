@@ -184,7 +184,8 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           rackSide: {
             type: String,
-            value: () => JSON.parse(localStorage.getItem('setting.rackSide'))
+            //value: () => JSON.parse(localStorage.getItem('setting.rackSide'))
+            value: () => 'ALL';
           },
 
           /**
@@ -455,7 +456,8 @@ Copyright © HatioLab Inc. All rights reserved.
        * @return
        */
       _getRackSideOpts() {
-        return Array.from(this.$['rack-side'].querySelectorAll('input[name=rack-side]'));
+        //return Array.from(this.$['rack-side'].querySelectorAll('input[name=rack-side]'));
+        return ['ALL'];
       }
 
       /**
@@ -463,12 +465,14 @@ Copyright © HatioLab Inc. All rights reserved.
        *******************************
        */
       _setRackSideDefaultValue() {
-        const rackSideOpts = this._getRackSideOpts();
+        /*const rackSideOpts = this._getRackSideOpts();
         rackSideOpts.forEach(rackSideOpt => {
           if (this.rackSide === rackSideOpt.value) {
             rackSideOpt.checked = true;
           }
-        });
+        });*/
+
+        this.rackSide = 'ALL';
       }
 
       /**
