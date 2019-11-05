@@ -353,6 +353,18 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
+       * @description 설비 유형 리스트 조회
+       *******************************
+       * @return
+       */
+      _getEquipmentItems() {
+        const equipmentItemAjax = this._getEquipmentItemAjax();
+        equipmentItemAjax.curl = `/common_codes/show_by_name?name=EQUIP_TYPE`;
+        equipmentItemAjax.baseUrl = this._getLocalStorage('setting.baseUrl');
+        equipmentItemAjax.generateRequest();
+      }
+
+      /**
        * @description 콤보 클리어
        *******************************
        */
@@ -407,6 +419,14 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
+       * @description 설비 유형 리스트 Ajax
+       *******************************
+       */
+      _getEquipmentItemAjax() {
+        return this.$['equipment-items-ajax'];
+      }
+
+      /**
        * @description 스테이션 리스트 Ajax
        *******************************
        * @return
@@ -439,6 +459,14 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _getZoneCombo() {
         return this.$['zone-combo'];
+      }
+
+      /**
+       * @description 설비 유형 리스트 콤보 리턴
+       *******************************
+       */
+      _getEquipmentCombo() {
+        return this.$['equipment-combo'];
       }
 
       /**
@@ -498,6 +526,8 @@ Copyright © HatioLab Inc. All rights reserved.
         if (this.deviceType !== 'KIOSK') {
           this._getZoneItems();
         }
+
+        this._getZoneItems();
       }
 
       /**
@@ -518,6 +548,26 @@ Copyright © HatioLab Inc. All rights reserved.
             zoneCombo.appendChild(option);
           })
         }
+      }
+
+      /**
+       * @description 설비 유형 콤보 렌더링
+       *******************************
+       * @param {Object} event
+       */
+      _renderEquipmentCombo(event) {
+        const equipmentCombo = this._getEquipmentCombo();
+        this._clearCombo(equipmentCombo);
+        console.log(equipmentCombo);
+        event.detail.items.forEach(equipment => {
+          const option = new Option(equipment.description, equipment.name);
+          if (this.equipmentType === equipment.name) {
+            option.selected = true;
+            this.equipmentType = equipment.name;
+          }
+
+          equipmentCombo.appendChild(option);
+        })
       }
 
       /**

@@ -28,9 +28,18 @@ Copyright © HatioLab Inc. All rights reserved.
     <sys-ajax id="broker-site-ajax" method="GET" content-type="application/json" on-sys-ajax-response="_setBrokerSite">
     </sys-ajax>
 
-    <!-- 랙 리스트 조회 -->
+    <!-- 스테이션 조회 -->
+    <sys-ajax id="zone-items-ajax" method="GET" content-type="application/json" on-sys-ajax-response="_renderZoneCombo">
+    </sys-ajax>
+
+    <!-- 랙 리스트(설비 이름) 조회 -->
     <sys-ajax id="rack-items-ajax" method="GET" content-type="application/json"
       on-sys-ajax-response="_renderRegionCombo">
+    </sys-ajax>
+
+    <!-- 설비 유형 조회 -->
+    <sys-ajax id="equipment-items-ajax" method="GET" content-type="application/json"
+      on-sys-ajax-response="_renderEquipmentCombo">
     </sys-ajax>
 
     <!-- KIOSK 메뉴 리스트 조회 -->
@@ -50,7 +59,7 @@ Copyright © HatioLab Inc. All rights reserved.
       <label style="text-align: left">[[stationLabel]]</label>
     </div>
     <div class="input-container">
-      <select id="station-combo"></select>
+      <select id="zone-combo"></select>
     </div>
 
     <!-- 설비 유형 설정 -->
@@ -277,6 +286,8 @@ Copyright © HatioLab Inc. All rights reserved.
       connectedCallback() {
         super.connectedCallback();
         this._getRegionItems();
+        // this._getZoneItems();
+        this._getEquipmentItems();
         this._getKioskMenus();
         this._setDefaultValues();
       }
@@ -495,6 +506,14 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _getScreenCombo() {
         return this.$['screen-combo']
+      }
+
+      /**
+       * @description return 스테이션 설정 콤보
+       ***********************
+       */
+      _getStationCombo() {
+        return this.$['zone-combo']
       }
 
       /**

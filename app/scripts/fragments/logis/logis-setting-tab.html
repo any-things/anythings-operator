@@ -46,12 +46,17 @@ Copyright © HatioLab Inc. All rights reserved.
     <sys-ajax id="job-combo-ajax" method="GET" content-type="application/json" on-sys-ajax-response="_renderJobCombo">
     </sys-ajax>
 
+    <!-- 설비 유형 조회 -->
+    <sys-ajax id="equipment-items-ajax" method="GET" content-type="application/json"
+      on-sys-ajax-response="_renderEquipmentCombo">
+    </sys-ajax>
+
     <!-- 스테이션 설정 -->
     <div id="station" class="input-container">
       <label style="text-align: left">[[stationLabel]]</label>
     </div>
     <div class="input-container">
-      <select id="station-combo"></select>
+      <select id="zone-combo"></select>
     </div>
 
     <!-- 설비 유형 설정 -->
@@ -324,6 +329,7 @@ Copyright © HatioLab Inc. All rights reserved.
         this._getRegionItems();
         this._setDefaultValues();
         this._getJobItems();
+        this._getEquipmentItems();
         this._hiddenDiv();
       }
 
