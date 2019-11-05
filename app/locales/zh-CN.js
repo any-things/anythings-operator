@@ -132,6 +132,8 @@ window.locales['zh-CN'] = {
   'label.update': 'Update',
   'label.equipment': 'Equipment',
   'label.equipment_name': 'Equipment Code',
+  'label.complete': '완료',
+  'label.incomplete': '미완료',
 
   // menu list
   'menu.Settings': '设置',

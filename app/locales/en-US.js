@@ -176,6 +176,8 @@ window.locales['en-US'] = {
   'menu.RtnPickedByCell': 'Cell Status',
   'menu.RtnRemainsBox': 'Fullbox Remains',
   'menu.StockLoadFixed': 'Load Stock To Fixed',
+  'label.complete': '완료',
+  'label.incomplete': '미완료',
 
   // button list
   'button.logout': 'Logout',

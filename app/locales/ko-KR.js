@@ -133,6 +133,8 @@ window.locales['ko-KR'] = {
   'label.station': '스테이션',
   'label.equipment': '설비 유형',
   'label.equipment_name': '설비 이름',
+  'label.complete': '완료',
+  'label.incomplete': '미완료',
 
   // menu list
   'menu.Settings': '설정',
