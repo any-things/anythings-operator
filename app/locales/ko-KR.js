@@ -30,7 +30,7 @@ window.locales['ko-KR'] = {
   'label.status': '상태',
   'label.input_seq': '투입순서',
   'label.order_no': '주문 번호',
-  'label.bucket_cd': '박스 ID',
+  'label.bucket_cd': '버킷 코드',
   'label.size': '사이즈',
   'label.sku_qty': '상품 수량',
   'label.label_cd': '송장 번호',

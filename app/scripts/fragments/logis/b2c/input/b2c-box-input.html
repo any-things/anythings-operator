@@ -21,7 +21,7 @@ Copyright © HatioLab Inc. All rights reserved.
       .chart-section {
         background-color: var(--things-white-opacity-background-color);
         border-radius: var(--things-default-border-radius);
-        padding: 15px;
+        padding: 10px;
         color: #fff;
       }
 
@@ -84,7 +84,7 @@ Copyright © HatioLab Inc. All rights reserved.
         display: grid;
         grid-template-columns: 1.2fr 2.5fr 0.5fr;
         grid-gap: 20px;
-        margin-bottom: 20px;
+        margin-bottom: 15px;
       }
 
       #middle-container {
@@ -92,15 +92,15 @@ Copyright © HatioLab Inc. All rights reserved.
         background-color: var(--things-white-opacity-background-color);
         grid-auto-flow: row;
         grid-gap: 20px;
-        padding: 20px;
+        padding: 15px;
         border-radius: var(--things-default-border-radius);
-        margin-bottom: 10px;
+        margin-bottom: 15px;
       }
 
       #label {
         text-align: left;
         color: rgba(255, 255, 255, .7);
-        font-size: 1.1rem;
+        font-size: 1rem;
         margin-top: auto;
         margin-bottom: auto;
       }
@@ -169,48 +169,13 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       .chart-section,
-      .order-section,
       .bucket-section {
         border-radius: var(--things-default-border-radius);
         overflow: hidden;
       }
 
-      .order-section {
-        display: grid;
-        grid-template: 1fr 1fr / 1.1fr 1fr;
-        background-color: #5a6378;
-      }
-
       .bucket-section {
         background-color: #c2671c;
-      }
-
-      .order-section div {
-        text-align: center;
-        color: #fff;
-      }
-
-      .order-section div span {
-        display: block;
-      }
-
-      .order-section img {
-        display: block;
-        margin: auto;
-      }
-
-      .order-section .order2 {
-        padding-top: 0;
-        grid-area: 2 / 1;
-      }
-
-      .order-section .order3 {
-        border-left: 1px solid rgba(0, 0, 0, .3);
-        border-bottom: 1px solid rgba(0, 0, 0, .3);
-      }
-
-      .order-section .order4 {
-        border-left: 1px solid rgba(0, 0, 0, .3);
       }
 
       span.bigtitle {
@@ -243,11 +208,6 @@ Copyright © HatioLab Inc. All rights reserved.
         top: 5px;
         font-size: 1.1rem;
         text-align: right;
-      }
-
-      .order-section .order2 b {
-        top: 10px;
-        font-size: 1.7rem;
       }
 
       span.plan {
@@ -286,7 +246,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
     <!-- 공박스 투입을 위한 Ajax -->
     <sys-ajax id="input-ajax" method="PUT" content-type="application/json" last-response="{{orderDataSet}}"
-      on-sys-ajax-error="_onBucketCdScanError">
+      on-sys-ajax-error="_onBoxIdScanError">
     </sys-ajax>
 
     <div id="container">
@@ -295,9 +255,9 @@ Copyright © HatioLab Inc. All rights reserved.
         <div class="bucket-section">
           <span class="bucket">
             <img src="./images/icon-greenbox.png">
-            [[inputableBucketLabel]]
+            [[inputableBoxLabel]]
           </span>
-          <b>[[inputableBuckets]]</b>
+          <b>[[inputableBoxes]]</b>
         </div>
 
         <!-- 전체 진행율 -->
@@ -355,10 +315,10 @@ Copyright © HatioLab Inc. All rights reserved.
         <div id="middle-container">
           <span id="label">
             <img src="./images/icon-barcode.png" />
-            [[bucketScanLabel]]
+            [[boxScanLabel]]
           </span>
                     
-          <input id="input-bucket-cd" on-keypress="_onBucketCdScan">
+          <input id="input-box-id" on-keypress="_onBoxIdScan">
   
           <button id="refresh-btn" on-click="refresh">
             <img src="./images/icon-refresh.png" />
@@ -366,21 +326,6 @@ Copyright © HatioLab Inc. All rights reserved.
           </button>
         </div>
       </div>
-
-      <!-- 박스 투입 Input Field -->
-      <!--div id="middle-container">
-        <span id="label">
-          <img src="./images/icon-barcode.png" />
-          [[bucketScanLabel]]
-        </span>
-
-        <input id="input-bucket-cd" on-keypress="_onBucketCdScan">
-
-        <button id="refresh-btn" on-click="refresh">
-          <img src="./images/icon-refresh.png" />
-          <span>[[refreshLabel]]</span>
-        </button>
-      </div-->
 
       <!-- 투입 박스 리스트 -->
       <item-list id="item-list" header="[[header]]" page="[[page]]" total="[[total]]" limit="[[limit]]" data="[[items]]"
@@ -398,19 +343,19 @@ Copyright © HatioLab Inc. All rights reserved.
       static get properties() {
         return {
           /**
-           * 버킷 스캔 라벨
+           * @description 박스 ID 스캔 라벨
            ****************
            * @type {String}
            */
-          bucketScanLabel: {
+          boxScanLabel: {
             type: String,
             value: function() {
-              return t('label.bucket_cd');
+              return t('label.box_id');
             }
           },
 
           /**
-           * 새로고침 라벨
+           * @description 새로고침 라벨
            ****************
            * @type {String}
            */
@@ -422,11 +367,11 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 투입 가능 박스 수 라벨
+           * @description 투입 가능 박스 수 라벨
            ****************
            * @type {String}
            */
-          inputableBucketLabel: {
+          inputableBoxLabel: {
             type: String,
             value: function() {
               return t('label.inputable_boxes');
@@ -434,7 +379,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 주문 라벨
+           * @description 주문 라벨
            ****************
            * @type {String}
            */
@@ -446,7 +391,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 총 진행율 라벨
+           * @description 총 진행율 라벨
            ****************
            * @type {String}
            */
@@ -456,7 +401,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 확정 라벨
+           * @description 확정 라벨
            ****************
            * @type {String}
            */
@@ -468,7 +413,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 예정 라벨
+           * @description 예정 라벨
            ****************
            * @type {String}
            */
@@ -480,7 +425,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 토탈 주문 확정
+           * @description 토탈 주문 확정
            ****************
            * @type {Number}
            */
@@ -490,7 +435,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 주문 예정
+           * @description 주문 예정
            ****************
            * @type {Number}
            */
@@ -500,7 +445,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * SKU 확정
+           * @description SKU 확정
            ****************
            * @type {Number}
            */
@@ -510,7 +455,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * SKU 예정
+           * @description SKU 예정
            ****************
            * @type {Number}
            */
@@ -520,7 +465,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * PCS 확정
+           * @description PCS 확정
            ****************
            * @type {Number}
            */
@@ -540,7 +485,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 작업 진행율 (주문)
+           * @description 작업 진행율 (주문)
            ****************
            * @type {Number}
            */
@@ -550,7 +495,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 작업 진행율 (PCS)
+           * @description 작업 진행율 (PCS)
            ****************
            * @type {Number}
            */
@@ -560,17 +505,17 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 투입가능 박스수
+           * @description 투입가능 박스수
            ****************
            * @type {Number}
            */
-          inputableBuckets: {
+          inputableBoxes: {
             type: Number,
             value: 0
           },
 
           /**
-           * 주문 데이터 셋
+           * @description 주문 데이터 셋
            ****************
            * @type {Object}
            */
@@ -580,7 +525,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 자동 리프레쉬 활성화
+           * @description 자동 리프레쉬 활성화
            ****************
            * @type {Boolean}
            */
@@ -589,7 +534,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 페이지 정보
+           * @description 페이지 정보
            ****************
            * @type {Number}
            */
@@ -599,7 +544,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * Limit 정보
+           * @description Limit 정보
            ****************
            * @type {Number}
            */
@@ -609,7 +554,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 총 아이템 개수
+           * @description 총 아이템 개수
            ****************
            * @type {Number}
            */
@@ -618,7 +563,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 그리드 데이터
+           * @description 그리드 데이터
            ****************
            * @type {Object}
            */
@@ -628,7 +573,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 그리드 헤더 정보
+           * @description 그리드 헤더 정보
            ****************
            * @type {Array}
            */
@@ -706,14 +651,14 @@ Copyright © HatioLab Inc. All rights reserved.
                   return data == 0 ? t('label.incomplete') : t('label.complete')
                 },
               }, {
-                fieldname: 'mpi_color',
+                fieldname: 'color_cd',
                 hidden: true
               }]
             }
           },
 
           /**
-           * 그리드 필드 정보
+           * @description 그리드 필드 정보
            ****************
            * @type {Array}
            */
@@ -738,7 +683,7 @@ Copyright © HatioLab Inc. All rights reserved.
                 textAlign: 'right'
               }
             }, {
-              display: t('label.picking_qty'),
+              display: t('label.pick_qty'),
               fieldname: 'pick_qty',
               columnWidth: '.2fr',
               style: {
@@ -757,7 +702,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * ready
+       * @description ready
        *******************
        */
       connectedCallback() {
@@ -774,7 +719,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 페이지 변경 시
+       * @description 페이지 변경 시
        *******************
        * @param {Object} e
        */
@@ -788,15 +733,15 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 초기 셋업
+       * @description 초기 셋업
        *******************
        */
       _initialSetup() {
-        this.$['input-bucket-cd'].select();
+        this.$['input-box-id'].select();
       }
 
       /**
-       * 자동 리프레쉬 시작
+       * @description 자동 리프레쉬 시작
        *******************
        */
       startAutoRefresh() {
@@ -821,7 +766,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 데이터 변경 시
+       * @description 데이터 변경 시
        *******************
        * @param {Array} items
        */
@@ -830,20 +775,20 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 바코드 인풋 박스 리셋
+       * @description 바코드 인풋 박스 리셋
        *******************
        */
       _barcodeInputReset() {
-        var inputBucketCd = this.$['input-bucket-cd'];
+        var inputBoxId = this.$['input-box-id'];
         if (this._scannedFlag) {
-          inputBucketCd.value = '';
+          inputBoxId.value = '';
           this._scannedFlag = false;
         }
-        inputBucketCd.focus();
+        inputBoxId.focus();
       }
 
       /**
-       * 주문 데이터 셋
+       * @description 주문 데이터 셋
        * 주문 데이터가 정상적으로 조회되면 자동조회를 활성화 하기 위해 enableAutoRefresh flag를 true로 초기화
        **************
        * @param {Object} orderDataSet
@@ -865,7 +810,7 @@ Copyright © HatioLab Inc. All rights reserved.
           this.totalProgressRateBySku = progressRate.rate_sku;
           this.totalProgressRateByOrder = progressRate.rate_order;
 
-          this.inputableBuckets = orderDataSet.result.inputable_buckets;
+          this.inputableBoxes = orderDataSet.result.inputable_buckets;
 
           if (orderDataSet.result.input_list && orderDataSet.result.input_list.items) {
             this.items = orderDataSet.result.input_list.items;
@@ -878,11 +823,11 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 버킷 스캔값 변경 핸들러
+       * @description 버킷 스캔값 변경 핸들러
        *********************
        * @param {Object} event
        */
-      _onBucketCdScan(event) {
+      _onBoxIdScan(event) {
         if (event.key === 'Enter') {
           var boxCd = event.currentTarget.value;
           // TODO : 박스 아이디 체크 정규식 가져오기 필요 
@@ -891,8 +836,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
           if (regExBox.exec(boxCd)) {
             event.currentTarget.value = '';
-
-            this.inputBucket(boxCd);
+            this.inputBox(boxCd);
 
             /*
             if (LOGIS_UTIL.getB2CInputBoxType() === 'box') {
@@ -917,7 +861,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 새로고침 - 주문 조회
+       * @description 새로고침 - 주문 조회
        *******************
        * @param {Object} event
        */
@@ -939,7 +883,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * item-list paginator-changed event handler
+       * @description item-list paginator-changed event handler
        * item-list의 page, limit, total property가 변경 되면 호출 됨
        * event.detail을 통해 현재 리스트의 page, limit을 초기화 하고
        ***********************
@@ -951,7 +895,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 웹 소켓으로 부터 데이터를 받아서 리프레쉬
+       * @description 웹 소켓으로 부터 데이터를 받아서 리프레쉬
        * 자동 조회 활성화를 위해 enableAutoRefresh flag를 true로 초기화
        *******************
        * @param {Object} data
@@ -962,24 +906,23 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 버킷 투입 
+       * @description 버킷 투입 
        *******************
-       * @param {String} bucketCd
+       * @param {String} boxId
        */
-      inputBucket(bucketCd) {
-        if (bucketCd) {
+      inputBox(boxId) {
+        if (boxId) {
           var rackCd = LOGIS_UTIL.getRackCd();
           var equipType = LOGIS_UTIL.getEquipType();
 
           if (rackCd) {
-            var inputBucketAjax = this.$['input-ajax'];
+            var inputBoxAjax = this.$['input-ajax'];
             var url = '/device_process/dps/input_bucket';
             url += '?page=' + this.page + '&limit=' + this.limit;
-            url += '&equipType=' + equipType + '&equipCd=' + rackCd + '&bucketCd=' + bucketCd;
+            url += '&equipType=' + equipType + '&equipCd=' + rackCd + '&bucketCd=' + boxId;
             url += '&inputType=' + LOGIS_UTIL.getB2CInputBoxType();
-
-            inputBucketAjax.curl = url;
-            inputBucketAjax.generateRequest();
+            inputBoxAjax.curl = url;
+            inputBoxAjax.generateRequest();
           } else {
             LOGIS_UTIL.showMessage(t('title.selecting_rack'), t('text.select_rack'));
           }
@@ -987,20 +930,18 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 버킷 코드 스캔 에러시
-       * 자동 리프레쉬 되지 않도록 enableAutoRefresh flag를 false로 초기화
+       * @description 박스 ID 스캔 에러시
        *******************
        * @param {Object} e
        */
-      _onBucketCdScanError(e) {
+      _onBoxIdScanError(e) {
         // LOGIS_UTIL.showMessage(e.detail.code, e.detail.msg, () => {
         //   this._initialSetup();
         // });
-        this.enableAutoRefresh = false;
       }
 
       /**
-       * 주문 상세 정보 조회
+       * @description 주문 상세 정보 조회
        ******************
        * @param {Object} event
        */
@@ -1011,7 +952,7 @@ Copyright © HatioLab Inc. All rights reserved.
           detail: {
             title: '[' + data.order_no + '] ' + t('title.dps_order_info_detail'),
             listFields: this.detailListFields,
-            listDataReqUrl: `/kiosk_process/dps/${data.order_no}/order_items`,
+            listDataReqUrl: `/device_process/dps/${data.order_no}/order_items`, // FIXME URL 체크
             handleListDataAfterSet: params => {
               const rows = params.listElement.getRows();
               rows.forEach(row => {
