@@ -290,8 +290,8 @@ Copyright © HatioLab Inc. All rights reserved.
     </sys-ajax>
 
     <!-- 공박스 투입을 위한 Ajax -->
-    <sys-ajax id="input-ajax" curl="/kiosk_process/dps/input_bucket/:rack_cd/:bucket_cd" method="PUT"
-      content-type="application/json" last-response="{{orderDataSet}}" on-sys-ajax-error="_onBucketCdScanError">
+    <sys-ajax id="input-ajax" method="PUT" content-type="application/json" last-response="{{orderDataSet}}"
+      on-sys-ajax-error="_onBucketCdScanError">
     </sys-ajax>
 
     <div id="container">
@@ -643,7 +643,7 @@ Copyright © HatioLab Inc. All rights reserved.
                   return data ? data : '';
                 },
                 classCallback: (data) => {
-                  let boxColor = data['mpi_color'];
+                  let boxColor = data['color_cd'];
                   boxColor = boxColor ? boxColor.toLowerCase() : 'n';
 
                   if (boxColor === 'r') {
@@ -659,7 +659,7 @@ Copyright © HatioLab Inc. All rights reserved.
                   }
                 }
               }, {
-                display: t('label.size'),
+                display: t('label.box_type'),
                 fieldname: 'box_type',
                 style: {
                   textAlign: 'center'
@@ -874,15 +874,22 @@ Copyright © HatioLab Inc. All rights reserved.
       _onBucketCdScan(event) {
         if (event.key === 'Enter') {
           var boxCd = event.currentTarget.value;
+          // TODO : 박스 아이디 체크 정규식 가져오기 필요 
+          // var regExBox = /^[bcdfghiBCDFGHI][0-9]{7}$/;
+          var regExBox = /^[A-Z][0-9]{7}$/; // SAMPLE 첫문자 알파벳 대문자 + 숫자 7자리  ( 총 8 자리 )
 
-          if (/^[bcdfghiBCDFGHI][0-9]{7}$/.exec(boxCd)) {
+          if (regExBox.exec(boxCd)) {
             event.currentTarget.value = '';
 
+            this.inputBucket(boxCd);
+
+            /*
             if (LOGIS_UTIL.getB2CInputBoxType() === 'box') {
               this.inputBox(boxCd);
             } else {
-              this.inputBucket(boxCd);
+              this.inputTray(boxCd);
             }
+            */
 
             SOUND.playInfoSound();
             this._scannedFlag = true;
@@ -906,12 +913,13 @@ Copyright © HatioLab Inc. All rights reserved.
       refresh(event) {
         this._barcodeInputReset();
         var rackCd = LOGIS_UTIL.getRackCd();
-        var equipType = 'Rack';
+        var equipType = LOGIS_UTIL.getEquipType();
 
         if (rackCd) {
           var showOrderAjax = this.$['batch-summary-ajax'];
-          var url = '/device_process/dps/batch_summary/' + rackCd;
-          url = url + '?page=' + this.page + '&limit=' + this.limit + '&equipType=' + equipType + '&equipCd=' + rackCd;
+          var url = '/device_process/dps/batch_summary';
+          url += '?page=' + this.page + '&limit=' + this.limit;
+          url += '&equipType=' + equipType + '&equipCd=' + rackCd;
           showOrderAjax.curl = url;
           showOrderAjax.generateRequest();
         } else {
@@ -943,41 +951,22 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 버킷 투입 트랜잭션
-       ******************
+       * 버킷 투입 
+       *******************
        * @param {String} bucketCd
        */
       inputBucket(bucketCd) {
-        if (bucketCd && bucketCd.length >= 4) {
+        if (bucketCd) {
           var rackCd = LOGIS_UTIL.getRackCd();
+          var equipType = LOGIS_UTIL.getEquipType();
 
           if (rackCd) {
             var inputBucketAjax = this.$['input-ajax'];
-            var url = '/kiosk_process/dps/input_bucket/' + rackCd + '/' + bucketCd;
-            url = url + '?page=' + this.page + '&limit=' + this.limit;
-            inputBucketAjax.curl = url;
-            inputBucketAjax.generateRequest();
-          } else {
-            LOGIS_UTIL.showMessage(t('title.selecting_rack'), t('text.select_rack'));
-          }
-        }
-      }
+            var url = '/device_process/dps/input_bucket';
+            url += '?page=' + this.page + '&limit=' + this.limit;
+            url += '&equipType=' + equipType + '&equipCd=' + rackCd + '&bucketCd=' + bucketCd;
+            url += '&inputType=' + LOGIS_UTIL.getB2CInputBoxType();
 
-      /**
-       * 박스 투입 트랜잭션
-       ******************
-       * @param {String} boxId
-       */
-      inputBox(boxId) {
-        if (boxId && boxId.length >= 4) {
-          var rackCd = LOGIS_UTIL.getRackCd();
-
-          if (rackCd) {
-            // 박스 ID의 첫 번째 글자가 박스 타입
-            var boxType = boxId.substring(0, 1);
-            var inputBucketAjax = this.$['input-ajax'];
-            var url = '/kiosk_process/dps/input_box/' + rackCd + '/' + boxId + '/' + boxType;
-            url = url + '?page=' + this.page + '&limit=' + this.limit;
             inputBucketAjax.curl = url;
             inputBucketAjax.generateRequest();
           } else {
