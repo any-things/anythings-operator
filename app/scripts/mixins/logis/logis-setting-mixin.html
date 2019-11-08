@@ -226,7 +226,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _getBrokerAddress() {
         let brokerAddrsAjax = this._getBrokerAddrsAjax();
-        brokerAddrsAjax.curl = '/settings/show_by_name?name=mps.broker.address';
+        brokerAddrsAjax.curl = '/settings/show_by_name?name=mw.rabbitmq.broker.address';
         brokerAddrsAjax.baseUrl = this._getLocalStorage('setting.baseUrl');
         brokerAddrsAjax.generateRequest();
       }
@@ -238,7 +238,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _getBrokerPort() {
         let brokerPortAjax = this._getBrokerPortAjax();
-        brokerPortAjax.curl = '/settings/show_by_name?name=mps.broker.port';
+        brokerPortAjax.curl = '/settings/show_by_name?name=mw.rabbitmq.broker.port';
         brokerPortAjax.baseUrl = this._getLocalStorage('setting.baseUrl');
         brokerPortAjax.generateRequest();
       }
@@ -250,7 +250,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _getBrokerSite() {
         let brokerSiteAjax = this._getBrokerSiteAjax();
-        brokerSiteAjax.curl = '/settings/show_by_name?name=mps.broker.site.code';
+        brokerSiteAjax.curl = '/settings/show_by_name?name=mw.rabbitmq.broker.site.code';
         brokerSiteAjax.baseUrl = this._getLocalStorage('setting.baseUrl');
         brokerSiteAjax.generateRequest();
       }
