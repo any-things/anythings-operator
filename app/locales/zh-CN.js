@@ -130,7 +130,10 @@ window.locales['zh-CN'] = {
   'label.com_cnt': '订单完成数量',
   'label.redo': '重置',
   'label.update': 'Update',
+  'label.stage': 'Stage',
+  'label.station': 'Station',
   'label.equipment': 'Equipment',
+  'label.equipment_type': 'Equipment Type',
   'label.equipment_name': 'Equipment Code',
   'label.complete': '완료',
   'label.incomplete': '미완료',
@@ -226,7 +229,6 @@ window.locales['zh-CN'] = {
   'button.cancel_full': '满箱取消',
   'button.detailed_content': 'View Contents',
   'button.update': 'Update',
-  'label.station': 'Station',
 
   // text list
   'text.login_failure': '认证失败！',

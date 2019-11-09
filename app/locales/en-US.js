@@ -130,9 +130,13 @@ window.locales['en-US'] = {
   'label.com_cnt': 'Complete Count',
   'label.redo': 'Rework',
   'label.update': 'Update',
+  'label.stage': 'Stage',
   'label.station': 'Station',
   'label.equipment': 'Equipment',
+  'label.equipment_type': 'Equipment Type',
   'label.equipment_name': 'Equipment Code',
+  'label.complete': '완료',
+  'label.incomplete': '미완료',
 
   // menu list
   'menu.Settings': 'Setting',
@@ -176,8 +180,6 @@ window.locales['en-US'] = {
   'menu.RtnPickedByCell': 'Cell Status',
   'menu.RtnRemainsBox': 'Fullbox Remains',
   'menu.StockLoadFixed': 'Load Stock To Fixed',
-  'label.complete': '완료',
-  'label.incomplete': '미완료',
 
   // button list
   'button.logout': 'Logout',

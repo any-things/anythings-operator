@@ -191,7 +191,7 @@ Copyright © HatioLab Inc. All rights reserved.
         if (visible) {
           var settingPda = this.shadowRoot.querySelector('logis-setting-pda')
           if (settingPda) {
-            settingPda.resetRegionInfo();
+            settingPda.resetRackInfo();
           }
         }
       }
@@ -387,8 +387,8 @@ Copyright © HatioLab Inc. All rights reserved.
         } else if (!this.isNotLogin) {
           this.commonSetting.saveSetting();
           this.setting.saveSetting().then(() => {
-            this.reloadApp();
-          })
+              this.reloadApp();
+            })
             .catch(error => {
               let title = error.detail ? error.detail.code : 'Error';
               let message = error.detail ? error.detail.msg : 'Error occured while saving setting.';

@@ -28,21 +28,19 @@ Copyright © HatioLab Inc. All rights reserved.
 
     <!-- 애플리케이션 서버 접속 IP -->
     <div id="mgr-ip" class="input-container">
-      <label>
-        <!-- <img src="../../../images/icon-brand.png" /> -->
-        <label style="text-align: left">[[ipLabel]]</label>
-      </label>
+      <!--img src="../../../images/icon-statusbar-type3.png" /-->
+      <label style="text-align: left">[[ipLabel]]</label>
     </div>
+    
     <div class="input-container">
       <input id="ip" placeholder="IP Address (ex: 127.0.0.1)">
     </div>
 
-
     <!-- 애플리케이션 서버 접속 포트 -->
     <div id="mgr-port" class="input-container">
       <label style="text-align: left">[[portLabel]]</label>
-      <!-- <input id="port" type="number" min="0" placeholder="Port (ex: 8080)"> -->
     </div>
+    
     <div class="input-container">
       <input id="port" type="number" min="0" placeholder="Port (ex: 8080)">
     </div>
@@ -50,8 +48,8 @@ Copyright © HatioLab Inc. All rights reserved.
     <!-- 언어 선택 -->
     <div id="locales" class="input-container">
       <label style="text-align: left">[[localeLabel]]</label>
-      <!-- <select id="locale"></select> -->
     </div>
+    
     <div class="input-container">
       <select id="locale"></select>
     </div>
@@ -160,6 +158,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @description locales 값이 변경될 때 호출
        * 현재 언어 리스트를 통해 언어 선택 콤보를 출력
        **********************
+       * @param {Array} locales
        */
       _renderLocaleOptions(locales) {
         const localeSelector = this._getLocaleSelector();
@@ -203,7 +202,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description 사이트 도메인의 URL이 비정상적으로 설정 되었을 경우에 호출됨
-       * ** 401 에러의 경우 관리 도메인이 정상적으로 설정 되어 있는 것이기 때문에
+       * 401 에러의 경우 관리 도메인이 정상적으로 설정 되어 있는 것이기 때문에
        * 사이트 도메인 session check를 수행함
        **********************
        * @param {Object} event
