@@ -31,6 +31,13 @@ LOGIS_UTIL.getEquipType = function () {
 };
 
 /**
+ * 스테이지 코드를 리턴 
+ */
+LOGIS_UTIL.getStageCd = function () {
+  return JSON.parse(localStorage.getItem('setting.stageCd'));
+};
+
+/**
  * 현재 설정에서 선택한 랙 코드를 리턴
  */
 LOGIS_UTIL.getRackCd = function () {
