@@ -13,120 +13,151 @@ Copyright © HatioLab Inc. All rights reserved.
     <style>
       #container {
         display: grid;
-        height:70px;
+        height: 70px;
         grid-template-columns: 1fr 1fr 1fr 1fr;
-        background:url(../../../images/bg_prodprocess.png) 0 100% repeat-x #616161;
-        border-top:.03rem solid #6d6d6d;border-bottom:.03rem solid #2f333c;
-        border-radius:12px;
+        background: url(../../../images/bg_prodprocess.png) 0 100% repeat-x #616161;
+        border-top: .03rem solid #6d6d6d;
+        border-bottom: .03rem solid #2f333c;
+        border-radius: 12px;
         box-shadow: 0px .03rem .03rem rgba(0, 0, 0, 0.2);
-        line-height:65px;
+        line-height: 65px;
         margin-top: 15px;
       }
-      .job-block{
-        position:relative;
-        text-align:center;
+
+      .job-block {
+        position: relative;
+        text-align: center;
       }
+
       .job-block[active] {
-        background:url(../../../images/bg_prodprocess.png) 0 100% repeat-x #54b8dd;
-        margin-top:-9px !important;
-        height:85px !important;
-        border:.04rem solid #12c8e6;
-        border-radius:9px;
+        background: url(../../../images/bg_prodprocess.png) 0 100% repeat-x #54b8dd;
+        margin-top: -9px !important;
+        height: 85px !important;
+        border: .04rem solid #12c8e6;
+        border-radius: 9px;
         box-shadow: .04rem .04rem .04rem rgba(0, 0, 0, 0.3);
-        font-size:1.2rem;
-        line-height:80px;
+        font-size: 1.2rem;
+        line-height: 80px;
       }
+
       .job-block[others] {
-        background:url(../../../images/bg_prodprocess.png) 0 100% repeat-x #999;
-        border-top:.03rem solid #ccc !important;border-bottom:.03rem solid #666 !important;
-        margin-top:-1px;
-        height:69px;
+        background: url(../../../images/bg_prodprocess.png) 0 100% repeat-x #999;
+        border-top: .03rem solid #ccc !important;
+        border-bottom: .03rem solid #666 !important;
+        margin-top: -1px;
+        height: 69px;
       }
+
       .job-block[others][active] {
-        background:url(../../../images/bg_prodprocess.png) 0 100% repeat-x #999;
-        margin-top:-15px !important;
-        height:95px !important;
-        border:.04rem solid #ccc;border-bottom:.04rem solid #ccc !important;
+        background: url(../../../images/bg_prodprocess.png) 0 100% repeat-x #999;
+        margin-top: -15px !important;
+        height: 95px !important;
+        border: .04rem solid #ccc;
+        border-bottom: .04rem solid #ccc !important;
       }
-      .job-block.last-job{
-        background:url(../../../images/bg_prodprocess.png) 50% 50% repeat-x #9cd484;
-        border-top:.03rem solid #a0ec7f;border-bottom:.03rem solid #325224;
-        margin-top:-1px;
-        height:69px;
-        outline:1px solid #434854;
+
+      .job-block.last-job {
+        background: url(../../../images/bg_prodprocess.png) 50% 50% repeat-x #9cd484;
+        border-top: .03rem solid #a0ec7f;
+        border-bottom: .03rem solid #325224;
+        margin-top: -1px;
+        height: 69px;
+        outline: 1px solid #434854;
       }
+
       .job-block.last-job[active] {
-        background:url(../../../images/bg_prodprocess.png) 50% 50% repeat-x #9cd484;
-        border:.04rem solid #a0ec7f;
+        background: url(../../../images/bg_prodprocess.png) 50% 50% repeat-x #9cd484;
+        border: .04rem solid #a0ec7f;
       }
-      .job-block.last-job::after{
-        content:"";
-        display:block;
-        margin:auto;
-        width:0;height:0;
-        position:relative;
-        top:-98px;
-	      border-left:80px solid transparent;
-	      border-right:80px solid transparent;
-	      border-bottom:25px solid #90c47a;
+
+      .job-block.last-job::after {
+        content: "";
+        display: block;
+        margin: auto;
+        width: 0;
+        height: 0;
+        position: relative;
+        top: -98px;
+        border-left: 80px solid transparent;
+        border-right: 80px solid transparent;
+        border-bottom: 25px solid #90c47a;
       }
-      .job-block.last-job[active]::after{
-        top:-125px;
+
+      .job-block.last-job[active]::after {
+        top: -125px;
       }
-      .job-block::before{
-        content:"";
-        display:block;
-        width:35px;height:35px;
-        position:absolute;
-        z-index:1;
-        margin-top:-12px;margin-left:calc(50% - 15px);
+
+      .job-block::before {
+        content: "";
+        display: block;
+        width: 35px;
+        height: 35px;
+        position: absolute;
+        z-index: 1;
+        margin-top: -12px;
+        margin-left: calc(50% - 15px);
       }
-      .job-block.barstatus-type1::before{
-        background:url(../../../images/icon-statusbar-type1.png) no-repeat;
+
+      .job-block.barstatus-type1::before {
+        background: url(../../../images/icon-statusbar-type1.png) no-repeat;
       }
-      .job-block.barstatus-type2::before{
-        background:url(../../../images/icon-statusbar-type2.png) no-repeat;
+
+      .job-block.barstatus-type2::before {
+        background: url(../../../images/icon-statusbar-type2.png) no-repeat;
       }
-      .job-block.barstatus-type3::before{
-        background:url(../../../images/icon-statusbar-type3.png) no-repeat;
+
+      .job-block.barstatus-type3::before {
+        background: url(../../../images/icon-statusbar-type3.png) no-repeat;
       }
+
       span.begin-text {
         font-size: 0.5em;
       }
+
       span.end-text {
         font-size: 0.8em;
       }
-      .job-block-chart{
-        display:block;
-        width:70%;height:3px;
-        margin:auto;
-        position:relative;
-        top:-18px;
-        border:2px solid rgba(0,0,0,.2);
-        background-color:rgba(0,0,0,.5);
+
+      .job-block-chart {
+        display: block;
+        width: 70%;
+        height: 3px;
+        margin: auto;
+        position: relative;
+        top: -18px;
+        border: 2px solid rgba(0, 0, 0, .2);
+        background-color: rgba(0, 0, 0, .5);
       }
-      .job-block[active] .job-block-chart{
-        height:5px;
-        top:-22px;
+
+      .job-block[active] .job-block-chart {
+        height: 5px;
+        top: -22px;
       }
-      .job-block-chart span{
-        display:block;
-        height:3px;min-width:5% !important;
+
+      .job-block-chart span {
+        display: block;
+        height: 3px;
+        min-width: 5% !important;
       }
-      .job-block[active] .job-block-chart span{
-        height:5px;
+
+      .job-block[active] .job-block-chart span {
+        height: 5px;
       }
-      .job-block-chart span.colorR{
-        background-color:var(--things-chartcolor-type1);
+
+      .job-block-chart span.colorR {
+        background-color: var(--things-chartcolor-type1);
       }
-      .job-block-chart span.colorG{
-        background-color:var(--things-chartcolor-type4);
+
+      .job-block-chart span.colorG {
+        background-color: var(--things-chartcolor-type4);
       }
-      .job-block-chart span.colorB{
-        background-color:var(--things-chartcolor-type5);
+
+      .job-block-chart span.colorB {
+        background-color: var(--things-chartcolor-type5);
       }
-      .job-block-chart span.colorY{
-        background-color:var(--things-chartcolor-type3);
+
+      .job-block-chart span.colorY {
+        background-color: var(--things-chartcolor-type3);
       }
     </style>
     <div id="container" on-track="_handleTrack"></div>
@@ -187,16 +218,16 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       _inputListChanged(inputList) {
-        if(!inputList) return;
-        if(inputList.length === 0) {
+        if (!inputList) return;
+        if (inputList.length === 0) {
           this._clearJobIndicator();
           return;
         }
         this.visibleList = [];
         let firstItemId;
-        for(let i = 0; i < this.maxCnt; i++) {
-          if(i === 0) firstItemId = inputList[i].id;
-          if(!inputList[i]) { // maxCnt 보다 적은 물량이 들어왔을 경우
+        for (let i = 0; i < this.maxCnt; i++) {
+          if (i === 0) firstItemId = inputList[i].id;
+          if (!inputList[i]) { // maxCnt 보다 적은 물량이 들어왔을 경우
             break;
           }
 
@@ -205,13 +236,13 @@ Copyright © HatioLab Inc. All rights reserved.
 
         this._renderJobIndicator(this.visibleList);
 
-        if(!this.selectedElement) {
+        if (!this.selectedElement) {
           this.selectFirstItem(firstItemId);
         } else {
           // 선택한 엘리먼트가 현재 그려진 엘리먼트 중에 있는지 확인
           let targetId = this.selectedElement.getAttribute('target-id');
           this.selectedElement = this._getBucketElementById(targetId);
-          if(this.selectedElement) { // 있다면 선택된 버킷을 유지
+          if (this.selectedElement) { // 있다면 선택된 버킷을 유지
             this._itemSelected({
               currentTarget: this.selectedElement
             });
@@ -232,15 +263,16 @@ Copyright © HatioLab Inc. All rights reserved.
           block.setAttribute('target-id', item.id);
           block.classList.add('job-block');
           block.onclick = this._itemSelected.bind(this);
-          block.getData = function() {
+          block.getData = function () {
             return item;
           };
 
-          let innerCode = (this.jobType === 'DAS') ? item.sku_cd : item.bucket_cd;
+          // TODO 옵션 처리 필요 맵핑 컬럼이 달라짐. 
+          let innerCode = (this.jobType === 'DAS') ? item.sku_cd : item.box_id;
 
-          if(!innerCode) return;
+          if (!innerCode) return;
 
-          if(this.showFullCode) { // 설정을 통해 결정된 showFullCode (상품 코드 전부 보기) 여부에 따라 앞자리를 표시/제거
+          if (this.showFullCode) { // 설정을 통해 결정된 showFullCode (상품 코드 전부 보기) 여부에 따라 앞자리를 표시/제거
             const beginSpan = document.createElement('span');
             beginSpan.classList.add('begin-text');
             beginSpan.innerHTML = innerCode.substr(0, innerCode.length - 4);
@@ -260,16 +292,16 @@ Copyright © HatioLab Inc. All rights reserved.
           jobBlockChart.appendChild(jobBlockChartBar);
           block.appendChild(jobBlockChart);
 
-          if(item.status ==='R') {
+          if (item.status === 'R') {
             selectedElement = block;
             selectedItem = item;
 
-          } else if((!selectedElement && item.status ==='F') || (selectedItem&&selectedItem.status==='F')) {
+          } else if ((!selectedElement && item.status === 'F') || (selectedItem && selectedItem.status === 'F')) {
             selectedElement = block;
             selectedItem = item;
           }
 
-          block.getProgressBar = function() {
+          block.getProgressBar = function () {
             return jobBlockChartBar;
           }
 
@@ -277,7 +309,7 @@ Copyright © HatioLab Inc. All rights reserved.
         });
 
         // list의 수량이 4 미만일 경우 => job-progress-bar가 가득차지 않음
-        if(list.length < 4) {
+        if (list.length < 4) {
           // _setBlockOrderStyle을 통해 가장 오른쪽 부터 채워지도록 스타일을 적용
           this._setBlockOrderStyle();
         }
@@ -290,7 +322,7 @@ Copyright © HatioLab Inc. All rights reserved.
           }
         }));
 
-        if(selectedElement) {
+        if (selectedElement) {
           this.selectedElement = selectedElement;
         }
       }
@@ -313,7 +345,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
       _clearJobIndicator() {
         let container = this.$['container'];
-        while(container.children.length) {
+        while (container.children.length) {
           container.removeChild(container.firstChild);
         }
       }
@@ -327,12 +359,12 @@ Copyright © HatioLab Inc. All rights reserved.
       selectNextItem() {
         let nextInput;
         this.inputList.forEach((input, index) => {
-          if(this.selectedInput.id === input.id) {
+          if (this.selectedInput.id === input.id) {
             nextInput = this.inputList[index + 1];
           }
         });
 
-        if(nextInput) { // 다음 아이템을 selectedInput으로 초기화 후 return
+        if (nextInput) { // 다음 아이템을 selectedInput으로 초기화 후 return
           this.selectedInput = nextInput;
           this._itemSelected({
             currentTarget: this._getBucketElementById(this.selectedInput.id),
@@ -346,9 +378,9 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       _itemSelected(event) {
-        if(!event || !event.currentTarget) return;
+        if (!event || !event.currentTarget) return;
 
-        if(this.selectedElement) {
+        if (this.selectedElement) {
           this.selectedElement.removeAttribute('active');
         }
 
@@ -358,7 +390,7 @@ Copyright © HatioLab Inc. All rights reserved.
         this.selectedInput = this.visibleList.filter(item => item.id === targetId)[0];
 
         let customEvent;
-        if(event.type === 'click') { // 클릭 이벤트를 통해 발생할 경우
+        if (event.type === 'click') { // 클릭 이벤트를 통해 발생할 경우
           customEvent = new CustomEvent('item-selected-by-click', {
             detail: this.selectedInput
           });
@@ -373,7 +405,7 @@ Copyright © HatioLab Inc. All rights reserved.
       _handleTrack(event) {
         let state = event.detail.state;
 
-        switch(state) {
+        switch (state) {
           case 'start':
             this.startX = event.detail.x;
             break;
@@ -382,8 +414,8 @@ Copyright © HatioLab Inc. All rights reserved.
             break;
         }
 
-        if(this.startX && this.endX) {
-          if(this.startX - this.endX < - this.sensitivity) {
+        if (this.startX && this.endX) {
+          if (this.startX - this.endX < - this.sensitivity) {
             this._swipeToRight();
           } else if (this.startX - this.endX > this.sensitivity) {
             this._swipeToLeft()
@@ -414,7 +446,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       getBlockById(id) {
-        if(!id) return;
+        if (!id) return;
         const jobBlock = this.shadowRoot.querySelector('div[target-id="' + id + '"]');
         return jobBlock;
       }

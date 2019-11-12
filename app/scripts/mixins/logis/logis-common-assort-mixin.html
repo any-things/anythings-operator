@@ -162,13 +162,14 @@ Copyright © HatioLab Inc. All rights reserved.
         }
 
         let inputListAjax = this.$['input-list-ajax'];
-        let rackCd = LOGIS_UTIL.getRackCd();
+        let equipType = LOGIS_UTIL.getEquipType();
+        let equipCd = LOGIS_UTIL.getRackCd();
         let zoneCd = LOGIS_UTIL.getEquipZone();
-        let sideCd = LOGIS_UTIL.getRackSide();
+        //        let sideCd = LOGIS_UTIL.getRackSide();
         let showOthersOrder = LOGIS_UTIL.getShowOthersOrder();
 
         inputListAjax.curl =
-          `/tablet_process/input_list/${rackCd}/${zoneCd}/${sideCd}`;
+          `/device_process/search/input_list/${equipType}/${equipCd}/${zoneCd}`;
         // 대상 외 작업 조회 여부 param setting
         inputListAjax.customParams = {
           show_others_order: showOthersOrder
@@ -181,7 +182,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Boolean} mpiOnFlag 표시기 점등 여부 DPS의 경우 존재
        */
       refreshInputDetails(mpiOnFlag) {
-        this.setListHeaderColor(this.selectedInput.mpi_color);
+        this.setListHeaderColor(this.selectedInput.color_cd);
         let inputSeqId = this.selectedInput.id;
         let rackCd = LOGIS_UTIL.getRackCd();
         let zoneCd = LOGIS_UTIL.getEquipZone();
@@ -327,7 +328,7 @@ Copyright © HatioLab Inc. All rights reserved.
             // FIXME: 제품 코드가 처음 입력될때 클라이언트 에러발생, inputDetails['F']가 undefined
             this._updateStatus(inputDetails['F'].concat(inputDetails['R']));
             this.frontDetailList = LOGIS_UTIL.sortByLeftQty(inputDetails['F']);
-          }  else if (inputDetails['R']) {
+          } else if (inputDetails['R']) {
             this._updateStatus(inputDetails['R']);
           }
 
