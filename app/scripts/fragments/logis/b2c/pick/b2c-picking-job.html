@@ -92,7 +92,7 @@ Copyright © HatioLab Inc. All rights reserved.
     </sys-ajax>
 
     <!-- 투입 이벤트의 거래처 작업 리스트 -->
-    <sys-ajax id="input-job-details-ajax" method="PUT"
+    <sys-ajax id="input-job-details-ajax" method="GET"
       curl="/tablet_process/dps/input_details/:job_input_seq_id/:rack_cd/:zone_cd/:side_cd"
       content-type="application/json" last-response="{{inputDetails}}">
     </sys-ajax>
@@ -305,9 +305,9 @@ Copyright © HatioLab Inc. All rights reserved.
             type: Array,
             value: function () {
               return [{
-                fieldname: 'loc_cd',
+                fieldname: 'sub_equip_cd',
                 columnWidth: 'auto',
-                displayCallback: value => '(' + (value ? value.substring(4) : '') + ')'
+                displayCallback: value => '(' + value + ')'
               }, {
                 fieldname: 'div_cd',
                 columnWidth: 'auto',

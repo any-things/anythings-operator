@@ -165,8 +165,6 @@ Copyright © HatioLab Inc. All rights reserved.
         let equipType = LOGIS_UTIL.getEquipType();
         let equipCd = LOGIS_UTIL.getRackCd();
         let zoneCd = LOGIS_UTIL.getEquipZone();
-        //        let sideCd = LOGIS_UTIL.getRackSide();
-        let showOthersOrder = LOGIS_UTIL.getShowOthersOrder();
 
         inputListAjax.curl =
           `/device_process/search/input_list/${equipType}/${equipCd}/${zoneCd}`;
@@ -179,28 +177,27 @@ Copyright © HatioLab Inc. All rights reserved.
       /**
        * @description 상품 리스트 중 선택된 상품 정보 상세 조회
        *********************
-       * @param {Boolean} mpiOnFlag 표시기 점등 여부 DPS의 경우 존재
+       * @param {Boolean} indOnFlag 지시기 점등 여부 
        */
-      refreshInputDetails(mpiOnFlag) {
+      refreshInputDetails(indOnFlag) {
+        if (!indOnFlag) {
+          // TODO 옵션 처리 
+          indOnFlag = false;
+        }
+
         this.setListHeaderColor(this.selectedInput.color_cd);
         let inputSeqId = this.selectedInput.id;
-        let rackCd = LOGIS_UTIL.getRackCd();
+        let equipType = LOGIS_UTIL.getEquipType();
+        let equipCd = LOGIS_UTIL.getRackCd();
         let zoneCd = LOGIS_UTIL.getEquipZone();
         let sideCd = LOGIS_UTIL.getRackSide();
+
         try {
           this.validationBeforeRefreshDetail(zoneCd, sideCd);
           let detailAjax = this.$['input-job-details-ajax'];
 
-          if (this.jobType === 'DAS') {
-            detailAjax.curl =
-              `/tablet_process/input_details/${rackCd}/${inputSeqId}/${sideCd}/${zoneCd}`;
-          } else if (this.jobType === 'DPS') {
-            detailAjax.curl =
-              `/tablet_process/${this.jobType.toLowerCase()}/input_details/${inputSeqId}/${rackCd}/${zoneCd}/${sideCd}`;
-            detailAjax.customParams = {
-              mpi_on_flag: mpiOnFlag
-            };
-          }
+          detailAjax.curl =
+            `/device_process/search/input_jobs/${inputSeqId}/${equipType}/${equipCd}/${zoneCd}/${indOnFlag}`;
 
           detailAjax.generateRequest();
         } catch (error) {
@@ -302,7 +299,7 @@ Copyright © HatioLab Inc. All rights reserved.
             this.holdIndicator = true;
           }
 
-          this.refreshInputDetails(this.jobType === 'DPS');
+          this.refreshInputDetails();
         }
       }
 
@@ -312,36 +309,25 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Array} inputDetails
        */
       _inputDetailsChanged(inputDetails) {
-        if (inputDetails == null) return;
+        if (!inputDetails) {
+          this.frontDetailList = [];
+          this.rearDetailList = [];
+          return;
+        }
         let sideCd = LOGIS_UTIL.getRackSide();
 
-        if (sideCd === 'F') {
-          this._updateStatus(inputDetails[sideCd]);
-          this.frontDetailList = LOGIS_UTIL.sortByLeftQty(inputDetails[sideCd]);
+        this._updateStatus(inputDetails);
 
-        } else if (sideCd === 'R') {
-          this._updateStatus(inputDetails[sideCd]);
-          this.rearDetailList = LOGIS_UTIL.sortByLeftQty(inputDetails[sideCd]);
+        let frontDetailListData = [];
+        let rearDetailListData = [];
 
-        } else if (sideCd === 'ALL') {
-          if (inputDetails['F']) {
-            // FIXME: 제품 코드가 처음 입력될때 클라이언트 에러발생, inputDetails['F']가 undefined
-            this._updateStatus(inputDetails['F'].concat(inputDetails['R']));
-            this.frontDetailList = LOGIS_UTIL.sortByLeftQty(inputDetails['F']);
-          } else if (inputDetails['R']) {
-            this._updateStatus(inputDetails['R']);
-          }
+        inputDetails.forEach(inputDetail => {
+          if (inputDetail.side_cd == 'F') frontDetailListData.push(inputDetail);
+          else rearDetailListData.push(inputDetail);
+        });
 
-          if (inputDetails['R']) {
-            this.rearDetailList = LOGIS_UTIL.sortByLeftQty(inputDetails['R']);
-          }
-
-        } else if (sideCd === 'T') {
-          // TODO
-
-        } else {
-          LOGIS_UTIL.showMessage(t('error.SETTING_ERROR'), t('text.invalid_sidecode'), this.moveToSetting);
-        }
+        this.frontDetailList = LOGIS_UTIL.sortByLeftQty(frontDetailListData);
+        this.rearDetailList = LOGIS_UTIL.sortByLeftQty(rearDetailListData);;
 
         SOUND.playInfoSound()
       }
@@ -382,13 +368,13 @@ Copyright © HatioLab Inc. All rights reserved.
         contents.forEach(content => {
           let data = content.getData();
           let status = data.status;
-          let mpiColor = data.mpi_color;
+          let indColor = data.color_cd;
           let relatedMyZone = data.has_my_jobs; // 내 작업존과 관계 여부
           let lastZone = data.is_my_zone_is_last; // 마지막 작업 처리 존 여부
           let progressBar = content.getProgressBar();
 
           this.addBarStatusTypeClass(status, content); // indicator의 상태에 따른 아이콘 적용
-          this.addMpiColorClass(mpiColor, progressBar); // 프로그레스 바에 mpi 색상 적용
+          this.addIndColorClass(indColor, progressBar); // 프로그레스 바에 ind 색상 적용
           this.addOthersZoneAttr(relatedMyZone, content); // 나와 관계 없는 작업 attribute 추가
           this.addLastZoneClass(lastZone, content); // 마지막 작업존 여부에 따른 class 추가
         });
@@ -417,13 +403,13 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * @description 프로그레스 바에 mpi 색상 적용
+       * @description 프로그레스 바에 ind 색상 적용
        ***********************
-       * @param {String} mpiColor R: red, G: green, B: blue, Y: yellow
+       * @param {String} indColor R: red, G: green, B: blue, Y: yellow
        * @param {String} progressBar
        */
-      addMpiColorClass(mpiColor, progressBar) {
-        progressBar.classList.add('color' + mpiColor);
+      addIndColorClass(indColor, progressBar) {
+        progressBar.classList.add('color' + indColor);
       }
 
       /**
@@ -480,7 +466,7 @@ Copyright © HatioLab Inc. All rights reserved.
       setListHeaderColor(color) {
         let headerButtons = Array.from(this.shadowRoot.querySelectorAll('button.list-header-btn'));
         headerButtons.forEach(headerButton => {
-          headerButton.setAttribute('mpi-color', color);
+          headerButton.setAttribute('ind-color', color);
         });
       }
 
