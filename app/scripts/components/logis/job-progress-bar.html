@@ -292,7 +292,10 @@ Copyright © HatioLab Inc. All rights reserved.
           jobBlockChart.appendChild(jobBlockChartBar);
           block.appendChild(jobBlockChart);
 
-          if (item.status === 'R') {
+          if (item.is_selected_item == 1) {
+            selectedElement = block;
+            selectedItem = item;
+          } else if (!selectedElement && item.status === 'R') {
             selectedElement = block;
             selectedItem = item;
 

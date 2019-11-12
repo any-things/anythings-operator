@@ -91,10 +91,8 @@ Copyright © HatioLab Inc. All rights reserved.
       on-sys-ajax-response="_inputListPageResponsed">
     </sys-ajax>
 
-    <!-- 투입 이벤트의 거래처 작업 리스트 -->
-    <sys-ajax id="input-job-details-ajax" method="GET"
-      curl="/tablet_process/dps/input_details/:job_input_seq_id/:rack_cd/:zone_cd/:side_cd"
-      content-type="application/json" last-response="{{inputDetails}}">
+    <!-- 투입 이벤트의 작업 리스트 -->
+    <sys-ajax id="input-job-details-ajax" method="GET" content-type="application/json" last-response="{{inputDetails}}">
     </sys-ajax>
 
     <!-- 태블릿 작업 존의 처리 안된 혹은 처리 완료된 작업을 조회하여 지시기에 점등 -->
@@ -108,16 +106,12 @@ Copyright © HatioLab Inc. All rights reserved.
       content-type="application/json">
     </sys-ajax>
 
-    <!-- DPS 웨어러블 검수 기능 & QPS 웨어러블 검수 / 박스 수동 투입 -->
-    <sys-ajax id="insp-with-pick-ajax" method="PUT"
-      curl="/tablet_process/dps/insp_with_pick/:rack_cd/:zone_cd/:sideCd/:input_seq/:skuCd"
-      content-type="application/json" on-sys-ajax-response="_inspWithPickResponsed"
-      on-sys-ajax-error="_inspWithPickError">
-    </sys-ajax>
-
     <!-- DPS출발   -->
-    <sys-ajax id="depart-ajax" method="PUT" curl="/tablet_process/dps/box_depart/:rack_cd/:zone_cd/:box_id"
-      content-type="application/json">
+    <sys-ajax id="depart-ajax" method="PUT" curl="/device_process/dps/bucket_depart" content-type="application/json">
+    </sys-ajax>
+    <!-- DPS도착   -->
+    <sys-ajax id="arrive-ajax" method="PUT" curl="/device_process/dps/bucket_arrive" content-type="application/json"
+      on-sys-ajax-response="_arriveBucketResponsed">
     </sys-ajax>
 
     <div id="status">
@@ -139,13 +133,9 @@ Copyright © HatioLab Inc. All rights reserved.
 
     <div id="prod-info">
       <div id="prod-info-left">
-        <span>[[orderIdLabel]]</span>
-        <span class="prodname">[[orderId]]</span>
+        <span>[[orderNoLabel]]</span>
+        <span class="prodname">[[orderNo]]</span>
       </div>
-      <!-- SKU 정보 조회 시 복수개가 조회된 경우 실행되는 사용자가 고를 수 있는 팝업이 가미된 SKU Input -->
-      <auto-popup-input id="sku-barcd" resource-url="[[getSkuAjaxUrl]]" popup-title="[[popupTitleLabel]]"
-        button-txt-callback="[[_skuButtonTxtCallback]]" on-item-selected="skuSelected">
-      </auto-popup-input>
       <!-- 개발 모드일때만 인풋 박스 표시 -->
       <dom-if if="[[isDevMode]]">
         <template>
@@ -212,10 +202,6 @@ Copyright © HatioLab Inc. All rights reserved.
       </dom-if>
     </div>
 
-    <!-- <job-progress-bar id="dps-job-indicator" job-type="[[jobType]]" selected-input="{{selectedInput}}"
-      on-item-selected="_selectedInputChanged" on-item-selected-by-click="_selectedInputChanged"
-      input-list="[[inputList]]" on-configured="_addJobStatusAttr">
-    </job-progress-bar> -->
   </template>
 
   <script>
@@ -231,9 +217,9 @@ Copyright © HatioLab Inc. All rights reserved.
            ****************
            * @type {String}
            */
-          orderIdLabel: {
+          orderNoLabel: {
             type: String,
-            value: () => t('label.order_id')
+            value: () => t('label.order_no')
           },
 
           /**
@@ -401,51 +387,12 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * SKU 정보 조회를 위한 URL
-           ****************
-           * @type {String}
-           */
-          getSkuAjaxUrl: {
-            type: String,
-            value: `/pda_process/find_sku/${LOGIS_UTIL.getRackCd()}/:inputValue`
-          },
-
-          /**
-           * SKU 정보 조회 후 복수개가 조회된 경우 사용자가 고를 수 있는 팝업이 실행되는데 그 팝업에 표시할 타이틀
-           ****************
-           * @type {String}
-           */
-          popupTitleLabel: {
-            type: String,
-            value: () => t('label.sku')
-          },
-
-          /**
            * 블루투스 ID
            ****************
            * @type {String}
            */
           bluetoothId: {
             type: String
-          },
-
-          /**
-           * QPS 여부
-           ****************
-           * @type {Boolean}
-           */
-          isQps: {
-            value: JSON.parse(localStorage.getItem('setting.isQps'))
-          },
-
-          /**
-           * ?
-           ****************
-           * @type {Array}
-           */
-          needIndScanCode: {
-            type: Array,
-            value: []
           }
         }
       }
@@ -456,41 +403,6 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       connectedCallback() {
         super.connectedCallback();
-        this._getIndCd();
-      }
-
-      /**
-       * @description 지시기 리스트 조회
-       ******************
-       */
-      _getIndCd() {
-        const indGetAjax = this.$['ind-get-ajax'];
-        indGetAjax.baseUrl = JSON.parse(localStorage.getItem('setting.baseUrl'));
-        indGetAjax.customParams = {
-          select: "ind_cd",
-          sort: [{
-            "field": "loc_cd",
-            "ascending": true
-          }],
-          page: 1,
-          limit: 10000
-        };
-
-        indGetAjax.curl = `/location`;
-        indGetAjax.generateRequest();
-      }
-
-      /**
-       * @description 지시기 리스트 설정
-       ******************
-       * @param {Object} event
-       */
-      _indCodeSetting(event) {
-        this.indList = [];
-
-        event.detail.items.forEach(item => {
-          this.indList.push(item.ind_cd);
-        });
       }
 
       /**
@@ -709,7 +621,6 @@ Copyright © HatioLab Inc. All rights reserved.
             dataList.forEach(item => {
               if (item.ind_cd == this.indCd && item.picked_qty >= item.pick_qty) {
                 this.indCd = 'NaN';
-                this.needIndScanCode = [];
               }
             })
             if (selectedBCd == data.sku_barcd) {
@@ -723,17 +634,6 @@ Copyright © HatioLab Inc. All rights reserved.
             }
           }
         });
-
-        for (var i = 0; i < list.length; i++) {
-          var iData = list[i].getData();
-          for (var j = i + 1; j < list.length; j++) {
-            var jData = list[j].getData();
-
-            if (iData.status == 'P' && jData.status == 'P' && iData.sku_barcd == jData.sku_barcd) {
-              this.needIndScanCode.push(iData.sku_barcd);
-            }
-          }
-        }
       }
 
       /**
@@ -770,7 +670,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * @description [완료] 버튼 클릭
+       * @description [완료] 버튼 클릭 ( 박스 출발 )
        ******************
        * @param {Object} event
        */
@@ -803,121 +703,31 @@ Copyright © HatioLab Inc. All rights reserved.
        * @description 블루투스 subscribe callback
        * 연결된 블루투스 장비에 의해 호출 됨
        * MpsBluetoothScannerMixin을 사용하는 컴퍼넌트는 scanned 함수를 구현해야함
-       * @param {String} scannedBarcode 스캔한 상품 바/코드
+       * @param {String} scannedBarcode 스캔은 박스 도착 박스 ID 
        */
       scanned(scannedBarcode) {
-        this.isIndCd = this.indList.indexOf(scannedBarcode) >= 0;
-        var needIndCd = this.needIndScanCode.indexOf(scannedBarcode) >= 0;
-
-        if (needIndCd || this.isIndCd) {
-          if (this.isIndCd) {
-            this.indCd = scannedBarcode;
-            this.drawDecoLine(this.indCd);
-            return;
-
-          } else if (this.indCd == 'NaN') {
-            document.dispatchEvent(new CustomEvent('show-toast', {
-              detail: {
-                type: t('error.no_scan_ind_code'),
-                message: t('error.no_scan_ind_code')
-              }
-            }));
-            return;
-          }
-
-        } else {
-          if (scannedBarcode.indexOf('DONE_BY_QR') === 0) {
-            this.doneIconClicked();
-            return;
-
-          } else if (/^[bcdfghiBCDFGHI][0-9]{7}$/.test(scannedBarcode)) {
-            var event = {};
-            event.detail = {};
-            event.detail.sku_cd = scannedBarcode;
-            this.skuSelected(event);
-            return;
-          }
-        }
-
-        this.drawDecoLine(this.indCd);
-        this.$['sku-barcd'].value = scannedBarcode;
-        this.$['sku-barcd']._triggerAjax();
-      }
-
-      /**
-       * @description decoration라인 추가
-       ******************
-       * @param {String} searchItem decoration라인추가할 아이템
-       */
-      drawDecoLine(searchItem) {
-        var mpsList = this.$['content'].getElementsByTagName('item-list');
-        var allRows = [];
-        allRows = allRows.concat(mpsList[0].getRows(), mpsList[1].getRows())
-        allRows.forEach(row => {
-          if (row.getData().ind_cd == searchItem && row.getData().status == 'P') {
-            if (row.classList.value.indexOf('complete') < 0) {
-              row.classList.add('underline');
-            }
-          }
-        })
-      }
-
-      /**
-       * @description 스캔한 상품 바코드로 여러 개의 상품이 검색된 이후 하나의 상품을 선택시
-       ******************
-       * @param {Object} event
-       */
-      skuSelected(event) {
-        const inspWithPickAjax = this.$['insp-with-pick-ajax'];
-        let scannedBarcode = this.scannedBarcode = event.detail.sku_cd;
-        let inputSeqId = this.selectedInput ? this.selectedInput.id : 'none';
-        let rackCd = LOGIS_UTIL.getRackCd();
+        // TODO : BOX ID 체크 룰 필요 
+        // 박스 도착 이벤트 발생 
+        const bucketArriveAjax = this.$['arrive-ajax'];
+        let equipType = LOGIS_UTIL.getEquipType();
+        let equipCd = LOGIS_UTIL.getRackCd();
         let zoneCd = LOGIS_UTIL.getEquipZone();
-        let sideCd = LOGIS_UTIL.getRackSide();
-        inspWithPickAjax.curl = `/tablet_process/dps/insp_with_pick/${rackCd}/${sideCd}/${zoneCd}/${inputSeqId}/${scannedBarcode}/${this.indCd}`;
-        inspWithPickAjax.generateRequest();
+        let jobType = LOGIS_UTIL.getJobType();
+        let bucketCd = scannedBarcode;
+
+        bucketArriveAjax.curl = `/device_process/${jobType}/bucket_arrive?equipType=${equipType}&equipCd=${equipCd}&equipZone=${zoneCd}&bucketCd=${bucketCd}`;
+
+        bucketArriveAjax.generateRequest();
       }
 
       /**
-       * @description 웨어러블 검수 실패시
-       ******************
+       * @description 버킷 도착 이벤트 response
        * @param {Object} event
        */
-      _inspWithPickError(event) {
-        this.indCd = 'NaN';
-        var allRows = [];
-        var mpsList = this.$['content'].getElementsByTagName('item-list');
-        allRows = allRows.concat(mpsList[0].getRows(), mpsList[1].getRows())
-        allRows.forEach(row => {
-          row.classList.remove('underline');
-        })
-      }
-
-      /**
-       * 웨어러블 검수 응답시
-       ******************
-       * @param {Object} event
-       */
-      _inspWithPickResponsed(event) {
-        if (event.detail.refresh_type === 'input-added') {
-          this.boxId = this.scannedBarcode;
-          this.scannedBarcode = '';
-        }
-
-        this.refreshByWs(event.detail.refresh_type);
-      }
-
-      /**
-       * SKU 정보 조회 시 복수개가 조회된 경우 사용자가 고를 수 있는 버튼이 실행되는데 그 버튼에 표시할 내용
-       *******************
-       * @param {Object} item
-       */
-      _skuButtonTxtCallback(item) {
-        return `(${item.sku_cd})
-                ${item.sku_nm}`;
+      _arriveBucketResponsed(event) {
+        this.inputList = event.detail.result;
       }
     }
-
     customElements.define(B2cPickingJob.is, B2cPickingJob);
   </script>
 </dom-module>

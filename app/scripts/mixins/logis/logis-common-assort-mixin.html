@@ -168,10 +168,8 @@ Copyright © HatioLab Inc. All rights reserved.
 
         inputListAjax.curl =
           `/device_process/search/input_list/${equipType}/${equipCd}/${zoneCd}`;
-        // 대상 외 작업 조회 여부 param setting
-        inputListAjax.customParams = {
-          show_others_order: showOthersOrder
-        };
+
+        inputListAjax.generateRequest();
       }
 
       /**
@@ -273,7 +271,7 @@ Copyright © HatioLab Inc. All rights reserved.
         if (selectedInput) {
           this.skuCd = selectedInput.sku_cd;
           this.skuNm = selectedInput.sku_nm;
-          this.orderId = selectedInput.order_id;
+          this.orderNo = selectedInput.order_no;
 
           if (this.jobType === 'DAS') {
             /**
