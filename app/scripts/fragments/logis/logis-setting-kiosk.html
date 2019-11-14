@@ -21,53 +21,61 @@ Copyright © HatioLab Inc. All rights reserved.
     </sys-ajax>
 
     <!-- 메시지 통신을 위한 메시지 브로커 포트 조회 -->
-    <sys-ajax id="broker-port-ajax" method="GET" content-type="application/json" on-sys-ajax-response="_setBrokerPort">
+    <sys-ajax id="broker-port-ajax" method="GET" content-type="application/json" 
+      on-sys-ajax-response="_setBrokerPort">
     </sys-ajax>
 
     <!-- 메시지 통신을 위한 사이트 코드 조회 -->
-    <sys-ajax id="broker-site-ajax" method="GET" content-type="application/json" on-sys-ajax-response="_setBrokerSite">
+    <sys-ajax id="broker-site-ajax" method="GET" content-type="application/json" 
+      on-sys-ajax-response="_setBrokerSite">
     </sys-ajax>
 
-    <!-- 스테이션 조회 -->
-    <sys-ajax id="zone-items-ajax" method="GET" content-type="application/json" on-sys-ajax-response="_renderZoneCombo">
-    </sys-ajax>
-
-    <!-- 랙 리스트(설비 이름) 조회 -->
-    <sys-ajax id="rack-items-ajax" method="GET" content-type="application/json"
-      on-sys-ajax-response="_renderRegionCombo">
+    <!-- 스테이지 조회 -->
+    <sys-ajax id="stages-ajax" method="GET" content-type="application/json" 
+      on-sys-ajax-response="_renderStageCombo">
     </sys-ajax>
 
     <!-- 설비 유형 조회 -->
-    <sys-ajax id="equipment-items-ajax" method="GET" content-type="application/json"
-      on-sys-ajax-response="_renderEquipmentCombo">
+    <sys-ajax id="equip-types-ajax" method="GET" content-type="application/json"
+      on-sys-ajax-response="_renderEquipTypeCombo">
     </sys-ajax>
 
+    <!-- 랙 리스트(설비 이름) 조회 -->
+    <sys-ajax id="racks-ajax" method="GET" content-type="application/json"
+      on-sys-ajax-response="_renderRackCombo">
+    </sys-ajax>
+
+    <!-- 작업 스테이션 조회 -->
+    <sys-ajax id="stations-ajax" method="GET" content-type="application/json" 
+      on-sys-ajax-response="_renderStationCombo">
+    </sys-ajax>
+    
     <!-- KIOSK 메뉴 리스트 조회 -->
     <sys-ajax id="kiosk-menu-ajax" last-response="{{kioskMenuList}}">
     </sys-ajax>
 
     <!-- 업데이트 내역 조회 -->
-    <sys-ajax id="update-ajax" method="GET" last-response="{{updatedList}}">
+    <sys-ajax id="update-ajax" method="GET" last-response="{{updatedItems}}">
     </sys-ajax>
 
     <!-- 설정 사항 저장 -->
     <sys-ajax id="update-setting-ajax" method="PUT" content-type="application/json">
     </sys-ajax>
 
-    <!-- 스테이션 설정 -->
-    <div id="station" class="input-container">
-      <label style="text-align: left">[[stationLabel]]</label>
+    <!-- 스테이지 설정 -->
+    <div id="stage" class="input-container">
+      <label style="text-align: left">[[stageLabel]]</label>
     </div>
     <div class="input-container">
-      <select id="zone-combo"></select>
+      <select id="stage-combo"></select>
     </div>
 
     <!-- 설비 유형 설정 -->
-    <div id="equipment" class="input-container">
-      <label style="text-align: left">[[equipmentLabel]]</label>
+    <div id="equipType" class="input-container">
+      <label style="text-align: left">[[equipTypeLabel]]</label>
     </div>
     <div class="input-container">
-      <select id="equipment-combo"></select>
+      <select id="equip-type-combo"></select>
     </div>
 
     <!-- 설비 이름 설정 -->
@@ -76,6 +84,14 @@ Copyright © HatioLab Inc. All rights reserved.
     </div>
     <div class="input-container">
       <select id="rack-combo"></select>
+    </div>
+
+    <!-- 작업 스테이션 (작업 구역) 설정 -->
+    <div id="station" class="input-container">
+      <label style="text-align: left">[[stationLabel]]</label>
+    </div>
+    <div class="input-container">
+      <select id="station-combo"></select>
     </div>
 
     <!-- 메뉴 이동 -->
@@ -93,13 +109,16 @@ Copyright © HatioLab Inc. All rights reserved.
     <div id="update-operato" class="input-container">
       <label style="text-align: left">[[updateLabel]]</label>
     </div>
+
+    <!-- 업데이트 관련 버튼 -->
     <div class="button-container">
-      <button id="move-btn" on-click="_viewUpdateContent">[[detailedContentBtnLabel]]</button>
-      <button id="move-btn" on-click="_moveToScreen">[[updateBtnLabel]]</button>
+      <button id="view-updated-item-btn" on-click="_viewUpdateContent">[[detailedContentBtnLabel]]</button>
+      <button id="update-btn" on-click="_moveToScreen">[[updateBtnLabel]]</button>
     </div>
 
+    <!-- 새로고침 버튼 -->
     <div class="button-container">
-      <button id="update-btn" on-click="_moveToScreen" style="float: right;">[[refreshBtnLabel]]</button>
+      <button id="refresh-btn" on-click="_moveToScreen" style="float: right;">[[refreshBtnLabel]]</button>
     </div>
   </template>
 
@@ -122,7 +141,17 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * @description 스테이션 라벨
+           * @description 스테이지 라벨
+           *********************
+           * @type {String}
+           */
+          stageLabel: {
+            type: String,
+            value: () => t('label.stage')
+          },
+
+          /**
+           * @description 작업 스테이션 라벨
            *********************
            * @type {String}
            */
@@ -136,9 +165,9 @@ Copyright © HatioLab Inc. All rights reserved.
            *********************
            * @type {String}
            */
-          equipmentLabel: {
+          equipTypeLabel: {
             type: String,
-            value: () => t('label.equipment')
+            value: () => t('label.equipment_type')
           },
 
           /**
@@ -270,11 +299,6 @@ Copyright © HatioLab Inc. All rights reserved.
           kioskMenuList: {
             type: Array,
             observer: '_renderScreenCombo'
-          },
-
-          updatedList: {
-            type: Array,
-            observer: '_updatedListChanged'
           }
         }
       }
@@ -285,9 +309,10 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       connectedCallback() {
         super.connectedCallback();
-        this._getRegionItems();
-        // this._getZoneItems();
-        this._getEquipmentItems();
+        this._getStageList();
+        this._getEquipTypeList();
+        this._getRackList();
+        this._getStationList();
         this._getKioskMenus();
         this._setDefaultValues();
       }
@@ -341,7 +366,6 @@ Copyright © HatioLab Inc. All rights reserved.
 
         screenList.forEach(screen => {
           const option = new Option(t('menu.' + screen.name), screen.routing);
-
           if (this.kioskScreen === screen.routing) {
             option.selected = true;
           };
@@ -366,7 +390,6 @@ Copyright © HatioLab Inc. All rights reserved.
 
         codeTypes.forEach(codeType => {
           const option = new Option(codeType.name, codeType.value);
-
           if (this.kioskCodeType === codeType.value) {
             option.selected = true;
           };
@@ -384,9 +407,9 @@ Copyright © HatioLab Inc. All rights reserved.
       _renderInputTypeCombo(inputTypes) {
         const inputTypeCombo = this._getInputTypeCombo();
         this._clearCombo(inputTypeCombo);
+
         inputTypes.forEach(inputType => {
           const option = new Option(inputType.name, inputType.value);
-
           if (this.kioskInputType === inputType.value) {
             option.selected = true;
           };
@@ -395,16 +418,11 @@ Copyright © HatioLab Inc. All rights reserved.
         });
       }
 
-      _viewUpdateContent(event) {
-        const deviceType = localStorage.getItem('setting.deviceType');
-
-        const updatedListAjax = this._getUpdatedList();
-        updatedListAjax.curl = '/device_process/release_notes/' + deviceType;
-        updatedListAjax.baseUrl = this._getLocalStorage('setting.baseUrl');
-        updatedListAjax.generateRequest();
-
-      }
-
+      /**
+       * @description 메뉴 이동
+       **********************
+       * @param {Object} event
+       */
       _moveToScreen(event) {
         if (this._getScreenCombo().selectedOptions[0] && this._getScreenCombo().selectedOptions[0].value) {
           const selectedKioskScreen = this._getScreenCombo().selectedOptions[0].value
@@ -412,27 +430,6 @@ Copyright © HatioLab Inc. All rights reserved.
             location.hash = `/${selectedKioskScreen}`;
           }
         }
-      }
-
-      _updatedListChanged(updatedList) {
-        document.dispatchEvent(new CustomEvent('open-form-list-dialog', {
-          detail: {
-            title: t('title.patch_notes'),
-            listFields: [{
-              display: 'Seq.',
-              fieldname: 'seq',
-              columnWidth: '0.7fr',
-              style: {
-                textAlign: 'center'
-              }
-            }, {
-              display: 'Content',
-              fieldname: 'content',
-              columnWidth: '2fr'
-            }],
-            listData: updatedList
-          }
-        }));
       }
 
       /**
@@ -454,10 +451,9 @@ Copyright © HatioLab Inc. All rights reserved.
             // this._setLocalStorage(this.rackSideLSKey, this._getSelectedOpt(this._getRackSideOpts()).value);
             // this._setLocalStorage(this.rackSideNameLSKey, this._getSelectedOpt(this._getRackSideOpts()).getAttribute('rack-side-name'));
             resolve();
-          })
-            .catch(error => {
-              reject(error);
-            });
+          }).catch(error => {
+            reject(error);
+          });
         })
       }
 
@@ -485,7 +481,7 @@ Copyright © HatioLab Inc. All rights reserved.
           updateSettingAjax.params = {
             equip_type: 'Rack',
             equip_cd: rackCode
-            // ,side_cd: rackSide
+              // ,side_cd: rackSide
           };
 
           updateSettingAjax.addEventListener('sys-ajax-response', () => {
@@ -503,17 +499,28 @@ Copyright © HatioLab Inc. All rights reserved.
       /**
        * @description return 스크린 설정 콤보
        ***********************
+       * @return {Object} combo box
        */
       _getScreenCombo() {
         return this.$['screen-combo']
       }
 
       /**
-       * @description return 스테이션 설정 콤보
+       * @description return 스테이지 설정 콤보
        ***********************
+       * @return {Object} combo box
+       */
+      _getStageCombo() {
+        return this.$['stage-combo']
+      }
+
+      /**
+       * @description return 작업 스테이션 설정 콤보
+       ***********************
+       * @return {Object} combo box
        */
       _getStationCombo() {
-        return this.$['zone-combo']
+        return this.$['station-combo']
       }
 
       /**
@@ -541,10 +548,6 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _getInputTypeCombo() {
         return this.$['input-type-combo'];
-      }
-
-      _getUpdatedList() {
-        return this.$['update-ajax'];
       }
     }
 

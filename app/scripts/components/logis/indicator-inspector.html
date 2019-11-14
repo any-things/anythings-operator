@@ -40,7 +40,9 @@ Copyright © HatioLab Inc. All rights reserved.
 
   <script>
     class IndicatorInspector extends Polymer.Element {
-      static get is() { return 'indicator-inspector' }
+      static get is() {
+        return 'indicator-inspector'
+      }
 
       static get properties() {
         return {
@@ -120,9 +122,9 @@ Copyright © HatioLab Inc. All rights reserved.
 
         let rackCd = LOGIS_UTIL.getRackCd();
         let sideCode = LOGIS_UTIL.getRackSide();
-        let zoneCode = LOGIS_UTIL.getEquipZone();
+        let stationCode = LOGIS_UTIL.getEquipZone();
         let inspectAjax = this.$['inspect-sku-ajax'];
-        inspectAjax.curl = `/pda_process/inspection_by_mpi/${rackCd}/${sideCode}/${zoneCd}/${this.comCode}/${skuCode}`;
+        inspectAjax.curl = `/pda_process/inspection_by_mpi/${rackCd}/${sideCode}/${stationCode}/${this.comCode}/${skuCode}`;
         inspectAjax.generateRequest();
         this.skuCode = null;
       }

@@ -146,7 +146,7 @@ Copyright © HatioLab Inc. All rights reserved.
     </div>
 
     <div id = "bottom-container">
-      <select id="rack-combo" on-change="_getZoneItems"></select>
+      <select id="rack-combo" on-change="_getStationList"></select>
       <button id = "on-btn" class= 'btn' on-click="_ledOn">[[ledOnBtnLabel]]</button>
       <button id = "off-btn" class= 'btn' on-click="_ledOff">[[ledOffBtnLabel]]</button>
     </div>
@@ -339,7 +339,7 @@ Copyright © HatioLab Inc. All rights reserved.
             this._initialSetup();
           }
         });
-        this._getRegionItems();
+        this._getRackList();
       }
 
       /**
@@ -733,7 +733,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @description 랙 리스트 조회
        *******************
        */
-      _getRegionItems() {
+      _getRackList() {
         const rackGetAjax = this.$['rack-get-ajax'];
         rackGetAjax.baseUrl = JSON.parse(localStorage.getItem('setting.baseUrl'));
         rackGetAjax.customParams = {
