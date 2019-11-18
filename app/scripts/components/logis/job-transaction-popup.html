@@ -241,7 +241,7 @@ Copyright © HatioLab Inc. All rights reserved.
         let equipCd = LOGIS_UTIL.getRackCd();
 
         let jobCancelAjax = this.getJobHandleAjax({
-          curl: `/device_process/classify/cancel/${this.equipType}/${this.equipCd}/${this.jobId}`,
+          curl: `/device_process/classify/cancel/${equipType}/${equipCd}/${this.jobId}`,
           method: 'POST',
           responseCallback: this._jobCancelResponsed.bind(this)
         });
@@ -258,7 +258,7 @@ Copyright © HatioLab Inc. All rights reserved.
         let equipCd = LOGIS_UTIL.getRackCd();
 
         let jobFinishAjax = this.getJobHandleAjax({
-          curl: `/device_process/classify/confirm/${this.equipType}/${this.equipCd}/${this.jobId}`,
+          curl: `/device_process/classify/confirm/${equipType}/${equipCd}/${this.jobId}`,
           method: 'POST',
           responseCallback: this._jobFinishResponsed.bind(this)
         });

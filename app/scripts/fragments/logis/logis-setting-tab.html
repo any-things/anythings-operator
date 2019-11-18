@@ -20,18 +20,15 @@ Copyright © HatioLab Inc. All rights reserved.
     </sys-ajax>
 
     <!-- 메시지 브로커 포트 조회 Ajax -->
-    <sys-ajax id="broker-port-ajax" method="GET" content-type="application/json" 
-      on-sys-ajax-response="_setBrokerPort">
+    <sys-ajax id="broker-port-ajax" method="GET" content-type="application/json" on-sys-ajax-response="_setBrokerPort">
     </sys-ajax>
 
     <!-- 메시지 브로커 사이트 코드 조회 Ajax -->
-    <sys-ajax id="broker-site-ajax" method="GET" content-type="application/json" 
-      on-sys-ajax-response="_setBrokerSite">
+    <sys-ajax id="broker-site-ajax" method="GET" content-type="application/json" on-sys-ajax-response="_setBrokerSite">
     </sys-ajax>
 
     <!-- 스테이지 조회 -->
-    <sys-ajax id="stages-ajax" method="GET" content-type="application/json" 
-      on-sys-ajax-response="_renderStageCombo">
+    <sys-ajax id="stages-ajax" method="GET" content-type="application/json" on-sys-ajax-response="_renderStageCombo">
     </sys-ajax>
 
     <!-- 설비 유형 조회 -->
@@ -40,23 +37,22 @@ Copyright © HatioLab Inc. All rights reserved.
     </sys-ajax>
 
     <!-- 랙 리스트 조회 Ajax -->
-    <sys-ajax id="racks-ajax" method="GET" content-type="application/json"
-      on-sys-ajax-response="_renderRackCombo">
+    <sys-ajax id="racks-ajax" method="GET" content-type="application/json" on-sys-ajax-response="_renderRackCombo">
     </sys-ajax>
 
     <!-- 스테이션 리스트 조회 Ajax -->
-    <sys-ajax id="stations-ajax" method="GET" content-type="application/json" 
+    <sys-ajax id="stations-ajax" method="GET" content-type="application/json"
       on-sys-ajax-response="_renderStationCombo">
     </sys-ajax>
 
     <!-- 작업 유형 리스트 조회 Ajax -->
-    <sys-ajax id="job-type-ajax" method="GET" content-type="application/json" 
+    <sys-ajax id="job-type-ajax" method="GET" content-type="application/json"
       on-sys-ajax-response="_renderJobTypeCombo">
     </sys-ajax>
 
     <!-- 작업 위치 (앞, 뒤, 앞/뒤, 전체 등) 조회 Ajax, TODO 설정 조회 값 수정 필요 -->
-    <sys-ajax auto method="GET" curl="/settings/show_by_name?name=operator.side.set" 
-      content-type="application/json" last-response="{{sideSetResponse}}">
+    <sys-ajax auto method="GET" curl="/settings/show_by_name?name=operator.side.set" content-type="application/json"
+      last-response="{{sideSetResponse}}">
     </sys-ajax>
 
     <!-- 업데이트 내역 조회 -->
@@ -74,7 +70,7 @@ Copyright © HatioLab Inc. All rights reserved.
     <div class="input-container">
       <select id="stage-combo"></select>
     </div>
-  
+
     <!-- 설비 유형 설정 -->
     <div id="equipType" class="input-container">
       <label style="text-align: left">[[equipTypeLabel]]</label>
@@ -97,7 +93,7 @@ Copyright © HatioLab Inc. All rights reserved.
     </div>
     <div class="input-container">
       <select id="station-combo"></select>
-    </div>  
+    </div>
 
     <!-- 업데이트 -->
     <div id="update-operato" class="input-container">
@@ -112,7 +108,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
     <!-- 새로고침 버튼 -->
     <div class="button-container">
-      <button id="refresh-btn" on-click="_moveToScreen" style="float: right;">[[refreshBtnLabel]]</button>
+      <button id="refresh-btn" on-click="_refreshApp" style="float: right;">[[refreshBtnLabel]]</button>
     </div>
   </template>
 
@@ -461,17 +457,17 @@ Copyright © HatioLab Inc. All rights reserved.
       saveSetting() {
         return new Promise((resolve, reject) => {
           this.updateSetting().then(() => {
-              this._setLocalStorage(this.rackCodeLSKey, this._getRackCombo().selectedOptions[0].value);
-              this._setLocalStorage(this.rackNameLSKey, this._getRackCombo().selectedOptions[0].innerText);
-              this._setLocalStorage(this.stationCodeLSKey, this._getStationCombo().selectedOptions[0].value);
-              this._setLocalStorage(this.rackSideLSKey, this._getSelectedOpt(this._getRackSideOpts()).value);
-              this._setLocalStorage(this.rackSideNameLSKey, this._getSelectedOpt(this._getRackSideOpts()).getAttribute('rack-side-name'));
-              this._setLocalStorage(this.jobTypeLSKey, this._getJobTypeCombo().selectedOptions[0].value);
-              //this._setLocalStorage(this.showOthersOrderLSKey, JSON.parse(this._getSelectedOpt(this._getShowOthersOrderOpts()).value));
-              //this._setLocalStorage(this.showFullCodeLSKey, JSON.parse(this._getSelectedOpt(this._getShowFullCodeOpts()).value));
-              //this._setLocalStorage(this.autoPickingLSKey, this._getAutoPickingInput().checked);
-              resolve();
-            })
+            this._setLocalStorage(this.rackCodeLSKey, this._getRackCombo().selectedOptions[0].value);
+            this._setLocalStorage(this.rackNameLSKey, this._getRackCombo().selectedOptions[0].innerText);
+            this._setLocalStorage(this.stationCodeLSKey, this._getStationCombo().selectedOptions[0].value);
+            //this._setLocalStorage(this.rackSideLSKey, this._getSelectedOpt(this._getRackSideOpts()).value);
+            //this._setLocalStorage(this.rackSideNameLSKey, this._getSelectedOpt(this._getRackSideOpts()).getAttribute('rack-side-name'));
+            //this._setLocalStorage(this.jobTypeLSKey, this._getJobTypeCombo().selectedOptions[0].value);
+            //this._setLocalStorage(this.showOthersOrderLSKey, JSON.parse(this._getSelectedOpt(this._getShowOthersOrderOpts()).value));
+            //this._setLocalStorage(this.showFullCodeLSKey, JSON.parse(this._getSelectedOpt(this._getShowFullCodeOpts()).value));
+            //this._setLocalStorage(this.autoPickingLSKey, this._getAutoPickingInput().checked);
+            resolve();
+          })
             .catch(error => {
               reject(error);
             })
@@ -559,6 +555,11 @@ Copyright © HatioLab Inc. All rights reserved.
           this.$['auto-pick'].setAttribute('style', `display: flex`);
           this.$['ble-mode'].setAttribute('style', `display: none`);
         }*/
+      }
+
+      _refreshApp() {
+        this.saveSetting();
+        super.reloadApp();
       }
     }
 

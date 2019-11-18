@@ -99,6 +99,15 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
+           * @description 설비 타입 
+           ****************
+           * @type {String}
+           */
+          equipmentType: {
+            type: String,
+            value: () => JSON.parse(localStorage.getItem('setting.equipType'))
+          },
+          /**
            * @description 랙 코드
            ****************
            * @type {String}
@@ -107,6 +116,9 @@ Copyright © HatioLab Inc. All rights reserved.
             type: String,
             value: () => JSON.parse(localStorage.getItem('setting.rackCd'))
           },
+
+
+
 
           /**
            * @description 랙 코드 로케일 키
@@ -702,6 +714,23 @@ Copyright © HatioLab Inc. All rights reserved.
         updatedItemsAjax.curl = '/device_process/release_notes/' + deviceType;
         updatedItemsAjax.baseUrl = this._getLocalStorage('setting.baseUrl');
         updatedItemsAjax.generateRequest();
+      }
+
+      /**
+      * @description web view cache clear
+      **************************
+      * windows에 CacheClear가 있다면 (cordova plugin 사용 가능한 상태)
+      * webview cache를 클리어한 후 리로드
+      * 없을 경우 리로드
+      */
+      reloadApp() {
+        if ('CacheClear' in window) {
+          window.CacheClear(() => {
+            location.reload(true);
+          });
+        } else {
+          location.reload(true);
+        }
       }
     }
   }
