@@ -248,7 +248,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _getBrokerPort() {
         let brokerPortAjax = this._getBrokerPortAjax();
-        brokerPortAjax.curl = '/settings/show_by_name?name=mw.rabbitmq.broker.port';
+        brokerPortAjax.curl = '/settings/show_by_name?name=mw.rabbitmq.web.mqtt.port';
         brokerPortAjax.baseUrl = this._getLocalStorage('setting.baseUrl');
         brokerPortAjax.generateRequest();
       }
@@ -260,7 +260,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _getBrokerSite() {
         let brokerSiteAjax = this._getBrokerSiteAjax();
-        brokerSiteAjax.curl = '/settings/show_by_name?name=mw.rabbitmq.broker.site.code';
+        brokerSiteAjax.curl = '/settings/show_by_name?name=mw.rabbitmq.site.code';
         brokerSiteAjax.baseUrl = this._getLocalStorage('setting.baseUrl');
         brokerSiteAjax.generateRequest();
       }
