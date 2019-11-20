@@ -253,23 +253,23 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 왼쪽 로케이션 라벨
+           * 앞  로케이션 라벨
            ****************
            * @type {String}
            */
-          locLeftLabel: {
+          locFrontLabel: {
             type: String,
-            value: () => t('label.left')
+            value: () => t('label.front')
           },
 
           /**
-           * 오른쪽 로케이션 라벨
+           * 뒤 로케이션 라벨
            ****************
            * @type {String}
            */
-          locRightLabel: {
+          locRearLabel: {
             type: String,
-            value: () => t('label.right')
+            value: () => t('label.rear')
           },
 
           /**
@@ -295,7 +295,7 @@ Copyright © HatioLab Inc. All rights reserved.
                 columnWidth: 'auto',
                 displayCallback: value => '(' + value + ')'
               }, {
-                fieldname: 'div_cd',
+                fieldname: 'side_cd',
                 columnWidth: 'auto',
                 hidden: true
               }, {
@@ -604,12 +604,12 @@ Copyright © HatioLab Inc. All rights reserved.
         list.forEach(row => {
           let data = row.getData();
 
-          if (data.div_cd == 'L') {
-            row.getElementsByClassName("data-item")[0].innerText = '(' + this.locLeftLabel + ')';
+          if (data.side_cd == 'F') {
+            row.getElementsByClassName("data-item")[0].innerText = '(' + this.locFrontLabel + ')';
             row.getElementsByClassName("data-item")[2].innerText = '';
 
-          } else if (data.div_cd == 'R') {
-            row.getElementsByClassName("data-item")[0].innerText = '(' + this.locRightLabel + ')';
+          } else if (data.side_cd == 'R') {
+            row.getElementsByClassName("data-item")[0].innerText = '(' + this.locRearLabel + ')';
             row.getElementsByClassName("data-item")[2].innerText = '';
           }
 
@@ -618,18 +618,13 @@ Copyright © HatioLab Inc. All rights reserved.
             var dataList = [];
             dataList = dataList.concat(this.inputDetails.F, this.inputDetails.R);
 
-            dataList.forEach(item => {
-              if (item.ind_cd == this.indCd && item.picked_qty >= item.pick_qty) {
-                this.indCd = 'NaN';
-              }
-            })
             if (selectedBCd == data.sku_barcd) {
               document.dispatchEvent(new CustomEvent('close-dialog'));
             }
           } else {
-            if (data.div_cd == 'L') {
+            if (data.side_cd == 'F') {
               row.style.color = 'yellow';
-            } else if (data.div_cd == 'R') {
+            } else if (data.side_cd == 'R') {
               row.style.color = 'aqua';
             }
           }
