@@ -108,6 +108,15 @@ Copyright © HatioLab Inc. All rights reserved.
             value: () => JSON.parse(localStorage.getItem('setting.equipType'))
           },
           /**
+           * @description 설비 타입 키 
+           ****************
+           * @type {String}
+           */
+          equipmentTypeLSKey: {
+            type: String,
+            value: 'setting.equipType'
+          },
+          /**
            * @description 랙 코드
            ****************
            * @type {String}
@@ -116,9 +125,6 @@ Copyright © HatioLab Inc. All rights reserved.
             type: String,
             value: () => JSON.parse(localStorage.getItem('setting.rackCd'))
           },
-
-
-
 
           /**
            * @description 랙 코드 로케일 키
@@ -150,23 +156,23 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * @description 스테이션 코드
+           * @description 설비 존 
            ****************
            * @type {String}
            */
-          stationCode: {
+          equipZone: {
             type: String,
-            value: () => JSON.parse(localStorage.getItem('setting.stationCd'))
+            value: () => JSON.parse(localStorage.getItem('setting.equipZone'))
           },
 
           /**
-           * @description 스테이션 라벨 로케일 키
+           * @description 설비 존 키 
            ****************
            * @type {String}
            */
-          stationCodeLSKey: {
+          equipZoneLSKey: {
             type: String,
-            value: 'setting.stationCd'
+            value: 'setting.equipZone'
           },
 
           /**

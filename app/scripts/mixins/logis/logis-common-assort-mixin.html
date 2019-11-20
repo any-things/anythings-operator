@@ -188,7 +188,8 @@ Copyright © HatioLab Inc. All rights reserved.
         let equipType = LOGIS_UTIL.getEquipType();
         let equipCd = LOGIS_UTIL.getRackCd();
         let zoneCd = LOGIS_UTIL.getEquipZone();
-        let sideCd = LOGIS_UTIL.getRackSide();
+        //        let sideCd = LOGIS_UTIL.getRackSide(); // TODO 설정 처리 
+        let sideCd = 'ALL';
 
         try {
           this.validationBeforeRefreshDetail(zoneCd, sideCd);

@@ -459,7 +459,8 @@ Copyright © HatioLab Inc. All rights reserved.
           this.updateSetting().then(() => {
             this._setLocalStorage(this.rackCodeLSKey, this._getRackCombo().selectedOptions[0].value);
             this._setLocalStorage(this.rackNameLSKey, this._getRackCombo().selectedOptions[0].innerText);
-            this._setLocalStorage(this.stationCodeLSKey, this._getStationCombo().selectedOptions[0].value);
+            this._setLocalStorage(this.equipZoneLSKey, this._getStationCombo().selectedOptions[0].value);
+            this._setLocalStorage(this.equipmentTypeLSKey, this._getEquipTypeCombo().selectedOptions[0].value);
             //this._setLocalStorage(this.rackSideLSKey, this._getSelectedOpt(this._getRackSideOpts()).value);
             //this._setLocalStorage(this.rackSideNameLSKey, this._getSelectedOpt(this._getRackSideOpts()).getAttribute('rack-side-name'));
             //this._setLocalStorage(this.jobTypeLSKey, this._getJobTypeCombo().selectedOptions[0].value);
@@ -559,7 +560,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
       _refreshApp() {
         this.saveSetting();
-        super.reloadApp();
+        //super.reloadApp();
       }
     }
 
