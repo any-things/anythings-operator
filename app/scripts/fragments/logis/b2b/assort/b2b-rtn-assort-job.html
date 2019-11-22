@@ -139,7 +139,7 @@ Copyright © HatioLab Inc. All rights reserved.
       content-type="application/json"
       last-response="{{inputListResponse}}">
     </sys-ajax>
-
+    
     <!-- 투입 이벤트의 거래처 작업 리스트 -->
     <sys-ajax
       id="input-job-details-ajax"
@@ -182,7 +182,7 @@ Copyright © HatioLab Inc. All rights reserved.
           value="{{skuBarCd}}"
           button-text-callback="[[_skuButtonTextCallback]]"
           selected-item="{{findSkuResponse}}"
-          on-keypress="_handleBarcodeKeypress">
+          on-keypress="_handleBarcodeKeypress">dddd
         </barcode-field>
 
         <!-- 상품 코드 표시 컴포넌트 행 -->
@@ -365,7 +365,7 @@ Copyright © HatioLab Inc. All rights reserved.
             value: () => {
               return [{
                   display: t('label.location'),
-                  fieldname: 'loc_cd',
+                  fieldname: 'sub_equip_cd',
                   columnWidth: '0.5fr'
                 }, {
                   display: t('label.picking_qty') + '/' + t('label.picked_qty') + '/' + t('label.pick_qty'),
@@ -532,7 +532,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           jobType: {
             type: String,
-            value: 'RTN'
+            value: 'rtn'
           },
 
           /**
@@ -701,7 +701,7 @@ Copyright © HatioLab Inc. All rights reserved.
           // 그 외 값은 상품 정보로 판단하여 상품 조회
         } else {
           let ajax = this.$['find-sku-ajax'];
-          ajax.curl = `/tablet_process/find_sku/${this.rackCd}/${inputValue}`;
+          ajax.curl = `/device_process//sku/search_by_like/Rack/${this.rackCd}/${inputValue}`;
           ajax.generateRequest();
         }
       }
@@ -784,7 +784,8 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} inputSkuResponse
        */
       _inputListResponseChanged(inputListResponse) {
-        this.inputList = inputListResponse || [];
+       // this.inputList = inputListResponse || [];
+        this.items = inputListResponse|| [];
         window.SOUND.playInfoSound();
       }
 
@@ -795,10 +796,11 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _inputListChanged(inputList) {
         if (!inputList || !inputList.items || inputList.items.length === 0) {
-          this.selectedInput = JSON.parse(JSON.stringify({}));
+          //this.selectedInput = JSON.parse(JSON.stringify({}));
         } else {
-          this.selectedInput = JSON.parse(JSON.stringify(inputList));
-          this.refreshInputDetails();
+          //this.selectedInput = JSON.parse(JSON.stringify(inputList));
+          //this.refreshInputDetails();
+          this.items = inputList;
         }
       }
 
@@ -836,8 +838,8 @@ Copyright © HatioLab Inc. All rights reserved.
           showOthersOrder
         } = this;
         var ajax = this.$['input-list-ajax'];
-        ajax.curl = `/pda_process/rtn/latest_input/${rackCd}/${zoneCd}/${sideCd}`;
-        // 대상 외 작업 조회 여부 param setting
+        ajax.curl = `/device_process/search/input_jobs/Rack/${rackCd}`;
+        // 대상 외 작업 조회 여부 param setting 
         ajax.customParams = {
           show_others_order: showOthersOrder
         };
@@ -973,10 +975,13 @@ Copyright © HatioLab Inc. All rights reserved.
 
         // 마지막으로 스캔한 코드가 박스 바코드이면 박스째 투입으로 처리
         if (this.inputValue === boxBarcd) {
-          inputAjax.curl = `/pda_process/box_input/${rackCd}/${sideCd}/${this.zoneCd}/${comCd}/${skuCd}?allow_continous_scan=${isContinousScanAllowed}`;
+            ///
+          //inputAjax.curl = `/device_process/input/sku/${rackCd}/${equip_cd}/${comCd}/${skuCd} ?allow_continous_scan=${isContinousScanAllowed}`;
+          //inputAjax.curl = `/device_process/sku/search_by_like/${equip_type}/${equip_cd}/${sku_cd}`;
+          
           // 스캔한 코드가 상품 바코드이면 개별 상품 투입으로 처리
         } else {
-          inputAjax.curl = `/pda_process/input_sku/${rackCd}/${sideCd}/${this.zoneCd}/${comCd}/${skuCd}?allow_continous_scan=${isContinousScanAllowed}`;
+          inputAjax.curl = `/device_process/input/sku/Rack/${rackCd}/${comCd}/${skuCd}?allow_continous_scan=${isContinousScanAllowed}`;
         }
 
         inputAjax.generateRequest();
@@ -1057,8 +1062,10 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       chuteNumberScanned(chuteNumber) {
         const chuteInfoAjax = this.$['chute-info-ajax'];
-        chuteInfoAjax.curl = `/pda_process/chute_info/${chuteNumber}`;
-        chuteInfoAjax.generateRequest();
+        var url = `/device_process/dynamic/${this.jobType}/chute_info`;
+        url += '?chuteNo=' + chuteNumber;
+        chuteInfoAjax.curl = url;
+        chuteInfoAjax.generateRequest(); 
       }
 
       /**
@@ -1285,7 +1292,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _requestFullbox(boxId, locCd, fullboxQty) {
         var ajax = this.$['request-fullbox-ajax']
-        ajax.curl = `/pda_process/rtn/fullbox_by_split`;
+        ajax.curl = `/device_process/rtn/fullbox_by_split`;
         ajax.body = {
           loc_cd: locCd,
           box_id: boxId,
