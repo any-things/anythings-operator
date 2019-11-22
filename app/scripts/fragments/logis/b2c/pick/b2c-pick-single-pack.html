@@ -197,8 +197,6 @@ Copyright © HatioLab Inc. All rights reserved.
     </div>
 
     <div id="input-container">
-      <input hidden id="continue-box-scan" type="checkbox" on-change="_continueBoxScan">
-      <label hidden>[[continueBoxScanLabel]]</label>
       <input id="print-check" type="checkbox">
       <label>[[reprintLabel]]</label>
       <input id="redo-check" type="checkbox" on-click="refresh">
@@ -223,7 +221,7 @@ Copyright © HatioLab Inc. All rights reserved.
               // a. 피스 수량/ 박스타입/ 주문 수/ 완료주문 수
               return [{
                 display: t('label.pcs_qty'),
-                fieldname: 'pcs_qty',
+                fieldname: 'pick_qty',
                 columnWidth: '0.25fr',
                 style: {
                   textAlign: 'center',
@@ -237,18 +235,21 @@ Copyright © HatioLab Inc. All rights reserved.
                 },
               }, {
                 display: t('label.order_cnt'),
-                fieldname: 'order_cnt',
+                fieldname: 'tot_order_cnt',
                 columnWidth: '0.25fr',
                 style: {
                   textAlign: 'center',
                 },
               }, {
                 display: t('label.com_cnt'),
-                fieldname: 'comp_cnt',
+                fieldname: 'comp_order_cnt',
                 columnWidth: '0.25fr',
                 style: {
                   textAlign: 'center',
                 },
+              }, {
+                hidden: true,
+                fieldname: 'selected_job',
               }]
             }
           },
@@ -320,13 +321,6 @@ Copyright © HatioLab Inc. All rights reserved.
             type: String,
             value: function () {
               return t('label.box')
-            }
-          },
-
-          continueBoxScanLabel: {
-            type: String,
-            value: function () {
-              return t('label.continue_box_scan');
             }
           },
 
@@ -454,7 +448,7 @@ Copyright © HatioLab Inc. All rights reserved.
             type: String
           },
 
-          currentSkuInfo: {
+          selectedSkuInfo: {
             type: Object
           }
         };
@@ -486,16 +480,14 @@ Copyright © HatioLab Inc. All rights reserved.
 
       _addOrderStatusAttr(event) {
         let list = event.detail.contentElements;
-        if (this.currentSkuInfo) {
-          list.forEach(row => {
-            let data = row.getData();
-            if (data.box_type_cd == this.currentSkuInfo.box_type_cd && data.pcs_qty == this.currentSkuInfo.pick_qty) {
-              row.classList.add('selected');
-            } else {
-              row.classList.remove('selected');
-            }
-          })
-        }
+        list.forEach(row => {
+          let data = row.getData();
+          if (data.selected_job == 1) {
+            row.classList.add('selected');
+          } else {
+            row.classList.remove('selected');
+          }
+        })
       }
 
       /**
@@ -523,15 +515,20 @@ Copyright © HatioLab Inc. All rights reserved.
         }
 
         if (event) {
+          this.selectedSkuInfo = event.detail;
+
           if (this.skuCode && this.skuCode != event.detail.sku_cd && this._getSkuNmInput().value != '') {
             this._skuChangeConfirm(event.detail.sku_cd, event.detail.sku_barcd);
           } else {
             let skuCode = self.skuCode = event.detail.sku_cd
             self.skuBarcd = event.detail.sku_barcd;
             if (self.boxId) {
+              // 피킹 검수 ? 
               self._getSkuAjax().curl = `/kiosk_process/dps/single_packaging/${self.rackCd}/${skuCode}/S/${self.boxId}`;
             } else {
-              self._getSkuAjax().curl = `/kiosk_process/dps/single_packaging/${self.rackCd}/${skuCode}/S/NA`;
+              // 대상 상품 변경 
+              //              self._getSkuAjax().curl = `/kiosk_process/dps/single_packaging/${self.rackCd}/${skuCode}/S/NA`;
+              self._getSkuAjax().curl = `/device_process/dynamic/dps/single_pack/sku_change?equipType=${LOGIS_UTIL.getEquipType()}&equipCd=${self.rackCd}&skuCd=${skuCode}`;
             }
             self._getSkuAjax().generateRequest();
           }
@@ -545,8 +542,10 @@ Copyright © HatioLab Inc. All rights reserved.
           self._getSkuCdInput().value = self.skuBarcd;
           self._getSkuCdInput().select();
           if (self.boxId) {
+            // 피킹 검수 ? 
             self._getSkuAjax().curl = `/kiosk_process/dps/single_packaging/${self.rackCd}/${self.skuBarcd}/S/${self.boxId}`;
           } else {
+            // 대상 상품 변경 
             self._getSkuAjax().curl = `/kiosk_process/dps/single_packaging/${self.rackCd}/${self.skuBarcd}/S/NA`;
           }
         }, function () {
@@ -566,20 +565,12 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       _getSkuData(e) {
-        if (e.detail && e.detail[0]) {
-          var summary = e.detail[0].summary[0];
-          if (summary) {
-            this.boxPicking = summary.all_box_qty;
-            this.boxPicked = summary.finish_box_qty;
-          }
-          this._doGetSkuData(e.detail[0].orderList[0], e.detail[0].summary[0], e.detail[0].summaryList);
-        }
-      }
+        if (e.detail && e.detail.result && e.detail.result[0]) {
+          this.boxPicking = e.detail.result[0].tot_cnt;
+          this.boxPicked = e.detail.result[0].comp_cnt;
 
-      _doGetSkuData(item, summary, summaryList) {
-        this.skuItem = this.currentSkuInfo = item;
-
-        if (!this.skuItem) {
+          this._doGetSkuData(e.detail.result);
+        } else {
           document.dispatchEvent(new CustomEvent('show-toast', {
             detail: {
               title: t('text.order_not_exist'),
@@ -587,39 +578,42 @@ Copyright © HatioLab Inc. All rights reserved.
             }
           }));
           this.refresh();
-          return;
-        }
 
-        this.items = summaryList;
+        }
+      }
+
+      _doGetSkuData(items) {
+        this.items = items;
         this.set('items', this.items.slice());
 
-        if (this.$['continue-box-scan'].checked && this.skuItem.pick_qty > 1) {
-          document.dispatchEvent(new CustomEvent('show-toast', {
-            detail: {
-              title: t('text.cannot_continue_box_scan'),
-              message: t('text.cannot_continue_box_scan'),
-            }
-          }));
-          this.refresh();
-          this._getSkuCdInput().select();
 
-        } else if (this.skuItem) {
-          if (this.skuItem.bucket_cd && this._getBoxIdInput().value != '' && this._getSkuNmInput().value != '') {
-            this._getBoxAjax().curl = `/kiosk_process/dps/start_single_packaging/${this.rackCd}/${this.skuItem.sku_cd}/${this.skuItem.bucket_cd}/1/${this.skuItem.box_type_cd}`;
-            this._getBoxAjax().generateRequest();
+        // if (this.$['continue-box-scan'].checked && this.skuItem.pick_qty > 1) {
+        //   document.dispatchEvent(new CustomEvent('show-toast', {
+        //     detail: {
+        //       title: t('text.cannot_continue_box_scan'),
+        //       message: t('text.cannot_continue_box_scan'),
+        //     }
+        //   }));
+        //   this.refresh();
+        //   this._getSkuCdInput().select();
 
-          } else {
-            this._getSkuNmInput().value = this.skuItem.sku_nm;
-            this.boxType = this.skuItem.box_type_cd;
-            this.orderQty = this.skuItem.picking_qty + '/' + this.skuItem.pick_qty;
-            this._getBoxIdInput().value = this.skuItem.bucket_cd;
-            if (this.skuItem.picking_qty < this.skuItem.pick_qty && !(this.skuItem.bucket_cd) && (!this._getBoxIdInput().value || this._getBoxIdInput().value == '')) {
-              this._getBoxIdInput().select();
-            } else {
-              this._getSkuCdInput().select();
-            }
-          }
-        }
+        // } else if (this.skuItem) {
+        //   if (this.skuItem.bucket_cd && this._getBoxIdInput().value != '' && this._getSkuNmInput().value != '') {
+        //     this._getBoxAjax().curl = `/kiosk_process/dps/start_single_packaging/${this.rackCd}/${this.skuItem.sku_cd}/${this.skuItem.bucket_cd}/1/${this.skuItem.box_type_cd}`;
+        //     this._getBoxAjax().generateRequest();
+
+        //   } else {
+        //     this._getSkuNmInput().value = this.skuItem.sku_nm;
+        //     this.boxType = this.skuItem.box_type_cd;
+        //     this.orderQty = this.skuItem.picking_qty + '/' + this.skuItem.pick_qty;
+        //     this._getBoxIdInput().value = this.skuItem.bucket_cd;
+        //     if (this.skuItem.picking_qty < this.skuItem.pick_qty && !(this.skuItem.bucket_cd) && (!this._getBoxIdInput().value || this._getBoxIdInput().value == '')) {
+        //       this._getBoxIdInput().select();
+        //     } else {
+        //       this._getSkuCdInput().select();
+        //     }
+        //   }
+        // }
       }
 
       //박스아이디 형식에 맞으면 아이디 매핑 아니면 SKU조회B2323211
@@ -793,20 +787,6 @@ Copyright © HatioLab Inc. All rights reserved.
         } else {
           // 재발행 실패했을 경우
           this.showMessage(t('button.confirm'), t('text.reprint_event_listener_error'), this.focusBucketInput.bind(this));
-        }
-      }
-
-      _continueBoxScan() {
-        if (this.$['continue-box-scan'].checked) {
-          this.$['box-qty-label'].setAttribute(`style`, `display: grid`);
-          this.$['box-qty'].setAttribute(`style`, `display: grid`);
-          this.$['order-qty-label'].setAttribute(`style`, `display: none`);
-          this.$['order-qty'].setAttribute(`style`, `display: none`);
-        } else {
-          this.$['box-qty-label'].setAttribute(`style`, `display: none`);
-          this.$['box-qty'].setAttribute(`style`, `display: none`);
-          this.$['order-qty-label'].setAttribute(`style`, `display: grid`);
-          this.$['order-qty'].setAttribute(`style`, `display: grid`);
         }
       }
 
