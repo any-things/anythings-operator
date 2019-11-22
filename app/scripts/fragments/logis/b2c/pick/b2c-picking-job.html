@@ -107,11 +107,12 @@ Copyright © HatioLab Inc. All rights reserved.
     </sys-ajax>
 
     <!-- DPS출발   -->
-    <sys-ajax id="depart-ajax" method="PUT" curl="/device_process/dps/bucket_depart" content-type="application/json">
+    <sys-ajax id="depart-ajax" method="PUT" curl="/device_process/dynamic/dps/bucket_depart"
+      content-type="application/json">
     </sys-ajax>
     <!-- DPS도착   -->
-    <sys-ajax id="arrive-ajax" method="PUT" curl="/device_process/dps/bucket_arrive" content-type="application/json"
-      on-sys-ajax-response="_arriveBucketResponsed">
+    <sys-ajax id="arrive-ajax" method="PUT" curl="/device_process/dynamic/dps/bucket_arrive"
+      content-type="application/json" on-sys-ajax-response="_arriveBucketResponsed">
     </sys-ajax>
 
     <div id="status">
@@ -710,7 +711,7 @@ Copyright © HatioLab Inc. All rights reserved.
         let jobType = LOGIS_UTIL.getJobType();
         let bucketCd = scannedBarcode;
 
-        bucketArriveAjax.curl = `/device_process/${jobType}/bucket_arrive?equipType=${equipType}&equipCd=${equipCd}&equipZone=${zoneCd}&bucketCd=${bucketCd}`;
+        bucketArriveAjax.curl = `/device_process/dynamic/${jobType}/bucket_arrive?equipType=${equipType}&equipCd=${equipCd}&equipZone=${zoneCd}&bucketCd=${bucketCd}`;
 
         bucketArriveAjax.generateRequest();
       }

@@ -317,9 +317,9 @@ Copyright © HatioLab Inc. All rights reserved.
             <img src="./images/icon-barcode.png" />
             [[boxScanLabel]]
           </span>
-                    
+
           <input id="input-box-id" on-keypress="_onBoxIdScan">
-  
+
           <button id="refresh-btn" on-click="refresh">
             <img src="./images/icon-refresh.png" />
             <span>[[refreshLabel]]</span>
@@ -349,7 +349,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           boxScanLabel: {
             type: String,
-            value: function() {
+            value: function () {
               return t('label.box_id');
             }
           },
@@ -361,7 +361,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           refreshLabel: {
             type: String,
-            value: function() {
+            value: function () {
               return t('button.refresh');
             }
           },
@@ -373,7 +373,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           inputableBoxLabel: {
             type: String,
-            value: function() {
+            value: function () {
               return t('label.inputable_boxes');
             }
           },
@@ -385,7 +385,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           orderLabel: {
             type: String,
-            value: function() {
+            value: function () {
               return t('label.order');
             }
           },
@@ -407,7 +407,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           pickedLabel: {
             type: String,
-            value: function() {
+            value: function () {
               return t('label.picked_qty');
             }
           },
@@ -419,7 +419,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           pickingLabel: {
             type: String,
-            value: function() {
+            value: function () {
               return t('label.pick_qty');
             }
           },
@@ -579,7 +579,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           header: {
             type: Array,
-            value: function() {
+            value: function () {
               return [{
                 display: t('label.input_seq'),
                 fieldname: 'input_seq',
@@ -748,7 +748,7 @@ Copyright © HatioLab Inc. All rights reserved.
         if (this.enableAutoRefresh) {
           try {
             this.refresh();
-          } catch (e) {}
+          } catch (e) { }
         }
 
         let interval = 20 * 1000;
@@ -758,9 +758,9 @@ Copyright © HatioLab Inc. All rights reserved.
           if (!interval) {
             interval = 20 * 1000;
           }
-        } catch (e) {}
+        } catch (e) { }
 
-        setTimeout(function() {
+        setTimeout(function () {
           this.startAutoRefresh();
         }.bind(this), interval);
       }
@@ -872,7 +872,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
         if (rackCd) {
           var showOrderAjax = this.$['batch-summary-ajax'];
-          var url = '/device_process/dps/batch_summary';
+          var url = '/device_process/dynamic/dps/batch_summary';
           url += '?page=' + this.page + '&limit=' + this.limit;
           url += '&equipType=' + equipType + '&equipCd=' + rackCd;
           showOrderAjax.curl = url;
@@ -917,7 +917,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
           if (rackCd) {
             var inputBoxAjax = this.$['input-ajax'];
-            var url = '/device_process/dps/input_bucket';
+            var url = '/device_process/dynamic/dps/input_bucket';
             url += '?page=' + this.page + '&limit=' + this.limit;
             url += '&equipType=' + equipType + '&equipCd=' + rackCd + '&bucketCd=' + boxId;
             url += '&inputType=' + LOGIS_UTIL.getB2CInputBoxType();

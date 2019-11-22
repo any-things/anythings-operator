@@ -22,16 +22,19 @@ Copyright © HatioLab Inc. All rights reserved.
         height: calc(100% - 40px);
         padding: 20px;
         border-radius: var(--things-default-border-radius);
-        color: rgba(255,255,255,.8);
+        color: rgba(255, 255, 255, .8);
         text-align: center;
       }
+
       #left-container {
         height: 100%;
       }
+
       #right-container {
         display: grid;
         grid-template-rows: 50% 50%;
       }
+
       #top-container {
         margin: 10px;
         display: grid;
@@ -39,6 +42,7 @@ Copyright © HatioLab Inc. All rights reserved.
         background-color: var(--things-white-opacity-background-color);
         border-radius: var(--things-default-border-radius);
       }
+
       #bottom-container {
         display: grid;
         grid-template-rows: 15% 85%;
@@ -47,6 +51,7 @@ Copyright © HatioLab Inc. All rights reserved.
         background-color: var(--things-white-opacity-background-color);
         border-radius: var(--things-default-border-radius);
       }
+
       .label {
         color: #D5D7DB;
         font-size: 25pt;
@@ -54,64 +59,78 @@ Copyright © HatioLab Inc. All rights reserved.
         grid-column-start: 1;
         grid-column-end: 2;
       }
+
       #top-container input {
         align-self: center;
         width: 80%;
       }
-      auto-popup-input{
+
+      auto-popup-input {
         align-self: center;
         width: 81.5%;
       }
-      #totalOrderContainer{
+
+      #totalOrderContainer {
         grid-column-start: 1;
         grid-column-end: 3;
       }
-      .order{
+
+      .order {
         align-self: center;
         font-size: larger;
       }
-      span.smalltitle{
+
+      span.smalltitle {
         display: inline-block !important;
         border-bottom: 3px solid var(--things-secondary-color);
       }
-      span.proc b{
+
+      span.proc b {
         display: block;
         color: #fff;
         font-size: 2.5rem;
-        text-shadow: 1px 3px 3px rgba(0,0,0,.3);
+        text-shadow: 1px 3px 3px rgba(0, 0, 0, .3);
         line-height: 1.3;
       }
+
       #boxId-container {
         display: grid;
         grid-template-columns: 1r 2fr;
       }
+
       .big-label {
         font-size: larger;
         align-self: center;
       }
-      .bigproc{
+
+      .bigproc {
         align-self: center;
       }
-      .bigproc b{
+
+      .bigproc b {
         display: block;
         color: #fff;
         font-size: 6rem;
-        text-shadow: 1px 3px 3px rgba(0,0,0,.3);
+        text-shadow: 1px 3px 3px rgba(0, 0, 0, .3);
         line-height: 1.3;
       }
-      #input-container{
+
+      #input-container {
         grid-column-start: 1;
         grid-column-end: 3;
         text-align: right;
         align-self: center;
       }
-      #input-container input{
+
+      #input-container input {
         height: 20px;
       }
-      item-list{
+
+      item-list {
         height: 80%;
         margin: 10px;
       }
+
       #left-top-container {
         margin: 10px;
         height: 20%;
@@ -122,32 +141,20 @@ Copyright © HatioLab Inc. All rights reserved.
       }
     </style>
 
-    <sys-ajax
-      id="get-sku-ajax"
-      method="GET"
-      content-type="application/json"
-      on-sys-ajax-response="_getSkuData">
+    <sys-ajax id="get-sku-ajax" method="GET" content-type="application/json" on-sys-ajax-response="_getSkuData">
     </sys-ajax>
 
-    <sys-ajax
-      id="box-put-ajax"
-      method="PUT"
-      content-type="application/json"
-      on-sys-ajax-response="_getBoxData"
+    <sys-ajax id="box-put-ajax" method="PUT" content-type="application/json" on-sys-ajax-response="_getBoxData"
       on-sys-ajax-error="_handleStatusError">
     </sys-ajax>
 
     <!-- 송장 재발행을 위한 Ajax -->
-    <sys-ajax
-      id="reprint-invoice-ajax"
-      curl="/kiosk_process/dps/packing/print/:box_id"
-      method="PUT"
-      content-type="application/json"
-      on-sys-ajax-response="_reprintSucceed">
+    <sys-ajax id="reprint-invoice-ajax" curl="/kiosk_process/dps/packing/print/:box_id" method="PUT"
+      content-type="application/json" on-sys-ajax-response="_reprintSucceed">
     </sys-ajax>
 
     <div id="left-container">
-      <div id = "left-top-container">
+      <div id="left-top-container">
         <div class="order">
           <span class="smalltitle">[[total]] [[box]]</span>
           <span class="proc"><b>[[boxPicking]]</b></span>
@@ -159,26 +166,16 @@ Copyright © HatioLab Inc. All rights reserved.
         </div>
       </div>
 
-      <item-list
-        id="item-list"
-        header="[[header]]"
-        data="[[items]]"
-        on-configured="_addOrderStatusAttr">
+      <item-list id="item-list" header="[[header]]" data="[[items]]" on-configured="_addOrderStatusAttr">
       </item-list>
     </div>
 
     <div id="right-container">
-      <div id = "top-container">
+      <div id="top-container">
         <span class="label">[[skuCdLabel]]</span>
 
-        <auto-popup-input
-          hide-keyboard
-          id="sku-code"
-          resource-url="[[getSkuAjaxUrl]]"
-          popup-title="[[popupTitleLabel]]"
-          button-txt-callback="[[_skuButtonTxtCallback]]"
-          allowed-focus-out
-          on-item-selected="skuChange"
+        <auto-popup-input hide-keyboard id="sku-code" resource-url="[[getSkuAjaxUrl]]" popup-title="[[popupTitleLabel]]"
+          button-txt-callback="[[_skuButtonTxtCallback]]" allowed-focus-out on-item-selected="skuChange"
           on-sys-ajax-error="_findSkuError">
         </auto-popup-input>
 
@@ -190,21 +187,21 @@ Copyright © HatioLab Inc. All rights reserved.
       </div>
 
       <div id="bottom-container">
-        <span id='box-type-label'class="big-label">[[boxTypeLabel]]</span>
+        <span id='box-type-label' class="big-label">[[boxTypeLabel]]</span>
         <span id='box-qty-label' class="big-label" hidden>[[boxQtyLabel]]</span>
-        <span id='order-qty-label' class="big-label" >[[orderQtyLabel]]</span>
-        <span id='box-type'class="bigproc" ><b>[[boxType]]</b></span>
-        <span id='box-qty'class="bigproc" hidden><b>[[boxQty]]</b></span>
-        <span id='order-qty'class="bigproc" ><b>[[orderQty]]</b></span>
+        <span id='order-qty-label' class="big-label">[[orderQtyLabel]]</span>
+        <span id='box-type' class="bigproc"><b>[[boxType]]</b></span>
+        <span id='box-qty' class="bigproc" hidden><b>[[boxQty]]</b></span>
+        <span id='order-qty' class="bigproc"><b>[[orderQty]]</b></span>
       </div>
     </div>
 
     <div id="input-container">
-      <input hidden id = "continue-box-scan" type="checkbox" on-change="_continueBoxScan">
+      <input hidden id="continue-box-scan" type="checkbox" on-change="_continueBoxScan">
       <label hidden>[[continueBoxScanLabel]]</label>
-      <input id = "print-check" type="checkbox">
+      <input id="print-check" type="checkbox">
       <label>[[reprintLabel]]</label>
-      <input id = "redo-check" type="checkbox" on-click="refresh">
+      <input id="redo-check" type="checkbox" on-click="refresh">
       <label>[[redoLabel]]</label>
     </div>
   </template>
@@ -222,7 +219,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
           header: {
             type: Array,
-            value: function() {
+            value: function () {
               // a. 피스 수량/ 박스타입/ 주문 수/ 완료주문 수
               return [{
                 display: t('label.pcs_qty'),
@@ -258,84 +255,84 @@ Copyright © HatioLab Inc. All rights reserved.
 
           rackCd: {
             type: String,
-            value: function() {
+            value: function () {
               return JSON.parse(localStorage.getItem('setting.rackCd'));
             }
           },
 
           skuCdLabel: {
             type: String,
-            value: function() {
+            value: function () {
               return t('label.sku_cd');
             }
           },
 
           skuNmLabel: {
             type: String,
-            value: function() {
+            value: function () {
               return t('label.sku_nm');
             }
           },
 
           boxTypeLabel: {
             type: String,
-            value: function() {
+            value: function () {
               return t('label.box_type');
             }
           },
 
           boxQtyLabel: {
             type: String,
-            value: function() {
+            value: function () {
               return t('label.box_qty');
             }
           },
 
           boxIdLabel: {
             type: String,
-            value: function() {
+            value: function () {
               return t('label.box_id');
             }
           },
 
           total: {
             type: String,
-            value: function() {
+            value: function () {
               return t('label.total')
             }
           },
 
           finished: {
             type: String,
-            value: function() {
+            value: function () {
               return t('label.finished')
             }
           },
 
           order_qty: {
             type: String,
-            value: function() {
+            value: function () {
               return t('label.order_qty')
             }
           },
 
           box: {
             type: String,
-            value: function() {
+            value: function () {
               return t('label.box')
             }
           },
 
           continueBoxScanLabel: {
             type: String,
-            value: function() {
+            value: function () {
               return t('label.continue_box_scan');
             }
           },
 
           orderQtyLabel: {
             type: String,
-            value: function() {
+            value: function () {
               return t('label.order_qty');
             }
           },
@@ -347,14 +344,14 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           qtyLabel: {
             type: String,
-            value: function() {
+            value: function () {
               return t('label.qty');
             }
           },
 
           redoLabel: {
             type: String,
-            value: function() {
+            value: function () {
               return t('label.redo');
             }
           },
@@ -376,7 +373,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           getSkuAjaxUrl: {
             type: String,
-            value: `/pda_process/find_sku/${LOGIS_UTIL.getRackCd()}/:inputValue`
+            value: `/device_process/sku/search_by_like/${LOGIS_UTIL.getEquipType()}/${LOGIS_UTIL.getRackCd()}/:inputValue`
           },
 
           /**
@@ -544,7 +541,7 @@ Copyright © HatioLab Inc. All rights reserved.
       _skuChangeConfirm(skuCd, skuBarcd) {
         var self = this;
 
-        LOGIS_UTIL.showConfirm(t('button.confirm'), t('text.confirm_sku_change'), function() {
+        LOGIS_UTIL.showConfirm(t('button.confirm'), t('text.confirm_sku_change'), function () {
           self._getSkuCdInput().value = self.skuBarcd;
           self._getSkuCdInput().select();
           if (self.boxId) {
@@ -552,7 +549,7 @@ Copyright © HatioLab Inc. All rights reserved.
           } else {
             self._getSkuAjax().curl = `/kiosk_process/dps/single_packaging/${self.rackCd}/${self.skuBarcd}/S/NA`;
           }
-        }, function() {
+        }, function () {
           let skuCode = self.skuCode = skuCd
           self.skuItem = null;
           self.boxType = "";
@@ -656,7 +653,7 @@ Copyright © HatioLab Inc. All rights reserved.
             } else {
               if (this.boxId && this._getBoxIdInput().value && this.boxId != this._getBoxIdInput().value) {
                 var self = this;
-                LOGIS_UTIL.showMessage(t('button.confirm'), t('text.not_comp_exis_box_id'), function() {
+                LOGIS_UTIL.showMessage(t('button.confirm'), t('text.not_comp_exis_box_id'), function () {
                   if (self.skuItem && self.skuItem.bucket_cd) {
                     self._getBoxIdInput().value = self.skuItem.bucket_cd;
                   }
@@ -731,7 +728,7 @@ Copyright © HatioLab Inc. All rights reserved.
             if (skuInfo.picking_qty == 0 && !skuInfo.bucket_cd) {
               if (this.skuItem && this.skuItem.pick_qty != skuInfo.pick_qty) {
                 var self = this;
-                LOGIS_UTIL.showMessage(t('button.confirm'), t('text.confirm_qty_change'), function() {
+                LOGIS_UTIL.showMessage(t('button.confirm'), t('text.confirm_qty_change'), function () {
                   self._getBoxIdInput().select();
                 });
                 e.target.blur();
