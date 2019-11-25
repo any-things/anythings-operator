@@ -67,13 +67,13 @@ Copyright © HatioLab Inc. All rights reserved.
       <!-- 트랜잭션 버튼 섹션 -->
       <div id="btn-container">
         <button on-click="adjustQty" hidden$="[[hideAdjustBtn]]">[[adjustQtyLabel]]</button>
-        <button on-click="jobCancel">[[jobCancelLabel]]</button>
+        <button on-click="jobCancel">[[jobCancelLabel]] s</button>
         <button on-click="jobFinish">[[jobFinishLabel]]</button>
         <button on-click="fullBox">[[fullBoxLabel]]</button>
         <button id="close-btn" on-click="closeDialog">[[closeDialogLabel]]</button>
       </div>
     </div>
-  </template>
+  </template> 
 
   <script>
     class RtnAssortTransaction extends Polymer.Element {
@@ -257,8 +257,8 @@ Copyright © HatioLab Inc. All rights reserved.
        *********************
        */
       jobCancel() {
-        let jobCancelAjax = this.getJobHandleAjax({
-          curl: `/tablet_process/cancel_job/${this.jobId}`,
+        let jobCancelAjax = this.getJobHandleAjax({ 
+          curl: `/device_process/classify/cancel/${deviceType}/${equipType}/${equipCd}/${this.jobId}`,
           method: 'PUT',
           responseCallback: this._jobCancelResponsed.bind(this)
         });
@@ -272,7 +272,8 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       jobFinish() {
         let jobFinishAjax = this.getJobHandleAjax({
-          curl: `/tablet_process/finish_job/${this.jobId}`,
+          ///classify/confirm/{device_type}/{equip_type}/{equip_cd}/{job_instance_id}
+          curl: `/device_process/confirm/${device_type}/${equip_type}/${equip_cd}${this.jobId}`,
           method: 'PUT',
           responseCallback: this._jobFinishResponsed.bind(this)
         });

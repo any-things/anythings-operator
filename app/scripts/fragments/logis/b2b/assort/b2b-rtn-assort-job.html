@@ -182,7 +182,7 @@ Copyright © HatioLab Inc. All rights reserved.
           value="{{skuBarCd}}"
           button-text-callback="[[_skuButtonTextCallback]]"
           selected-item="{{findSkuResponse}}"
-          on-keypress="_handleBarcodeKeypress">dddd
+          on-keypress="_handleBarcodeKeypress">
         </barcode-field>
 
         <!-- 상품 코드 표시 컴포넌트 행 -->
@@ -617,7 +617,8 @@ Copyright © HatioLab Inc. All rights reserved.
       refreshByWs(data) {
         // 분류 작업 처리시 서버에서 메시지 전달
         if (data === 'details') {
-          this.refreshInputDetails();
+          //this.refreshInputDetails();
+          this.refreshInputList();
 
           // 기타 메시지 인 경우
         } else {
@@ -628,7 +629,7 @@ Copyright © HatioLab Inc. All rights reserved.
               let d = JSON.parse(data);
               if (d && d.refresh_type === 'full' && d.loc_cd === popup.locCd) {
                 popup.$['btn-close'].click();
-                this.refreshInputDetails();
+                //this.refreshInputDetails();
               }
             }
           } catch (e) {
@@ -701,7 +702,7 @@ Copyright © HatioLab Inc. All rights reserved.
           // 그 외 값은 상품 정보로 판단하여 상품 조회
         } else {
           let ajax = this.$['find-sku-ajax'];
-          ajax.curl = `/device_process//sku/search_by_like/Rack/${this.rackCd}/${inputValue}`;
+          ajax.curl = `/device_process/sku/search_by_like/Rack/${this.rackCd}/${inputValue}`;
           ajax.generateRequest();
         }
       }
@@ -773,8 +774,12 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} inputSkuResponse
        */
       _inputSkuResponseChanged(inputSkuResponse) {
-        if (inputSkuResponse && inputSkuResponse.items && inputSkuResponse.items.length > 0) {
-          this.refreshInputDetails();
+        if (inputSkuResponse) {
+          if(typeof(inputSkuResponse) == 'Array') {
+            this.items = inputSkuResponse;
+          } else {
+            this.items = [inputSkuResponse];
+          }
         }
       }
 
@@ -795,11 +800,9 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} inputList
        */
       _inputListChanged(inputList) {
-        if (!inputList || !inputList.items || inputList.items.length === 0) {
-          //this.selectedInput = JSON.parse(JSON.stringify({}));
-        } else {
-          //this.selectedInput = JSON.parse(JSON.stringify(inputList));
-          //this.refreshInputDetails();
+        if (!inputList || !inputList.items || inputList.items.length === 0) { 
+
+        } else { 
           this.items = inputList;
         }
       }
@@ -851,7 +854,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Boolean} mpiOnFlag 표시기 점등 여부
        * @Override
        */
-      refreshInputDetails(mpiOnFlag) {
+      /*refreshInputDetails(mpiOnFlag) { 
         let rackCd = this.rackCd;
         let zoneCd = this.zoneCd;
         let sideCd = LOGIS_UTIL.getRackSide();
@@ -862,15 +865,15 @@ Copyright © HatioLab Inc. All rights reserved.
         // skuCd가 없으면 detail을 호출하지 않음.
         if (skuCd === '_na_') return;
 
-        try {
-          this.validationBeforeRefreshDetail(zoneCd, sideCd);
-          let detailAjax = this.$['input-job-details-ajax'];
-          detailAjax.curl = `/tablet_process/job_details/${rackCd}/${sideCd}/${zoneCd}/${comCd}/${skuCd}`;
+        try {  
+          //this.validationBeforeRefreshDetail(zoneCd, sideCd); 
+          let detailAjax = this.$['input-job-details-ajax']; 
+          detailAjax.curl = `/device_process/search/input_jobs/Rack/${rackCd}`;
           detailAjax.generateRequest();
         } catch (error) {
           LOGIS_UTIL.showMessage(error.title, error.message, error.callback);
         }
-      }
+      }*/
 
       /**
        * @description 확정 수량
@@ -975,8 +978,6 @@ Copyright © HatioLab Inc. All rights reserved.
 
         // 마지막으로 스캔한 코드가 박스 바코드이면 박스째 투입으로 처리
         if (this.inputValue === boxBarcd) {
-            ///
-          //inputAjax.curl = `/device_process/input/sku/${rackCd}/${equip_cd}/${comCd}/${skuCd} ?allow_continous_scan=${isContinousScanAllowed}`;
           //inputAjax.curl = `/device_process/sku/search_by_like/${equip_type}/${equip_cd}/${sku_cd}`;
           
           // 스캔한 코드가 상품 바코드이면 개별 상품 투입으로 처리
@@ -1168,7 +1169,7 @@ Copyright © HatioLab Inc. All rights reserved.
         if (!items || items.length === 0) {
           return;
         }
-
+        //if(items.)
         var doingList = items.filter((item) => {
           return item.status != 'W' && item.status != 'F';
         });
@@ -1291,7 +1292,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Number} fullboxQty 풀 박스 수량
        */
       _requestFullbox(boxId, locCd, fullboxQty) {
-        var ajax = this.$['request-fullbox-ajax']
+        var ajax = this.$['request-fullbox-ajax'] 
         ajax.curl = `/device_process/rtn/fullbox_by_split`;
         ajax.body = {
           loc_cd: locCd,

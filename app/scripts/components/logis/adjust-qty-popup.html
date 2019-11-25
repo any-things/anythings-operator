@@ -198,14 +198,23 @@ Copyright © HatioLab Inc. All rights reserved.
           });
 
         } else {
+          let equipType = LOGIS_UTIL.getEquipType() || "Rack";
+          let equipCd = LOGIS_UTIL.getRackCd();
+          let deviceType = LOGIS_UTIL.getDeviceType(); 
           const adjustQtyAjax = this._getAdjustQtyAjax();
-          adjustQtyAjax.curl = `/tablet_process/split_job/${this.jobId}`;
+          
+          adjustQtyAjax.curl = `/device_process/classify/split/${deviceType}/${equipType}/${equipCd}/${this.jobId}`
+          adjustQtyAjax.method = 'POST';
+ 
+          var params = { req_qty: currentQty, res_qty : adjustQty };
+          adjustQtyAjax.params = params;
+          
           adjustQtyAjax.body = {
             req_box_qty: 0,
             req_pick_qty: currentQty,
             res_box_qty: 0,
             res_picked_qty: adjustQty
-          };
+          }; 
           adjustQtyAjax.generateRequest();
         }
       }
