@@ -505,29 +505,22 @@ Copyright © HatioLab Inc. All rights reserved.
         var self = this;
         this.boxId = this._getBoxIdInput().value;
 
-        if (this.$['redo-check'].checked && this.skuCode != event.detail.sku_cd) {
-          this.refresh();
-          this._getSkuCdInput().value = this.skuBarcd = event.detail.sku_barcd;
-          this.skuCode = event.detail.sku_cd;
-          this.boxId = this._getBoxIdInput().value = "";
-          this._getBoxIdInput().select();
-          return;
-        }
-
         if (event) {
-          this.selectedSkuInfo = event.detail;
-
+          // 다른 상품 코드를 스캔 했을때 confirm  메시지 
           if (this.skuCode && this.skuCode != event.detail.sku_cd && this._getSkuNmInput().value != '') {
-            this._skuChangeConfirm(event.detail.sku_cd, event.detail.sku_barcd);
+            this._skuChangeConfirm(event.detail);
           } else {
+            // 같은 상품 계속 scan 
+            this.selectedSkuInfo = event.detail;
+
             let skuCode = self.skuCode = event.detail.sku_cd
             self.skuBarcd = event.detail.sku_barcd;
+
             if (self.boxId) {
-              // 피킹 검수 ? 
+              // 박스 ID 가 있으면 피킹 검수 .... 
               self._getSkuAjax().curl = `/kiosk_process/dps/single_packaging/${self.rackCd}/${skuCode}/S/${self.boxId}`;
             } else {
               // 대상 상품 변경 
-              //              self._getSkuAjax().curl = `/kiosk_process/dps/single_packaging/${self.rackCd}/${skuCode}/S/NA`;
               self._getSkuAjax().curl = `/device_process/dynamic/dps/single_pack/sku_change?equipType=${LOGIS_UTIL.getEquipType()}&equipCd=${self.rackCd}&skuCd=${skuCode}`;
             }
             self._getSkuAjax().generateRequest();
@@ -535,29 +528,28 @@ Copyright © HatioLab Inc. All rights reserved.
         }
       }
 
-      _skuChangeConfirm(skuCd, skuBarcd) {
+      /**
+       * 상품 코드 변경시 메시지 처리  
+       */
+      _skuChangeConfirm(skuInform) {
         var self = this;
 
         LOGIS_UTIL.showConfirm(t('button.confirm'), t('text.confirm_sku_change'), function () {
-          self._getSkuCdInput().value = self.skuBarcd;
+          self._getSkuCdInput().value = self.skuCode;
+          self._getSkuNmInput().value = self.selectedSkuInfo.sku_nm;
           self._getSkuCdInput().select();
-          if (self.boxId) {
-            // 피킹 검수 ? 
-            self._getSkuAjax().curl = `/kiosk_process/dps/single_packaging/${self.rackCd}/${self.skuBarcd}/S/${self.boxId}`;
-          } else {
-            // 대상 상품 변경 
-            self._getSkuAjax().curl = `/kiosk_process/dps/single_packaging/${self.rackCd}/${self.skuBarcd}/S/NA`;
-          }
+
         }, function () {
-          let skuCode = self.skuCode = skuCd
-          self.skuItem = null;
+          self.selectedSkuInfo = skuInform;
           self.boxType = "";
           self.boxQty = "";
           self.orderQty = "";
           self.boxId = "";
           self._getBoxIdInput().value = "";
-          self.skuBarcd = skuBarcd;
-          self._getSkuAjax().curl = `/kiosk_process/dps/single_packaging/${self.rackCd}/${skuCode}/S/NA`;
+          self._getSkuNmInput().value = "";
+          self.skuCode = skuInform.sku_cd;
+          self.skuBarcd = skuInform.sku_barcd;
+          self._getSkuAjax().curl = `/device_process/dynamic/dps/single_pack/sku_change?equipType=${LOGIS_UTIL.getEquipType()}&equipCd=${self.rackCd}&skuCd=${skuInform.sku_cd}`;
           self._getSkuAjax().generateRequest();
         });
 
@@ -585,35 +577,7 @@ Copyright © HatioLab Inc. All rights reserved.
       _doGetSkuData(items) {
         this.items = items;
         this.set('items', this.items.slice());
-
-
-        // if (this.$['continue-box-scan'].checked && this.skuItem.pick_qty > 1) {
-        //   document.dispatchEvent(new CustomEvent('show-toast', {
-        //     detail: {
-        //       title: t('text.cannot_continue_box_scan'),
-        //       message: t('text.cannot_continue_box_scan'),
-        //     }
-        //   }));
-        //   this.refresh();
-        //   this._getSkuCdInput().select();
-
-        // } else if (this.skuItem) {
-        //   if (this.skuItem.bucket_cd && this._getBoxIdInput().value != '' && this._getSkuNmInput().value != '') {
-        //     this._getBoxAjax().curl = `/kiosk_process/dps/start_single_packaging/${this.rackCd}/${this.skuItem.sku_cd}/${this.skuItem.bucket_cd}/1/${this.skuItem.box_type_cd}`;
-        //     this._getBoxAjax().generateRequest();
-
-        //   } else {
-        //     this._getSkuNmInput().value = this.skuItem.sku_nm;
-        //     this.boxType = this.skuItem.box_type_cd;
-        //     this.orderQty = this.skuItem.picking_qty + '/' + this.skuItem.pick_qty;
-        //     this._getBoxIdInput().value = this.skuItem.bucket_cd;
-        //     if (this.skuItem.picking_qty < this.skuItem.pick_qty && !(this.skuItem.bucket_cd) && (!this._getBoxIdInput().value || this._getBoxIdInput().value == '')) {
-        //       this._getBoxIdInput().select();
-        //     } else {
-        //       this._getSkuCdInput().select();
-        //     }
-        //   }
-        // }
+        this._getSkuNmInput().value = this.selectedSkuInfo.sku_nm;
       }
 
       //박스아이디 형식에 맞으면 아이디 매핑 아니면 SKU조회B2323211
@@ -767,7 +731,10 @@ Copyright © HatioLab Inc. All rights reserved.
         this.boxId = "";
         this.skuCode = "";
         this.skuBarcd = "";
-        this.skuItem = null;
+        this.items = [];
+        // this.boxPicking = "0";
+        // this.boxPicked = "0";
+        this.selectedSkuInfo = null;
       }
 
       reprint() {
