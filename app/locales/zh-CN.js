@@ -352,6 +352,9 @@ window.locales['zh-CN'] = {
   'text.]_process': ']检验-箱子正常处理完毕。',
   'text.box_check': '箱检验',
   'text.box_no_process': '此箱无法处理！',
+  'text.single_box_done': '이미 처리 완료된 박스 입니다.',
+  'text.single_box_complete': '처리 완료 되었습니다.',
+
 
   // title list
   'title.confirm_inspect': '检验结束',

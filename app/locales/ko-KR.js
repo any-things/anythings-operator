@@ -352,6 +352,9 @@ window.locales['ko-KR'] = {
   'text.]_process': '] 체크 - 박스가 정상 처리되었습니다.',
   'text.box_check': '박스 체크',
   'text.box_no_process': '박스 처리 안 됨!',
+  'text.single_box_done': '이미 처리 완료된 박스 입니다.',
+  'text.single_box_complete': '처리 완료 되었습니다.',
+
 
   // title list
   'title.confirm_inspect': '검수 확인',
@@ -374,6 +377,7 @@ window.locales['ko-KR'] = {
   'title.cancel_confirmation': '확정 취소',
   'title.selecting_rack': '랙 선택',
   'title.patch_notes': '업데이트 내역',
+
 
   // error list
   'error.VALIDATION_ERROR': '유효성 검사 오류!',

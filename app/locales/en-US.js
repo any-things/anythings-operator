@@ -352,6 +352,9 @@ window.locales['en-US'] = {
   'text.]_process': '] - The box is processed normally.',
   'text.box_check': 'Box check',
   'text.box_no_process': 'The box has not been processed!',
+  'text.single_box_done': '이미 처리 완료된 박스 입니다.',
+  'text.single_box_complete': '처리 완료 되었습니다.',
+
 
   // title list
   'title.confirm_inspect': 'Confirm Inspection',
