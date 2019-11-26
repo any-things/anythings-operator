@@ -469,6 +469,19 @@ Copyright © HatioLab Inc. All rights reserved.
             let skuCode = event.detail.sku_cd;
 
             if (self.boxId) {
+              // 박스 맵핑 후 작업 완료된 건에 대해서는 .... 
+              if (this.currentJobInstance && this.currentJobInstance.status != 'P') {
+                // 이미 처리 완료된 박스 입니다.
+                document.dispatchEvent(new CustomEvent('show-toast', {
+                  detail: {
+                    title: t('text.single_box_done'),
+                    message: t('text.single_box_done'),
+                  }
+                }));
+
+                return;
+              }
+
               // 박스 ID 가 있으면 피킹 
               self._getBoxAjax().curl = `/device_process/dynamic/dps/single_pack/pick?jobId=${self.currentJobInstance.id}`;
               self._getBoxAjax().generateRequest();
