@@ -4,7 +4,8 @@ Copyright © HatioLab Inc. All rights reserved.
 -->
 
 <link rel="import" href="../../../bower_components/polymer/polymer-element.html">
-<link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout.html"> 
+
 
 <!--
   물류 공통 > 로케이션 - 박스 매핑 팝업
@@ -118,7 +119,7 @@ Copyright © HatioLab Inc. All rights reserved.
           return;
         }
 
-        MsgAlert.webAlert({
+        window.MsgAlert.webAlert({
           title: `${lcCode}`,
           message: t('text.please_scan_box'),
           confirmText: t('button.cancel'),
@@ -152,8 +153,8 @@ Copyright © HatioLab Inc. All rights reserved.
       assignBoxToLocation(lcCode, boxId) {
         try {
           this.validateBeforeMapping(lcCode, boxId);
-        } catch (error) {
-          MsgAlert.webAlert({
+        } catch (error) { 
+          window.MsgAlert.webAlert({
             title: error.title,
             message: error.message,
             confirmCallback: error.confirmCallback
@@ -166,8 +167,10 @@ Copyright © HatioLab Inc. All rights reserved.
 
         var ajax = this.$['assign-box-to-loc'];
         var rackCd = this.rackCd || LOGIS_UTIL.getRackCd();
-        ajax.curl = `/pda_process/assign/location_box/${rackCd}/${lcCode}/${boxId}`;
-
+        var equipType = LOGIS_UTIL.getEquipType() || "Rack"; 
+        ajax.curl = `/device_process/assign/cell_box/${equipType}/${rackCd}/${lcCode}/${boxId}`;
+        ajax.params = {skip_equip_check : true};
+        
         // 요청 직전 AJAX 핸들링을 위한 이벤트
         var detail = { ajax, params: { rackCd, lcCode, boxId }};
         var event = new CustomEvent('before-assign-request', { detail });
@@ -201,7 +204,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _handleAssignError(e) {
         this._reset();
-        MsgAlert.close();
+        window.MsgAlert.close();
       }
 
       /**
@@ -216,7 +219,8 @@ Copyright © HatioLab Inc. All rights reserved.
 
         // 박스 ID 규칙 - 숫자 혹은 영문으로 시작하고 공백포함 가능 4글자 영문 나머지 11글자는 숫자
         // TODO 박스 ID 규칙을 서버에 등록하고 모바일에 내려줘서 유효성 체크하도록 수정
-        if (boxId.search(/^[A-Z0-9]{1}[A-Z,\s]{4}[0-9]{11}$/) < 0) {
+        //if (boxId.search(/^[A-Z0-9]{1}[A-Z,\s]{4}[0-9]{11}$/) < 0) {
+          if (boxId.length < 16) {
           isValidBoxId = false;
         }
 
@@ -248,7 +252,7 @@ Copyright © HatioLab Inc. All rights reserved.
         this.inputValue = null;
 
         if(!isContinueAlert || isContinueAlert != true) {
-          MsgAlert.close();
+          window.MsgAlert.close();
         }
       }
     }

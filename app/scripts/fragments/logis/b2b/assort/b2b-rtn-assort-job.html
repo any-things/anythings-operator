@@ -849,33 +849,6 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * @description 상품 리스트 중 선택된 상품 정보 상세 조회
-       *********************
-       * @param {Boolean} mpiOnFlag 표시기 점등 여부
-       * @Override
-       */
-      /*refreshInputDetails(mpiOnFlag) { 
-        let rackCd = this.rackCd;
-        let zoneCd = this.zoneCd;
-        let sideCd = LOGIS_UTIL.getRackSide();
-        let comCd = this.comCd ? this.comCd : '_na_';
-        let skuCd = this.skuCd ? this.skuCd : '_na_';
-        let headerColor = this.selectedInput ? this.selectedInput.mpi_color : 'Y';
-
-        // skuCd가 없으면 detail을 호출하지 않음.
-        if (skuCd === '_na_') return;
-
-        try {  
-          //this.validationBeforeRefreshDetail(zoneCd, sideCd); 
-          let detailAjax = this.$['input-job-details-ajax']; 
-          detailAjax.curl = `/device_process/search/input_jobs/Rack/${rackCd}`;
-          detailAjax.generateRequest();
-        } catch (error) {
-          LOGIS_UTIL.showMessage(error.title, error.message, error.callback);
-        }
-      }*/
-
-      /**
        * @description 확정 수량
        *********************
        * @param {Number} pickedQty 예정 수량
@@ -1228,16 +1201,18 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _handleBoxAssignResponse(event) {
         var response = event.detail;
-        if (!response) {
+        var pickedQty = event.detail.picked_qty; 
+      
+        if (!response || pickedQty<=0) {
           return;
         }
 
-        var locCd = response.loc_cd;
-        var pickedQty = response.max_stock_qty;
-        var boxId = response.box_id;
-
+        var locCd = response.detail.cell_cd;
+        var boxId = response.detail.box_id;
+        var jobId = response.job_id;
+ 
         if (pickedQty > 0) {
-          this._showAdjustFullboxQty(boxId, locCd, pickedQty);
+          this._showAdjustFullboxQty(boxId, locCd, pickedQty,jobId); 
         }
 
         this._initFocus();
@@ -1250,8 +1225,9 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {String} locCd 로케이션
        * @param {Number} totalPickedQty 총 확정 수량
        */
-      _showAdjustFullboxQty(boxId, locCd, totalPickedQty) {
-        if (!boxId || totalPickedQty <= 0) {
+      _showAdjustFullboxQty(boxId, locCd, totalPickedQty,jobId) {
+       
+        if (!boxId || totalPickedQty<=0 ) {
           return;
         }
 
@@ -1261,20 +1237,21 @@ Copyright © HatioLab Inc. All rights reserved.
         adjustPopup.locCd = locCd;
         adjustPopup.jobType = this.jobType;
         adjustPopup.isNumberUpDown = true;
+        adjustPopup.jobId = jobId;
 
         setTimeout(() => {
           LOGIS_UTIL.showPopup(t('button.adjust_qty'), adjustPopup, 'fit', 'fit', () => {
             adjustPopup.setCurrentQty(totalPickedQty);
             adjustPopup.adjustQty = () => {
               let adjustQty = parseInt(adjustPopup._getAdjustQtyInput().value);
-
+              
               if (adjustQty > totalPickedQty) {
                 adjustPopup._getAdjustQtyInput().style = 'color: red';
                 window.SOUND.playErrorSound();
                 return;
               }
-
-              this._requestFullbox(boxId, locCd, adjustQty);
+              
+              this._requestFullbox(boxId, locCd, adjustQty,adjustPopup.jobId);
               adjustPopup.closeDialog();
             };
           }, () => {
@@ -1291,9 +1268,15 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {String} locCd 로케이션
        * @param {Number} fullboxQty 풀 박스 수량
        */
-      _requestFullbox(boxId, locCd, fullboxQty) {
+      _requestFullbox(boxId, locCd, fullboxQty,jobId) {
         var ajax = this.$['request-fullbox-ajax'] 
-        ajax.curl = `/device_process/rtn/fullbox_by_split`;
+
+        var equipType = LOGIS_UTIL.getEquipType() || "Rack";
+        var equipCd = LOGIS_UTIL.getRackCd();
+        var deviceType = LOGIS_UTIL.getDeviceType(); 
+         
+        ajax.curl = `/device_process/fullbox/${deviceType}/${equipType}/${equipCd}/${jobId}`;
+        ajax.params= {req_qty:fullboxQty,box_id:boxId}
         ajax.body = {
           loc_cd: locCd,
           box_id: boxId,
