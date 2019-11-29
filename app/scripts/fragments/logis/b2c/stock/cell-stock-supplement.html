@@ -90,12 +90,12 @@ Copyright © HatioLab Inc. All rights reserved.
       content-type="application/json">
     </sys-ajax>
 
-    <!-- 랙 정보 조회 Ajax -->
+    <!-- 설비 정보 조회 Ajax -->
     <sys-ajax
-      id="rack-get-ajax"
+      id="equip-list-ajax"
       method="GET"
       content-type="application/json"
-      on-sys-ajax-response="_rackSetting">
+      on-sys-ajax-response="_equipSetting">
     </sys-ajax>
 
     <div id="container">
@@ -146,7 +146,7 @@ Copyright © HatioLab Inc. All rights reserved.
     </div>
 
     <div id = "bottom-container">
-      <select id="rack-combo" on-change="_getStationList"></select>
+      <select id="equip-combo" on-change="_getStationList"></select>
       <button id = "on-btn" class= 'btn' on-click="_ledOn">[[ledOnBtnLabel]]</button>
       <button id = "off-btn" class= 'btn' on-click="_ledOff">[[ledOffBtnLabel]]</button>
     </div>
@@ -314,7 +314,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description 스캔한 바코드를 통해 재고 정보를 조회
-       ******************
+       *******************
        * @param {Object} event
        */
       /*_barcdScanHandler(event) {
@@ -330,7 +330,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description lifecycle
-       ******************
+       *******************
        */
       connectedCallback() {
         super.connectedCallback();
@@ -339,12 +339,12 @@ Copyright © HatioLab Inc. All rights reserved.
             this._initialSetup();
           }
         });
-        this._getRackList();
+        this._getEquipmentList();
       }
 
       /**
        * @description 스캔한 skuBarcd를 통해 재고 정보를 조회
-       ******************
+       *******************
        * @param {String} skuBarcd
        */
       _getSkuInfo(skuBarcd) {
@@ -356,7 +356,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description 적치 대상 상품 선택 완료시 적치 위치 콤보박스를 구성하기 위해 대상 location을 조회함
-       ***************
+       *******************
        * @param {Object} event
        */
       _searchRecommendLocations(event) {
@@ -372,8 +372,8 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description 적치 대상 상품 선택 완료시 적치 위치 콤보박스를 구성하기 위해 대상 location을 조회함
-       ***************
-       * @param {String} skuCd
+       *******************
+       * @param {Object} skuInfo
        */
       _getLocationList(skuInfo) {
         if (skuInfo) {
@@ -389,7 +389,7 @@ Copyright © HatioLab Inc. All rights reserved.
       /**
        * @description location-ajax response event handler
        * location 조회 후 combo box를 구성함
-       ***************
+       *******************
        * @param {Object} response
        */
       _renderLocationCombo(response) {
@@ -419,7 +419,7 @@ Copyright © HatioLab Inc. All rights reserved.
       /**
        * @description _locationSelected를 수동 호출 / select on change event handler를 통해 호출 됨
        * 선택한 location 정보를 바탕으로 재고 수량을 조회함
-       ****************
+       *******************
        */
       _locationSelected() {
         const locationCombo = this.$['location'];
@@ -431,6 +431,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description 추천 로케이션 리스트에서 선택시에 해당 로케이션의 재고 정보를 조회한다
+       *******************
        */
       getOrderStockInfo() {
         try {
@@ -451,6 +452,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description 재고 정보 조회 전 Validation Check
+       ********************
        */
       validateBeforeOrderStockAjax() {
         if (!this.locCd) {
@@ -483,16 +485,18 @@ Copyright © HatioLab Inc. All rights reserved.
       /**
        * @description order-stock-ajax response event handler
        * 조회 결과를 화면에 출력 & 변경 로케이션 input으로 focus 이동
-       ******************
+       *******************
        * @param {Object} response
        */
       _fillOrderStockInfo(response) {
         let data = response.detail;
+
         if (data.fixed_flag) {
           this.orderQtyLabel = t('label.max_load_qty');
         } else {
           this.orderQtyLabel = t('label.order_qty');
         }
+
         if (data.input_qty <= 0) {
           document.dispatchEvent(new CustomEvent('show-toast', {
             detail: {
@@ -501,6 +505,7 @@ Copyright © HatioLab Inc. All rights reserved.
             }
           }));
           this._clearView();
+
         } else {
           // 조회를 통해 구한 값을 input에 출력
           this.$['order-qty'].value = data.picked_qty;
@@ -513,7 +518,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description 변경 로케이션에 엔터 키 핸들러
-       ******************
+       *******************
        * @param {Object} event
        */
       _locScanHandler(event) {
@@ -523,13 +528,15 @@ Copyright © HatioLab Inc. All rights reserved.
           this.$['location'].value = '';
           this.$['change-loc'].select();
           this._load();
+
         } else if (event.keyCode === 13) {
           document.dispatchEvent(new CustomEvent('show-toast', {
             detail: {
-              type: t(''),
+              type: '',
               message: t("error.loc_cd_invalid")
             }
           }))
+
           this.$['change-loc'].value = '';
           this.$['change-loc'].select();
         }
@@ -730,21 +737,21 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * @description 랙 리스트 조회
+       * @description 설비 리스트 조회
        *******************
        */
-      _getRackList() {
-        const rackGetAjax = this.$['rack-get-ajax'];
-        rackGetAjax.baseUrl = JSON.parse(localStorage.getItem('setting.baseUrl'));
-        rackGetAjax.customParams = {
+      _getEquipmentList() {
+        const equipListAjax = this.$['equip-list-ajax'];
+        equipListAjax.baseUrl = JSON.parse(localStorage.getItem('setting.baseUrl'));
+        equipListAjax.customParams = {
           query: [{
             "name": "rack_type",
             "operator": "noteq",
             "value": "O"
           }]
         };
-        rackGetAjax.curl = `/rack`;
-        rackGetAjax.generateRequest();
+        equipListAjax.curl = `/rack`;
+        equipListAjax.generateRequest();
       }
 
       /**
@@ -753,7 +760,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _ledOn() {
         const ledOnajax = this.$['led-on-ajax'];
-        let rackCd = this.$['rack-combo'].value;
+        let rackCd = this.$['equip-combo'].value;
         ledOnajax.curl = `/pda_process/dps/led/on/${rackCd}`;
         ledOnajax.generateRequest();
       }
@@ -764,23 +771,23 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _ledOff() {
         const ledOffajax = this.$['led-off-ajax'];
-        let rackCd = this.$['rack-combo'].value;
+        let rackCd = this.$['equip-combo'].value;
         ledOffajax.curl = `/pda_process/dps/led/off/${rackCd}`;
         ledOffajax.generateRequest();
       }
 
       /**
-       * @description 랙 설정
+       * @description 설비 설정
        *******************
        */
-      _rackSetting(e) {
-        e.detail.items.forEach(rack => {
-          const option = new Option(rack.rack_nm, rack.rack_cd);
-          if (this.rackCode === rack.rack_cd) {
+      _equipSetting(e) {
+        e.detail.items.forEach(equip => {
+          const option = new Option(equip.rack_nm, equip.rack_cd);
+          if (this.equipCd === equip.rack_cd) {
             option.selected = true;
-            this.rackName = rack.rack_nm;
+            this.equipNm = equip.rack_nm;
           }
-          this.$['rack-combo'].appendChild(option);
+          this.$['equip-combo'].appendChild(option);
         })
       }
     }

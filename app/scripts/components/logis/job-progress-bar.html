@@ -165,7 +165,9 @@ Copyright © HatioLab Inc. All rights reserved.
 
   <script>
     class JobProgressBar extends Polymer.GestureEventListeners(Polymer.Element) {
-      static get is() { return 'job-progress-bar' }
+      static get is() {
+        return 'job-progress-bar'
+      }
       static get properties() {
         return {
           /**
@@ -263,7 +265,7 @@ Copyright © HatioLab Inc. All rights reserved.
           block.setAttribute('target-id', item.id);
           block.classList.add('job-block');
           block.onclick = this._itemSelected.bind(this);
-          block.getData = function () {
+          block.getData = function() {
             return item;
           };
 
@@ -304,7 +306,7 @@ Copyright © HatioLab Inc. All rights reserved.
             selectedItem = item;
           }
 
-          block.getProgressBar = function () {
+          block.getProgressBar = function() {
             return jobBlockChartBar;
           }
 
@@ -418,7 +420,7 @@ Copyright © HatioLab Inc. All rights reserved.
         }
 
         if (this.startX && this.endX) {
-          if (this.startX - this.endX < - this.sensitivity) {
+          if (this.startX - this.endX < -this.sensitivity) {
             this._swipeToRight();
           } else if (this.startX - this.endX > this.sensitivity) {
             this._swipeToLeft()
@@ -445,7 +447,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * 현재 태블릿의 작업 존 코드 리턴
        */
       _getZoneCd() {
-        return JSON.parse(localStorage.getItem('setting.equipZone'));
+        return JSON.parse(localStorage.getItem('setting.stationCd'));
       }
 
       getBlockById(id) {

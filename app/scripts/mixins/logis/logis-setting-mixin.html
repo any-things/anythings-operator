@@ -9,33 +9,43 @@ Copyright © HatioLab Inc. All rights reserved.
       static get properties() {
         return {
           /**
-           * @description 랙 라벨
-           ****************
+           * @description 스테이지 라벨
+           *********************
            * @type {String}
            */
-          rackLabel: {
+          stageCdLabel: {
             type: String,
-            value: () => t('label.rack_nm')
+            value: () => t('label.stage')
           },
 
           /**
-           * @description 작업 라벨
-           ****************
+           * @description 설비 유형 라벨
+           *********************
            * @type {String}
            */
-          jobLabel: {
+          equipTypeLabel: {
             type: String,
-            value: () => t('label.job_type')
+            value: () => t('label.equipment_type')
           },
 
           /**
-           * @description 스테이션 라벨
+           * @description 설비 이름 라벨
            ****************
            * @type {String}
            */
-          zoneLabel: {
+          equipCdLabel: {
             type: String,
-            value: () => t('label.zone_cd')
+            value: () => t('label.equipment_name')
+          },
+
+          /**
+           * @description 작업 스테이션 라벨
+           ****************
+           * @type {String}
+           */
+          stationCdLabel: {
+            type: String,
+            value: () => t('label.station_cd')
           },
 
           /**
@@ -43,9 +53,9 @@ Copyright © HatioLab Inc. All rights reserved.
            ****************
            * @type {String}
            */
-          rackSideLabel: {
+          workSideLabel: {
             type: String,
-            value: () => t('label.rack_side')
+            value: () => t('label.work_side')
           },
 
           /**
@@ -99,6 +109,96 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
+           * @description 스테이지 코드 로컬 스토리지 키 
+           ****************
+           * @type {String}
+           */
+          stageCdLSKey: {
+            type: String,
+            value: 'setting.stageCd'
+          },
+
+          /**
+           * @description 설비 타입 로컬 스토리지 키 
+           ****************
+           * @type {String}
+           */
+          equipmentTypeLSKey: {
+            type: String,
+            value: 'setting.equipType'
+          },
+
+          /**
+           * @description 설비 코드 로컬 스토리지 키
+           ****************
+           * @type {String}
+           */
+          equipmentCdLSKey: {
+            type: String,
+            value: 'setting.equipCd'
+          },
+
+          /**
+           * @description 설비 이름 로컬 스토리지 키
+           ****************
+           * @type {String}
+           */
+          equipmentNmLSKey: {
+            type: String,
+            value: 'setting.equipNm'
+          },
+
+          /**
+           * @description 작업 스테이션 로컬 스토리지 키 
+           ****************
+           * @type {String}
+           */
+          stationCdLSKey: {
+            type: String,
+            value: 'setting.stationCd'
+          },
+
+          /**
+           * @description 작업 위치 코드 로컬 스토리지 키
+           ****************
+           * @type {String}
+           */
+          workSideCdLSKey: {
+            type: String,
+            value: 'setting.workSideCd'
+          },
+
+          /**
+           * @description 작업 위치 명 로컬 스토리지 키
+           ****************
+           * @type {String}
+           */
+          workSideNmLSKey: {
+            type: String,
+            value: 'setting.workSideNm'
+          },
+
+          /**
+           * @description 작업 이름 로컬 스토리지 키
+           ****************
+           * @type {String}
+           */
+          jobTypeLSKey: {
+            type: String,
+            value: 'setting.jobType'
+          },
+
+          /**
+           * @description 스테이지 코드
+           ****************
+           * @type {String}
+           */
+          stageCd: {
+            type: String,
+            value: () => JSON.parse(localStorage.getItem('setting.stageCd'))
+          },
+
+          /**
            * @description 설비 타입 
            ****************
            * @type {String}
@@ -107,72 +207,55 @@ Copyright © HatioLab Inc. All rights reserved.
             type: String,
             value: () => JSON.parse(localStorage.getItem('setting.equipType'))
           },
+
           /**
-           * @description 설비 타입 키 
+           * @description 설비 코드
            ****************
            * @type {String}
            */
-          equipmentTypeLSKey: {
+          equipCd: {
             type: String,
-            value: 'setting.equipType'
-          },
-          /**
-           * @description 랙 코드
-           ****************
-           * @type {String}
-           */
-          rackCode: {
-            type: String,
-            value: () => JSON.parse(localStorage.getItem('setting.rackCd'))
+            value: () => JSON.parse(localStorage.getItem('setting.equipCd'))
           },
 
           /**
-           * @description 랙 코드 로케일 키
+           * @description 설비 이름
            ****************
            * @type {String}
            */
-          rackCodeLSKey: {
+          equipNm: {
             type: String,
-            value: 'setting.rackCd'
+            value: () => JSON.parse(localStorage.getItem('setting.equipNm'))
           },
 
           /**
-           * @description 랙 이름
+           * @description 작업 스테이션 코드
            ****************
            * @type {String}
            */
-          rackName: {
-            type: String
+          stationCd: {
+            type: String,
+            value: () => JSON.parse(localStorage.getItem('setting.stationCd'))
           },
 
           /**
-           * @description 랙 이름 로케일 키
+           * @description 작업 위치 코드 값 
            ****************
            * @type {String}
            */
-          rackNameLSKey: {
+          workSideCd: {
             type: String,
-            value: 'setting.rackNm'
+            value: () => JSON.parse(localStorage.getItem('setting.workSideCd'))
           },
 
           /**
-           * @description 설비 존 
+           * @description 작업 위치 이름 
            ****************
            * @type {String}
            */
-          equipZone: {
+          workSideNm: {
             type: String,
-            value: () => JSON.parse(localStorage.getItem('setting.equipZone'))
-          },
-
-          /**
-           * @description 설비 존 키 
-           ****************
-           * @type {String}
-           */
-          equipZoneLSKey: {
-            type: String,
-            value: 'setting.equipZone'
+            value: () => JSON.parse(localStorage.getItem('setting.workSideNm'))
           },
 
           /**
@@ -183,55 +266,6 @@ Copyright © HatioLab Inc. All rights reserved.
           jobType: {
             type: String,
             value: () => JSON.parse(localStorage.getItem('setting.jobType'))
-          },
-
-          /**
-           * @description 작업 이름 로케일 키
-           ****************
-           * @type {String}
-           */
-          jobTypeLSKey: {
-            type: String,
-            value: 'setting.jobType'
-          },
-
-          /**
-           * @description 작업 위치
-           ****************
-           * @type {String}
-           */
-          rackSide: {
-            type: String,
-            value: () => JSON.parse(localStorage.getItem('setting.rackSide'))
-          },
-
-          /**
-           * @description 작업 위치 로케일 키
-           ****************
-           * @type {String}
-           */
-          rackSideLSKey: {
-            type: String,
-            value: 'setting.rackSide'
-          },
-
-          /**
-           * @description 작업 위치 명
-           ****************
-           * @type {String}
-           */
-          rackSideName: {
-            type: String
-          },
-
-          /**
-           * @description 작업 위치 명 로케일 키
-           ****************
-           * @type {String}
-           */
-          rackSideNameLSKey: {
-            type: String,
-            value: 'setting.rackSideLabel'
           },
 
           /**
@@ -352,12 +386,12 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * @description 랙 리스트를 조회
+       * @description 설비 리스트를 조회
        *******************************
        * @return
        */
-      _getRackList() {
-        const rackItemAjax = this._getRackListAjax();
+      _getEquipList() {
+        const rackItemAjax = this._getEquipListAjax();
         rackItemAjax.curl = `/racks?limit=1000`;
         rackItemAjax.baseUrl = this._getLocalStorage('setting.baseUrl');
         rackItemAjax.generateRequest();
@@ -369,11 +403,11 @@ Copyright © HatioLab Inc. All rights reserved.
        * @return
        */
       _getStationList() {
-        const selectedOption = this._getRackCombo().selectedOptions[0];
+        const selectedOption = this._getEquipCombo().selectedOptions[0];
         if (selectedOption && selectedOption.value) {
-          const rackCode = selectedOption.value;
+          const equipCd = selectedOption.value;
           const stationListAjax = this._getStationListAjax();
-          stationListAjax.curl = `/racks/${rackCode}/stations`;
+          stationListAjax.curl = `/racks/${equipCd}/stations`;
           stationListAjax.baseUrl = this._getLocalStorage('setting.baseUrl');
           stationListAjax.generateRequest();
         }
@@ -385,7 +419,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @return
        */
       _getJobTypeList() {
-        const jobTypeAjax = this._getJobTypesAjax();
+        const jobTypeAjax = this._getJobTypeListAjax();
         jobTypeAjax.curl = `/common_codes/show_by_name?name=JOB_TYPE`;
         jobTypeAjax.baseUrl = this._getLocalStorage('setting.baseUrl');
         jobTypeAjax.generateRequest();
@@ -406,6 +440,7 @@ Copyright © HatioLab Inc. All rights reserved.
       /**
        * @description 콤보 클리어
        *******************************
+       * @param {Object} combo
        */
       _clearCombo(combo) {
         while (combo.childElementCount) {
@@ -433,6 +468,7 @@ Copyright © HatioLab Inc. All rights reserved.
       /**
        * @description 체크한 옵션 값 리턴
        *******************************
+       * @param {Array} options
        * @return
        */
       _getSelectedOpt(options) {
@@ -458,17 +494,17 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * @description 랙 리스트 조회 Ajax
+       * @description 설비 리스트 조회 Ajax
        *******************************
        */
-      _getRackListAjax() {
-        return this.$['racks-ajax'];
+      _getEquipListAjax() {
+        return this.$['equips-ajax'];
       }
 
       /**
        * @description 스테이션 리스트 Ajax
        *******************************
-       * @return
+       * @return {Object} ajax
        */
       _getStationListAjax() {
         return this.$['stations-ajax'];
@@ -477,9 +513,10 @@ Copyright © HatioLab Inc. All rights reserved.
       /**
        * @description 작업 유형 리스트 Ajax
        *******************************
+       * @return {Object} ajax
        */
-      _getJobTypesAjax() {
-        return this.$['job-type-ajax'];
+      _getJobTypeListAjax() {
+        return this.$['job-types-ajax'];
       }
 
       /**
@@ -494,7 +531,7 @@ Copyright © HatioLab Inc. All rights reserved.
       /**
        * @description 업데이트 세팅 ajax 리턴
        *******************************
-       * @return
+       * @return {Object} ajax
        */
       _getUpdateSettingAjax() {
         return this.$['update-setting-ajax'];
@@ -503,7 +540,7 @@ Copyright © HatioLab Inc. All rights reserved.
       /**
        * @description 스테이지 리스트 콤보 리턴
        *******************************
-       * @return
+       * @return {Object} combo
        */
       _getStageCombo() {
         return this.$['stage-combo'];
@@ -512,6 +549,7 @@ Copyright © HatioLab Inc. All rights reserved.
       /**
        * @description 설비 유형 리스트 콤보 리턴
        *******************************
+       * @return {Object} combo
        */
       _getEquipTypeCombo() {
         return this.$['equip-type-combo'];
@@ -520,15 +558,16 @@ Copyright © HatioLab Inc. All rights reserved.
       /**
        * @description 설비 리스트 콤보 리턴 -> TODO 설비 유형에 따른 설비 리스트를 조회하도록 변경
        *******************************
-       * @return
+       * @return {Object} combo
        */
-      _getRackCombo() {
-        return this.$['rack-combo'];
+      _getEquipCombo() {
+        return this.$['equip-combo'];
       }
 
       /**
        * @description 작업 스테이션 리스트 콤보 리턴
        *******************************
+       * @return {Object} combo
        */
       _getStationCombo() {
         return this.$['station-combo'];
@@ -537,7 +576,7 @@ Copyright © HatioLab Inc. All rights reserved.
       /**
        * @description 작업 유형 리스트 콤보 리턴
        *******************************
-       * @return
+       * @return {Object} combo
        */
       _getJobTypeCombo() {
         return this.$['job-type-combo'];
@@ -574,8 +613,8 @@ Copyright © HatioLab Inc. All rights reserved.
        *******************************
        * @return
        */
-      _getRackSideOpts() {
-        //return Array.from(this.$['rack-side'].querySelectorAll('input[name=rack-side]'));
+      _getWorkSideOpts() {
+        //return Array.from(this.$['work-side'].querySelectorAll('input[name=work-side]'));
         return ['ALL'];
       }
 
@@ -583,36 +622,32 @@ Copyright © HatioLab Inc. All rights reserved.
        * @description 작업 위치 (사이드 코드) 콤보 렌더링
        *******************************
        */
-      _setRackSideDefaultValue() {
-        /*const rackSideOpts = this._getRackSideOpts();
-        rackSideOpts.forEach(rackSideOpt => {
-          if (this.rackSide === rackSideOpt.value) {
-            rackSideOpt.checked = true;
+      _setWorkSideDefaultValue() {
+        /*const workSideOpts = this._getWorkSideOpts();
+        workSideOpts.forEach(workSideOpt => {
+          if (this.workSideCd === workSideOpt.value) {
+            workSideOpt.checked = true;
           }
         });*/
 
-        this.rackSide = 'ALL';
+        this.workSideCd = 'ALL';
       }
 
       /**
        * @description 스테이지 콤보 렌더링
        *******************************
+       * @param {Object} event
        */
       _renderStageCombo(event) {
         const stageCombo = this._getStageCombo();
         this._clearCombo(stageCombo);
-        let stages = event.detail.items;
+        let stages = (event && event.detail && event.detail.items) ? event.detail.items : [];
 
-        if (stages) {
-          stages.forEach(stage => {
-            const option = new Option(stage.stage_cd, stage.stage_nm);
-            if (this.stageCode === stage.stage_cd) {
-              option.selected = true;
-            }
-
-            stageCombo.appendChild(option);
-          })
-        }
+        stages.forEach(stage => {
+          const option = new Option(stage.stage_cd, stage.stage_nm);
+          option.selected = (this.stageCd === stage.stage_cd);
+          stageCombo.appendChild(option);
+        });
       }
 
       /**
@@ -623,43 +658,34 @@ Copyright © HatioLab Inc. All rights reserved.
       _renderEquipTypeCombo(event) {
         const equipTypeCombo = this._getEquipTypeCombo();
         this._clearCombo(equipTypeCombo);
-        let equipTypes = event.detail.items;
+        let equipTypes = (event && event.detail && event.detail.items) ? event.detail.items : [];
 
         equipTypes.forEach(equipType => {
           const option = new Option(equipType.description, equipType.name);
-          if (this.equipmentType === equipType.name) {
-            option.selected = true;
-            this.equipmentType = equipType.name;
-          }
-
+          option.selected = (this.equipmentType === equipType.name);
           equipTypeCombo.appendChild(option);
         })
       }
 
       /**
-       * @description 랙 콤보 렌더링
+       * @description 설비 콤보 렌더링
        *******************************
        * @param {Object} event
        */
-      _renderRackCombo(event) {
-        const rackCombo = this._getRackCombo();
-        this._clearCombo(rackCombo);
+      _renderEquipCombo(event) {
+        const equipCombo = this._getEquipCombo();
+        this._clearCombo(equipCombo);
+        let equipCdList = (event && event.detail && event.detail.items) ? event.detail.items : [];
 
-        if (event && event.detail) {
-          event.detail.items.forEach(rack => {
-            const option = new Option(rack.rack_nm, rack.rack_cd);
-            if (this.rackCode === rack.rack_cd) {
-              option.selected = true;
-              this.rackName = rack.rack_nm;
-            }
+        equipCdList.forEach(equip => {
+          const option = new Option(equip.rack_nm, equip.rack_cd);
+          if (this.equipCd === equip.rack_cd) {
+            option.selected = true;
+            this.equipNm = equip.rack_nm;
+          }
 
-            rackCombo.appendChild(option);
-          });
-        }
-
-        if (this.deviceType !== 'KIOSK') {
-          this._getStationList();
-        }
+          equipCombo.appendChild(option);
+        });
 
         this._getStationList();
       }
@@ -672,17 +698,13 @@ Copyright © HatioLab Inc. All rights reserved.
       _renderStationCombo(event) {
         const stationCombo = this._getStationCombo();
         this._clearCombo(stationCombo);
+        let stationList = (event && event.detail) ? event.detail : [];
 
-        if (event && event.detail) {
-          event.detail.forEach(station => {
-            const option = new Option(station, station);
-            if (this.stationCode === station) {
-              option.selected = true;
-            }
-
-            stationCombo.appendChild(option);
-          })
-        }
+        stationList.forEach(station => {
+          const option = new Option(station, station);
+          option.selected = (this.stationCd === station);
+          stationCombo.appendChild(option);
+        });
       }
 
       /**
@@ -692,17 +714,14 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _renderJobTypeCombo(event) {
         const jobTypeCombo = this._getJobTypeCombo();
+
         if (jobTypeCombo) {
           this._clearCombo(jobTypeCombo);
-          let jobTypes = event.detail.items;
+          let jobTypes = (event && event.detail && event.detail.items) ? event.detail.items : [];
 
           jobTypes.forEach(job => {
             const option = new Option(job.description, job.name);
-            if (this.jobType === job.name) {
-              option.selected = true;
-              this.jobType = job.name;
-            }
-
+            option.selected = (this.jobType === job.name);
             jobTypeCombo.appendChild(option);
           })
         }
@@ -722,12 +741,12 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-      * @description web view cache clear
-      **************************
-      * windows에 CacheClear가 있다면 (cordova plugin 사용 가능한 상태)
-      * webview cache를 클리어한 후 리로드
-      * 없을 경우 리로드
-      */
+       * @description web view cache clear
+       **************************
+       * windows에 CacheClear가 있다면 (cordova plugin 사용 가능한 상태)
+       * webview cache를 클리어한 후 리로드
+       * 없을 경우 리로드
+       */
       reloadApp() {
         if ('CacheClear' in window) {
           window.CacheClear(() => {

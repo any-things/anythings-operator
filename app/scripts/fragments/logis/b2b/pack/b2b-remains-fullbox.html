@@ -257,7 +257,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           zoneCdLabel: {
             type: String,
-            value: () => t('label.zone_cd')
+            value: () => t('label.station_cd')
           },
 
           /**
@@ -491,7 +491,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _rackCdChanged(rackCd) {
         if (rackCd) {
-          window.localStorage.setItem('setting.rackCd', JSON.stringify(rackCd));
+          window.localStorage.setItem('setting.equipCd', JSON.stringify(rackCd));
         }
       }
 
@@ -502,7 +502,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _rackNmChanged(rackNm) {
         if (rackNm) {
-          window.localStorage.setItem('setting.rackNm', JSON.stringify(rackNm));
+          window.localStorage.setItem('setting.equipNm', JSON.stringify(rackNm));
         }
       }
 
@@ -513,7 +513,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _zoneCdChanged(zoneCd) {
         if (zoneCd) {
-          window.localStorage.setItem('setting.equipZone', JSON.stringify(zoneCd));
+          window.localStorage.setItem('setting.stationCd', JSON.stringify(zoneCd));
         }
       }
 

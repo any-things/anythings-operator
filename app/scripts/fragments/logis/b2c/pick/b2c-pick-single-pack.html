@@ -215,7 +215,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
           header: {
             type: Array,
-            value: function () {
+            value: function() {
               // a. 피스 수량/ 박스타입/ 주문 수/ 완료주문 수
               return [{
                 display: t('label.pcs_qty'),
@@ -254,70 +254,70 @@ Copyright © HatioLab Inc. All rights reserved.
 
           rackCd: {
             type: String,
-            value: function () {
-              return JSON.parse(localStorage.getItem('setting.rackCd'));
+            value: function() {
+              return JSON.parse(localStorage.getItem('setting.equipCd'));
             }
           },
 
           skuCdLabel: {
             type: String,
-            value: function () {
+            value: function() {
               return t('label.sku_cd');
             }
           },
 
           skuNmLabel: {
             type: String,
-            value: function () {
+            value: function() {
               return t('label.sku_nm');
             }
           },
 
           boxTypeLabel: {
             type: String,
-            value: function () {
+            value: function() {
               return t('label.box_type');
             }
           },
 
           boxIdLabel: {
             type: String,
-            value: function () {
+            value: function() {
               return t('label.box_id');
             }
           },
 
           total: {
             type: String,
-            value: function () {
+            value: function() {
               return t('label.total')
             }
           },
 
           finished: {
             type: String,
-            value: function () {
+            value: function() {
               return t('label.finished')
             }
           },
 
           order_qty: {
             type: String,
-            value: function () {
+            value: function() {
               return t('label.order_qty')
             }
           },
 
           box: {
             type: String,
-            value: function () {
+            value: function() {
               return t('label.box')
             }
           },
 
           orderQtyLabel: {
             type: String,
-            value: function () {
+            value: function() {
               return t('label.order_qty');
             }
           },
@@ -329,14 +329,14 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           qtyLabel: {
             type: String,
-            value: function () {
+            value: function() {
               return t('label.qty');
             }
           },
 
           redoLabel: {
             type: String,
-            value: function () {
+            value: function() {
               return t('label.redo');
             }
           },
@@ -500,12 +500,12 @@ Copyright © HatioLab Inc. All rights reserved.
       _skuChangeConfirm(skuInform) {
         var self = this;
 
-        LOGIS_UTIL.showConfirm(t('button.confirm'), t('text.confirm_sku_change'), function () {
+        LOGIS_UTIL.showConfirm(t('button.confirm'), t('text.confirm_sku_change'), function() {
           self._getSkuCdInput().value = self.skuCode;
           self._getSkuNmInput().value = self.selectedSkuInfo.sku_nm;
           self._getSkuCdInput().select();
 
-        }, function () {
+        }, function() {
           self.selectedSkuInfo = skuInform;
           self.boxType = "";
           self.orderQty = "";

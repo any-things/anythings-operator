@@ -8,7 +8,7 @@ Copyright © HatioLab Inc. All rights reserved.
 <link rel="import" href="../common/any-setting-styles.html">
 
 <!--
-  물류 > 설정 화면
+  물류 > 설정 화면 공통
  -->
 
 <dom-module id="logis-setting-common">
@@ -16,16 +16,68 @@ Copyright © HatioLab Inc. All rights reserved.
     <style include="shared-styles any-setting-styles"></style>
 
     <!-- 관리 사이트 세션 체크 Ajax -->
-    <sys-ajax id="mgr-site-session-check-ajax" method="GET" on-sys-ajax-response="_mgrSiteSessionResponsed"
-      on-sys-ajax-error="_mgrSiteSessionError" custom-error-handler timeout="10000">
-    </sys-ajax>
-
-    <!-- 사이트 세션 체크 Ajax -->
-    <sys-ajax id="domain-session-check-ajax" method="GET" on-sys-ajax-response="_domainSessionResponsed"
-      on-sys-ajax-error="_domainSessionError" on-sys-ajax-unauthorized="_domainUnauthorized" custom-error-handler
+    <sys-ajax 
+      id="mgr-site-session-check-ajax" 
+      method="GET" 
+      on-sys-ajax-response="_mgrSiteSessionResponsed"
+      on-sys-ajax-error="_mgrSiteSessionError" 
+      custom-error-handler 
       timeout="10000">
     </sys-ajax>
 
+    <!-- 사이트 세션 체크 Ajax -->
+    <sys-ajax 
+      id="domain-session-check-ajax" 
+      method="GET" 
+      on-sys-ajax-response="_domainSessionResponsed"
+      on-sys-ajax-error="_domainSessionError" 
+      on-sys-ajax-unauthorized="_domainUnauthorized" 
+      custom-error-handler
+      timeout="10000">
+    </sys-ajax>
+
+    <!-- 스테이지 조회 -->
+    <sys-ajax 
+      id="stages-ajax" 
+      method="GET" 
+      content-type="application/json" 
+      on-sys-ajax-response="_renderStageCombo">
+    </sys-ajax>
+
+    <!-- 설비 유형 조회 -->
+    <sys-ajax 
+      id="equip-types-ajax" 
+      method="GET" 
+      content-type="application/json"
+      on-sys-ajax-response="_renderEquipTypeCombo">
+    </sys-ajax>
+
+    <!-- 설비 코드 조회 -->
+    <sys-ajax 
+      id="equips-ajax" 
+      method="GET" 
+      content-type="application/json"
+      on-sys-ajax-response="_renderEquipCombo">
+    </sys-ajax>
+
+    <!-- 작업 스테이션 조회 -->
+    <sys-ajax 
+      id="stations-ajax" 
+      method="GET" 
+      content-type="application/json" 
+      on-sys-ajax-response="_renderStationCombo">
+    </sys-ajax>
+
+    <!-- 장비 설정 조회 Ajax -->
+    <sys-ajax 
+      id="device-profile-ajax" 
+      method="GET" 
+      on-sys-ajax-response="_deviceProfileResponsed"
+      on-sys-ajax-unauthorized="_domainUnauthorized" 
+      custom-error-handler
+      timeout="20000">
+    </sys-ajax>
+  
     <!-- 애플리케이션 서버 접속 IP -->
     <div id="mgr-ip" class="input-container">
       <!--img src="../../../images/icon-statusbar-type3.png" /-->
@@ -53,10 +105,46 @@ Copyright © HatioLab Inc. All rights reserved.
     <div class="input-container">
       <select id="locale"></select>
     </div>
+
+    <!-- 스테이지 설정 -->
+    <div id="stage" class="input-container">
+      <label style="text-align: left">[[stageCdLabel]]</label>
+    </div>
+    
+    <div class="input-container">
+      <select id="stage-combo"></select>
+    </div>
+
+    <!-- 설비 유형 설정 -->
+    <div id="equipType" class="input-container">
+      <label style="text-align: left">[[equipTypeLabel]]</label>
+    </div>
+    
+    <div class="input-container">
+      <select id="equip-type-combo"></select>
+    </div>
+
+    <!-- 설비 이름 설정 -->
+    <div id="rack" class="input-container">
+      <label style="text-align: left">[[equipCdLabel]]</label>
+    </div>
+
+    <div class="input-container">
+      <select id="equip-combo"></select>
+    </div>
+
+    <!-- 작업 스테이션 (작업 구역) 설정 -->
+    <div id="station" class="input-container">
+      <label style="text-align: left">[[stationCdLabel]]</label>
+    </div>
+    
+    <div class="input-container">
+      <select id="station-combo"></select>
+    </div>
   </template>
 
   <script>
-    class LogisSettingCommon extends Polymer.Element {
+    class LogisSettingCommon extends LogisSettingMixin(Polymer.Element) {
       static get is() {
         return 'logis-setting-common'
       }
@@ -142,11 +230,11 @@ Copyright © HatioLab Inc. All rights reserved.
        *********************
        */
       _setDefaultValues() {
-        let mgrSiteUrl = JSON.parse(localStorage.getItem('setting.mgrSiteUrl'));
+        let mgrSiteUrl = this._getLocalStorage('setting.mgrSiteUrl');
 
         if (!mgrSiteUrl) {
           mgrSiteUrl = location.origin + '/rest';
-          localStorage.setItem('setting.mgrSiteUrl', JSON.stringify(mgrSiteUrl));
+          this._setLocalStorage('setting.mgrSiteUrl', mgrSiteUrl);
         }
 
         let currentUrl = new URL(mgrSiteUrl);
@@ -169,7 +257,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
         locales.forEach(locale => {
           const option = new Option(locale.desc, locale.code);
-          option.selected = this.locale === locale.code;
+          option.selected = (this.locale === locale.code);
           localeSelector.appendChild(option);
         });
       }
@@ -180,7 +268,7 @@ Copyright © HatioLab Inc. All rights reserved.
        **********************
        */
       _checkMgrSiteSession() {
-        const mgrSiteUrl = JSON.parse(localStorage.getItem('setting.mgrSiteUrl'));
+        const mgrSiteUrl = this._getLocalStorage('setting.mgrSiteUrl');
 
         if (mgrSiteUrl) {
           const mgrSiteSessionAjax = this._getMgrSiteSessionAjax();
@@ -220,7 +308,7 @@ Copyright © HatioLab Inc. All rights reserved.
        **********************
        */
       _checkDomainSiteSession() {
-        const baseUrl = JSON.parse(localStorage.getItem('setting.baseUrl'));
+        const baseUrl = this._getLocalStorage('setting.baseUrl');
 
         if (baseUrl) {
           const domainSessionAjax = this._getDomainsSessionAjax();
@@ -235,13 +323,23 @@ Copyright © HatioLab Inc. All rights reserved.
        * @description 사이트 도메인의 session check가 정상 처리 되었을 경우 호출 됨
        * session-responsed 이벤트를 발생시켜 화면 구성을 다시 수행함 (로그아웃 버튼 활성화, 사용자 정보 표시 등)
        **********************
+       * @param {Object} event
        */
       _domainSessionResponsed(event) {
-        localStorage.setItem('setting.user', JSON.stringify(event.detail));
+        // 1. 사용자 정보 로컬 스토리지에 저장
+        this._setLocalStorage('setting.user', event.detail);
+        // 2. 세션 OK 응답 이벤트 Fire
         this.dispatchEvent(new CustomEvent('session-responsed', {
           detail: event.detail
         }));
 
+        // 3. 스테이지 리스트 조회
+        this._getStageList();
+        // 4. 설비 유형 리스트 조회
+        this._getEquipTypeList();
+        // 5. 설비 이름 리스트 조회 - TODO 설비 유형 값이 로컬 스토리지에 존재한다면 설비 이름 조회시 파라미터로 넘어가야함.
+        //                            설비 유형 값이 로컬 스토리지에 존재하지 않는다면 설비 유형 리스트 기본값이 설정된 이후에 설비 이름 조회시 파라미터로 넘어가야함
+        this._getEquipList();
       }
 
       /**
@@ -289,6 +387,16 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
+       * @description 장비 설정 프로파일 조회 시 ...
+       **********************
+       * @param {Object} event
+       */
+      _deviceProfileResponsed(event) {
+        console.log('장비 설정 프로파일 조회 성공!');
+        console.log(event);
+      }
+
+      /**
        * @description 관리 및 사이트 도메인의 URL이 정상적으로 설정 되었으나
        * 로그인 되지 않은 상태일 때 로그인 화면으로 이동하기 위한 함수
        **********************
@@ -311,10 +419,15 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description 공통 설정의 설정 내용 저장
+       **********************
        */
       saveSetting() {
         this._saveMgrSiteUrl();
         this._saveLocale();
+        this._saveStage();
+        this._saveEquipType();
+        this._saveEquipCd();
+        this._saveStationCd();
       }
 
       /**
@@ -324,19 +437,64 @@ Copyright © HatioLab Inc. All rights reserved.
       _saveMgrSiteUrl() {
         const ip = this._getIpInput().value;
         const port = this._getPortInput().value;
-        let mgrSiteUrl;
-
-        if (port) {
-          mgrSiteUrl = `http://${ip}:${port}/rest`;
-        } else {
-          mgrSiteUrl = `http://${ip}/rest`;
-        }
+        let mgrSiteUrl = port ? `http://${ip}:${port}/rest` : `http://${ip}/rest`;
 
         if (this.isMgrSiteUrlChanged(mgrSiteUrl)) {
           this._clearBaseUrl();
         }
 
-        localStorage.setItem('setting.mgrSiteUrl', JSON.stringify(mgrSiteUrl));
+        this._setLocalStorage('setting.mgrSiteUrl', mgrSiteUrl);
+      }
+
+      /**
+       * @description 언어 설정 로컬 스토리지에 저장
+       ***********************
+       */
+      _saveLocale() {
+        let val = this._getLocaleSelector().selectedOptions[0].value
+        this._setLocalStorage('setting.locale', val);
+      }
+
+      /**
+       * @description 스테이지 코드를 로컬 스토리지에 저장
+       ***********************
+       */
+      _saveStage() {
+        let selectedOpts = this._getStageCombo().selectedOptions;
+        this.stageCd = (selectedOpts && selectedOpts.length > 0) ? selectedOpts[0].innerText : null;
+        this._setLocalStorage(this.stageCdLSKey, this.stageCd);
+      }
+
+      /**
+       * @description 설비 유형을 로컬 스토리지에 저장
+       ***********************
+       */
+      _saveEquipType() {
+        let selectedOpts = this._getEquipTypeCombo().selectedOptions;
+        this.equipmentType = (selectedOpts && selectedOpts.length > 0) ? selectedOpts[0].innerText : null;
+        this._setLocalStorage(this.equipmentTypeLSKey, this.equipmentType);
+      }
+
+      /**
+       * @description 설비 코드를 로컬 스토리지에 저장
+       ***********************
+       */
+      _saveEquipCd() {
+        let selectedOpts = this._getEquipCombo().selectedOptions;
+        this.equipCd = (selectedOpts && selectedOpts.length > 0) ? selectedOpts[0].value : null;
+        this.equipNm = (selectedOpts && selectedOpts.length > 0) ? selectedOpts[0].innerText : null;
+        this._setLocalStorage(this.equipmentCdLSKey, this.equipCd);
+        this._setLocalStorage(this.equipmentNmLSKey, this.equipNm);
+      }
+
+      /**
+       * @description 작업 스테이션 코드를 로컬 스토리지에 저장
+       ***********************
+       */
+      _saveStationCd() {
+        let selectedOpts = this._getStationCombo().selectedOptions;
+        this.stationCd = (selectedOpts && selectedOpts.length > 0) ? selectedOpts[0].value : null;
+        this._setLocalStorage(this.stationCdLSKey, this.stationCd);
       }
 
       /**
@@ -345,7 +503,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {String} mgrSiteUrl
        */
       isMgrSiteUrlChanged(mgrSiteUrl) {
-        const currentMgrSiteUrl = JSON.parse(localStorage.getItem('setting.mgrSiteUrl'));
+        const currentMgrSiteUrl = this._getLocalStorage('setting.mgrSiteUrl');
         return mgrSiteUrl !== currentMgrSiteUrl;
       }
 
@@ -355,14 +513,6 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _clearBaseUrl() {
         localStorage.removeItem('setting.baseUrl');
-      }
-
-      /**
-       * @description 언어 설정 localStorage에 저장
-       ***********************
-       */
-      _saveLocale() {
-        localStorage.setItem('setting.locale', JSON.stringify(this._getLocaleSelector().selectedOptions[0].value));
       }
 
       /**

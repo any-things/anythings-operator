@@ -55,7 +55,10 @@ Copyright © HatioLab Inc. All rights reserved.
 
     <div id="container">
       <!-- 물류 공통 설정 화면 조각 -->
-      <logis-setting-common id="common-setting" locales="[[locales]]" on-session-responsed="_sessionResponseHandler"
+      <logis-setting-common 
+        id="common-setting" 
+        locales="[[locales]]" 
+        on-session-responsed="_sessionResponseHandler"
         on-session-unauthorized="_sessionUnauthHandler">
       </logis-setting-common>
 
@@ -189,10 +192,10 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _visibleChanged(visible) {
         if (visible) {
-          var settingPda = this.shadowRoot.querySelector('logis-setting-pda')
+          /*var settingPda = this.shadowRoot.querySelector('logis-setting-pda')
           if (settingPda) {
             settingPda.resetRackInfo();
-          }
+          }*/
         }
       }
 
@@ -402,6 +405,9 @@ Copyright © HatioLab Inc. All rights reserved.
       /**
        * @description 에러 메시치 출력 공통 method
        *********************
+       * @param {String} title
+       * @param {String} message
+       * @param {Function} confirmCallback
        */
       _showErrorMessage(title, message, confirmCallback) {
         openAlert({

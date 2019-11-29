@@ -282,7 +282,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           zoneCdLabel: {
             type: String,
-            value: () => t('label.zone_cd')
+            value: () => t('label.station_cd')
           },
 
           /**
@@ -645,7 +645,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _rackCdChanged(rackCd) {
         if (rackCd) {
-          window.localStorage.setItem('setting.rackCd', JSON.stringify(rackCd));
+          window.localStorage.setItem('setting.equipCd', JSON.stringify(rackCd));
         }
       }
 
@@ -656,7 +656,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _rackNmChanged(rackNm) {
         if (rackNm) {
-          window.localStorage.setItem('setting.rackNm', JSON.stringify(rackNm));
+          window.localStorage.setItem('setting.equipNm', JSON.stringify(rackNm));
         }
       }
 
@@ -667,7 +667,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _zoneCdChanged(zoneCd) {
         if (zoneCd) {
-          window.localStorage.setItem('setting.equipZone', JSON.stringify(zoneCd));
+          window.localStorage.setItem('setting.stationCd', JSON.stringify(zoneCd));
           if (this.rackCd) {
             WEB_MQTT.reset(this.rackCd, zoneCd);
           }
@@ -775,7 +775,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _inputSkuResponseChanged(inputSkuResponse) {
         if (inputSkuResponse) {
-          if(typeof(inputSkuResponse) == 'Array') {
+          if (typeof(inputSkuResponse) == 'Array') {
             this.items = inputSkuResponse;
           } else {
             this.items = [inputSkuResponse];
@@ -789,8 +789,8 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} inputSkuResponse
        */
       _inputListResponseChanged(inputListResponse) {
-       // this.inputList = inputListResponse || [];
-        this.items = inputListResponse|| [];
+        // this.inputList = inputListResponse || [];
+        this.items = inputListResponse || [];
         window.SOUND.playInfoSound();
       }
 
@@ -800,9 +800,9 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} inputList
        */
       _inputListChanged(inputList) {
-        if (!inputList || !inputList.items || inputList.items.length === 0) { 
+        if (!inputList || !inputList.items || inputList.items.length === 0) {
 
-        } else { 
+        } else {
           this.items = inputList;
         }
       }
@@ -952,7 +952,7 @@ Copyright © HatioLab Inc. All rights reserved.
         // 마지막으로 스캔한 코드가 박스 바코드이면 박스째 투입으로 처리
         if (this.inputValue === boxBarcd) {
           //inputAjax.curl = `/device_process/sku/search_by_like/${equip_type}/${equip_cd}/${sku_cd}`;
-          
+
           // 스캔한 코드가 상품 바코드이면 개별 상품 투입으로 처리
         } else {
           inputAjax.curl = `/device_process/input/sku/Rack/${rackCd}/${comCd}/${skuCd}?allow_continous_scan=${isContinousScanAllowed}`;
@@ -1039,7 +1039,7 @@ Copyright © HatioLab Inc. All rights reserved.
         var url = `/device_process/dynamic/${this.jobType}/chute_info`;
         url += '?chuteNo=' + chuteNumber;
         chuteInfoAjax.curl = url;
-        chuteInfoAjax.generateRequest(); 
+        chuteInfoAjax.generateRequest();
       }
 
       /**
@@ -1201,18 +1201,18 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _handleBoxAssignResponse(event) {
         var response = event.detail;
-        var pickedQty = event.detail.picked_qty; 
-      
-        if (!response || pickedQty<=0) {
+        var pickedQty = event.detail.picked_qty;
+
+        if (!response || pickedQty <= 0) {
           return;
         }
 
         var locCd = response.detail.cell_cd;
         var boxId = response.detail.box_id;
         var jobId = response.job_id;
- 
+
         if (pickedQty > 0) {
-          this._showAdjustFullboxQty(boxId, locCd, pickedQty,jobId); 
+          this._showAdjustFullboxQty(boxId, locCd, pickedQty, jobId);
         }
 
         this._initFocus();
@@ -1225,9 +1225,9 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {String} locCd 로케이션
        * @param {Number} totalPickedQty 총 확정 수량
        */
-      _showAdjustFullboxQty(boxId, locCd, totalPickedQty,jobId) {
-       
-        if (!boxId || totalPickedQty<=0 ) {
+      _showAdjustFullboxQty(boxId, locCd, totalPickedQty, jobId) {
+
+        if (!boxId || totalPickedQty <= 0) {
           return;
         }
 
@@ -1244,14 +1244,14 @@ Copyright © HatioLab Inc. All rights reserved.
             adjustPopup.setCurrentQty(totalPickedQty);
             adjustPopup.adjustQty = () => {
               let adjustQty = parseInt(adjustPopup._getAdjustQtyInput().value);
-              
+
               if (adjustQty > totalPickedQty) {
                 adjustPopup._getAdjustQtyInput().style = 'color: red';
                 window.SOUND.playErrorSound();
                 return;
               }
-              
-              this._requestFullbox(boxId, locCd, adjustQty,adjustPopup.jobId);
+
+              this._requestFullbox(boxId, locCd, adjustQty, adjustPopup.jobId);
               adjustPopup.closeDialog();
             };
           }, () => {
@@ -1268,15 +1268,18 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {String} locCd 로케이션
        * @param {Number} fullboxQty 풀 박스 수량
        */
-      _requestFullbox(boxId, locCd, fullboxQty,jobId) {
-        var ajax = this.$['request-fullbox-ajax'] 
+      _requestFullbox(boxId, locCd, fullboxQty, jobId) {
+        var ajax = this.$['request-fullbox-ajax']
 
         var equipType = LOGIS_UTIL.getEquipType() || "Rack";
         var equipCd = LOGIS_UTIL.getRackCd();
-        var deviceType = LOGIS_UTIL.getDeviceType(); 
-         
+        var deviceType = LOGIS_UTIL.getDeviceType();
+
         ajax.curl = `/device_process/fullbox/${deviceType}/${equipType}/${equipCd}/${jobId}`;
-        ajax.params= {req_qty:fullboxQty,box_id:boxId}
+        ajax.params = {
+          req_qty: fullboxQty,
+          box_id: boxId
+        }
         ajax.body = {
           loc_cd: locCd,
           box_id: boxId,

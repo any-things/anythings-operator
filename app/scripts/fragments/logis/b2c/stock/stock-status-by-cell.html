@@ -335,7 +335,7 @@ Copyright © HatioLab Inc. All rights reserved.
           this.skuCd = skuInfo.sku_cd;
           // 적치 대상 로케이션 리스트를 조회
           const locInfoAjax = this.$['location-ajax'];
-          let rackCd = JSON.parse(localStorage.getItem('setting.rackCd'));
+          let rackCd = JSON.parse(localStorage.getItem('setting.equipCd'));
           locInfoAjax.curl = `/pda_process/dps/load_locs/${rackCd}/${this.skuCd}/${this.comCd}`;
           locInfoAjax.generateRequest();
         }

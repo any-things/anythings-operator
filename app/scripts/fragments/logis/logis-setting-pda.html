@@ -13,82 +13,50 @@ Copyright © HatioLab Inc. All rights reserved.
     <style include="shared-styles any-setting-styles"></style>
 
     <!-- 메시지 브로커 IP 조회(서버 설정)를 위한 Ajax -->
-    <sys-ajax id="broker-addrs-ajax" method="GET" content-type="application/json"
+    <sys-ajax 
+      id="broker-addrs-ajax" 
+      method="GET" 
+      content-type="application/json"
       on-sys-ajax-response="_setBrokerAddress">
     </sys-ajax>
 
     <!-- 메시지 브로커 Port 조회(서버 설정)를 위한 Ajax -->
-    <sys-ajax id="broker-port-ajax" method="GET" content-type="application/json" on-sys-ajax-response="_setBrokerPort">
+    <sys-ajax 
+      id="broker-port-ajax" 
+      method="GET" 
+      content-type="application/json" 
+      on-sys-ajax-response="_setBrokerPort">
     </sys-ajax>
 
     <!-- 메시지 브로커 사이트 코드 조회(서버 설정)를 위한 Ajax -->
-    <sys-ajax id="broker-site-ajax" method="GET" content-type="application/json" on-sys-ajax-response="_setBrokerSite">
-    </sys-ajax>
-
-    <!-- 스테이지 조회 -->
-    <sys-ajax id="stages-ajax" method="GET" content-type="application/json" 
-      on-sys-ajax-response="_renderStageCombo">
-    </sys-ajax>
-
-    <!-- 설비 유형 조회 -->
-    <sys-ajax id="equip-types-ajax" method="GET" content-type="application/json"
-      on-sys-ajax-response="_renderEquipTypeCombo">
-    </sys-ajax>
-
-    <!-- 랙 리스트 조회를 위한 Ajax -->
-    <sys-ajax id="racks-ajax" method="GET" content-type="application/json"
-      on-sys-ajax-response="_renderRackCombo">
-    </sys-ajax>
-
-    <!-- 작업 스테이션 리스트 조회를 위한 Ajax -->
-    <sys-ajax id="stations-ajax" method="GET" content-type="application/json" 
-      on-sys-ajax-response="_renderStationCombo">
+    <sys-ajax 
+      id="broker-site-ajax" 
+      method="GET" 
+      content-type="application/json" 
+      on-sys-ajax-response="_setBrokerSite">
     </sys-ajax>
 
     <!-- 작업 유형 리스트 조회를 위한 Ajax -->
-    <sys-ajax id="job-type-ajax" method="GET" content-type="application/json" 
+    <sys-ajax 
+      id="job-types-ajax" 
+      method="GET" 
+      content-type="application/json" 
       on-sys-ajax-response="_renderJobTypeCombo">
     </sys-ajax>
 
     <!-- 업데이트 내역 조회 -->
-    <sys-ajax id="update-ajax" method="GET" last-response="{{updatedItems}}">
+    <sys-ajax 
+      id="update-ajax" 
+      method="GET" 
+      last-response="{{updatedItems}}">
     </sys-ajax>
 
     <!-- 서버에 PDA 상태 업데이트를 위한 Ajax -->
-    <sys-ajax id="update-setting-ajax" method="PUT" content-type="application/json">
+    <sys-ajax 
+      id="update-setting-ajax" 
+      method="PUT" 
+      content-type="application/json">
     </sys-ajax>
-
-    <!-- 스테이지 설정 -->
-    <div id="stage" class="input-container">
-      <label style="text-align: left">[[stageLabel]]</label>
-    </div>
-    <div class="input-container">
-      <select id="stage-combo"></select>
-    </div>
-
-    <!-- 설비 유형 설정 -->
-    <div id="equipType" class="input-container">
-      <label style="text-align: left">[[equipTypeLabel]]</label>
-    </div>
-    <div class="input-container">
-      <select id="equip-type-combo"></select>
-    </div>
-
-    <!-- 설비 이름 설정 -->
-    <div id="rack" class="input-container">
-      <label style="text-align: left">[[rackLabel]]</label>
-    </div>
-    <div class="input-container">
-      <select id="rack-combo"></select>
-    </div>
-
-    <!-- 스테이션 설정 -->
-    <div id="station" class="input-container">
-      <label style="text-align: left">[[stationLabel]]</label>
-    </div>
-    <div class="input-container">
-      <select id="station-combo"></select>
-    </div>  
 
     <!-- 업데이트 -->
     <div id="update-operato" class="input-container">
@@ -136,46 +104,6 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * @description 스테이지 라벨
-           *********************
-           * @type {String}
-           */
-          stageLabel: {
-            type: String,
-            value: () => t('label.stage')
-          },
-
-          /**
-           * @description 설비 유형 라벨
-           *********************
-           * @type {String}
-           */
-          equipTypeLabel: {
-            type: String,
-            value: () => t('label.equipment_type')
-          },
-
-          /**
-           * @description 설비 이름 라벨
-           *********************
-           * @type {String}
-           */
-          rackLabel: {
-            type: String,
-            value: () => t('label.equipment_name')
-          },
-
-          /**
-           * @description 스테이션 라벨
-           *********************
-           * @type {String}
-           */
-          stationLabel: {
-            type: String,
-            value: () => t('label.station')
-          },
-
-          /**
            * @description 내역 보기 버튼 라벨
            *********************
            * @type {String}
@@ -214,12 +142,7 @@ Copyright © HatioLab Inc. All rights reserved.
       connectedCallback() {
         super.connectedCallback();
         this._setDefaultValues();
-        this._getStageList();
-        this._getEquipTypeList();
-        this._getRackList();
-        this._getStationList();
-        this._getJobTypeList();
-        this._hideRack();
+        //this._getJobTypeList();
       }
 
       /**
@@ -227,7 +150,7 @@ Copyright © HatioLab Inc. All rights reserved.
        ******************
        */
       _setDefaultValues() {
-        this._setRackSideDefaultValue();
+        this._setWorkSideDefaultValue();
       }
 
       /**
@@ -239,18 +162,12 @@ Copyright © HatioLab Inc. All rights reserved.
       saveSetting() {
         return new Promise((resolve, reject) => {
           this.updateSetting().then(() => {
-              // 랙 코드 값 저장
-              this._setLocalStorage(this.rackCodeLSKey, this._getRackCombo().selectedOptions[0].value);
-              // 랙 명 값 저장
-              this._setLocalStorage(this.rackNameLSKey, this._getRackCombo().selectedOptions[0].innerText);
-              // 작업 존 값 저장
-              this._setLocalStorage(this.stationCodeLSKey, this._getStationCombo().selectedOptions[0].value);
               // 작업 유형 값 저장
-              this._setLocalStorage(this.jobTypeLSKey, this._getJobTypeCombo().selectedOptions[0].value);
+              //this._setLocalStorage(this.jobTypeLSKey, this._getJobTypeCombo().selectedOptions[0].value);
               // 작업 위치 값 저장
-              this._setLocalStorage(this.rackSideLSKey, this._getSelectedOpt(this._getRackSideOpts()).value);
+              //this._setLocalStorage(this.workSideCdLSKey, this._getSelectedOpt(this._getWorkSideOpts()).value);
               // 작업 위치 라벨 저장
-              this._setLocalStorage(this.rackSideNameLSKey, this._getSelectedOpt(this._getRackSideOpts()).getAttribute('rack-side-name'));
+              //this._setLocalStorage(this.workSideNmLSKey, this._getSelectedOpt(this._getWorkSideOpts()).innerText);
               resolve();
             })
             .catch(error => {
@@ -265,16 +182,24 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       updateSetting() {
         return new Promise((resolve, reject) => {
-          const rackCombo = this._getRackCombo();
-          const rackCode = rackCombo.selectedOptions.length === 1 ? rackCombo.selectedOptions[0].value : null;
-          const stationCombo = this._getStationCombo()
-          const stationCode = stationCombo.selectedOptions.length === 1 ? stationCombo.selectedOptions[0].value : null;
+          let equipType = this._getLocalStorage('setting.equipType');
+          let equipCd = this._getLocalStorage('setting.equipCd');
+          let stationCd = this._getLocalStorage('setting.stationCd');
+          let errMsg = null;
 
-          if (!rackCode || !stationCode) {
+          if (!equipType) {
+            errMsg = t('text.equip_type_is_not_set');
+          } else if (!equipCd) {
+            errMsg = t('text.equip_code_is_not_set');
+          } else if (!stationCd) {
+            errMsg = t('text.zone_code_is_not_set');
+          }
+
+          if (errMsg) {
             throw {
               detail: {
                 code: t('error.SETTING_ERROR'),
-                msg: !rackCode ? t('text.rack_code_is_not_set') : t('text.zone_code_is_not_set')
+                msg: errMsg
               }
             };
           }
@@ -282,9 +207,9 @@ Copyright © HatioLab Inc. All rights reserved.
           const updateSettingAjax = this._getUpdateSettingAjax();
           updateSettingAjax.curl = `/${this.deviceType.toLowerCase()}s/update/setting`
           updateSettingAjax.params = {
-            equip_type: 'Rack',
-            equip_cd: rackCode,
-            station_cd: stationCode
+            equip_type: equipType,
+            equip_cd: equipCd,
+            station_cd: stationCd
           };
 
           updateSettingAjax.addEventListener('sys-ajax-response', () => {
@@ -311,14 +236,14 @@ Copyright © HatioLab Inc. All rights reserved.
        * @description 랙 설정 리셋
        ******************
        */
-      resetRackInfo() {
+      /*resetRackInfo() {
         // 랙 코드 값 저장
         if (this.$['job-type-combo'].value != 'QPS' || this.jobType != 'QPS') {
-          var rackCd = JSON.parse(localStorage.getItem(this.rackCodeLSKey))
-          var rackNm = JSON.parse(localStorage.getItem(this.rackNameLSKey))
+          var rackCd = JSON.parse(localStorage.getItem(this.equipmentCdLSKey))
+          var rackNm = JSON.parse(localStorage.getItem(this.equipmentNmLSKey))
 
           if (rackCd && rackNm) {
-            this._getRackCombo().value = rackCd;
+            this._getEquipCombo().value = rackCd;
           }
 
           // 작업 스테이션 값 저장
@@ -344,36 +269,35 @@ Copyright © HatioLab Inc. All rights reserved.
             stationCombo.value = stationCd;
           }
         }
-
-      }
+      }*/
 
       /**
        * @description 랙 정보 숨기기
        ******************
        */
-      _hideRack() {
-        /*if (this._getJobTypeCombo().selectedOptions.length > 0) {
+      /*_hideRack() {
+        if (this._getJobTypeCombo().selectedOptions.length > 0) {
           this.jobType = this._getJobTypeCombo().selectedOptions[0].value;
         }
 
         if (this.$['job-type-combo'].value == 'QPS' || this.jobType == 'QPS') {
           this.$['zone'].style.display = 'none';
           this.$['rack'].style.display = 'none';
-          this.$['rack-side'].style.display = 'none';
+          this.$['work-side'].style.display = 'none';
           this.$['invoice-field-substr'].style.display = 'none';
-          this._setLocalStorage('setting.rackCd', 'NA');
-          this._setLocalStorage('setting.rackNm', 'NA');
-          this._setLocalStorage('setting.equipZone', 'NA');
+          this._setLocalStorage('setting.equipCd', 'NA');
+          this._setLocalStorage('setting.equipNm', 'NA');
+          this._setLocalStorage('setting.stationCd', 'NA');
           this._setLocalStorage('setting.isQps', true);
 
         } else {
           this.$['zone'].style.display = 'flex';
           this.$['rack'].style.display = 'flex';
-          this.$['rack-side'].style.display = 'flex';
+          this.$['work-side'].style.display = 'flex';
           this.$['invoice-field-substr'].style.display = 'flex';
           this._setLocalStorage('setting.isQps', false);
-        }*/
-      }
+        }
+      }*/
     }
 
     customElements.define(LogisSettingPda.is, LogisSettingPda);

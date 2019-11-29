@@ -210,109 +210,106 @@ Copyright © HatioLab Inc. All rights reserved.
         <template is="dom-if" if="[[!isKIOSK]]">
           <menu-tiles route="{{route}}" device-type="[[deviceType]]"></menu-tiles>
         </template>
-      </app-drawer>
+  </app-drawer>
 
-      <!-- Main content -->
-      <app-header-layout has-scrolling-region>
-        <app-header slot="header" fixed reveals effects="waterfall">
+  <!-- Main content -->
+  <app-header-layout has-scrolling-region>
+    <app-header slot="header" fixed reveals effects="waterfall">
 
-          <app-toolbar>
-            <div id="top-bar">
-              <span id="header">
+      <app-toolbar>
+        <div id="top-bar">
+          <span id="header">
                 <div id="menu-btn">
                   <img src="./images/icon-brand.png" />
                   <span>[[currentSite]]</span>
-                </div>
-                <span id="title">[[title]]</span>
-              </span>
+        </div>
+        <span id="title">[[title]]</span>
+        </span>
 
-              <div id="input-container">
-                <span id="rack-name" is-kiosk$="[[isKIOSK]]">[[rackName]]</span>
-                <span id="station-code">[[stationCode]]</span>
-                <span id="rack-side" is-kiosk$="[[isKIOSK]]" hidden>[[rackSideLabel]]</span>
-              </div>
+        <div id="input-container">
+          <span id="equip-name" is-kiosk$="[[isKIOSK]]">[[equipNm]]</span>
+          <span id="station-code">[[stationCd]]</span>
+          <span id="work-side" is-kiosk$="[[isKIOSK]]" hidden>[[workSideNm]]</span>
+        </div>
 
-              <div id="buttons">
-                <iron-icon id="refresh-btn" icon="refresh" on-click="refresh" hidden></iron-icon>
-                <iron-icon id="ind-off-btn" icon="lightbulb-outline" on-click="showCodePopup" hidden></iron-icon>
-                <iron-icon id="ind-on-last-btn" icon="list" on-click="showCodePopup" hidden></iron-icon>
-                <iron-icon id="batch-full-box-btn" icon="move-to-inbox" on-click="showCodePopup" hidden></iron-icon>
-                <iron-icon id="kiosk-setting-btn" icon="settings" on-click="toSetting" hidden></iron-icon>
-                <iron-icon id="logout-btn" icon="power-settings-new" on-click="logout" hidden></iron-icon>
-              </div>
-            </div>
-          </app-toolbar>
-        </app-header>
+        <div id="buttons">
+          <iron-icon id="refresh-btn" icon="refresh" on-click="refresh" hidden></iron-icon>
+          <iron-icon id="ind-off-btn" icon="lightbulb-outline" on-click="showCodePopup" hidden></iron-icon>
+          <iron-icon id="ind-on-last-btn" icon="list" on-click="showCodePopup" hidden></iron-icon>
+          <iron-icon id="batch-full-box-btn" icon="move-to-inbox" on-click="showCodePopup" hidden></iron-icon>
+          <iron-icon id="kiosk-setting-btn" icon="settings" on-click="toSetting" hidden></iron-icon>
+          <iron-icon id="logout-btn" icon="power-settings-new" on-click="logout" hidden></iron-icon>
+        </div>
+        </div>
+      </app-toolbar>
+    </app-header>
 
-        <iron-pages id="main" role="main" selected="[[page]]" attr-for-selected="name" selected-attribute="visible">
+    <iron-pages id="main" role="main" selected="[[page]]" attr-for-selected="name" selected-attribute="visible">
 
-          <!-- Common Views -->
-          <cell-box-mapping-status name="cell_box_mapping_status" is-pda="[[isPDA]]"></cell-box-mapping-status>
-          <picking-status name="picking_status" is-kiosk="[[isKIOSK]]"></picking-status>
-          <picking-status-by-cell name="picking_status_by_cell" is-pda="[[isPDA]]"></picking-status-by-cell>
-          <box-list name="box_list" is-kiosk="[[isKIOSK]]"></box-list>
-          <label-list name="label_list" is-pda="[[isPDA]]"></label-list>
-          <!-- Common Views -->
+      <!-- Common Views -->
+      <cell-box-mapping-status name="cell_box_mapping_status" is-pda="[[isPDA]]"></cell-box-mapping-status>
+      <picking-status name="picking_status" is-kiosk="[[isKIOSK]]"></picking-status>
+      <picking-status-by-cell name="picking_status_by_cell" is-pda="[[isPDA]]"></picking-status-by-cell>
+      <box-list name="box_list" is-kiosk="[[isKIOSK]]"></box-list>
+      <label-list name="label_list" is-pda="[[isPDA]]"></label-list>
+      <!-- Common Views -->
 
-          <!-- DAS Views -->
-          <rack-input-list name="rack_input_list" is-pda="[[isPDA]]"></rack-input-list>
-          <!-- DAS Views -->
+      <!-- DAS Views -->
+      <rack-input-list name="rack_input_list" is-pda="[[isPDA]]"></rack-input-list>
+      <!-- DAS Views -->
 
-          <!-- Tablet Views -->
-          <b2b-job-assort name="b2b_job_assort"></b2b-job-assort>
-          <b2c-picking-job name="b2c_picking_job"></b2c-picking-job>
+      <!-- Tablet Views -->
+      <b2b-job-assort name="b2b_job_assort"></b2b-job-assort>
+      <b2c-picking-job name="b2c_picking_job"></b2c-picking-job>
 
-          <tab-das2-order-info name="tab_das2_ord_info"></tab-das2-order-info>
-          <tab-das-order-list name="tab_das_ord_list"></tab-das-order-list>
-          <!-- Tablet Views -->
+      <tab-das2-order-info name="tab_das2_ord_info"></tab-das2-order-info>
+      <tab-das-order-list name="tab_das_ord_list"></tab-das-order-list>
+      <!-- Tablet Views -->
 
-          <!-- PDA Views -->
-          <stock-status-by-cell name="stock_status_by_cell"></stock-status-by-cell>
-          <cell-stock-supplement name="cell_stock_supplement"></cell-stock-supplement>
-          <fixed-cell-stock-supplement name="fixed_cell_stock_supplement"></fixed-cell-stock-supplement>
-          <b2c-one-sku-order name="b2c_one_sku_order"></b2c-one-sku-order>
+      <!-- PDA Views -->
+      <stock-status-by-cell name="stock_status_by_cell"></stock-status-by-cell>
+      <cell-stock-supplement name="cell_stock_supplement"></cell-stock-supplement>
+      <fixed-cell-stock-supplement name="fixed_cell_stock_supplement"></fixed-cell-stock-supplement>
+      <b2c-one-sku-order name="b2c_one_sku_order"></b2c-one-sku-order>
 
-          <b2b-cell-box-mapping-status name="b2b_cell_box_mapping_status"></b2b-cell-box-mapping-status>
-          <b2b-assort-job name="b2b_assort_job"></b2b-assort-job>
-          <b2b-rtn-assort-job name="b2b_rtn_assort_job" rack-nm="{{rackName}}" zone-cd="{{stationCode}}">
-          </b2b-rtn-assort-job>
-          <b2b-rtn-inspection name="b2b_rtn_inspection" rack-nm="{{rackName}}" zone-cd="{{stationCode}}">
-          </b2b-rtn-inspection>
-          <b2b-remains-fullbox name="b2b_remains_fullbox" rack-nm="{{rackName}}" zone-cd="{{stationCode}}">
-          </b2b-remains-fullbox>
+      <b2b-cell-box-mapping-status name="b2b_cell_box_mapping_status"></b2b-cell-box-mapping-status>
+      <b2b-assort-job name="b2b_assort_job"></b2b-assort-job>
+      <b2b-rtn-assort-job name="b2b_rtn_assort_job" rack-nm="{{equipNm}}" zone-cd="{{stationCd}}">
+      </b2b-rtn-assort-job>
+      <b2b-rtn-inspection name="b2b_rtn_inspection" rack-nm="{{equipNm}}" zone-cd="{{stationCd}}">
+      </b2b-rtn-inspection>
+      <b2b-remains-fullbox name="b2b_remains_fullbox" rack-nm="{{equipNm}}" zone-cd="{{stationCd}}">
+      </b2b-remains-fullbox>
 
-          <pda-region-sku-info name="pda_region_sku_info"></pda-region-sku-info>
-          <pda-das2-process name="pda_das2_process" rack-nm="{{rackName}}" zone-cd="{{stationCode}}"></pda-das2-process>
-          <pda-dps2-process name="pda_dps2_process" rack-nm="{{rackName}}" zone-cd="{{stationCode}}"></pda-dps2-process>
-          <!-- PDA Views -->
+      <pda-region-sku-info name="pda_region_sku_info"></pda-region-sku-info>
+      <pda-das2-process name="pda_das2_process" rack-nm="{{equipNm}}" zone-cd="{{stationCd}}"></pda-das2-process>
+      <pda-dps2-process name="pda_dps2_process" rack-nm="{{equipNm}}" zone-cd="{{stationCd}}"></pda-dps2-process>
+      <!-- PDA Views -->
 
-          <!-- KIOSK View -->
-          <b2b-out-middle-assort name="b2b_out_middle_assort"></b2b-out-middle-assort>
-          <b2b-out-middle-assort-with-weight name="b2b_out_middle_assort_weight"></b2b-out-middle-assort-with-weight>
-          <b2b-rtn-middle-assort name="b2b_rtn_middle_assort"></b2b-rtn-middle-assort>
-          <b2b-qty-inspection name="b2b_qty_inspection"></b2b-qty-inspection>
-          <b2b-weight-inspection name="b2b_weight_inspection"></b2b-weight-inspection>
-          <b2b-sku-input name="b2b_sku_input"></b2b-sku-input>
-          <b2c-box-input name="b2c_box_input"></b2c-box-input>
-          <b2c-pick-single-pack name="b2c_pick_single_pack"></b2c-pick-single-pack>
-          <b2c-packing-check name="b2c_packing_check"></b2c-packing-check>
-          <b2c-packing-popup name="b2c_packing_popup"></b2c-packing-popup>
-          <b2c-qty-inspection name="b2c_qty_inspection"></b2c-qty-inspection>
-          <!-- KIOSK View -->
+      <!-- KIOSK View -->
+      <b2b-out-middle-assort name="b2b_out_middle_assort"></b2b-out-middle-assort>
+      <b2b-out-middle-assort-with-weight name="b2b_out_middle_assort_weight"></b2b-out-middle-assort-with-weight>
+      <b2b-rtn-middle-assort name="b2b_rtn_middle_assort"></b2b-rtn-middle-assort>
+      <b2b-qty-inspection name="b2b_qty_inspection"></b2b-qty-inspection>
+      <b2b-weight-inspection name="b2b_weight_inspection"></b2b-weight-inspection>
+      <b2b-sku-input name="b2b_sku_input"></b2b-sku-input>
+      <b2c-box-input name="b2c_box_input"></b2c-box-input>
+      <b2c-pick-single-pack name="b2c_pick_single_pack"></b2c-pick-single-pack>
+      <b2c-packing-check name="b2c_packing_check"></b2c-packing-check>
+      <b2c-packing-popup name="b2c_packing_popup"></b2c-packing-popup>
+      <b2c-qty-inspection name="b2c_qty_inspection"></b2c-qty-inspection>
+      <!-- KIOSK View -->
 
-          <logis-login name="login" resources="[[resources]]" language="[[language]]" is-dev-mode="[[_computeIsDev()]]"
-            on-login-succeed="_handleLoginSuccess">
-          </logis-login>
+      <logis-login name="login" resources="[[resources]]" language="[[language]]" is-dev-mode="[[_computeIsDev()]]" on-login-succeed="_handleLoginSuccess">
+      </logis-login>
 
-          <logis-setting id="logis-setting" name="logis_setting" device-type="[[deviceType]]"
-            is-dev-mode="[[isDevMode]]" is-not-login="[[isNotLogin]]" on-session-responsed="_sessionResponsed"
-            on-session-unauthorized="_sessionUnauthorized">
-          </logis-setting>
+      <logis-setting id="logis-setting" name="logis_setting" device-type="[[deviceType]]" is-dev-mode="[[isDevMode]]" is-not-login="[[isNotLogin]]" on-session-responsed="_sessionResponsed" on-session-unauthorized="_sessionUnauthorized">
+      </logis-setting>
 
-          <logis-home name="home"></logis-home>
-        </iron-pages>
-      </app-header-layout>
-    </app-drawer-layout>
+      <logis-home name="home"></logis-home>
+    </iron-pages>
+  </app-header-layout>
+  </app-drawer-layout>
   </template>
 
   <script>
@@ -362,13 +359,13 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * @description 설정한 랙 코드
+           * @description 설정한 설비 이름
            ******************************
            * @type {String}
            */
-          rackName: {
+          equipNm: {
             type: String,
-            value: () => JSON.parse(localStorage.getItem('setting.rackNm'))
+            value: () => JSON.parse(localStorage.getItem('setting.equipNm'))
           },
 
           /**
@@ -376,9 +373,9 @@ Copyright © HatioLab Inc. All rights reserved.
            ******************************
            * @type {String}
            */
-          stationCode: {
+          stationCd: {
             type: String,
-            value: () => JSON.parse(localStorage.getItem('setting.equipZone'))
+            value: () => JSON.parse(localStorage.getItem('setting.stationCd'))
           },
 
           /**
@@ -402,24 +399,24 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * @description 랙 사이드 설정
+           * @description 작업 사이드 설정
            ******************************
            * @type {String}
            */
-          kioskRackSide: {
+          workSideCd: {
             type: String,
-            value: () => JSON.parse(localStorage.getItem('setting.rackSide'))
+            value: () => JSON.parse(localStorage.getItem('setting.workSideCd'))
           },
 
           /**
            * @description KIOSK 환경에서 상단에 표시되는 작업 위치
-           * logis-setting에 의해 rackSide이 결정되면 rackSide을 바탕으로 화면에 표시할 값을 결정함
+           * logis-setting에 의해 workSide가 결정되면 workSide를 바탕으로 화면에 표시할 값을 결정함
            ******************************
            * @type {String}
            */
-          rackSideLabel: {
+          workSideNm: {
             type: String,
-            value: () => JSON.parse(localStorage.getItem('setting.rackSideLabel'))
+            value: () => JSON.parse(localStorage.getItem('setting.workSideNm'))
           },
 
           /**
@@ -618,10 +615,10 @@ Copyright © HatioLab Inc. All rights reserved.
         if (this.isLoginScreen()) {
           this.showLogoutBtn(false);
           this.showRefreshBtn(false);
-          this.showRackName(false);
+          this.showEquipName(false);
           this.showStationCode(false);
           this.enableMenuBtn(true);
-          this.showKioskRackSide(false);
+          this.showKioskWorkSide(false);
 
           if (deviceType === CONST.DEVICE_TYPE.TABLET || deviceType === CONST.DEVICE_TYPE.PDA) {
             this.fixViewSize(true);
@@ -642,11 +639,11 @@ Copyright © HatioLab Inc. All rights reserved.
               this.showLogoutBtn(true);
               this.showRefreshBtn(false);
               this.showSidebar(false);
-              this.showRackName(true);
+              this.showEquipName(true);
               this.showStationCode(false);
               this.fixViewSize(false);
               this.enableMenuBtn(false);
-              this.showKioskRackSide(true);
+              this.showKioskWorkSide(true);
               break;
 
             case CONST.DEVICE_TYPE.PDA:
@@ -655,7 +652,7 @@ Copyright © HatioLab Inc. All rights reserved.
                 this.showLogoutBtn(true);
                 this.showRefreshBtn(true);
                 this.showSidebar(true);
-                this.showRackName(false);
+                this.showEquipName(false);
                 this.showStationCode(false);
                 this.fixViewSize(true);
                 importNativeLibs();
@@ -666,7 +663,7 @@ Copyright © HatioLab Inc. All rights reserved.
                 this.showLogoutBtn(true);
                 this.showRefreshBtn(false);
                 this.showSidebar(true);
-                this.showRackName(true);
+                this.showEquipName(true);
                 this.showStationCode(true);
                 this.fixViewSize(true);
                 importNativeLibs();
@@ -679,7 +676,7 @@ Copyright © HatioLab Inc. All rights reserved.
               this.showLogoutBtn(true);
               this.showRefreshBtn(true);
               this.showSidebar(true);
-              this.showRackName(true);
+              this.showEquipName(true);
               this.showStationCode(true);
               this.fixViewSize(true);
               importNativeLibs();
@@ -697,13 +694,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _sessionResponsed(event) {
         document.dispatchEvent(new CustomEvent('session-responsed', event));
-
-        if (this.jobType = 'QPS') {
-          this.currentSite = event.detail.domain.brandName;
-        } else {
-          this.currentSite = event.detail.domain.name;
-        }
-
+        this.currentSite = event.detail.domain.name;
         this.showLogoutBtn(true);
         this._setupIcons(this.deviceType);
         this.checkSetting();
@@ -718,32 +709,31 @@ Copyright © HatioLab Inc. All rights reserved.
         try {
           switch (this.deviceType) {
             case CONST.DEVICE_TYPE.KIOSK:
-              // if (!JSON.parse(localStorage.getItem('setting.rackCd'))) {
-              //   throw {
-              //     title: t('error.SETTING_ERROR'),
-              //     message: t('text.rack_code_is_not_set')
-              //   };
-              // } else if (!JSON.parse(localStorage.getItem('setting.rackSide'))) {
-              //   throw {
-              //     title: t('error.SETTING_ERROR'),
-              //     message: t('text.rack_side_is_not_set')
-              //   };
-              // }
-              break;
-
-            /*default:
-              if(!JSON.parse(localStorage.getItem('setting.rackCd'))) {
+              /*if (!JSON.parse(localStorage.getItem('setting.equipCd'))) {
                 throw {
                   title: t('error.SETTING_ERROR'),
                   message: t('text.rack_code_is_not_set')
                 };
-              } else if (!JSON.parse(localStorage.getItem('setting.equipZone'))) {
+              } else if (!JSON.parse(localStorage.getItem('setting.workSideCd'))) {
                 throw {
                   title: t('error.SETTING_ERROR'),
-                  message: t('text.zone_code_is_not_set')
+                  message: t('text.rack_side_is_not_set')
                 };
-              }
-              break;*/
+              }*/
+              break;
+
+              /*default:
+                  if (!JSON.parse(localStorage.getItem('setting.equipCd'))) {
+                    throw {
+                      title: t('error.SETTING_ERROR'),
+                      message: t('text.rack_code_is_not_set')
+                    };
+                  } else if (!JSON.parse(localStorage.getItem('setting.stationCd'))) {
+                    throw {
+                      title: t('error.SETTING_ERROR'),
+                      message: t('text.zone_code_is_not_set')
+                    };
+              }*/
           }
         } catch (error) {
           openAlert({
@@ -755,8 +745,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * @description session check request가 비정상적으로 도착하면 (base url 불량)
-       * setting 화면으로 이동
+       * @description session check request가 비정상적으로 도착하면 (base url 불량) setting 화면으로 이동
        ******************************
        */
       _sessionError() {
@@ -778,14 +767,13 @@ Copyright © HatioLab Inc. All rights reserved.
       hideHeaderButtons() {
         this.showRefreshBtn(false);
         this.showLogoutBtn(false);
-        this.showRackName(false);
+        this.showEquipName(false);
         this.showStationCode(false);
-        this.showKioskRackSide(false);
+        this.showKioskWorkSide(false);
       }
 
       /**
-       * @description session check request가 401 에러 발생시
-       * login 화면으로 이동
+       * @description session check request가 401 에러 발생시 로그인 화면으로 이동
        ******************************
        */
       _sessionUnauthorized() {
@@ -803,8 +791,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * @description 서버에 대한 모든 요청이 인증 에러 발생시
-       * 로그인 화면으로 라우팅
+       * @description 서버에 대한 모든 요청이 인증 에러 발생시 로그인 화면으로 라우팅
        ******************************
        */
       _handleUnauthorized(e) {
@@ -831,7 +818,7 @@ Copyright © HatioLab Inc. All rights reserved.
       _handleLoginSuccess() {
         this.isNotLogin = false;
         this.showLogoutBtn();
-        // this.shadowRoot.querySelector('logis-setting')._getRackList();
+        // this.shadowRoot.querySelector('logis-setting')._getEquipList();
         this.resetInfo();
         this._moveToDefaultView();
 
@@ -956,12 +943,12 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * @description 랙명 활성화/비활성화
+       * @description 설비 이름 활성화/비활성화
        ******************************
        * @param {String} value
        */
-      showRackName(value) {
-        this.$['rack-name'].hidden = !value;
+      showEquipName(value) {
+        this.$['equip-name'].hidden = !value;
       }
 
       /**
@@ -991,17 +978,17 @@ Copyright © HatioLab Inc. All rights reserved.
         }
       }
 
-      // /**
-      //  * deviceType이 tablet 혹은 pda일 때 cordova plugin을 임포트 함
-      //  */
-      // importNativeLibs() {
-      //   if(!CONST.IS_DEV_MODE && !document.head.querySelector('#cordova-libs')) {
-      //     const scriptTag = document.createElement('script');
-      //     scriptTag.setAttribute('id', 'cordova-libs');
-      //     scriptTag.setAttribute('src', './cordova.js');
-      //     document.head.appendChild(scriptTag);
-      //   }
-      // }
+      /**
+       * deviceType이 tablet 혹은 pda일 때 cordova plugin을 임포트 함
+       */
+      importNativeLibs() {
+        if (!CONST.IS_DEV_MODE && !document.head.querySelector('#cordova-libs')) {
+          const scriptTag = document.createElement('script');
+          scriptTag.setAttribute('id', 'cordova-libs');
+          scriptTag.setAttribute('src', './cordova.js');
+          document.head.appendChild(scriptTag);
+        }
+      }
 
       /**
        * @description menu button 활성화/비활성화
@@ -1104,6 +1091,7 @@ Copyright © HatioLab Inc. All rights reserved.
       /**
        * @description 코드 버튼 활성화
        ******************************
+       * @param {String} viewType
        */
       showCodeButton(viewType) {
         this.$['ind-on-last-btn'].hidden = false;
@@ -1121,9 +1109,10 @@ Copyright © HatioLab Inc. All rights reserved.
       /**
        * @description 키오스크 작업 위치 정보 활성 / 비활성화
        ******************************
+       * @param {String} value
        */
-      showKioskRackSide(value) {
-        this.$['rack-side'].hidden = !value;
+      showKioskWorkSide(value) {
+        this.$['work-side'].hidden = !value;
       }
 
       /**
@@ -1149,7 +1138,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
         if (buttonId.indexOf('ind-off-btn') >= 0) {
           popup.actionType = 'mpi-off';
-          title = t('title.mpi_off_all');
+          title = t('title.ind_off_all');
 
         } else if (buttonId.indexOf('batch-full-box-btn') >= 0) {
           popup.actionType = 'batch-full-box';
@@ -1157,7 +1146,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
         } else if (buttonId.indexOf('ind-on-last-btn') >= 0) {
           popup.actionType = 'mpi-on-last';
-          title = t('title.mpi_on_last');
+          title = t('title.ind_on_last');
         }
 
         document.dispatchEvent(new CustomEvent('open-dialog', {
