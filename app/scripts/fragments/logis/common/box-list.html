@@ -61,7 +61,9 @@ Copyright © HatioLab Inc. All rights reserved.
 
   <script>
     class BoxList extends Polymer.Element {
-      static get is() { return 'box-list' }
+      static get is() {
+        return 'box-list'
+      }
 
       static get properties() {
         return {
@@ -180,28 +182,30 @@ Copyright © HatioLab Inc. All rights reserved.
           boxList: {
             type: Array,
             value: function() {
-              return [/*{
-                box_seq: '1',
-                cust_nm: '거래처 1',
-                loc_cd: 'M01-001',
-                box_id: 'BCD10492850',
-                batch_id: '',
-                id: ''
-              }, {
-                box_seq: '2',
-                cust_nm: '거래처 1',
-                loc_cd: 'M01-001',
-                box_id: 'BCD10492850',
-                batch_id: '',
-                id: ''
-              }, {
-                box_seq: '3',
-                cust_nm: '거래처 1',
-                loc_cd: 'M01-001',
-                box_id: 'BCD10492850',
-                batch_id: '',
-                id: ''
-              }*/];
+              return [
+                /*{
+                                box_seq: '1',
+                                cust_nm: '거래처 1',
+                                loc_cd: 'M01-001',
+                                box_id: 'BCD10492850',
+                                batch_id: '',
+                                id: ''
+                              }, {
+                                box_seq: '2',
+                                cust_nm: '거래처 1',
+                                loc_cd: 'M01-001',
+                                box_id: 'BCD10492850',
+                                batch_id: '',
+                                id: ''
+                              }, {
+                                box_seq: '3',
+                                cust_nm: '거래처 1',
+                                loc_cd: 'M01-001',
+                                box_id: 'BCD10492850',
+                                batch_id: '',
+                                id: ''
+                              }*/
+              ];
             }
           }
         }
@@ -258,10 +262,10 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       searchBoxList() {
         var ajax = this.$['box-list-ajax'];
-        ajax.curl = `/tablet_process/boxed_list/${LOGIS_UTIL.getRackCd()}/${LOGIS_UTIL.getEquipZone()}/${LOGIS_UTIL.getRackSide()}`;
+        ajax.curl = `/tablet_process/boxed_list/${LOGIS_UTIL.getEquipCd()}/${LOGIS_UTIL.getStationCd()}/${LOGIS_UTIL.getWorkSideCd()}`;
 
         // 최초 조회 이후 baseUrl이 초기화 되었다면 명시적으로 generateRequest를 호출함
-        if(ajax.baseUrl) {
+        if (ajax.baseUrl) {
           ajax.generateRequest();
         }
       }
@@ -286,7 +290,7 @@ Copyright © HatioLab Inc. All rights reserved.
         mpsBoxListDetail.boxResult = boxResult;
 
         var brokerSite = LOGIS_UTIL.getBrokerSiteCd();
-        if(this.jobType == 'DAS' && (brokerSite == 'ym01' || brokerSite == 'ym02')) {
+        if (this.jobType == 'DAS' && (brokerSite == 'ym01' || brokerSite == 'ym02')) {
           mpsBoxListDetail.isBoxCancelEnabled = true;
         }
 

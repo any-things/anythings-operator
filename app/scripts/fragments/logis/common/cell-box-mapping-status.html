@@ -101,7 +101,9 @@ Copyright © HatioLab Inc. All rights reserved.
 
   <script>
     class CellBoxMappingStatus extends BarcodeScannerMixin(Polymer.Element) {
-      static get is() { return 'cell-box-mapping-status' }
+      static get is() {
+        return 'cell-box-mapping-status'
+      }
 
       static get properties() {
         return {
@@ -173,46 +175,48 @@ Copyright © HatioLab Inc. All rights reserved.
             type: Array,
             value: () => {
               return [{
-                display: t('label.location'),
-                fieldname: 'loc_cd',
-                style: {
-                  textAlign: 'center'
-                }
-              }, {
-                display: t('label.box_id'),
-                fieldname: 'box_id',
-                displayCallback: value => {
-                  return value || '';
-                },
-                style: {
-                  textAlign: 'center'
-                }
-              }, {
-                display: '',
-                fieldname: 'clear_box_id',
-                columnWidth: '50px',
-                displayCallback: (value, row) => {
-                  return row.box_id || '';
-                },
-                button: (item, button) => {
-                  let text = '';
-                  if (item.box_id) {
-                    text = ' X ';
-                  } else {
-                    button.setAttribute('hidden', true);
+                  display: t('label.location'),
+                  fieldname: 'loc_cd',
+                  style: {
+                    textAlign: 'center'
                   }
-                  return text;
+                }, {
+                  display: t('label.box_id'),
+                  fieldname: 'box_id',
+                  displayCallback: value => {
+                    return value || '';
+                  },
+                  style: {
+                    textAlign: 'center'
+                  }
+                }, {
+                  display: '',
+                  fieldname: 'clear_box_id',
+                  columnWidth: '50px',
+                  displayCallback: (value, row) => {
+                    return row.box_id || '';
+                  },
+                  button: (item, button) => {
+                    let text = '';
+                    if (item.box_id) {
+                      text = ' X ';
+                    } else {
+                      button.setAttribute('hidden', true);
+                    }
+                    return text;
+                  }
                 }
-              }/*, {
-                display: t('menu.BoxAssign'),
-                fieldname: 'result',
-                displayCallback: value => {
-                  return t('label.success');
-                },
-                style: {
-                  textAlign: 'center'
-                }
-              }*/]
+                /*, {
+                                display: t('menu.BoxAssign'),
+                                fieldname: 'result',
+                                displayCallback: value => {
+                                  return t('label.success');
+                                },
+                                style: {
+                                  textAlign: 'center'
+                                }
+                              }*/
+              ]
             }
           },
 
@@ -251,7 +255,7 @@ Copyright © HatioLab Inc. All rights reserved.
         this.routingUrl = location.hash.replace('#/', '');
 
         document.addEventListener(`alert-closed-at-${this.routingUrl}`, event => {
-          if(!event.detail.hasCallback) {
+          if (!event.detail.hasCallback) {
             this._initialSetup();
           }
         });
@@ -289,8 +293,8 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       refreshList() {
         const refreshAjax = this.$['refresh-ajax'];
-        var rackCd = LOGIS_UTIL.getRackCd();
-        var equipZoneCd = LOGIS_UTIL.getEquipZone();
+        var rackCd = LOGIS_UTIL.getEquipCd();
+        var equipZoneCd = LOGIS_UTIL.getStationCd();
         var params = {
           query: JSON.stringify([{
             name: 'rack_cd',
@@ -327,7 +331,7 @@ Copyright © HatioLab Inc. All rights reserved.
         let data = event && event.detail && event.detail.data;
         let locCd = data.loc_cd;
 
-        if(fieldname === 'clear_box_id') {
+        if (fieldname === 'clear_box_id') {
           this.clearJobMapping(locCd);
         }
       }
@@ -339,7 +343,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       clearJobMapping(locationCode) {
         let ajax = this.$['clear-job-mapping'];
-        var rackCd = LOGIS_UTIL.getRackCd();
+        var rackCd = LOGIS_UTIL.getEquipCd();
         ajax.curl = `/pda_process/unassign/location_box/${rackCd}/${locationCode}`;
         ajax.generateRequest();
       }
@@ -351,7 +355,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} event
        */
       _locInputKeypress(event) {
-        if(event.charCode === 13) {
+        if (event.charCode === 13) {
           this.$['box-id'].select();
         }
       }
@@ -363,7 +367,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} event
        */
       _boxInputKeypress(event) {
-        if(event.charCode === 13) {
+        if (event.charCode === 13) {
           this.executeJobMapping();
         }
       }
@@ -378,7 +382,7 @@ Copyright © HatioLab Inc. All rights reserved.
           const execJobMappingAjax = this.$['exec-job-mapping'];
           const locCd = this.$['loc-cd'].value;
           const boxId = this.$['box-id'].value;
-          var rackCd = LOGIS_UTIL.getRackCd();
+          var rackCd = LOGIS_UTIL.getEquipCd();
           execJobMappingAjax.curl = `/pda_process/assign/location_box/${rackCd}/${locCd}/${boxId}`;
           execJobMappingAjax.generateRequest();
 
@@ -399,7 +403,8 @@ Copyright © HatioLab Inc. All rights reserved.
         let locCd = this.$['loc-cd'].value;
         let boxId = this.$['box-id'].value;
 
-        let isValidLocCd = false, isValidBoxId = false;
+        let isValidLocCd = false,
+          isValidBoxId = false;
 
         if (locCd) {
           isValidLocCd = this.locations && this.locations.find(rowData => {
@@ -411,14 +416,14 @@ Copyright © HatioLab Inc. All rights reserved.
           isValidBoxId = true;
         }
 
-        if(!isValidLocCd) {
+        if (!isValidLocCd) {
           throw {
             title: t('error.VALIDATION_ERROR'),
             message: t('error.loc_cd_invalid'),
             confirmCallback: this._clearView.bind(this)
           }
 
-        } else if(!isValidBoxId) {
+        } else if (!isValidBoxId) {
           throw {
             title: t('error.VALIDATION_ERROR'),
             message: t('error.box_id_invalid'),

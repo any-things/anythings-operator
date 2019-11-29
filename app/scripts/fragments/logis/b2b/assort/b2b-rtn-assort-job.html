@@ -552,7 +552,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           rackCd: {
             type: String,
-            value: LOGIS_UTIL.getRackCd(),
+            value: LOGIS_UTIL.getEquipCd(),
             observer: '_rackCdChanged'
           },
 
@@ -564,7 +564,7 @@ Copyright © HatioLab Inc. All rights reserved.
           rackNm: {
             type: String,
             notify: true,
-            value: LOGIS_UTIL.getRackNm(),
+            value: LOGIS_UTIL.getEquipNm(),
             observer: '_rackNmChanged'
           },
 
@@ -1111,7 +1111,7 @@ Copyright © HatioLab Inc. All rights reserved.
       _reset(isItemReset) {
         this.rackCd = this.rackCd;
         this.zoneCd = this.zoneCd;
-        this.sideCd = LOGIS_UTIL.getRackSide();
+        this.sideCd = LOGIS_UTIL.getWorkSideCd();
         this.showOthersOrder = false;
 
         this.skuBarcd = '';
@@ -1226,7 +1226,6 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Number} totalPickedQty 총 확정 수량
        */
       _showAdjustFullboxQty(boxId, locCd, totalPickedQty, jobId) {
-
         if (!boxId || totalPickedQty <= 0) {
           return;
         }
@@ -1269,12 +1268,11 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Number} fullboxQty 풀 박스 수량
        */
       _requestFullbox(boxId, locCd, fullboxQty, jobId) {
-        var ajax = this.$['request-fullbox-ajax']
-
-        var equipType = LOGIS_UTIL.getEquipType() || "Rack";
-        var equipCd = LOGIS_UTIL.getRackCd();
+        var equipType = LOGIS_UTIL.getEquipType() || 'Rack';
+        var equipCd = LOGIS_UTIL.getEquipCd();
         var deviceType = LOGIS_UTIL.getDeviceType();
 
+        var ajax = this.$['request-fullbox-ajax'];
         ajax.curl = `/device_process/fullbox/${deviceType}/${equipType}/${equipCd}/${jobId}`;
         ajax.params = {
           req_qty: fullboxQty,

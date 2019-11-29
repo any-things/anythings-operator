@@ -588,19 +588,19 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           rackCd: {
             type: String,
-            value: LOGIS_UTIL.getRackCd(),
+            value: LOGIS_UTIL.getEquipCd(),
             observer: '_rackCdChanged'
           },
 
           /**
-           * 작업할 랙 명 표시값
+           * 작업할 설비 이름 표시값
            ****************
            * @type {String}
            */
           rackNm: {
             type: String,
             notify: true,
-            value: LOGIS_UTIL.getRackNm(),
+            value: LOGIS_UTIL.getEquipNm(),
             observer: '_rackNmChanged'
           },
 
@@ -612,7 +612,7 @@ Copyright © HatioLab Inc. All rights reserved.
           zoneCd: {
             type: String,
             notify: true,
-            value: LOGIS_UTIL.getEquipZone(),
+            value: LOGIS_UTIL.getStationCd(),
             observer: '_zoneCdChanged'
           }
         }
@@ -874,7 +874,7 @@ Copyright © HatioLab Inc. All rights reserved.
       refreshInputDetails(mpiOnFlag) {
         let rackCd = this.rackCd;
         let zoneCd = this.zoneCd;
-        let sideCd = LOGIS_UTIL.getRackSide();
+        let sideCd = LOGIS_UTIL.getWorkSideCd();
         let comCd = this.comCd ? this.comCd : '_na_';
         let skuCd = this.skuCd ? this.skuCd : '_na_';
         let headerColor = this.selectedInput ? this.selectedInput.mpi_color : 'Y';
@@ -1170,7 +1170,7 @@ Copyright © HatioLab Inc. All rights reserved.
       _reset(isItemReset) {
         this.rackCd = this.rackCd;
         this.zoneCd = this.zoneCd;
-        this.sideCd = LOGIS_UTIL.getRackSide();
+        this.sideCd = LOGIS_UTIL.getWorkSideCd();
         this.showOthersOrder = false;
 
         this.skuBarcd = '';

@@ -240,51 +240,50 @@ Copyright © HatioLab Inc. All rights reserved.
                 <span class="proc"><b>[[skuWeight]]</b> ([[skuMinimumWeight]] ~ [[skuMaximumWeight]])</span>
               </template>
 
-              <template is="dom-if" if="[[rejectStatus]]">
+  <template is="dom-if" if="[[rejectStatus]]">
                 <span class="proc-reject"><b>[[skuWeight]]</b> ([[skuMinimumWeight]] ~ [[skuMaximumWeight]])</span>
               </template>
-          </div>
-        </template>
-      </div>
+  </div>
+  </template>
+  </div>
 
-      <div id="bottom-container">
-        <item-list
-          header="[[header]]"
-          data="[[items]]"
-          on-configured="_addCompleteClass">
-        </item-list>
+  <div id="bottom-container">
+    <item-list header="[[header]]" data="[[items]]" on-configured="_addCompleteClass">
+    </item-list>
 
-        <div class="right-section">
-          <div class="radio-section">
-              <input type="radio" on-click="_handleInspectionMethodClick" name="chk_info" value="each" checked="checked" id="each">
-              <label for="each">[[indivisualLabel]]</label><br/>
-                <!--input type="radio" on-click="_handleInspectionMethodClick" name="chk_info" value="total" id="total">
+    <div class="right-section">
+      <div class="radio-section">
+        <input type="radio" on-click="_handleInspectionMethodClick" name="chk_info" value="each" checked="checked" id="each">
+        <label for="each">[[indivisualLabel]]</label><br/>
+        <!--input type="radio" on-click="_handleInspectionMethodClick" name="chk_info" value="total" id="total">
                 <label for="total">[[batchLabel]]</label><br/>
                 <input type="radio" on-click="_handleInspectionMethodClick" name="chk_info" value="inputCount" id="inputCount">
                 <label for="inputCount">[[qtyInputLabel]]</label><br/>
                 <input type="radio" on-click="_handleInspectionMethodClick" name="chk_info" value="addSku" id="addSku">
                 <label for="addSku">[[addSkuLabel]]</label-->
-          </div>
+      </div>
 
-          <div class="btn-section">
-            <template is="dom-if" if="[[jobType]]">
+      <div class="btn-section">
+        <template is="dom-if" if="[[jobType]]">
                 <button id="inspection-btn" on-click="searchSBS">[[sbsLabel]]</button>
             </template>
 
-            <button id="inspection-btn" on-click="completeInspection">[[completeLabel]]</button>
-            <button id="retry-inspection-btn" on-click="changeInspectionStatus">[[retryInspectionLabel]]</button>
-            <button id="reset-btn" on-click="reset">[[resetLabel]]</button>
-            <button id="reset-all-btn" on-click="resetAll">[[resetAllLabel]]</button>
-            <button id="reprint-btn" on-click="reprint">[[reprintLabel]]</button>
-          </div>
-        </div>
+        <button id="inspection-btn" on-click="completeInspection">[[completeLabel]]</button>
+        <button id="retry-inspection-btn" on-click="changeInspectionStatus">[[retryInspectionLabel]]</button>
+        <button id="reset-btn" on-click="reset">[[resetLabel]]</button>
+        <button id="reset-all-btn" on-click="resetAll">[[resetAllLabel]]</button>
+        <button id="reprint-btn" on-click="reprint">[[reprintLabel]]</button>
       </div>
     </div>
+  </div>
+  </div>
   </template>
 
   <script>
     class B2CQtyInspection extends Polymer.Element {
-      static get is() { return 'b2c-qty-inspection' }
+      static get is() {
+        return 'b2c-qty-inspection'
+      }
 
       static get properties() {
         return {
@@ -363,7 +362,7 @@ Copyright © HatioLab Inc. All rights reserved.
            ****************
            * @type {String}
            */
-           sbsLabel: {
+          sbsLabel: {
             type: String,
             value: t('button.search_sbs')
           },
@@ -443,7 +442,7 @@ Copyright © HatioLab Inc. All rights reserved.
            ****************
            * @type {String}
            */
-           retryInspectionLabel: {
+          retryInspectionLabel: {
             type: String,
             value: t('button.retry_inspection')
           },
@@ -645,49 +644,49 @@ Copyright © HatioLab Inc. All rights reserved.
            ****************
            * @type {String}
            */
-           getSkuAjaxUrl: {
+          getSkuAjaxUrl: {
             type: String,
-            value : `/pda_process/find_sku/${LOGIS_UTIL.getRackCd()}/:inputValue`
+            value: `/pda_process/find_sku/${LOGIS_UTIL.getEquipCd()}/:inputValue`
           },
           /**
            * SKU 정보 조회 후 복수개가 조회된 경우 사용자가 고를 수 있는 팝업이 실행되는데 그 팝업에 표시할 타이틀
            ****************
            * @type {String}
            */
-           popupTitleLabel: {
+          popupTitleLabel: {
             type: String,
             value: () => t('label.sku')
           },
         }
       }
-      _onBarcodeScan(e){
-        if (e.key != 'Enter') return;
+      _onBarcodeScan(e) {
+          if (e.key != 'Enter') return;
 
-        if(/^[bcdfghiBCDFGHI][0-9]{7}$/.exec(e.currentTarget.value)){
-          this.$['bucket-cd'].value = e.currentTarget.value;
-          if(this.$['sku-barcode'] === e.currentTarget){
-            this.$['sku-barcode'].value = '';
+          if (/^[bcdfghiBCDFGHI][0-9]{7}$/.exec(e.currentTarget.value)) {
+            this.$['bucket-cd'].value = e.currentTarget.value;
+            if (this.$['sku-barcode'] === e.currentTarget) {
+              this.$['sku-barcode'].value = '';
+            }
+            this._onBucketCdScan(e)
+          } else {
+            this.$['sku-barcode'].value = e.currentTarget.value;
+            this.$['sku-bcd'].value = e.currentTarget.value;
+            this.$['sku-bcd']._triggerAjax();
           }
-          this._onBucketCdScan(e)
-        }else{
-          this.$['sku-barcode'].value = e.currentTarget.value;
-          this.$['sku-bcd'].value = e.currentTarget.value;
-          this.$['sku-bcd']._triggerAjax();
         }
-      }
-      /**
-       * 최초 코드
-       */
+        /**
+         * 최초 코드
+         */
       connectedCallback() {
         super.connectedCallback();
         document.addEventListener('page-changed', event => {
-          if(event.detail.currentPage === location.hash.replace('#/', '')) {
+          if (event.detail.currentPage === location.hash.replace('#/', '')) {
             this.focusBucketInput();
           }
         });
 
         document.addEventListener(`alert-closed-at-${location.hash.replace('#/', '')}`, event => {
-          if(!event.detail.hasCallback) {
+          if (!event.detail.hasCallback) {
             this.focusBucketInput();
           }
         });
@@ -727,7 +726,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * 박스 ID 스캔 전 Validation Check
        */
       validateBeforeBucketScan() {
-        if(!this.bucketCd || this.bucketCd.length < 4) {
+        if (!this.bucketCd || this.bucketCd.length < 4) {
           throw {
             title: t('error.VALIDATION_ERROR'),
             message: t('error.bucket_cd_invalid'),
@@ -768,7 +767,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * 주문 번호 스캔 전 Validation Check
        */
       validateBeforeOrderScan() {
-        if(!this.orderId || this.orderId < 5) {
+        if (!this.orderId || this.orderId < 5) {
           throw {
             title: t('error.VALIDATION_ERROR'),
             message: t('error.order_id_invalid'),
@@ -786,7 +785,7 @@ Copyright © HatioLab Inc. All rights reserved.
         // if (e.key != 'Enter') return;
 
         // this.items (검수 대상 리스트)가 존재 하지 않는다면 alert
-        if(!this.items || this.items.length == 0) {
+        if (!this.items || this.items.length == 0) {
           e.currentTarget.value = '';
           this.showMessage(t('error.VALIDATION_ERROR'), t('text.target_not_exist'), this.focusBucketInput.bind(this));
           return;
@@ -798,7 +797,7 @@ Copyright © HatioLab Inc. All rights reserved.
         });
 
         // found (검수 대상 리스트 중 입력한 상품 코드와 일치하는 것)가 없다면 alert
-        if(!found || found.length == 0) {
+        if (!found || found.length == 0) {
           this.showMessage(t('error.invalid_sku_cd'), t('text.scanned_sku_code_not_exist'), this.focusSkuBarcdInput.bind(this));
           return;
         }
@@ -808,30 +807,30 @@ Copyright © HatioLab Inc. All rights reserved.
         let finishedItem = null;
         var flag = 0;
         let newItems = this.items.map((item, index) => {
-          if(skuBarcode == item.sku_cd || skuBarcode == item.sku_barcd) {
-            if(flag >=1){
+          if (skuBarcode == item.sku_cd || skuBarcode == item.sku_barcd) {
+            if (flag >= 1) {
               return item;
             }
-            if(item.diff_qty == 0) {
+            if (item.diff_qty == 0) {
               this.showMessage(t('error.out_of_valid_qty'), t('text.confirm_qty_out_of_item_qty'), this.focusSkuBarcdInput.bind(this));
               errorFlag = true;
               return null;
             }
 
-            if(this.inspectionMethodValue == 'each') {
+            if (this.inspectionMethodValue == 'each') {
               item.confirm_qty = ++item.confirm_qty;
               this.confirmSkuPcsQty = this.confirmSkuPcsQty + 1;
               flag++;
-            } else if(this.inspectionMethodValue == 'total') {
+            } else if (this.inspectionMethodValue == 'total') {
               var calcQty = item.item_qty - item.confirm_qty;
               item.confirm_qty = item.item_qty;
               this.confirmSkuPcsQty = this.confirmSkuPcsQty + calcQty;
 
-            } else if(this.inspectionMethodValue == 'inputCount') {
+            } else if (this.inspectionMethodValue == 'inputCount') {
               const inputCountPopup = document.createElement('inspection-enter-qty-popup');
               inputCountPopup.item = item;
 
-              if(item.sku_cd == skuBarcode || skuBarcode == item.sku_barcd) {
+              if (item.sku_cd == skuBarcode || skuBarcode == item.sku_barcd) {
                 document.dispatchEvent(new CustomEvent('open-dialog', {
                   detail: {
                     content: inputCountPopup,
@@ -843,14 +842,14 @@ Copyright © HatioLab Inc. All rights reserved.
                     },
                     closeCallback: () => {
                       let inputQty = inputCountPopup.inputQty;
-                      if(!inputQty) {
+                      if (!inputQty) {
                         this.focusSkuBarcdInput();
                         return;
                       }
                       this.confirmSkuPcsQty = this.confirmSkuPcsQty + inputQty;
-                      if(this.items[index].diff_qty > 0) {
+                      if (this.items[index].diff_qty > 0) {
                         this.items[index].diff_qty = this.items[index].item_qty - this.items[index].confirm_qty;
-                        if(this.items[index].diff_qty == 0) {
+                        if (this.items[index].diff_qty == 0) {
                           this.confirmSkuCnt = this.confirmSkuCnt + 1;
                           finishedItem = this.items[index];
                         }
@@ -858,19 +857,19 @@ Copyright © HatioLab Inc. All rights reserved.
 
                       let countItems = this.items;
 
-                      if(!errorFlag) {
-                        if(finishedItem) {
+                      if (!errorFlag) {
+                        if (finishedItem) {
                           countItems.splice(countItems.indexOf(finishedItem), 1);
                           countItems.push(finishedItem);
                         }
                       }
 
                       this.set('items', []);
-                      this.set('items',countItems);
+                      this.set('items', countItems);
 
                       this.focusSkuBarcdInput();
                       // 모든 검수가 완료 되었는지 확인하고 완료 되었다면 자동으로 검수 완료 처리
-                      if(this.checkFinished(this.items)) {
+                      if (this.checkFinished(this.items)) {
                         this.completeInspection();
                       }
                     }
@@ -878,16 +877,16 @@ Copyright © HatioLab Inc. All rights reserved.
                 }));
               }
 
-            }else if(this.inspectionMethodValue == 'addSku'){
+            } else if (this.inspectionMethodValue == 'addSku') {
               //바코드를 스캔할 때마다 상품 추가작업
               let pickAjax = this.$['add-sku-ajax'];
               pickAjax.curl = '';
 
             }
-            if(this.inspectionMethodValue != 'inputCount') {
-              if(item.diff_qty > 0) {
+            if (this.inspectionMethodValue != 'inputCount') {
+              if (item.diff_qty > 0) {
                 item.diff_qty = item.item_qty - item.confirm_qty;
-                if(item.diff_qty == 0) {
+                if (item.diff_qty == 0) {
                   this.confirmSkuCnt = this.confirmSkuCnt + 1;
                   finishedItem = item;
                   flag++;
@@ -899,8 +898,8 @@ Copyright © HatioLab Inc. All rights reserved.
         });
 
         // 오류가 없고 항목이 완료되었다면 완료된 항목은 아래로 이동 - 소팅
-        if(!errorFlag) {
-          if(finishedItem) {
+        if (!errorFlag) {
+          if (finishedItem) {
             newItems.splice(newItems.indexOf(finishedItem), 1);
             newItems.push(finishedItem);
           }
@@ -908,7 +907,7 @@ Copyright © HatioLab Inc. All rights reserved.
         }
         this.$['sku-barcode'].value = '';
         // 모든 검수가 완료 되었는지 확인하고 완료 되었다면 자동으로 검수 완료 처리
-        if(this.checkFinished(this.items)) {
+        if (this.checkFinished(this.items)) {
           this.completeInspection();
         }
       }
@@ -920,8 +919,8 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       checkFinished(items) {
         let finished = true;
-        for(let i = 0; i < items.length; i++) {
-          if(items[i].diff_qty > 0) {
+        for (let i = 0; i < items.length; i++) {
+          if (items[i].diff_qty > 0) {
             finished = false;
             break;
           }
@@ -935,9 +934,9 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Array} items
        ***************
        */
-       _addSkuResponsed(items) {
+      _addSkuResponsed(items) {
         //피킹이 완료되면 검수완료 작업.
-        if(items.length <=0){
+        if (items.length <= 0) {
           this.completeInspection();
         }
       }
@@ -948,26 +947,26 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} inspection
        */
       _inspectionChanged(inspection) {
-        if(inspection == null) return;
-        if(!(/([BRES])/.test(inspection.status))){
-          document.dispatchEvent(new CustomEvent('show-toast',{
-              detail:{
-                type: t('text.cannot_inspection_now'),
-                message: t('text.cannot_inspection_now')
-              }
-            }));
-            this.clearView();
-            this.focusBucketInput();
-            return;
+        if (inspection == null) return;
+        if (!(/([BRES])/.test(inspection.status))) {
+          document.dispatchEvent(new CustomEvent('show-toast', {
+            detail: {
+              type: t('text.cannot_inspection_now'),
+              message: t('text.cannot_inspection_now')
+            }
+          }));
+          this.clearView();
+          this.focusBucketInput();
+          return;
         }
         this.currentOrderId = inspection.order_id;
         this.custOrderId = inspection.cust_order_id;
         this.currentBucketCd = inspection.box_id;
         this.$['order-cd'].value = this.currentOrderId;
         this.$['bucket-cd'].value = this.currentBucketCd;
-        if(inspection.job_type === 'QPS') {
+        if (inspection.job_type === 'QPS') {
           this.jobType = true;
-          if(inspection.status === 'R') this.rejectStatus = true;
+          if (inspection.status === 'R') this.rejectStatus = true;
           else this.rejectStatus = false;
         } else {
           this.jobType = false;
@@ -977,7 +976,7 @@ Copyright © HatioLab Inc. All rights reserved.
         let skuPcs = 0;
 
         this.inspectionStatus = inspection.status;
-        if(this.inspectionStatus === 'B' || this.inspectionStatus === 'R') {
+        if (this.inspectionStatus === 'B' || this.inspectionStatus === 'R') {
           this.$['inspection-btn'].hidden = false;
           this.$['reset-btn'].hidden = false;
           this.$['reset-all-btn'].hidden = false;
@@ -1003,7 +1002,7 @@ Copyright © HatioLab Inc. All rights reserved.
         this.inspectionStatus === 'B' || this.inspectionStatus === 'R' ? this.confirmSkuPcsQty = 0 : this.confirmSkuPcsQty = this.pickedSkuPcsQty;
         this.focusSkuBarcdInput();
 
-        if(this.jobType) {
+        if (this.jobType) {
           this.$['input-section'].style['grid-template'] = '1.1fr / 1.4fr 1fr 1fr 1fr 1.4fr';
           this.skuMinimumWeight = (inspection.box_weight_list[0]).toFixed(0);
           this.skuWeight = (inspection.box_weight_list[1]).toFixed(0);
@@ -1045,7 +1044,7 @@ Copyright © HatioLab Inc. All rights reserved.
         let list = event.detail.contentElements;
         list.forEach(row => {
           let data = row.getData();
-          if(data.diff_qty <= 0) {
+          if (data.diff_qty <= 0) {
             row.classList.add('complete')
             let columns = Array.from(row.querySelectorAll('span.data-item'));
             columns.forEach(column => {
@@ -1060,8 +1059,8 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       completeInspection() {
         // 1. 모두 확인하였다면 검수 완료
-        if(this.pickedSkuCnt > 0 && this.confirmSkuCnt > 0 && this.pickedSkuCnt > 0 && this.confirmSkuCnt > 0 &&
-           this.pickedSkuCnt == this.confirmSkuCnt && this.pickedSkuPcsQty == this.confirmSkuPcsQty) {
+        if (this.pickedSkuCnt > 0 && this.confirmSkuCnt > 0 && this.pickedSkuCnt > 0 && this.confirmSkuCnt > 0 &&
+          this.pickedSkuCnt == this.confirmSkuCnt && this.pickedSkuPcsQty == this.confirmSkuPcsQty) {
           var completeAjax = this.$['inspection-complete-ajax'];
           completeAjax.curl = '/kiosk_process/dps/inspection/by_qty/finish/' + this.currentOrderId;
           completeAjax.customParams = {
@@ -1111,10 +1110,10 @@ Copyright © HatioLab Inc. All rights reserved.
        * 초기화
        */
       reset() {
-        if(this.items && this.items.length) {
+        if (this.items && this.items.length) {
           this.items = this.items.map((item) => {
-            if(this.prevSkuBarcode == item.sku_cd || this.prevSkuBarcode == item.sku_barcd) {
-              if(item.diff_qty == 0) {
+            if (this.prevSkuBarcode == item.sku_cd || this.prevSkuBarcode == item.sku_barcd) {
+              if (item.diff_qty == 0) {
                 this.confirmSkuCnt = this.confirmSkuCnt - 1;
               }
 
@@ -1128,7 +1127,7 @@ Copyright © HatioLab Inc. All rights reserved.
         }
 
         this.$['sku-barcode'].value = '';
-        if(this.$['bucket-cd'].value) {
+        if (this.$['bucket-cd'].value) {
           this.focusSkuBarcdInput();
         } else {
           this.focusBucketInput();
@@ -1139,7 +1138,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * 전체 초기화
        */
       resetAll() {
-        if(this.items && this.items.length) {
+        if (this.items && this.items.length) {
           this.items = this.items.map((item) => {
             item.confirm_qty = 0;
             item.diff_qty = item.item_qty - item.confirm_qty;
@@ -1151,7 +1150,7 @@ Copyright © HatioLab Inc. All rights reserved.
         this.confirmSkuCnt = 0;
         this.confirmSkuPcsQty = 0;
 
-        if(this.$['bucket-cd'].value) {
+        if (this.$['bucket-cd'].value) {
           this.focusSkuBarcdInput();
         } else {
           this.focusBucketInput();
@@ -1163,7 +1162,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       reprint() {
         // 검수가 완료되었다면 재발행을 호출할 수 있다.
-        if(this.inspectionStatus === 'E' || this.inspectionStatus === 'S'){
+        if (this.inspectionStatus === 'E' || this.inspectionStatus === 'S') {
           var reprintAjax = this.$['reprint-invoice-ajax'];
           reprintAjax.curl = '/kiosk_process/dps/inspection/print/' + this.currentOrderId;
           reprintAjax.customParams = {
@@ -1179,7 +1178,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * 재발행 후 호출되는 리스너
        */
       _reprintSucceed(e) {
-        if(e.detail.result.toLowerCase() === 'ok'){
+        if (e.detail.result.toLowerCase() === 'ok') {
           this.inspectionStatus = '';
           this._inspectionResultChanged();
         } else {
@@ -1265,14 +1264,14 @@ Copyright © HatioLab Inc. All rights reserved.
        * sku-barcode input field select
        */
       focusSkuBarcdInput() {
-        this.$['sku-barcode'].select();
-      }
-      /**
-       * SKU 정보 조회 시 복수개가 조회된 경우 사용자가 고를 수 있는 버튼이 실행되는데 그 버튼에 표시할 내용
-       *******************
-       * @param {Object} item
-       */
-       _skuButtonTxtCallback(item) {
+          this.$['sku-barcode'].select();
+        }
+        /**
+         * SKU 정보 조회 시 복수개가 조회된 경우 사용자가 고를 수 있는 버튼이 실행되는데 그 버튼에 표시할 내용
+         *******************
+         * @param {Object} item
+         */
+      _skuButtonTxtCallback(item) {
         return `(${item.sku_cd})
                 ${item.sku_nm}`;
       }
@@ -1284,11 +1283,11 @@ Copyright © HatioLab Inc. All rights reserved.
         var sbsUrl = 'http://128.10.1.128/source/report/open_gdc_o.asp?orderid=' + this.custOrderId;
         window.open(sbsUrl, 'SBS');
       }
-      changeInspectionStatus(){
+      changeInspectionStatus() {
         var boxId = this.$['bucket-cd'].value;
         var inputType = LOGIS_UTIL.getB2CInputBoxType();
         var changeStatusAjax = this.$['change-status-ajax'];
-        changeStatusAjax.curl = '/kiosk_process/dps/inspection/by_qty/again/'+inputType+'/'+boxId;
+        changeStatusAjax.curl = '/kiosk_process/dps/inspection/by_qty/again/' + inputType + '/' + boxId;
         changeStatusAjax.generateRequest();
       }
     }

@@ -287,7 +287,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           getSkuAjaxUrl: {
             type: String,
-            value: `/pda_process/find_stock_sku/${LOGIS_UTIL.getRackCd()}/:inputValue`
+            value: `/pda_process/find_stock_sku/${LOGIS_UTIL.getEquipCd()}/:inputValue`
           },
 
           /**
@@ -349,7 +349,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _getSkuInfo(skuBarcd) {
         const skuInfoAjax = this.$['sku-info-ajax'];
-        let rackCd = LOGIS_UTIL.getRackCd();
+        let rackCd = LOGIS_UTIL.getEquipCd();
         skuInfoAjax.curl = `/pda_process/find_stock_sku/${rackCd}/${skuBarcd}`;
         skuInfoAjax.generateRequest();
       }
@@ -379,7 +379,7 @@ Copyright © HatioLab Inc. All rights reserved.
         if (skuInfo) {
           if (skuInfo.sku_cd && skuInfo.sku_cd.length >= 4) {
             const locationAjax = this.$['location-ajax'];
-            let rackCd = LOGIS_UTIL.getRackCd();
+            let rackCd = LOGIS_UTIL.getEquipCd();
             locationAjax.curl = `/pda_process/dps/recommend_load_locs/${rackCd}/${skuInfo.sku_cd}/${skuInfo.com_cd}`;
             locationAjax.generateRequest();
           }
@@ -436,7 +436,7 @@ Copyright © HatioLab Inc. All rights reserved.
       getOrderStockInfo() {
         try {
           this.validateBeforeOrderStockAjax();
-          const rackCd = LOGIS_UTIL.getRackCd();
+          const rackCd = LOGIS_UTIL.getEquipCd();
           const orderStockAjax = this.$['order-stock-ajax'];
           orderStockAjax.curl = `/pda_process/dps/find_order_stock/${rackCd}/${this.locCd}/${this.skuCd}`;
           orderStockAjax.generateRequest();
@@ -574,7 +574,7 @@ Copyright © HatioLab Inc. All rights reserved.
           try {
             // 재고 적치전 validation 수행
             this.validateBeforeLoadStock();
-            let rackCd = LOGIS_UTIL.getRackCd();
+            let rackCd = LOGIS_UTIL.getEquipCd();
             let loadQty = this.inputQty;
             let qtyUnit = 'P';
             const loadStockAjax = this.$['load-stock-ajax'];

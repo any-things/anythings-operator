@@ -432,7 +432,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           rackCd: {
             type: String,
-            value: LOGIS_UTIL.getRackCd(),
+            value: LOGIS_UTIL.getEquipCd(),
             observer: '_rackCdChanged'
           },
 
@@ -444,7 +444,7 @@ Copyright © HatioLab Inc. All rights reserved.
           rackNm: {
             type: String,
             notify: true,
-            value: LOGIS_UTIL.getRackNm(),
+            value: LOGIS_UTIL.getEquipNm(),
             observer: '_rackNmChanged'
           },
 

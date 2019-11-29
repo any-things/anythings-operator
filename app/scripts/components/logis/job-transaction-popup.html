@@ -60,22 +60,22 @@ Copyright © HatioLab Inc. All rights reserved.
         <sku-qrcode-view data=[[skuCd]]></sku-qrcode-view>
       </template>
 
-      <button on-click="adjustQty" hidden$="[[hideAdjustBtn]]">[[adjustQtyLabel]]</button>
+  <button on-click="adjustQty" hidden$="[[hideAdjustBtn]]">[[adjustQtyLabel]]</button>
 
-      <template is="dom-if" if="[[showFullBoxBtn]]">
+  <template is="dom-if" if="[[showFullBoxBtn]]">
         <button on-click="labelPrint">[[fullBoxLabel]]</button>
       </template>
 
-      <template is="dom-if" if="[[showJobCancelBtn]]">
+  <template is="dom-if" if="[[showJobCancelBtn]]">
         <button on-click="jobCancel">[[jobCancelLabel]]</button>
       </template>
 
-      <template is="dom-if" if="[[showJobFinishBtn]]">
+  <template is="dom-if" if="[[showJobFinishBtn]]">
         <button on-click="jobFinish">[[jobFinishLabel]]</button>
       </template>
 
-      <button id="close-btn" on-click="closeDialog">[[closeDialogLabel]]</button>
-    </div>
+  <button id="close-btn" on-click="closeDialog">[[closeDialogLabel]]</button>
+  </div>
   </template>
 
   <script>
@@ -222,10 +222,10 @@ Copyright © HatioLab Inc. All rights reserved.
        * @description 라벨 출력
        ********************
        */
-      labelPrint() { 
+      labelPrint() {
         let equipType = LOGIS_UTIL.getEquipType() || "Rack";
-        let equipCd = LOGIS_UTIL.getRackCd();
-        let deviceType = LOGIS_UTIL.getDeviceType(); 
+        let equipCd = LOGIS_UTIL.getEquipCd();
+        let deviceType = LOGIS_UTIL.getDeviceType();
 
         let fullBoxAjax = this.getJobHandleAjax({
           curl: `/device_process/fullbox/${deviceType}/${equipType}/${equipCd}/${this.jobId}`,
@@ -242,13 +242,13 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       jobCancel() {
         let equipType = LOGIS_UTIL.getEquipType() || "Rack";
-        let equipCd = LOGIS_UTIL.getRackCd();
-        let deviceType = LOGIS_UTIL.getDeviceType(); 
+        let equipCd = LOGIS_UTIL.getEquipCd();
+        let deviceType = LOGIS_UTIL.getDeviceType();
 
         let jobCancelAjax = this.getJobHandleAjax({
           curl: `/device_process/classify/cancel/${deviceType}/${equipType}/${equipCd}/${this.jobId}`,
           method: 'POST',
-          responseCallback: this._jobCancelResponsed.bind(this) 
+          responseCallback: this._jobCancelResponsed.bind(this)
         });
 
         jobCancelAjax.generateRequest();
@@ -260,7 +260,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       jobFinish() {
         let equipType = LOGIS_UTIL.getEquipType() || "Rack";
-        let equipCd = LOGIS_UTIL.getRackCd();
+        let equipCd = LOGIS_UTIL.getEquipCd();
         let deviceType = LOGIS_UTIL.getDeviceType();
 
         let jobFinishAjax = this.getJobHandleAjax({
@@ -289,7 +289,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @description 수량 조절
        ********************
        */
-      adjustQty() { 
+      adjustQty() {
         this.closeDialog({
           detail: {
             type: 'adjust-qty',

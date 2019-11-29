@@ -87,12 +87,16 @@ Copyright © HatioLab Inc. All rights reserved.
 
   <script>
     class TabDasOrderList extends Polymer.Element {
-      static get is() { return 'tab-das-order-list' }
+      static get is() {
+        return 'tab-das-order-list'
+      }
 
       static get properties() {
         return {
           labelUndoOrderQty: {
-            value: () => { return t('label.unfinished_qty'); }
+            value: () => {
+              return t('label.unfinished_qty');
+            }
           },
 
           undoOrderQty: {
@@ -276,7 +280,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @description 이 화면의 표시 상태가 바뀔 때 handle
        */
       _visibleChanged(visible) {
-        if(visible) {
+        if (visible) {
           this.refresh();
         }
       }
@@ -291,7 +295,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       _itemsChanged(items) {
-        if(!items || items.length <= 0) return;
+        if (!items || items.length <= 0) return;
         var undoOrderQty = 0;
         items.forEach((item) => {
           if (!this.isComplete(item)) {
@@ -308,13 +312,13 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Array} items
        */
       refresh() {
-        let rackCd = LOGIS_UTIL.getRackCd();
-        let zoneCd = LOGIS_UTIL.getEquipZone();
-        let sideCd = LOGIS_UTIL.getRackSide();
+        let rackCd = LOGIS_UTIL.getEquipCd();
+        let zoneCd = LOGIS_UTIL.getStationCd();
+        let sideCd = LOGIS_UTIL.getWorkSideCd();
         const inputListAjax = this.$['input-list-ajax'];
         inputListAjax.curl = `/tablet_process/input_status/${rackCd}/${zoneCd}/${sideCd}`;
 
-        if(inputListAjax.baseUrl) {
+        if (inputListAjax.baseUrl) {
           // 최초 호출이 아닌 baseUrl이 있는 경우에는 명시적으로 generateRequest를 호출함
           inputListAjax.generateRequest();
         }
@@ -334,13 +338,13 @@ Copyright © HatioLab Inc. All rights reserved.
        ****************
        * @type {Object} event
        */
-       _addCompleteAttribute(event) {
+      _addCompleteAttribute(event) {
         const rows = event.detail.contentElements;
         rows.forEach(row => {
           const status = row.getData().status;
-          if(status === 'F') { // 완료 상태
+          if (status === 'F') { // 완료 상태
             row.classList.add('complete');
-          } else if(status === 'U') { // 미완료 상태
+          } else if (status === 'U') { // 미완료 상태
             row.classList.add('canceled');
           } else if (status === 'C') {
             row.classList.add('canceled');
@@ -355,9 +359,9 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} event
        */
       _skuSelected(event) {
-        const rackCd = LOGIS_UTIL.getRackCd();
-        const zoneCd = LOGIS_UTIL.getEquipZone();
-        const sideCd = LOGIS_UTIL.getRackSide();
+        const rackCd = LOGIS_UTIL.getEquipCd();
+        const zoneCd = LOGIS_UTIL.getStationCd();
+        const sideCd = LOGIS_UTIL.getWorkSideCd();
         const comCd = event.detail.data.com_cd;
         const skuCd = event.detail.data.sku_cd;
         const skuNm = event.detail.data.sku_nm;
@@ -378,7 +382,7 @@ Copyright © HatioLab Inc. All rights reserved.
                 let rowData = row.getData();
                 let pickQty = parseInt(rowData.pick_qty);
                 let pickedQty = parseInt(rowData.picked_qty);
-                if(pickQty === pickedQty || rowData.status === 'F') {
+                if (pickQty === pickedQty || rowData.status === 'F') {
                   row.classList.add('complete');
                 } else if (rowData.status === 'C') {
                   row.classList.add('canceled');

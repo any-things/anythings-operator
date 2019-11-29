@@ -61,7 +61,9 @@ Copyright © HatioLab Inc. All rights reserved.
 
   <script>
     class PdaRegionSkuInfo extends Polymer.Element {
-      static get is() { return 'pda-region-sku-info' }
+      static get is() {
+        return 'pda-region-sku-info'
+      }
 
       static get properties() {
         return {
@@ -105,8 +107,7 @@ Copyright © HatioLab Inc. All rights reserved.
               }, (() => {
                 // 작업 유형에 따라 가변
                 // 반품 작업일 때 거래처 대신 로케이션 표시
-                return LOGIS_UTIL.getJobType() === 'RTN' ?
-                {
+                return LOGIS_UTIL.getJobType() === 'RTN' ? {
                   display: t('label.location'),
                   fieldname: 'loc_cd',
                   columnWidth: '0.33fr',
@@ -114,7 +115,7 @@ Copyright © HatioLab Inc. All rights reserved.
                     textAlign: 'center'
                   },
                   displayCallback: (value, rowData) => {
-                    if(value) {
+                    if (value) {
                       var values = value.split('-');
                       return values.length >= 2 ? values[1] : value;
                     } else {
@@ -208,7 +209,7 @@ Copyright © HatioLab Inc. All rights reserved.
                 fieldname: 'loc_cd',
                 columnWidth: '0.33fr',
                 displayCallback: (value, rowData) => {
-                  if(value) {
+                  if (value) {
                     var values = value.split('-');
                     return values.length >= 2 ? values[1] : value;
                   } else {
@@ -246,7 +247,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
         // 현재 페이지로 라우팅 변경시 데이터 다시 조회하도록
         document.addEventListener('page-changed', event => {
-          if(event.detail.currentPage === 'pda_region_sku_info') {
+          if (event.detail.currentPage === 'pda_region_sku_info') {
             this.refresh();
           }
         });
@@ -265,8 +266,8 @@ Copyright © HatioLab Inc. All rights reserved.
        * @description 설정을 통해 선택한 랙와 존 영역내의 상품 리스트 조회
        */
       refresh() {
-        let rackCd = LOGIS_UTIL.getRackCd();
-        let zoneCd = LOGIS_UTIL.getEquipZone();
+        let rackCd = LOGIS_UTIL.getEquipCd();
+        let zoneCd = LOGIS_UTIL.getStationCd();
         const inputListAjax = this.$['input-list-ajax'];
         inputListAjax.curl = `/tablet_process/input_status/${rackCd}/${zoneCd}/ALL`;
         inputListAjax.generateRequest();
@@ -282,9 +283,9 @@ Copyright © HatioLab Inc. All rights reserved.
         const rows = event.detail.contentElements;
         rows.forEach(row => {
           const status = row.getData().status;
-          if(status === 'F') { // 완료 상태
+          if (status === 'F') { // 완료 상태
             row.classList.add('complete');
-          } else if(status === 'U') { // 미완료 상태
+          } else if (status === 'U') { // 미완료 상태
             row.classList.add('canceled');
           }
         });
@@ -300,8 +301,8 @@ Copyright © HatioLab Inc. All rights reserved.
         if (LOGIS_UTIL.getJobType() === 'RTN') return;
 
         const inputSeq = event.detail.data.input_seq;
-        const rackCd = LOGIS_UTIL.getRackCd();
-        const zoneCd = LOGIS_UTIL.getEquipZone();
+        const rackCd = LOGIS_UTIL.getEquipCd();
+        const zoneCd = LOGIS_UTIL.getStationCd();
 
         document.dispatchEvent(new CustomEvent('open-form-list-dialog', {
           detail: {
@@ -314,8 +315,9 @@ Copyright © HatioLab Inc. All rights reserved.
               const popupElement = params.popupElement;
               params.formData.total_pick_qty = '';
 
-              if(items && items.length > 0) {
-                let totalPlan = 0, totalPicked = 0;
+              if (items && items.length > 0) {
+                let totalPlan = 0,
+                  totalPicked = 0;
 
                 items.forEach(item => {
                   totalPlan += (item.pick_qty ? item.pick_qty : 0);
@@ -330,9 +332,9 @@ Copyright © HatioLab Inc. All rights reserved.
               const rows = params.listElement.getRows();
               rows.forEach(row => {
                 const status = row.getData().status;
-                if(status === 'F') {                // 완료 상태
+                if (status === 'F') { // 완료 상태
                   row.classList.add('complete');
-                } else if(status === 'U') {         // 미완료 상태
+                } else if (status === 'U') { // 미완료 상태
                   row.classList.add('canceled');
                 }
               });

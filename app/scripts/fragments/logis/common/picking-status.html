@@ -99,7 +99,9 @@ Copyright © HatioLab Inc. All rights reserved.
 
   <script>
     class MpsPickingList extends Polymer.Element {
-      static get is() { return 'picking-status' }
+      static get is() {
+        return 'picking-status'
+      }
 
       static get properties() {
         return {
@@ -211,7 +213,7 @@ Copyright © HatioLab Inc. All rights reserved.
       connectedCallback() {
         super.connectedCallback();
         document.addEventListener('page-changed', event => {
-          if(event.detail.currentPage === location.hash.replace('#/', '')) {
+          if (event.detail.currentPage === location.hash.replace('#/', '')) {
             this.refresh();
           }
         });
@@ -223,7 +225,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * 검색 조건을 바탕으로 데이터 조회
        */
       refresh() {
-        const rackCd = LOGIS_UTIL.getRackCd();
+        const rackCd = LOGIS_UTIL.getEquipCd();
         const locCd = this.$['loc-cd'].value;
         const skuCd = this.$['sku-cd'].value;
         const searchAjax = this._getSearchAjax();
@@ -237,7 +239,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       _lastResponseChanged(lastResponse) {
-        if(lastResponse && lastResponse.items) {
+        if (lastResponse && lastResponse.items) {
           this.items = lastResponse.items;
           this.total = lastResponse.total;
         }
@@ -256,11 +258,11 @@ Copyright © HatioLab Inc. All rights reserved.
        * item-list item click event handler
        */
       _selectItem(event) {
-        if(this.selectedItem) {
+        if (this.selectedItem) {
           this.selectedItem.classList.remove('selected')
         }
 
-        if(this.selectedItem != event.detail.row) {
+        if (this.selectedItem != event.detail.row) {
           this.selectedItem = event.detail.row;
           this.selectedItem.classList.add('selected');
         } else {
@@ -273,7 +275,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * cancel confirmation button click handler
        */
       cancelConfirmation() {
-        if(!this.selectedItem) {
+        if (!this.selectedItem) {
           openAlert({
             title: t('title.info'),
             message: t('text.NOTHING_SELECTED')
@@ -287,7 +289,7 @@ Copyright © HatioLab Inc. All rights reserved.
           critical: true,
           confirmCallback: () => {
             const selectedData = this.selectedItem.getData();
-            const rackCd =  LOGIS_UTIL.getRackCd();
+            const rackCd = LOGIS_UTIL.getEquipCd();
             const locCd = selectedData.loc_cd;
             const comCd = selectedData.com_cd;
             const skuCd = selectedData.sku_cd;

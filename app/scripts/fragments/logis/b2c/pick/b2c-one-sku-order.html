@@ -5,7 +5,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
 <link rel="import" href="../../../../../bower_components/polymer/polymer-element.html">
 
-<script src = "../../../../components/logis/logis-util.js"></script>
+<script src="../../../../components/logis/logis-util.js"></script>
 
 <!--
   물류 > B2C > 1 SKU - 1 Order 소분류 처리 화면 (PDA)
@@ -252,7 +252,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           getSkuAjaxUrl: {
             type: String,
-            value: `/pda_process/find_sku/${LOGIS_UTIL.getRackCd()}/:inputValue`
+            value: `/pda_process/find_sku/${LOGIS_UTIL.getEquipCd()}/:inputValue`
           },
 
           /**
@@ -303,22 +303,22 @@ Copyright © HatioLab Inc. All rights reserved.
        * 2. routing 변경하여 다른 화면으로 이동시 clear interval
        */
       connectedCallback() {
-        super.connectedCallback();
-        //Summary 정보 자동 조회
-        // document.addEventListener('page-changed', event => {
-        //   if(event.detail.currentPage === 'pda_one_sku_order') {
-        //     this._setRequestInterval();
-        // } else {
-        //     clearInterval(this.summaryRequestInterval);
-        //   }
-        // });
+          super.connectedCallback();
+          //Summary 정보 자동 조회
+          // document.addEventListener('page-changed', event => {
+          //   if(event.detail.currentPage === 'pda_one_sku_order') {
+          //     this._setRequestInterval();
+          // } else {
+          //     clearInterval(this.summaryRequestInterval);
+          //   }
+          // });
 
-        // this._setRequestInterval();
-        this.refreshSummary();
-      }
-      /**
-       * summary 조회 요청 interval 등록
-       */
+          // this._setRequestInterval();
+          this.refreshSummary();
+        }
+        /**
+         * summary 조회 요청 interval 등록
+         */
       _setRequestInterval() {
         this.summaryRequestInterval = setInterval(() => {
           this.refreshSummary();
@@ -332,7 +332,7 @@ Copyright © HatioLab Inc. All rights reserved.
         const summaryAjax = this._getSummaryAjax();
         summaryAjax.curl = '/pda_process/qps/one_sku_order/sum'
 
-        if(!summaryAjax.baseUrl) {
+        if (!summaryAjax.baseUrl) {
           summaryAjax.baseUrl = JSON.parse(localStorage.getItem('setting.baseUrl'));
         }
         summaryAjax.generateRequest();
@@ -342,8 +342,8 @@ Copyright © HatioLab Inc. All rights reserved.
        * summary 조회 결과 변화시 input field에 입력
        */
       _summaryChanged(summary) {
-        this._getTotalInput().value=summary.tot_qty;
-        this._getFinishedInput().value=summary.comp_qty;
+        this._getTotalInput().value = summary.tot_qty;
+        this._getFinishedInput().value = summary.comp_qty;
       }
 
       /**
@@ -367,24 +367,24 @@ Copyright © HatioLab Inc. All rights reserved.
        * 추천 박스 타입 조회 요청
        */
       _requestBoxType(event) {
-        const skuInfo = event.detail;
-        if(this.skuCd && this.skuCd == skuInfo.sku_barcd){
-          this._getSkuCdInput().value = skuInfo.sku_barcd;
-          const inspAjax = this._getInspAjax();
-          inspAjax.curl = `/pda_process/qps/one_sku_insp_with_pick/${this.mapId}`;
-          inspAjax.generateRequest();
-          // if()
-        }else{
-          this._setSkuInfo(skuInfo);
-          const boxTypeAjax = this._getBoxTypeAjax();
-          boxTypeAjax.curl = `/pda_process/qps/one_sku_order/scan_sku/${skuInfo.com_cd}/${skuInfo.sku_cd}`;
-          boxTypeAjax.generateRequest();
-        }
+          const skuInfo = event.detail;
+          if (this.skuCd && this.skuCd == skuInfo.sku_barcd) {
+            this._getSkuCdInput().value = skuInfo.sku_barcd;
+            const inspAjax = this._getInspAjax();
+            inspAjax.curl = `/pda_process/qps/one_sku_insp_with_pick/${this.mapId}`;
+            inspAjax.generateRequest();
+            // if()
+          } else {
+            this._setSkuInfo(skuInfo);
+            const boxTypeAjax = this._getBoxTypeAjax();
+            boxTypeAjax.curl = `/pda_process/qps/one_sku_order/scan_sku/${skuInfo.com_cd}/${skuInfo.sku_cd}`;
+            boxTypeAjax.generateRequest();
+          }
 
-      }
-      /**
-       * 추천 Box 조회 요청에 대한 response handler
-       */
+        }
+        /**
+         * 추천 Box 조회 요청에 대한 response handler
+         */
       _boxTypeResponsed(event) {
         var item = event.detail;
         this.orderList = event.detail.order_list;
@@ -392,29 +392,29 @@ Copyright © HatioLab Inc. All rights reserved.
         this._clearCombobox(orderCombo);
         this.orderList.forEach(order => {
           const option = document.createElement('option');
-          option.innerText = order.batch_id +' / '+ order.order_qty;
+          option.innerText = order.batch_id + ' / ' + order.order_qty;
           option.setAttribute('order-pcs', order);
           orderCombo.appendChild(option);
         });
         this.picking_qty = item.picking_qty;
         this.order_qty = item.order_qty;
         this._getBoxIdInput().value = item.box_id;
-        this._getOrderQtyInput().value = this.picking_qty+'/'+this.order_qty;
+        this._getOrderQtyInput().value = this.picking_qty + '/' + this.order_qty;
         this.mapId = item.id;
         this.recomendedBoxType = item.box_type_cd;
-        if(item.status=='PICKING'){
+        if (item.status == 'PICKING') {
           this._getSkuCdInput().select();
-        }else if(item.status=='PICKED'){
+        } else if (item.status == 'PICKED') {
           this.mapId = null;
           this._resetView();
           this._getBoxIdInput().select();
-          document.dispatchEvent(new CustomEvent('show-toast',{
-            detail:{
+          document.dispatchEvent(new CustomEvent('show-toast', {
+            detail: {
               title: t('text.order_already_picked'),
               message: t('text.order_already_picked')
             }
           }));
-        }else if(item.status=='READY'){
+        } else if (item.status == 'READY') {
           this._getBoxIdInput().select();
         }
       }
@@ -424,31 +424,31 @@ Copyright © HatioLab Inc. All rights reserved.
        * box-id 입력시 sku & box 맵핑을 요청함
        */
       _handleKeypress(event) {
-        if(event.keyCode === 13 ) {
-          if(this.order_qty < this.picking_qty){
-            document.dispatchEvent(new CustomEvent('show-toast',{
-              detail:{
+        if (event.keyCode === 13) {
+          if (this.order_qty < this.picking_qty) {
+            document.dispatchEvent(new CustomEvent('show-toast', {
+              detail: {
                 title: t('text.reprint_error_msg_1'),
                 message: t('text.reprint_error_msg_1'),
               }
             }));
             this._getSkuCdInput().select();
-          }else{
+          } else {
             const boxId = event.currentTarget.value;
             var boxInput = this._getBoxIdInput();
-            if(/^[bcdfghiBCDFGHI][0-9]{7}$/.exec(boxId)){
+            if (/^[bcdfghiBCDFGHI][0-9]{7}$/.exec(boxId)) {
               try {
-                if(!boxId) throw t('error.box_id_invalid');
-                if(!this._validateBoxId(boxId)) throw t('error.not_recommanded_box');
+                if (!boxId) throw t('error.box_id_invalid');
+                if (!this._validateBoxId(boxId)) throw t('error.not_recommanded_box');
                 this._requestSkuMapping(boxId)
               } catch (error) {
-                boxInput.value='';
+                boxInput.value = '';
                 boxInput.select();
                 this._commonAlert(error)
               }
-            }else{
-              document.dispatchEvent(new CustomEvent('show-toast',{
-                detail:{
+            } else {
+              document.dispatchEvent(new CustomEvent('show-toast', {
+                detail: {
                   title: t('title.box_form_check'),
                   message: t('text.box_form_check'),
                 }
@@ -478,8 +478,8 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _requestSkuMapping(boxId) {
         const skuMappingAjax = this._getSkuMappingAjax();
-        if(!this.mapId) {
-          this.mapId='NaN';
+        if (!this.mapId) {
+          this.mapId = 'NaN';
         }
         skuMappingAjax.curl = `/pda_process/qps/one_sku_order/scan_box/${this.mapId}/${boxId}`;
         skuMappingAjax.generateRequest();
@@ -490,40 +490,40 @@ Copyright © HatioLab Inc. All rights reserved.
        * 맵핑 상태를 확인하기 위해 _requestStatusCheck 호출
        */
       _handleSkuMappingResponse(event) {
-        var item  = event.detail;
+        var item = event.detail;
 
-        if(item.status == 'MAPPING') {
+        if (item.status == 'MAPPING') {
           this.mapId = item.id;
           this._toggleMessageSpinner(t('label.please_wait'));
           this._requestStatusCheck();
 
-        } else if(item.status == 'PICKING') {
+        } else if (item.status == 'PICKING') {
           this._getOrderQtyInput().value = item.picking_qty + '/' + item.order_qty;
           this._getSkuCdInput().select();
 
-        } else if(item.status == 'CANCEL') {
-         document.dispatchEvent(new CustomEvent('show-toast', {
-              detail:{
-                type: t('text.sku_canceled'),
-                message: t('text.sku_canceled'),
-              }
+        } else if (item.status == 'CANCEL') {
+          document.dispatchEvent(new CustomEvent('show-toast', {
+            detail: {
+              type: t('text.sku_canceled'),
+              message: t('text.sku_canceled'),
+            }
           }));
           this._resetView();
         }
       }
 
-      _selectOrderList(event){
+      _selectOrderList(event) {
         var i = this._getOrderListCombo().selectedIndex;
         var selectOrder = this.orderList[i];
         this.picking_qty = selectOrder.picking_qty;
         this.order_qty = selectOrder.order_qty;
         this.mapId = selectOrder.id;
         this._getBoxIdInput().value = selectOrder.box_id;
-        this._getOrderQtyInput().value = this.picking_qty+'/'+this.order_qty;
+        this._getOrderQtyInput().value = this.picking_qty + '/' + this.order_qty;
         this.recomendedBoxType = selectOrder.box_type_cd;
-        if(selectOrder.box_id == ' '){
+        if (selectOrder.box_id == ' ') {
           this._getBoxIdInput().select();
-        }else{
+        } else {
           this._getSkuCdInput().select();
         }
 
@@ -534,7 +534,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * 에러 발생시 화면에 나타난 msg-spinner를 close
        */
       _handleSkuMappingError(e) {
-        if(e.detail.success == false){
+        if (e.detail.success == false) {
           this._getBoxIdInput().select();
         }
         this._toggleMessageSpinner();
@@ -561,7 +561,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * END : 작업 맵핑 완료
        */
       _handleStatusResponse(event) {
-        if(event.detail.status.toUpperCase() === 'MAPPING') {
+        if (event.detail.status.toUpperCase() === 'MAPPING') {
           setTimeout(() => {
             this._requestStatusCheck()
           }, 3000);
@@ -570,20 +570,20 @@ Copyright © HatioLab Inc. All rights reserved.
           this.mapId = null;
           this._toggleMessageSpinner();
           this.refreshSummary();
-          document.dispatchEvent(new CustomEvent('show-toast',{
-              detail:{
-                type: t('text.box_mapping_complete'),
-                message: t('text.box_mapping_complete'),
-              }
+          document.dispatchEvent(new CustomEvent('show-toast', {
+            detail: {
+              type: t('text.box_mapping_complete'),
+              message: t('text.box_mapping_complete'),
+            }
           }));
           this._resetView();
-        } else if(event.detail.status.toUpperCase() === 'PICKING' ){
+        } else if (event.detail.status.toUpperCase() === 'PICKING') {
           this._getSkuCdInput().select();
-          document.dispatchEvent(new CustomEvent('show-toast',{
-              detail:{
-                type: t('text.box_mapping_complete'),
-                message: t('text.box_mapping_complete'),
-              }
+          document.dispatchEvent(new CustomEvent('show-toast', {
+            detail: {
+              type: t('text.box_mapping_complete'),
+              message: t('text.box_mapping_complete'),
+            }
           }));
         }
       }
@@ -593,8 +593,8 @@ Copyright © HatioLab Inc. All rights reserved.
        * 에러 발생시 msg-spinner를 close함
        *
        * 맵핑 에러 상태
-	     * LOC : location 에 상품 없음
-	     * STOCK : 재고가 부족함
+       * LOC : location 에 상품 없음
+       * STOCK : 재고가 부족함
        */
       _handleStatusError() {
         var boxInput = this._getBoxIdInput();

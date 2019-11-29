@@ -88,9 +88,9 @@ Copyright © HatioLab Inc. All rights reserved.
         }
 
         let inputListAjax = this.$['input-list-ajax'];
-        let rackCd = LOGIS_UTIL.getRackCd();
-        let zoneCd = LOGIS_UTIL.getEquipZone();
-        let sideCd = LOGIS_UTIL.getRackSide();
+        let rackCd = LOGIS_UTIL.getEquipCd();
+        let zoneCd = LOGIS_UTIL.getStationCd();
+        let sideCd = LOGIS_UTIL.getWorkSideCd();
         let showOthersOrder = LOGIS_UTIL.getShowOthersOrder();
 
         inputListAjax.curl =
@@ -109,9 +109,9 @@ Copyright © HatioLab Inc. All rights reserved.
       refreshInputDetails(mpiOnFlag) {
         this.setListHeaderColor(this.selectedInput.mpi_color);
         let inputSeqId = this.selectedInput.id;
-        let rackCd = LOGIS_UTIL.getRackCd();
-        let zoneCd = LOGIS_UTIL.getEquipZone();
-        let sideCd = LOGIS_UTIL.getRackSide();
+        let rackCd = LOGIS_UTIL.getEquipCd();
+        let zoneCd = LOGIS_UTIL.getStationCd();
+        let sideCd = LOGIS_UTIL.getWorkSideCd();
         try {
           this.validationBeforeRefreshDetail(zoneCd, sideCd);
           let detailAjax = this.$['input-job-details-ajax'];
@@ -238,7 +238,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _inputDetailsChanged(inputDetails) {
         if (inputDetails == null) return;
-        let sideCd = LOGIS_UTIL.getRackSide();
+        let sideCd = LOGIS_UTIL.getWorkSideCd();
 
         if (sideCd === 'F') {
           this._updateStatus(inputDetails[sideCd]);

@@ -123,7 +123,7 @@ Copyright © HatioLab Inc. All rights reserved.
         this._setLabels();
 
         // 2. 처음 로드할 때를 위해 작업 사이드 적용
-        LOGIS_UTIL.setRackSide(LOGIS_UTIL.getRackSide(), this);
+        LOGIS_UTIL.setWorkSide(LOGIS_UTIL.getWorkSideCd(), this);
 
         // 3. 해더의 refresh button 클릭시 발생하는 refresh-view-[route] event handler
         document.addEventListener('refresh-view-' + location.hash.replace('#/', ''), event => { // 버튼 클릭으로 인한 refres의 경우 type을 click으로 명시
@@ -163,8 +163,8 @@ Copyright © HatioLab Inc. All rights reserved.
 
         let inputListAjax = this.$['input-list-ajax'];
         let equipType = LOGIS_UTIL.getEquipType();
-        let equipCd = LOGIS_UTIL.getRackCd();
-        let zoneCd = LOGIS_UTIL.getEquipZone();
+        let equipCd = LOGIS_UTIL.getEquipCd();
+        let zoneCd = LOGIS_UTIL.getStationCd();
 
         inputListAjax.curl =
           `/device_process/search/input_list/${equipType}/${equipCd}/${zoneCd}`;
@@ -186,9 +186,9 @@ Copyright © HatioLab Inc. All rights reserved.
         this.setListHeaderColor(this.selectedInput.color_cd);
         let inputSeqId = this.selectedInput.id;
         let equipType = LOGIS_UTIL.getEquipType();
-        let equipCd = LOGIS_UTIL.getRackCd();
-        let zoneCd = LOGIS_UTIL.getEquipZone();
-        let sideCd = LOGIS_UTIL.getRackSide();
+        let equipCd = LOGIS_UTIL.getEquipCd();
+        let zoneCd = LOGIS_UTIL.getStationCd();
+        let sideCd = LOGIS_UTIL.getWorkSideCd();
 
         try {
           this.validationBeforeRefreshDetail(zoneCd, sideCd);
@@ -312,7 +312,7 @@ Copyright © HatioLab Inc. All rights reserved.
           this.rearDetailList = [];
           return;
         }
-        let sideCd = LOGIS_UTIL.getRackSide();
+        let sideCd = LOGIS_UTIL.getWorkSideCd();
 
         this._updateStatus(inputDetails);
 

@@ -109,7 +109,9 @@ Copyright © HatioLab Inc. All rights reserved.
 
   <script>
     class RackInputDetails extends Polymer.Element {
-      static get is() { return 'rack-input-details' }
+      static get is() {
+        return 'rack-input-details'
+      }
 
       static get properties() {
         return {
@@ -157,7 +159,7 @@ Copyright © HatioLab Inc. All rights reserved.
            ****************
            * @type {String}
            */
-           comCd: {
+          comCd: {
             type: String
           },
 
@@ -184,7 +186,7 @@ Copyright © HatioLab Inc. All rights reserved.
            ****************
            * @type {String}
            */
-           totalPickQty: {
+          totalPickQty: {
             type: String
           },
 
@@ -251,28 +253,28 @@ Copyright © HatioLab Inc. All rights reserved.
         const rows = event.detail.contentElements;
         rows.forEach(row => {
           const status = row.getData().status;
-          if(status === 'F') { // 완료 상태
+          if (status === 'F') { // 완료 상태
             row.classList.add('complete');
-          } else if(status === 'U') { // 미완료 상태
+          } else if (status === 'U') { // 미완료 상태
             row.classList.add('canceled');
           }
         });
       }
 
-     /**
-      * @description 상품 코드 값이 변경되면 해당 상품코드에 따른 거래처 리스트 조회
-      ***********************
-      * @param {Object} data
-      */
+      /**
+       * @description 상품 코드 값이 변경되면 해당 상품코드에 따른 거래처 리스트 조회
+       ***********************
+       * @param {Object} data
+       */
       _dataChanged(data) {
-        if(data) {
+        if (data) {
           this.comCd = data.com_cd;
           this.skuCd = data.sku_cd;
           this.skuName = data.sku_nm;
           this.inputSeq = data.input_seq;
 
-          let rackCd = LOGIS_UTIL.getRackCd();
-          let zoneCd = LOGIS_UTIL.getEquipZone();
+          let rackCd = LOGIS_UTIL.getEquipCd();
+          let zoneCd = LOGIS_UTIL.getStationCd();
           const inputDetailsAjax = this.$['input-details-ajax'];
           inputDetailsAjax.curl = `/tablet_process/das/input_status_details/${rackCd}/${zoneCd}/ALL/${this.comCd}/${this.skuCd}`;
         }
@@ -283,9 +285,10 @@ Copyright © HatioLab Inc. All rights reserved.
        ***********************
        * @param {Array} items 리스트 데이터
        */
-       _itemsChanged(items) {
-        if(items && items.length > 0) {
-          let totalPlan = 0, totalPicked = 0;
+      _itemsChanged(items) {
+        if (items && items.length > 0) {
+          let totalPlan = 0,
+            totalPicked = 0;
 
           items.forEach(function(item) {
             totalPlan += (item.pick_qty ? item.pick_qty : 0);

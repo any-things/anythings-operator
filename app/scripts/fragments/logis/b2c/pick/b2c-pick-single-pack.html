@@ -358,7 +358,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           getSkuAjaxUrl: {
             type: String,
-            value: `/device_process/sku/search_by_like/${LOGIS_UTIL.getEquipType()}/${LOGIS_UTIL.getRackCd()}/:inputValue`
+            value: `/device_process/sku/search_by_like/${LOGIS_UTIL.getEquipType()}/${LOGIS_UTIL.getEquipCd()}/:inputValue`
           },
 
           /**
@@ -555,7 +555,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
           // 박스 아이디 정규식에 맞으면 박스 투입 // TODO 박스 ID 정합성 .... 
           if (/^[bcdfghiBCDFGHI][0-9]{7}$/.exec(boxId)) {
-            this._getBoxAjax().curl = `/device_process/dynamic/dps/single_pack/box_input?equipType=${LOGIS_UTIL.getEquipType()}&equipCd=${LOGIS_UTIL.getRackCd()}&skuCd=${skuCode}&bucketCd=${boxId}`;;
+            this._getBoxAjax().curl = `/device_process/dynamic/dps/single_pack/box_input?equipType=${LOGIS_UTIL.getEquipType()}&equipCd=${LOGIS_UTIL.getEquipCd()}&skuCd=${skuCode}&bucketCd=${boxId}`;;
             this._getBoxAjax().generateRequest();
           } else {
             // BoxID 정규식에 맞지 않으면 SKU 으로 인식 상품 검색 

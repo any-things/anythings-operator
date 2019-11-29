@@ -81,7 +81,9 @@ Copyright © HatioLab Inc. All rights reserved.
 
   <script>
     class PickingStatusByCell extends BarcodeScannerMixin(Polymer.Element) {
-      static get is() { return 'picking-status-by-cell' }
+      static get is() {
+        return 'picking-status-by-cell'
+      }
 
       static get properties() {
         return {
@@ -201,11 +203,11 @@ Copyright © HatioLab Inc. All rights reserved.
         // 현재 페이지의 URL을 저장
         this.routingUrl = location.hash.replace('#/', '');
         // 랙 코드를 현재 랙 코드로 설정
-        this.chuteNo = LOGIS_UTIL.getEquipZone();
+        this.chuteNo = LOGIS_UTIL.getStationCd();
         this.$['chute-no'].value = this.chuteNo;
 
         document.addEventListener(`alert-closed-at-${this.routingUrl}`, event => {
-          if(!event.detail.hasCallback) {
+          if (!event.detail.hasCallback) {
             this._initialSetup();
           }
         });
@@ -245,7 +247,7 @@ Copyright © HatioLab Inc. All rights reserved.
         refreshAjax.curl = `/diy_services/rtn-picked-by-location/read_by_pagination`;
         var chuteNo = this.chuteNo;
 
-        if(chuteNo && chuteNo.length >= 3) {
+        if (chuteNo && chuteNo.length >= 3) {
           refreshAjax.params = {
             query: JSON.stringify([{
               name: 'chute_no',
@@ -279,7 +281,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} event
        */
       _rackInputKeypress(event) {
-        if(event.charCode === 13) {
+        if (event.charCode === 13) {
           this.chuteNo = this.$['chute-no'].value;
           this.refreshList();
         }

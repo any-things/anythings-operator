@@ -349,7 +349,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           boxScanLabel: {
             type: String,
-            value: function () {
+            value: function() {
               return t('label.box_id');
             }
           },
@@ -361,7 +361,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           refreshLabel: {
             type: String,
-            value: function () {
+            value: function() {
               return t('button.refresh');
             }
           },
@@ -373,7 +373,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           inputableBoxLabel: {
             type: String,
-            value: function () {
+            value: function() {
               return t('label.inputable_boxes');
             }
           },
@@ -385,7 +385,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           orderLabel: {
             type: String,
-            value: function () {
+            value: function() {
               return t('label.order');
             }
           },
@@ -407,7 +407,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           pickedLabel: {
             type: String,
-            value: function () {
+            value: function() {
               return t('label.picked_qty');
             }
           },
@@ -419,7 +419,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           pickingLabel: {
             type: String,
-            value: function () {
+            value: function() {
               return t('label.pick_qty');
             }
           },
@@ -579,7 +579,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           header: {
             type: Array,
-            value: function () {
+            value: function() {
               return [{
                 display: t('label.input_seq'),
                 fieldname: 'input_seq',
@@ -748,7 +748,7 @@ Copyright © HatioLab Inc. All rights reserved.
         if (this.enableAutoRefresh) {
           try {
             this.refresh();
-          } catch (e) { }
+          } catch (e) {}
         }
 
         let interval = 20 * 1000;
@@ -758,9 +758,9 @@ Copyright © HatioLab Inc. All rights reserved.
           if (!interval) {
             interval = 20 * 1000;
           }
-        } catch (e) { }
+        } catch (e) {}
 
-        setTimeout(function () {
+        setTimeout(function() {
           this.startAutoRefresh();
         }.bind(this), interval);
       }
@@ -867,7 +867,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       refresh(event) {
         this._barcodeInputReset();
-        var rackCd = LOGIS_UTIL.getRackCd();
+        var rackCd = LOGIS_UTIL.getEquipCd();
         var equipType = LOGIS_UTIL.getEquipType();
 
         if (rackCd) {
@@ -912,7 +912,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       inputBox(boxId) {
         if (boxId) {
-          var rackCd = LOGIS_UTIL.getRackCd();
+          var rackCd = LOGIS_UTIL.getEquipCd();
           var equipType = LOGIS_UTIL.getEquipType();
 
           if (rackCd) {

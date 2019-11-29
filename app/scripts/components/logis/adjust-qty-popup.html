@@ -72,7 +72,9 @@ Copyright © HatioLab Inc. All rights reserved.
 
   <script>
     class AdjustQtyDialog extends Polymer.Element {
-      static get is() { return 'adjust-qty-popup' }
+      static get is() {
+        return 'adjust-qty-popup'
+      }
 
       static get properties() {
         return {
@@ -150,7 +152,7 @@ Copyright © HatioLab Inc. All rights reserved.
         const adjustQtyInput = this._getAdjustQtyInput();
 
         var maxQty = qty - 1;
-        if(maxQty <= 0) {
+        if (maxQty <= 0) {
           maxQty = 1;
         }
         adjustQtyInput.setAttribute('max', maxQty);
@@ -191,7 +193,7 @@ Copyright © HatioLab Inc. All rights reserved.
         const adjustQty = parseInt(this._getAdjustQtyInput().value);
         const currentQty = parseInt(this._getCurrentQtyInput().value);
 
-        if(adjustQty >= currentQty) {
+        if (adjustQty >= currentQty) {
           openAlert({
             title: t('text.invalid_value'),
             message: t('text.adjust_value_invalid')
@@ -199,22 +201,25 @@ Copyright © HatioLab Inc. All rights reserved.
 
         } else {
           let equipType = LOGIS_UTIL.getEquipType() || "Rack";
-          let equipCd = LOGIS_UTIL.getRackCd();
-          let deviceType = LOGIS_UTIL.getDeviceType(); 
+          let equipCd = LOGIS_UTIL.getEquipCd();
+          let deviceType = LOGIS_UTIL.getDeviceType();
           const adjustQtyAjax = this._getAdjustQtyAjax();
-          
+
           adjustQtyAjax.curl = `/device_process/classify/split/${deviceType}/${equipType}/${equipCd}/${this.jobId}`
           adjustQtyAjax.method = 'POST';
- 
-          var params = { req_qty: currentQty, res_qty : adjustQty };
+
+          var params = {
+            req_qty: currentQty,
+            res_qty: adjustQty
+          };
           adjustQtyAjax.params = params;
-          
+
           adjustQtyAjax.body = {
             req_box_qty: 0,
             req_pick_qty: currentQty,
             res_box_qty: 0,
             res_picked_qty: adjustQty
-          }; 
+          };
           adjustQtyAjax.generateRequest();
         }
       }

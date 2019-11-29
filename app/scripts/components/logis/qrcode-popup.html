@@ -72,7 +72,9 @@ Copyright © HatioLab Inc. All rights reserved.
 
   <script>
     class QrcodePopup extends Polymer.Element {
-      static get is() { return 'qrcode-popup' }
+      static get is() {
+        return 'qrcode-popup'
+      }
 
       static get properties() {
         return {
@@ -156,14 +158,14 @@ Copyright © HatioLab Inc. All rights reserved.
         const kioskCodeType = LOGIS_UTIL.getBarcodeType();
         const basePath = './static/assets/kiosk_codes/';
 
-        if(actionType === 'mpi-off') {
-          return kioskCodeType == 'barcode' ? `${basePath}mpi_off_all_bar.svg`: `${basePath}mpi_off_all_qr.png`;
+        if (actionType === 'mpi-off') {
+          return kioskCodeType == 'barcode' ? `${basePath}mpi_off_all_bar.svg` : `${basePath}mpi_off_all_qr.png`;
 
         } else if (actionType === 'batch-full-box') {
-          return kioskCodeType == 'barcode' ? `${basePath}batch_full_box_bar.svg`: `${basePath}batch_full_box_qr.png`;
+          return kioskCodeType == 'barcode' ? `${basePath}batch_full_box_bar.svg` : `${basePath}batch_full_box_qr.png`;
 
         } else if (actionType === 'mpi-on-last') {
-          return kioskCodeType == 'barcode' ? `${basePath}mpi_on_last_bar.svg`: `${basePath}mpi_on_last_qr.png`;
+          return kioskCodeType == 'barcode' ? `${basePath}mpi_on_last_bar.svg` : `${basePath}mpi_on_last_qr.png`;
         }
       }
 
@@ -174,7 +176,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} event
        */
       _keypressHandler(event) {
-        if(event.charCode === 13) {
+        if (event.charCode === 13) {
           this.doTransaction();
         }
       }
@@ -195,20 +197,20 @@ Copyright © HatioLab Inc. All rights reserved.
             message: t('text.Sure to process'),
             confirmCallback: () => {
               const trxAjax = this.$['trx-ajax'];
-              let rackCd = LOGIS_UTIL.getRackCd();
-              let sideCd = LOGIS_UTIL.getRackSide();
+              let rackCd = LOGIS_UTIL.getEquipCd();
+              let sideCd = LOGIS_UTIL.getWorkSideCd();
 
-              if(this.actionType === 'mpi-off') {
+              if (this.actionType === 'mpi-off') {
                 trxAjax.curl = '/kiosk_process/mpi_off_all/' + rackCd;
-              } else if(this.actionType == 'batch-full-box') {
+              } else if (this.actionType == 'batch-full-box') {
                 trxAjax.curl = '/kiosk_process/das/fullbox_all/' + rackCd + '/' + sideCd;
-              } else if(this.actionType == 'mpi-on-last') {
+              } else if (this.actionType == 'mpi-on-last') {
                 trxAjax.curl = '/kiosk_process/restore_mpi/' + rackCd;
               }
 
               trxAjax.generateRequest();
             },
-            cancelCallback:() => {
+            cancelCallback: () => {
               this.initialSetup();
             }
           })
@@ -228,14 +230,14 @@ Copyright © HatioLab Inc. All rights reserved.
       validateBeforeTrx() {
         let code = this.$['code'].value;
 
-        if(!code) {
+        if (!code) {
           throw {
             title: t('error.VALIDATION_ERROR'),
             message: t('error.barcd_is_not_typed')
           }
-        } else if (this.actionType === 'mpi-off' && code !== this.mpiOffKey
-                || this.actionType === 'batch-full-box' && code !== this.batchFullBoxKey
-                || this.actionType === 'mpi-on-last' && code !== this.mpiOnLastKey) {
+        } else if (this.actionType === 'mpi-off' && code !== this.mpiOffKey ||
+          this.actionType === 'batch-full-box' && code !== this.batchFullBoxKey ||
+          this.actionType === 'mpi-on-last' && code !== this.mpiOnLastKey) {
           throw {
             title: t('error.VALIDATION_ERROR'),
             message: t('text.invalid_value')

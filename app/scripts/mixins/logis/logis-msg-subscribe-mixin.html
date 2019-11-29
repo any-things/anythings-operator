@@ -37,8 +37,8 @@ Copyright © HatioLab Inc. All rights reserved.
 
         // MQTT 연결
         WEB_MQTT.startConnectionMonitor(
-          LOGIS_UTIL.getRackCd(),
-          LOGIS_UTIL.getEquipZone(),
+          LOGIS_UTIL.getEquipCd(),
+          LOGIS_UTIL.getStationCd(),
           LOGIS_UTIL.getDeviceType(),
           LOGIS_UTIL.getBrokerAddress(),
           LOGIS_UTIL.getBrokerPort(),
@@ -60,45 +60,57 @@ Copyright © HatioLab Inc. All rights reserved.
               message
             } = event.detail;
 
-          // 메시지 내용이 프로토콜과 관계없는 경우
+            // 메시지 내용이 프로토콜과 관계없는 경우
           } else {
             var action = 'default';
           }
 
           // 메시지 프로퍼티의 action 값에 따라 동작 (새로고침, 정보 메시지, 에러 메시지)
           switch (action) {
-            case WEB_MQTT.ACTION.REFRESH: {
-              // 화면 리프레시. 이 믹스인을 사용하는 화면에서 구현
-              this.refreshByWs(message);
-            }
-            break;
+            case WEB_MQTT.ACTION.REFRESH:
+              {
+                // 화면 리프레시. 이 믹스인을 사용하는 화면에서 구현
+                this.refreshByWs(message);
+              }
+              break;
 
-            case WEB_MQTT.ACTION.SHOW_INFO: {
-              // 기기에서 설정한 작업과 메시지의 작업이 일치하고, iron-pages에서 현재 표시되고 있는 화면인 경우
-              if (jobType) {
-                if (this.jobType === jobType) {
+            case WEB_MQTT.ACTION.SHOW_INFO:
+              {
+                // 기기에서 설정한 작업과 메시지의 작업이 일치하고, iron-pages에서 현재 표시되고 있는 화면인 경우
+                if (jobType) {
+                  if (this.jobType === jobType) {
+                    showToast('info', message);
+                  }
+                } else {
                   showToast('info', message);
                 }
-              } else {
-                showToast('info', message);
               }
-            }
-            break;
+              break;
 
-            case WEB_MQTT.ACTION.SHOW_ERROR: {
-              if (jobType) {
-                if (this.jobType === jobType) {
-                  MsgAlert.webAlert({ title: t('title.error'), message, sound: 'error' });
+            case WEB_MQTT.ACTION.SHOW_ERROR:
+              {
+                if (jobType) {
+                  if (this.jobType === jobType) {
+                    MsgAlert.webAlert({
+                      title: t('title.error'),
+                      message,
+                      sound: 'error'
+                    });
+                  }
+                } else {
+                  MsgAlert.webAlert({
+                    title: t('title.error'),
+                    message,
+                    sound: 'error'
+                  });
                 }
-              } else {
-                MsgAlert.webAlert({ title: t('title.error'), message, sound: 'error' });
               }
-            }
-            break;
+              break;
 
-            default: {
-              console.log(event.detail);
-            }
+            default:
+              {
+                console.log(event.detail);
+              }
           }
         });
       }
@@ -108,8 +120,7 @@ Copyright © HatioLab Inc. All rights reserved.
        *******************
        * @param {String} message
        */
-      refreshByWs(message) {
-      }
+      refreshByWs(message) {}
     };
   };
 </script>

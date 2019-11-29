@@ -152,12 +152,12 @@ Copyright © HatioLab Inc. All rights reserved.
             <span>[[item.job_batch_seq]] - [[item.rack_nm]]</span>
           </div>
         </template>
-      </div>
+  </div>
 
-      <!--div class="button-container">
+  <!--div class="button-container">
         <button on-click="refresh">[[refreshLabel]]</button>
       </div-->
-    </div>
+  </div>
   </template>
 
   <script>
@@ -301,22 +301,22 @@ Copyright © HatioLab Inc. All rights reserved.
            * @type {Array}
            */
           selectorInfoFields: {
-             type: Array,
-             value: () => {
-               return [{
-                 display: t('label.dc_cd'),
-                 fieldname: 'dc_cd'
-               }, {
-                 display: t('label.com_cd'),
-                 fieldname: 'com_cd'
-               }, {
-                 display: t('label.job_id'),
-                 fieldname: 'job_id'
-               }, {
-                 display: t('label.batch_group_id'),
-                 fieldname: 'batch_group_id'
-               }];
-             }
+            type: Array,
+            value: () => {
+              return [{
+                display: t('label.dc_cd'),
+                fieldname: 'dc_cd'
+              }, {
+                display: t('label.com_cd'),
+                fieldname: 'com_cd'
+              }, {
+                display: t('label.job_id'),
+                fieldname: 'job_id'
+              }, {
+                display: t('label.batch_group_id'),
+                fieldname: 'batch_group_id'
+              }];
+            }
           },
 
           /**
@@ -325,25 +325,25 @@ Copyright © HatioLab Inc. All rights reserved.
            * @type {Array}
            */
           selectorColumns: {
-             type: Array,
-             value: () => {
-               return [{
-                 display: t('label.dc_cd'),
-                 fieldname: 'dc_cd'
-               }, {
-                 display: t('label.com_cd'),
-                 fieldname: 'com_cd',
-                 displayCallback: (value) => {
-                   return value ? value : 'N/A';
-                 }
-               }, {
-                 display: t('label.job_id'),
-                 fieldname: 'job_id'
-               }, {
-                 display: t('label.batch_group_id'),
-                 fieldname: 'batch_group_id'
-               }]
-             }
+            type: Array,
+            value: () => {
+              return [{
+                display: t('label.dc_cd'),
+                fieldname: 'dc_cd'
+              }, {
+                display: t('label.com_cd'),
+                fieldname: 'com_cd',
+                displayCallback: (value) => {
+                  return value ? value : 'N/A';
+                }
+              }, {
+                display: t('label.job_id'),
+                fieldname: 'job_id'
+              }, {
+                display: t('label.batch_group_id'),
+                fieldname: 'batch_group_id'
+              }]
+            }
           },
 
           /**
@@ -362,22 +362,22 @@ Copyright © HatioLab Inc. All rights reserved.
            * @type {Object}
            */
           selectorParams: {
-             type: Object,
-             value: () => {
-               return {
-                 sort: [{
-                   field: 'job_id',
-                   ascending: false
-                 }],
-                 query: [{
-                   name: 'job_date',
-                   value: (() => {
-                     let today = new Date();
-                     return today.toISOString().slice(0, 10);
-                   })()
-                 }]
-               }
-             }
+            type: Object,
+            value: () => {
+              return {
+                sort: [{
+                  field: 'job_id',
+                  ascending: false
+                }],
+                query: [{
+                  name: 'job_date',
+                  value: (() => {
+                    let today = new Date();
+                    return today.toISOString().slice(0, 10);
+                  })()
+                }]
+              }
+            }
           },
 
           /**
@@ -420,7 +420,7 @@ Copyright © HatioLab Inc. All rights reserved.
       connectedCallback() {
         super.connectedCallback();
         document.addEventListener(`alert-closed-at-${location.hash.replace('#/', '')}`, event => {
-          if(!event.detail.hasCallback) {
+          if (!event.detail.hasCallback) {
             this.focusSkuInput();
           }
         });
@@ -432,7 +432,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} response
        */
       _lastBarcodeRespChanged(response) {
-        if(response) {
+        if (response) {
           this.rackList = response;
         }
       }
@@ -460,7 +460,7 @@ Copyright © HatioLab Inc. All rights reserved.
         try {
           const skuCd = input.value;
           this.validateBeforeAssort(skuCd);
-          ajax.curl = `/kiosk_process/find_sku/${LOGIS_UTIL.getRackCd()}/${skuCd}`;
+          ajax.curl = `/kiosk_process/find_sku/${LOGIS_UTIL.getEquipCd()}/${skuCd}`;
           // TODO 아래 형식으로 변경
           //ajax.curl = `/kiosk_process/middle_assort/find_sku/${배치 그룹 ID}/${skuCd}`;
           ajax.generateRequest();
@@ -490,8 +490,8 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _middleAssortRtnAjaxResponsed(event) {
         this.midAssortResp = event.detail
-        var rackCd = LOGIS_UTIL.getRackCd();
-        var rackSide = LOGIS_UTIL.getRackSide();
+        var rackCd = LOGIS_UTIL.getEquipCd();
+        var rackSide = LOGIS_UTIL.getWorkSideCd();
         this.skuNm = this.midAssortResp && this.midAssortResp.sku_nm;
         this.boxInQty = this.midAssortResp && this.midAssortResp.box_in_qty;
       }
@@ -528,7 +528,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {String} skuCd
        */
       validateBeforeAssort(skuCd) {
-        if(!this.batchGroupId) {
+        if (!this.batchGroupId) {
           throw {
             title: t('label.batch_group'),
             message: t('text.NOTHING_SELECTED')

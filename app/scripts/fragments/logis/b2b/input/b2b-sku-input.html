@@ -729,7 +729,7 @@ Copyright © HatioLab Inc. All rights reserved.
         });
 
         // 3. 랙 선택 체크
-        if (!LOGIS_UTIL.getRackCd()) {
+        if (!LOGIS_UTIL.getEquipCd()) {
           LOGIS_UTIL.showMessage(t('text.selecting_rack'), t('text.select_rack'));
         }
 
@@ -840,7 +840,7 @@ Copyright © HatioLab Inc. All rights reserved.
        ***********************
        */
       getBatchSummary() {
-        const rackCd = LOGIS_UTIL.getRackCd();
+        const rackCd = LOGIS_UTIL.getEquipCd();
         if (rackCd) {
           const batchSummaryAjax = this.$['batch-summary-ajax'];
           let status = this.$['unfinished-only'].checked == true ? 'U' : '';
@@ -939,8 +939,8 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       inputSku(comCd, skuCd, skuBarcd) {
         if (skuCd && skuCd.length >= 3) {
-          var rackCd = LOGIS_UTIL.getRackCd();
-          var rackSide = LOGIS_UTIL.getRackSide();
+          var rackCd = LOGIS_UTIL.getEquipCd();
+          var rackSide = LOGIS_UTIL.getWorkSideCd();
           var startAssortAjax = this.$['input-sku-ajax'];
           let status = this.$['unfinished-only'].checked == true ? 'U' : '';
 
@@ -976,7 +976,7 @@ Copyright © HatioLab Inc. All rights reserved.
         const input = event.detail.input;
         const ajax = event.detail.ajax;
         const skuCd = input.value;
-        ajax.curl = `/kiosk_process/find_sku/${LOGIS_UTIL.getRackCd()}/${skuCd}`;
+        ajax.curl = `/kiosk_process/find_sku/${LOGIS_UTIL.getEquipCd()}/${skuCd}`;
         ajax.generateRequest();
       }
 
@@ -1006,9 +1006,9 @@ Copyright © HatioLab Inc. All rights reserved.
             title: t('text.checking_inspection'),
             message: t('text.check_inspection'),
             confirmCallback: () => {
-              const rackCd = LOGIS_UTIL.getRackCd();
-              const sideCd = LOGIS_UTIL.getRackSide();
-              let zoneCd = LOGIS_UTIL.getEquipZone();
+              const rackCd = LOGIS_UTIL.getEquipCd();
+              const sideCd = LOGIS_UTIL.getWorkSideCd();
+              let zoneCd = LOGIS_UTIL.getStationCd();
               let comCd = this.sku.com_cd;
               let skuCd = this.sku.sku_cd;
               this.doInspectTransaction(rackCd, sideCd, zoneCd, comCd, skuCd);
@@ -1070,7 +1070,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} event
        */
       showDetailList(event) {
-        const rackCd = LOGIS_UTIL.getRackCd();
+        const rackCd = LOGIS_UTIL.getEquipCd();
         const inputSeq = event.detail.data.input_seq;
         document.dispatchEvent(new CustomEvent('open-form-list-dialog', {
           detail: {

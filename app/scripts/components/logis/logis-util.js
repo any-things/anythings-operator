@@ -10,91 +10,104 @@
 LOGIS_UTIL = {};
 
 /**
- * 디바이스 타입 조회
+ * @description 디바이스 타입 조회
+ *******************
  */
 LOGIS_UTIL.getDeviceType = function() {
   return JSON.parse(localStorage.getItem('setting.deviceType'));
 };
 
 /**
- * 대상 외 주문 보이기 여부 리턴
+ * @description 대상 외 주문 보이기 여부 리턴
+ ********************
  */
 LOGIS_UTIL.getShowOthersOrder = function() {
   return JSON.parse(localStorage.getItem('setting.showOthersOrder'));
 };
 
 /**
- * 작업 유형 리턴
+ * @description 현재 설정에서 선택한 설비 유형 리턴
+ ********************
  */
 LOGIS_UTIL.getEquipType = function() {
   return JSON.parse(localStorage.getItem('setting.equipType'));
 };
 
 /**
- * 스테이지 코드를 리턴 
+ * @description 현재 설정에서 선택한 설비 코드를 리턴
+ ********************
+ */
+LOGIS_UTIL.getEquipCd = function() {
+  return JSON.parse(localStorage.getItem('setting.equipCd'));
+};
+
+/**
+ * @description 현재 설정에서 선택한 설비 이름을 리턴
+ ********************
+ */
+LOGIS_UTIL.getEquipNm = function() {
+  return JSON.parse(localStorage.getItem('setting.equipNm'));
+};
+
+/**
+ * @description 현재 설정에서 선택한 스테이지 코드를 리턴 
+ ********************
  */
 LOGIS_UTIL.getStageCd = function() {
   return JSON.parse(localStorage.getItem('setting.stageCd'));
 };
 
 /**
- * 현재 설정에서 선택한 랙 코드를 리턴
+ * @description 현재 설정에서 선택한 작업 스테이션을 리턴
+ ********************
  */
-LOGIS_UTIL.getRackCd = function() {
-  return JSON.parse(localStorage.getItem('setting.equipCd'));
-};
-
-/**
- * 현재 설정에서 선택한 랙 명을 리턴
- */
-LOGIS_UTIL.getRackNm = function() {
-  return JSON.parse(localStorage.getItem('setting.equipNm'));
-};
-
-/**
- * 현재 설정에서 선택한 장비 조회 범위 존을 리턴
- */
-LOGIS_UTIL.getEquipZone = function() {
+LOGIS_UTIL.getStationCd = function() {
   return JSON.parse(localStorage.getItem('setting.stationCd'));
 };
 
 /**
- * 랙의 작업 사이드를 리턴
+ * @description 현재 설정에서 선택한 작업 사이드를 리턴
+ ********************
  */
-LOGIS_UTIL.getRackSide = function() {
+LOGIS_UTIL.getWorkSideCd = function() {
   return JSON.parse(localStorage.getItem('setting.workSideCd'));
 };
 
 /**
- * 현재 태블릿의 자동피킹 여부를 리턴
+ * @description 현재 태블릿의 자동피킹 여부를 리턴
+ ********************
  */
 LOGIS_UTIL.getAutoPicking = function() {
   return JSON.parse(localStorage.getItem('setting.autoPicking'));
 };
 
 /**
- * 현재 태블릿의 상품코드 전부 보기 여부를 리턴
+ * @description 현재 태블릿의 상품코드 전부 보기 여부를 리턴
+ ********************
  */
 LOGIS_UTIL.getShowFullCode = function() {
   return JSON.parse(localStorage.getItem('setting.showFullCode'));
 };
 
 /**
- * 표시할 송장 번호 문자열의 시작 인덱스를 리턴
+ * @description 표시할 송장 번호 문자열의 시작 인덱스를 리턴
+ ********************
  */
 LOGIS_UTIL.getInvoiceFieldSubstr = function() {
   return parseInt(JSON.parse(localStorage.getItem('setting.invoiceFieldSubstr')));
 };
 
 /**
- * 작업 유형 리턴
+ * @description 작업 유형 리턴
+ ********************
  */
 LOGIS_UTIL.getJobType = function() {
   return JSON.parse(localStorage.getItem('setting.jobType'));
 };
 
 /**
- * 화면에서 데이터 리프레쉬 주기
+ * @description 화면에서 데이터 리프레쉬 주기
+ ********************
  */
 LOGIS_UTIL.getRefreshInterval = function() {
   let interval = JSON.parse(localStorage.getItem('setting.refreshInterval'));
@@ -103,49 +116,56 @@ LOGIS_UTIL.getRefreshInterval = function() {
 };
 
 /**
- * 사용하는 바코드 유형을 리턴
+ * @description 사용하는 바코드 유형을 리턴
+ ********************
  */
 LOGIS_UTIL.getBarcodeType = function() {
   return JSON.parse(localStorage.getItem('setting.barcodeType'));
 };
 
 /**
- * B2C 투입 박스 유형
+ * @description B2C 투입 박스 유형
+ ********************
  */
 LOGIS_UTIL.getB2CInputBoxType = function() {
   return JSON.parse(localStorage.getItem('setting.b2cKioskInputType'));
 };
 
 /**
- * 사용할 프린터 아이디 리턴
+ * @description 사용할 프린터 아이디 리턴
+ ********************
  */
 LOGIS_UTIL.getPrinterId = function() {
   return JSON.parse(localStorage.getItem('setting.printerId'));
 };
 
 /**
- * 메시지 브로커의 사이트 코드 조회
+ * @description 메시지 브로커의 사이트 코드 조회
+ ********************
  */
 LOGIS_UTIL.getBrokerSiteCd = function() {
   return localStorage.getItem('setting.brokerSite');
 };
 
 /**
- * 메시지 브로커 주소 조회
+ * @description 메시지 브로커 주소 조회
+ ********************
  */
 LOGIS_UTIL.getBrokerAddress = function() {
   return localStorage.getItem('setting.brokerAddress');
 };
 
 /**
- * 메시지 브로커 포트 조회
+ * @description 메시지 브로커 포트 조회
+ ********************
  */
 LOGIS_UTIL.getBrokerPort = function() {
   return localStorage.getItem('setting.brokerPort');
 };
 
 /**
- * 연속 스캔 허용 여부 조회
+ * @description 연속 스캔 허용 여부 조회
+ ********************
  */
 LOGIS_UTIL.isContinousScanAllowed = function() {
   let continousScanAllowed = localStorage.getItem('setting.continousScanAllowed');
@@ -153,7 +173,7 @@ LOGIS_UTIL.isContinousScanAllowed = function() {
 };
 
 /**
- * Warning 팝업 표시
+ * @description Warning 팝업 표시
  ******************
  * @param {String} title
  * @param {String} message
@@ -168,7 +188,7 @@ LOGIS_UTIL.showMessage = function(title, message, confirmCallback) {
 };
 
 /**
- * Warning 팝업 표시
+ * @description Warning 팝업 표시
  ******************
  * @param {String} title
  * @param {String} message
@@ -184,7 +204,8 @@ LOGIS_UTIL.showConfirm = function(title, message, cancelCallback, confirmCallbac
 };
 
 /**
- * 설정이 비어있는 경우 핸들러
+ * @description 설정이 비어있는 경우 핸들러
+ ********************
  */
 LOGIS_UTIL.handleRequiredSettingEmpty = function() {
   LOGIS_UTIL.showMessage(t('text.selecting_rack'), t('text.select_rack'), function() {
@@ -193,10 +214,11 @@ LOGIS_UTIL.handleRequiredSettingEmpty = function() {
 };
 
 /**
- * 설정에 랙 설정이 비어있는 지 체크
+ * @description 설정에 랙 설정이 비어있는 지 체크
+ ********************
  */
 LOGIS_UTIL.checkRequiredSettingEmpty = function() {
-  if (!LOGIS_UTIL.getRackCd()) {
+  if (!LOGIS_UTIL.getEquipCd()) {
     LOGIS_UTIL.handleRequiredSettingEmpty();
     return false;
   } else {
@@ -205,7 +227,7 @@ LOGIS_UTIL.checkRequiredSettingEmpty = function() {
 };
 
 /**
- * 팝업 표시
+ * @description 팝업 표시
  ******************
  * @param {String} title 팝업 타이틀
  * @param {Object} popup 팝업
@@ -236,12 +258,12 @@ LOGIS_UTIL.showPopup = function(title, popup, width, height, openCallback, close
 };
 
 /**
- * 현재 작업 위치 변경시
+ * @description 현재 작업 위치 변경시
  ******************
  * @param {String} rackSideCd
  * @param {String} screen
  */
-LOGIS_UTIL.setRackSide = function(rackSideCd, screen) {
+LOGIS_UTIL.setWorkSide = function(rackSideCd, screen) {
   if (!rackSideCd) rackSideCd = 'F';
 
   screen.showFront = false;
@@ -262,7 +284,7 @@ LOGIS_UTIL.setRackSide = function(rackSideCd, screen) {
 };
 
 /**
- * 다국어 처리된 완료 상태 값
+ * @description 다국어 처리된 완료 상태 값
  ******************
  */
 LOGIS_UTIL.getFinishedStatusName = function() {
@@ -270,7 +292,7 @@ LOGIS_UTIL.getFinishedStatusName = function() {
 };
 
 /**
- * 다국어 처리된 미완료 상태 값
+ * @description 다국어 처리된 미완료 상태 값
  ******************
  */
 LOGIS_UTIL.getUnfinishedStatusName = function() {
@@ -278,7 +300,7 @@ LOGIS_UTIL.getUnfinishedStatusName = function() {
 };
 
 /**
- * items의 내용 중에 left_qty가 0인 항목이 아래로 가도록 소팅
+ * @description items의 내용 중에 left_qty가 0인 항목이 아래로 가도록 소팅
  ******************
  * @param items
  */

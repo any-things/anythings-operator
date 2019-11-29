@@ -62,7 +62,9 @@ Copyright © HatioLab Inc. All rights reserved.
 
   <script>
     class RackInputList extends Polymer.Element {
-      static get is() { return 'rack-input-list' }
+      static get is() {
+        return 'rack-input-list'
+      }
 
       static get properties() {
         return {
@@ -153,7 +155,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
         // 현재 페이지로 라우팅 변경시 데이터 다시 조회하도록
         document.addEventListener('page-changed', event => {
-          if(event.detail.currentPage === 'rack-input-list') {
+          if (event.detail.currentPage === 'rack-input-list') {
             this.refresh();
           }
         });
@@ -173,8 +175,8 @@ Copyright © HatioLab Inc. All rights reserved.
        ****************
        */
       refresh() {
-        let rackCd = LOGIS_UTIL.getRackCd();
-        let zoneCd = LOGIS_UTIL.getEquipZone();
+        let rackCd = LOGIS_UTIL.getEquipCd();
+        let zoneCd = LOGIS_UTIL.getStationCd();
         const inputListAjax = this.$['input-list-ajax'];
         inputListAjax.curl = `/tablet_process/input_status/${rackCd}/${zoneCd}/ALL`;
         inputListAjax.generateRequest();
@@ -190,9 +192,9 @@ Copyright © HatioLab Inc. All rights reserved.
         const rows = event.detail.contentElements;
         rows.forEach(row => {
           const status = row.getData().status;
-          if(status === 'F') { // 완료 상태
+          if (status === 'F') { // 완료 상태
             row.classList.add('complete');
-          } else if(status === 'U') { // 미완료 상태
+          } else if (status === 'U') { // 미완료 상태
             row.classList.add('canceled');
           }
         });

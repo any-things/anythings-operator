@@ -145,24 +145,24 @@ Copyright © HatioLab Inc. All rights reserved.
             <input id="bucket-code" placeholder="개발 모드" class="row" on-keypress="_onBucketCodeChanged">
           </div>
         </template>
-      </dom-if>
+  </dom-if>
 
-      <div id="icon-section">
-        <div id="ble-section">
-          <label id="ble-id">[[deviceName]]</label>
-          <iron-icon id="bluetooth-btn" icon="[[bluetoothIcon]]" on-click="bluetoothIconClicked"></iron-icon>
-        </div>
-        <img id="qr-done" src="./static/assets/tab_codes/done_by_qr.png" />
-        <button id="done-btn" on-click="doneIconClicked">
+  <div id="icon-section">
+    <div id="ble-section">
+      <label id="ble-id">[[deviceName]]</label>
+      <iron-icon id="bluetooth-btn" icon="[[bluetoothIcon]]" on-click="bluetoothIconClicked"></iron-icon>
+    </div>
+    <img id="qr-done" src="./static/assets/tab_codes/done_by_qr.png" />
+    <button id="done-btn" on-click="doneIconClicked">
           <!-- <iron-icon id="done-btn" icon="[[doneIcon]]" on-click="doneIconClicked"></iron-icon> -->
           [[finishLabel]]
         </button>
-      </div>
-    </div>
+  </div>
+  </div>
 
-    <div id="content">
-      <dom-if if="[[showFront]]">
-        <template>
+  <div id="content">
+    <dom-if if="[[showFront]]">
+      <template>
           <div id="left-section">
             <button class="list-header-btn" disabled>[[frontBtnLabel]]</button>
 
@@ -171,15 +171,13 @@ Copyright © HatioLab Inc. All rights reserved.
             </item-list>
           </div>
         </template>
-      </dom-if>
+    </dom-if>
 
-      <job-progress-bar id="dps-job-indicator" job-type="[[jobType]]" selected-input="{{selectedInput}}"
-        on-item-selected="_selectedInputChanged" on-item-selected-by-click="_selectedInputChanged"
-        input-list="[[inputList]]" on-configured="_addJobStatusAttr">
-      </job-progress-bar>
+    <job-progress-bar id="dps-job-indicator" job-type="[[jobType]]" selected-input="{{selectedInput}}" on-item-selected="_selectedInputChanged" on-item-selected-by-click="_selectedInputChanged" input-list="[[inputList]]" on-configured="_addJobStatusAttr">
+    </job-progress-bar>
 
-      <dom-if if="[[showRear]]">
-        <template>
+    <dom-if if="[[showRear]]">
+      <template>
           <div id="right-section">
             <button class="list-header-btn" disabled>[[rearBtnLabel]]</button>
 
@@ -188,10 +186,10 @@ Copyright © HatioLab Inc. All rights reserved.
             </item-list>
           </div>
         </template>
-      </dom-if>
+    </dom-if>
 
-      <dom-if if="[[showTotal]]">
-        <template>
+    <dom-if if="[[showTotal]]">
+      <template>
           <div id="total-section">
             <button class="list-header-btn" disabled>[[totalBtnLabel]]</button>
 
@@ -200,8 +198,8 @@ Copyright © HatioLab Inc. All rights reserved.
             </item-list>
           </div>
         </template>
-      </dom-if>
-    </div>
+    </dom-if>
+  </div>
 
   </template>
 
@@ -290,7 +288,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           header: {
             type: Array,
-            value: function () {
+            value: function() {
               return [{
                 fieldname: 'sub_equip_cd',
                 columnWidth: 'auto',
@@ -299,8 +297,7 @@ Copyright © HatioLab Inc. All rights reserved.
                 fieldname: 'side_cd',
                 columnWidth: 'auto',
                 hidden: true
-              }, {
-              }, {
+              }, {}, {
                 fieldname: 'sku_nm',
               }, {
                 fieldname: 'picking_sum',
@@ -350,10 +347,10 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-            * 화면에서 완료 버튼 아이콘
-            ****************
-            * @type {String}
-            */
+           * 화면에서 완료 버튼 아이콘
+           ****************
+           * @type {String}
+           */
           doneIcon: {
             type: String,
             value: 'icons:done'
@@ -419,8 +416,8 @@ Copyright © HatioLab Inc. All rights reserved.
           }
         }
         let totalPickQty = 0; // 총 주문 수량
-        let pickedQty = 0;    // 총 확정 수량
-        let canceledQty = 0;   // 작업 취소된 상품 수량
+        let pickedQty = 0; // 총 확정 수량
+        let canceledQty = 0; // 작업 취소된 상품 수량
 
         inputDetails.forEach(item => {
           totalPickQty += item.pick_qty;
@@ -440,7 +437,7 @@ Copyright © HatioLab Inc. All rights reserved.
         this.pickedQty = pickedQty;
         this.pickedPercent =
           (totalPickQty && totalPickQty > 0 && pickedQty && pickedQty > 0) ?
-            Math.floor(pickedQty / totalPickQty * 100) : 0;
+          Math.floor(pickedQty / totalPickQty * 100) : 0;
 
         this._updateBlockChart(this.pickedPercent);
 
@@ -507,9 +504,9 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       indOffByTabletZone() {
         const indOffAjax = this.$['ind-off-my-zone-ajax'];
-        let rackCd = LOGIS_UTIL.getRackCd();
-        let zoneCd = LOGIS_UTIL.getEquipZone();
-        let sideCd = LOGIS_UTIL.getRackSide();
+        let rackCd = LOGIS_UTIL.getEquipCd();
+        let zoneCd = LOGIS_UTIL.getStationCd();
+        let sideCd = LOGIS_UTIL.getWorkSideCd();
         indOffAjax.curl = `/tablet_process/ind_off/${rackCd}/${zoneCd}/${sideCd}`;
         indOffAjax.generateRequest();
       }
@@ -522,9 +519,9 @@ Copyright © HatioLab Inc. All rights reserved.
       indOnByTabletZone(mode) {
         const indOnAjax = this.$['ind-on-jobs-ajax'];
         let inputSeqId = this.selectedInput.id;
-        let rackCd = LOGIS_UTIL.getRackCd();
-        let zoneCd = LOGIS_UTIL.getEquipZone();
-        let sideCd = LOGIS_UTIL.getRackSide();
+        let rackCd = LOGIS_UTIL.getEquipCd();
+        let zoneCd = LOGIS_UTIL.getStationCd();
+        let sideCd = LOGIS_UTIL.getWorkSideCd();
         indOnAjax.curl = `/tablet_process/dps/ind_on/${inputSeqId}/${rackCd}/${zoneCd}/${sideCd}/${mode}`;
         indOnAjax.generateRequest();
       }
@@ -640,11 +637,13 @@ Copyright © HatioLab Inc. All rights reserved.
       swipeLeft(event) {
         if (!this.inputList || this.inputList.length == 0) return;
         let startInputSeq = this.inputList[0].input_seq;
-        let rackCd = LOGIS_UTIL.getRackCd();
-        let zoneCd = LOGIS_UTIL.getEquipZone();
-        let sideCd = LOGIS_UTIL.getRackSide();
+        let rackCd = LOGIS_UTIL.getEquipCd();
+        let zoneCd = LOGIS_UTIL.getStationCd();
+        let sideCd = LOGIS_UTIL.getWorkSideCd();
         let pageAjax = this.$['input-list-pages-ajax'];
-        pageAjax.customParams = { show_others_order: LOGIS_UTIL.getShowOthersOrder() };
+        pageAjax.customParams = {
+          show_others_order: LOGIS_UTIL.getShowOthersOrder()
+        };
         pageAjax.curl = `/tablet_process/dps/input_pages/${rackCd}/${zoneCd}/${sideCd}/DOWN/${startInputSeq}`;
         pageAjax.generateRequest();
       }
@@ -657,9 +656,9 @@ Copyright © HatioLab Inc. All rights reserved.
       swipeRight(event) {
         if (!this.inputList || this.inputList.length == 0) return;
         let startInputSeq = this.inputList[this.inputList.length - 1].input_seq;
-        let rackCd = LOGIS_UTIL.getRackCd();
-        let zoneCd = LOGIS_UTIL.getEquipZone();
-        let sideCd = LOGIS_UTIL.getRackSide();
+        let rackCd = LOGIS_UTIL.getEquipCd();
+        let zoneCd = LOGIS_UTIL.getStationCd();
+        let sideCd = LOGIS_UTIL.getWorkSideCd();
         let pageAjax = this.$['input-list-pages-ajax'];
         pageAjax.curl = `/tablet_process/dps/input_pages/${rackCd}/${zoneCd}/${sideCd}/UP/${startInputSeq}`;
         pageAjax.generateRequest();
@@ -674,8 +673,8 @@ Copyright © HatioLab Inc. All rights reserved.
         const inspWithPickAjax = this.$['depart-ajax'];
         let scannedBarcode = this.selectedInput.bucket_cd;
         //if(this.selectedInput.status==='F') {
-        let rackCd = LOGIS_UTIL.getRackCd();
-        let zoneCd = LOGIS_UTIL.getEquipZone();
+        let rackCd = LOGIS_UTIL.getEquipCd();
+        let zoneCd = LOGIS_UTIL.getStationCd();
         inspWithPickAjax.curl = `/tablet_process/dps/box_depart/${rackCd}/${zoneCd}/${scannedBarcode}`;
         inspWithPickAjax.generateRequest();
         //}
@@ -706,8 +705,8 @@ Copyright © HatioLab Inc. All rights reserved.
         // 박스 도착 이벤트 발생 
         const bucketArriveAjax = this.$['arrive-ajax'];
         let equipType = LOGIS_UTIL.getEquipType();
-        let equipCd = LOGIS_UTIL.getRackCd();
-        let zoneCd = LOGIS_UTIL.getEquipZone();
+        let equipCd = LOGIS_UTIL.getEquipCd();
+        let zoneCd = LOGIS_UTIL.getStationCd();
         let jobType = LOGIS_UTIL.getJobType();
         let bucketCd = scannedBarcode;
 
