@@ -29,6 +29,10 @@ LOGIS_UTIL.setLocalStorage = function(key, value) {
   localStorage.setItem(key, JSON.stringify(value));
 };
 
+/*******************************************************************************
+ *                        장비에서 설정한 내용을 조회
+ ******************************************************************************/
+
 /**
  * @description 디바이스 타입 조회
  *******************
@@ -36,15 +40,6 @@ LOGIS_UTIL.setLocalStorage = function(key, value) {
  */
 LOGIS_UTIL.getDeviceType = function() {
   return LOGIS_UTIL.getLocalStorage('setting.deviceType');
-};
-
-/**
- * @description 작업 스테이션 내 대상 외 주문 정보 표시 여부 리턴 (DPS 유형 설정)
- ********************
- * @return 작업 스테이션 내 대상 외 주문 정보 표시 여부
- */
-LOGIS_UTIL.getShowOthersOrder = function() {
-  return LOGIS_UTIL.getLocalStorage('setting.showOthersOrder');
 };
 
 /**
@@ -102,6 +97,29 @@ LOGIS_UTIL.getWorkSideCd = function() {
 };
 
 /**
+ * @description 작업 유형 리턴
+ ********************
+ * @return 작업 유형
+ */
+LOGIS_UTIL.getJobType = function() {
+  return LOGIS_UTIL.getLocalStorage('setting.jobType');
+};
+
+/*******************************************************************************
+ *                        서버에서 장비에 대해서 설정한 내용을 조회
+ ******************************************************************************/
+
+/**
+ * @description 작업 스테이션 내 대상 외 주문 정보 표시 여부 리턴 (DPS 유형 설정)
+ ********************
+ * @return 작업 스테이션 내 대상 외 주문 정보 표시 여부
+ */
+LOGIS_UTIL.getShowOthersOrder = function() {
+  return LOGIS_UTIL.getLocalStorage('setting.showOthersOrder');
+};
+
+
+/**
  * @description 현재 태블릿의 자동피킹 여부를 리턴 (DPS 유형 설정)
  ********************
  * @return 자동 피킹 
@@ -127,15 +145,6 @@ LOGIS_UTIL.getShowFullCode = function() {
 LOGIS_UTIL.getInvoiceFieldSubstr = function() {
   let invFieldSubstrIdx = LOGIS_UTIL.getLocalStorage('setting.invoiceFieldSubstr');
   return invFieldSubstrIdx ? parseInt(invFieldSubstrIdx) : -1;
-};
-
-/**
- * @description 작업 유형 리턴
- ********************
- * @return 작업 유형
- */
-LOGIS_UTIL.getJobType = function() {
-  return LOGIS_UTIL.getLocalStorage('setting.jobType');
 };
 
 /**
@@ -212,6 +221,11 @@ LOGIS_UTIL.isContinousScanAllowed = function() {
   return continousScanAllowed === null ? false : continousScanAllowed;
 };
 
+/*******************************************************************************
+ *                                  유틸리티 함수
+ ******************************************************************************/
+
+
 /**
  * @description Warning 팝업 표시
  ******************
@@ -244,7 +258,7 @@ LOGIS_UTIL.showConfirm = function(title, message, cancelCallback, confirmCallbac
 };
 
 /**
- * @description 설정이 비어있는 경우 핸들러
+ * @description 설비 설정이 비어있는 경우 핸들러
  ********************
  */
 LOGIS_UTIL.handleRequiredSettingEmpty = function() {
@@ -254,7 +268,7 @@ LOGIS_UTIL.handleRequiredSettingEmpty = function() {
 };
 
 /**
- * @description 설정에 랙 설정이 비어있는 지 체크
+ * @description 설정에 설비 설정이 비어있는 지 체크
  ********************
  */
 LOGIS_UTIL.checkRequiredSettingEmpty = function() {

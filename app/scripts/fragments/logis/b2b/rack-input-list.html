@@ -208,15 +208,16 @@ Copyright © HatioLab Inc. All rights reserved.
       _skuSelected(event) {
         const content = document.createElement('rack-input-details');
         content.data = event.detail.data;
+        LOGIS_UTIL.showPopup(null, content, 'fit', 'fit');
 
-        document.dispatchEvent(new CustomEvent('open-dialog', {
+        /*document.dispatchEvent(new CustomEvent('open-dialog', {
           detail: {
             content: content,
             closeCallback: () => {
               //this.refresh();
             }
           }
-        }))
+        }))*/
       }
     }
 

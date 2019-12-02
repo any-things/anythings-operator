@@ -806,11 +806,13 @@ Copyright © HatioLab Inc. All rights reserved.
         let errorFlag = false;
         let finishedItem = null;
         var flag = 0;
+
         let newItems = this.items.map((item, index) => {
           if (skuBarcode == item.sku_cd || skuBarcode == item.sku_barcd) {
             if (flag >= 1) {
               return item;
             }
+
             if (item.diff_qty == 0) {
               this.showMessage(t('error.out_of_valid_qty'), t('text.confirm_qty_out_of_item_qty'), this.focusSkuBarcdInput.bind(this));
               errorFlag = true;
@@ -821,6 +823,7 @@ Copyright © HatioLab Inc. All rights reserved.
               item.confirm_qty = ++item.confirm_qty;
               this.confirmSkuPcsQty = this.confirmSkuPcsQty + 1;
               flag++;
+
             } else if (this.inspectionMethodValue == 'total') {
               var calcQty = item.item_qty - item.confirm_qty;
               item.confirm_qty = item.item_qty;
@@ -831,7 +834,44 @@ Copyright © HatioLab Inc. All rights reserved.
               inputCountPopup.item = item;
 
               if (item.sku_cd == skuBarcode || skuBarcode == item.sku_barcd) {
-                document.dispatchEvent(new CustomEvent('open-dialog', {
+                LOGIS_UTIL.showPopup(this.qtyInputLabel, inputCountPopup, 'fit', 'fit', function() {
+                  inputCountPopup._initialSetup();
+
+                }.bind(this), function() {
+                  let inputQty = inputCountPopup.inputQty;
+                  if (!inputQty) {
+                    this.focusSkuBarcdInput();
+                    return;
+                  }
+                  this.confirmSkuPcsQty = this.confirmSkuPcsQty + inputQty;
+                  if (this.items[index].diff_qty > 0) {
+                    this.items[index].diff_qty = this.items[index].item_qty - this.items[index].confirm_qty;
+                    if (this.items[index].diff_qty == 0) {
+                      this.confirmSkuCnt = this.confirmSkuCnt + 1;
+                      finishedItem = this.items[index];
+                    }
+                  }
+
+                  let countItems = this.items;
+
+                  if (!errorFlag) {
+                    if (finishedItem) {
+                      countItems.splice(countItems.indexOf(finishedItem), 1);
+                      countItems.push(finishedItem);
+                    }
+                  }
+
+                  this.set('items', []);
+                  this.set('items', countItems);
+
+                  this.focusSkuBarcdInput();
+                  // 모든 검수가 완료 되었는지 확인하고 완료 되었다면 자동으로 검수 완료 처리
+                  if (this.checkFinished(this.items)) {
+                    this.completeInspection();
+                  }
+                }.bind(this));
+
+                /*document.dispatchEvent(new CustomEvent('open-dialog', {
                   detail: {
                     content: inputCountPopup,
                     width: 'fit',
@@ -874,7 +914,7 @@ Copyright © HatioLab Inc. All rights reserved.
                       }
                     }
                   }
-                }));
+                }));*/
               }
 
             } else if (this.inspectionMethodValue == 'addSku') {

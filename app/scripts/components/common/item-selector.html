@@ -65,7 +65,9 @@ Copyright © HatioLab Inc. All rights reserved.
 
   <script>
     class ItemSelector extends Polymer.Element {
-      static get is() { return 'item-selector' }
+      static get is() {
+        return 'item-selector'
+      }
       static get properties() {
         return {
           infoColumnCnt: {
@@ -180,7 +182,7 @@ Copyright © HatioLab Inc. All rights reserved.
         mpsList.setAttribute('dialog', '');
         mpsList.addEventListener('data-list-click', event => {
           const selectedRow = event.detail.row;
-          if(this.selectedRow) this.selectedRow.classList.remove('selected');
+          if (this.selectedRow) this.selectedRow.classList.remove('selected');
           selectedRow.classList.add('selected');
           this.selectedRow = selectedRow;
         });
@@ -197,7 +199,7 @@ Copyright © HatioLab Inc. All rights reserved.
         const confirmBtn = document.createElement('button');
         confirmBtn.innerText = t('button.confirm');
         confirmBtn.onclick = () => {
-          if(this.selectedRow) {
+          if (this.selectedRow) {
             this.initData(this.selectedRow.getData());
             this.closeSelector();
           } else {
@@ -206,11 +208,23 @@ Copyright © HatioLab Inc. All rights reserved.
         }
 
         buttonContainer.appendChild(confirmBtn);
-
         container.appendChild(mpsList);
         container.appendChild(buttonContainer);
 
-        document.dispatchEvent(new CustomEvent('open-dialog', {
+        LOGIS_UTIL.showPopup('', container, 'fit', 'fit', function() {
+          const getDataAjax = this.$['get-data-ajax'];
+          getDataAjax.addEventListener('sys-ajax-response', event => {
+            if (this.responseHandler && typeof this.responseHandler === 'function') {
+              mpsList.data = this.responseHandler(event.detail);
+            } else {
+              mpsList.data = event.detail.items ? event.detail.items : event.detail;
+            }
+          });
+
+          getDataAjax.generateRequest();
+        }.bind(this));
+
+        /*document.dispatchEvent(new CustomEvent('open-dialog', {
           detail: {
             content: container,
             width: 'fit',
@@ -227,11 +241,11 @@ Copyright © HatioLab Inc. All rights reserved.
               getDataAjax.generateRequest();
             }
           }
-        }))
+        }))*/
       }
 
       setStyle(element, styleObj) {
-        for(let key in styleObj) {
+        for (let key in styleObj) {
           element.style[key] = styleObj[key];
         }
       }

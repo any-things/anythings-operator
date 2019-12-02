@@ -224,32 +224,36 @@ Copyright © HatioLab Inc. All rights reserved.
             <template>
               <span class="header-item">[[item.display]]</span>
             </template>
-          </dom-repeat>
-        </li>
-      </div>
+  </dom-repeat>
+  </li>
+  </div>
 
-      <div id="body-container"><div id="data-container" dialog$="[[dialog]]"></div></div>
+  <div id="body-container">
+    <div id="data-container" dialog$="[[dialog]]"></div>
+  </div>
 
-      <div id="paginator-container">
-        <div id="paginator">
-          <iron-icon icon="icons:chevron-left" on-click="prevPage" class="prevPage"></iron-icon>
-          <input id="page" type="number" name="page" max="[[lastPage]]" on-change="_initPage" value="[[page]]">
-          <iron-icon icon="icons:chevron-right" on-click="nextPage" class="nextPage"></iron-icon>
-          <span><b>[[page]]</b> Page of [[endPage]] Pages</span>
-        </div>
-
-        <div id="page-summary">
-          <span>Limit</span>
-          <input id="limit" type="number" name="limit" id="limit" min="[[minLimit]]" max="[[maxLimit]]" on-change="_initLimit" value="[[limit]]">
-          <span>from [[beginDataNumber]] to [[endDataNumber]] Total [[total]]</span>
-        </div>
-      </div>
+  <div id="paginator-container">
+    <div id="paginator">
+      <iron-icon icon="icons:chevron-left" on-click="prevPage" class="prevPage"></iron-icon>
+      <input id="page" type="number" name="page" max="[[lastPage]]" on-change="_initPage" value="[[page]]">
+      <iron-icon icon="icons:chevron-right" on-click="nextPage" class="nextPage"></iron-icon>
+      <span><b>[[page]]</b> Page of [[endPage]] Pages</span>
     </div>
+
+    <div id="page-summary">
+      <span>Limit</span>
+      <input id="limit" type="number" name="limit" id="limit" min="[[minLimit]]" max="[[maxLimit]]" on-change="_initLimit" value="[[limit]]">
+      <span>from [[beginDataNumber]] to [[endDataNumber]] Total [[total]]</span>
+    </div>
+  </div>
+  </div>
   </template>
 
   <script>
     class ItemList extends Polymer.Element {
-      static get is() { return 'item-list' }
+      static get is() {
+        return 'item-list'
+      }
       static get properties() {
         return {
           /**
@@ -365,7 +369,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Array} data
        */
       _renderContents(header, data) {
-        if(header && header.length > 0) {
+        if (header && header.length > 0) {
           this._renderHeader(header);
 
           // render header 성공 후 flag 변경
@@ -384,7 +388,7 @@ Copyright © HatioLab Inc. All rights reserved.
           this._clearRows();
         }
 
-        if(header && header.length > 0 && data && data.length >= 0) {
+        if (header && header.length > 0 && data && data.length >= 0) {
           this._renderContent(header, data);
 
           // render content 성공 후 flag 변경
@@ -399,7 +403,7 @@ Copyright © HatioLab Inc. All rights reserved.
         }
 
         // header, content가 모두 redner 되면 list-configured custom event 발생
-        if(this.isHeaderConfigured && this.isContentConfigured) {
+        if (this.isHeaderConfigured && this.isContentConfigured) {
           this.dispatchEvent(new CustomEvent('configured', {
             detail: {
               header: header,
@@ -423,7 +427,7 @@ Copyright © HatioLab Inc. All rights reserved.
         header.forEach(item => {
           let colWidth = item.columnWidth ? item.columnWidth : '1fr';
           let hidden = item.hidden;
-          if(hidden) {
+          if (hidden) {
             colWidth = '0';
           }
           gridTempCols.push(colWidth);
@@ -458,7 +462,7 @@ Copyright © HatioLab Inc. All rights reserved.
             let hidden = column.hidden;
             let fieldname = column.fieldname;
             let dataItem;
-            if(column.button) { // 컬럼의 button에 값이 있다면 버튼 타입
+            if (column.button) { // 컬럼의 button에 값이 있다면 버튼 타입
               dataItem = this.createButtonItem(column.button, fieldname, rowData);
             } else if (column.image) {
               dataItem = this.createImageItem(column.image, rowData[fieldname], rowData);
@@ -467,13 +471,13 @@ Copyright © HatioLab Inc. All rights reserved.
             }
 
             // 컬럼에 class callback이 있다면 해당 classCallback을 실행한 return 값을 class에 적용
-            if(column.classCallback) {
+            if (column.classCallback) {
               dataItem.classList.add(column.classCallback(rowData));
             }
 
-            if(style && !hidden) { // hidden 컬럼이 아니고 스타일에 값이 있다면 스타일을 적용
+            if (style && !hidden) { // hidden 컬럼이 아니고 스타일에 값이 있다면 스타일을 적용
               this.setDataStyle(dataItem, style);
-            } else if(hidden) { // hidden 컬럼일 경우
+            } else if (hidden) { // hidden 컬럼일 경우
               this.hideColumn(dataItem);
             }
 
@@ -493,7 +497,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _clearRows() {
         const dataContainer = this.$['data-container'];
-        while(dataContainer.hasChildNodes()) {
+        while (dataContainer.hasChildNodes()) {
           dataContainer.removeChild(dataContainer.firstChild);
         }
       }
@@ -528,7 +532,7 @@ Copyright © HatioLab Inc. All rights reserved.
           // 리스트 내부의 차일드를 찾아 button-cell이 아닌 경우에
           // getValue를 통해 데이터를 추출하고 data 오브젝트에 초기화
           this.childNodes.forEach((item, idx) => {
-            if(!item.hasAttribute('button-cell')) {
+            if (!item.hasAttribute('button-cell')) {
               data[fieldList[idx]] = item.getValue();
             }
           });
@@ -565,24 +569,32 @@ Copyright © HatioLab Inc. All rights reserved.
 
         // 3. 데이터 타입에 따라 버튼의 텍스트 표시 방법을 결정
         let btnType = typeof buttonCallback;
-        switch(btnType) {
+        switch (btnType) {
           case 'string':
-          case 'number': {
-            button.innerText = buttonTxt;
-          } break;
-          case 'function': {
-            button.innerText = buttonCallback(item, button);
-          } break;
-          case 'boolean': {
-            if(btnType) {
-              button.innerText = item[fieldname];
-            } else {
-              button.setAttribute('hidden', true);
+          case 'number':
+            {
+              button.innerText = buttonTxt;
             }
-          } break;
-          default: {
-            button.innerText = item[fieldname];
-          } break;
+            break;
+          case 'function':
+            {
+              button.innerText = buttonCallback(item, button);
+            }
+            break;
+          case 'boolean':
+            {
+              if (btnType) {
+                button.innerText = item[fieldname];
+              } else {
+                button.setAttribute('hidden', true);
+              }
+            }
+            break;
+          default:
+            {
+              button.innerText = item[fieldname];
+            }
+            break;
         }
         return button;
       }
@@ -595,9 +607,8 @@ Copyright © HatioLab Inc. All rights reserved.
           return src;
         }
 
-        if(imageObj.zoomDialog) {
+        if (imageObj.zoomDialog) {
           imgTag.onclick = function(event) {
-
             const content = new Image(imgTag.clientWidth * 2, imgTag.clientHeight * 2);
             content.setAttribute('src', src);
 
@@ -614,7 +625,7 @@ Copyright © HatioLab Inc. All rights reserved.
           }
         }
 
-        if('style' in imageObj) {
+        if ('style' in imageObj) {
           this.setDataStyle(imgTag, imageObj.style)
         }
         return imgTag;
@@ -634,7 +645,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
         // 2. span 엘리먼트(필드)의 값을 결정하고 초기화
         dataItem.value = value;
-        if(displayCallback) { // displayCallback이 있는 경우 해당 함수 실행 결과를 field의 값으로 결정
+        if (displayCallback) { // displayCallback이 있는 경우 해당 함수 실행 결과를 field의 값으로 결정
           dataItem.innerHTML = displayCallback(value, rowData);
         } else { // displayCallback이 없을 경우 그냥 value를 초기화
           dataItem.innerHTML = value;
@@ -655,7 +666,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} style 적용할 스타일의 오브젝트
        */
       setDataStyle(dataItem, style) {
-        for(let key in style) {
+        for (let key in style) {
           dataItem.style[key] = style[key];
         }
       }
@@ -677,7 +688,7 @@ Copyright © HatioLab Inc. All rights reserved.
       _showPaginatorChanged(showPaginator) {
         const paginatorContainer = this.$['paginator-container'];
 
-        if(showPaginator) {
+        if (showPaginator) {
           paginatorContainer.style.display = 'flex';
           this.page = 1;
         } else {
@@ -694,7 +705,7 @@ Copyright © HatioLab Inc. All rights reserved.
       _initPage(event) {
         const pageInput = event.currentTarget;
         const page = parseInt(pageInput.value);
-        if(page && page > 0 && !this.noMorePage(page)) {
+        if (page && page > 0 && !this.noMorePage(page)) {
           this.page = page;
         } else {
           openAlert({
@@ -716,7 +727,7 @@ Copyright © HatioLab Inc. All rights reserved.
       _initLimit(event) {
         const limitInput = event.currentTarget;
         const limit = parseInt(limitInput.value);
-        if(limit <= this.maxLimit && limit >= this.minLimit) {
+        if (limit <= this.maxLimit && limit >= this.minLimit) {
           this.limit = limit;
 
         } else {
@@ -740,7 +751,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {limit} limit
        */
       _setupPaginator(data, page, total, limit) {
-        if(data && page && total && limit) {
+        if (data && page && total && limit) {
           this.beginDataNumber = this._getBeginDataNum();
           this.endDataNumber = this._getEndDataNum();
           this.endPage = this._getEndPage();
@@ -799,7 +810,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * input change 이벤트를 발생
        */
       prevPage() {
-        if(this.page > 1) {
+        if (this.page > 1) {
           const pageInput = this.$['page'];
           pageInput.value = this.page - 1;
           pageInput.dispatchEvent(new InputEvent('change'));
@@ -813,7 +824,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * input change 이벤트를 발생
        */
       nextPage() {
-        if(!this.noMorePage(this.page + 1)) {
+        if (!this.noMorePage(this.page + 1)) {
           const pageInput = this.$['page'];
           pageInput.value = this.page + 1;
           pageInput.dispatchEvent(new InputEvent('change'));

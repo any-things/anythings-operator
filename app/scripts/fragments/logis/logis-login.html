@@ -308,22 +308,13 @@ Copyright © HatioLab Inc. All rights reserved.
         const siteSelector = document.createElement('logis-site-selector');
         siteSelector.siteList = siteList;
 
-        document.dispatchEvent(new CustomEvent('open-dialog', {
-          detail: {
-            content: siteSelector,
-            title: t('title.select_site'),
-            width: 'fit',
-            height: 'fit',
-            openCallback: () => {
-              siteSelector._getSiteSelectElement().focus();
-            },
-            closeCallback: () => {
-              if (siteSelector.selectedSiteUrl) {
-                this._reqSignIn(siteSelector.selectedSiteUrl, siteSelector.selectedDomainId);
-              }
-            }
+        LOGIS_UTIL.showPopup(t('title.select_site'), siteSelector, 'fit', 'fit', function() {
+          siteSelector._getSiteSelectElement().focus();
+        }.bind(this), function() {
+          if (siteSelector.selectedSiteUrl) {
+            this._reqSignIn(siteSelector.selectedSiteUrl, siteSelector.selectedDomainId);
           }
-        }));
+        }.bind(this));
       }
 
       /**

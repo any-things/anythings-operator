@@ -848,7 +848,11 @@ Copyright © HatioLab Inc. All rights reserved.
           this._popupButtonClick(event.detail.buttonId);
         });
 
-        document.dispatchEvent(new CustomEvent('open-dialog', {
+        LOGIS_UTIL.showPopup(t('menu.DasJobProcess'), buttonPopup, 'fit', 'fit', null, function() {
+          this.refresh();
+        }.bind(this));
+
+        /*document.dispatchEvent(new CustomEvent('open-dialog', {
           detail: {
             title: t('menu.DasJobProcess'),
             content: buttonPopup,
@@ -858,7 +862,7 @@ Copyright © HatioLab Inc. All rights reserved.
               this.refresh();
             }
           }
-        }))
+        }))*/
       }
 
       /**

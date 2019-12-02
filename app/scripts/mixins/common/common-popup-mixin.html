@@ -31,14 +31,16 @@ Copyright © HatioLab Inc. All rights reserved.
         const openCallback = options.openCallback && typeof options.openCallback === 'function' ? options.openCallback.bind(this) : null;
         const closeCallback = options.closeCallback && typeof options.closeCallback === 'function' ? options.closeCallback.bind(this) : null;
 
-        document.dispatchEvent(new CustomEvent('open-dialog', {
+        LOGIS_UTIL.showPopup(options.title ? options.title : null, formListPopup, 'fit', 'fit', openCallback, closeCallback);
+
+        /*document.dispatchEvent(new CustomEvent('open-dialog', {
           detail: {
             title: options.title ? options.title : null,
             content: formListPopup,
             openCallback: openCallback,
             closeCallback: closeCallback
           }
-        }));
+        }));*/
       }
 
       throwException(errorMessage) {

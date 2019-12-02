@@ -1114,15 +1114,9 @@ Copyright © HatioLab Inc. All rights reserved.
           title = t('title.ind_on_last');
         }
 
-        document.dispatchEvent(new CustomEvent('open-dialog', {
-          detail: {
-            content: popup,
-            width: 'fit',
-            height: 'fit',
-            title: title,
-            openCallback: popup.initialSetup.bind(popup)
-          }
-        }));
+        LOGIS_UTIL.showPopup(title, popup, 'fit', 'fit', function() {
+          popup.initialSetup.bind(popup);
+        }.bind(this));
       }
 
       /**

@@ -176,23 +176,27 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} event
        */
       _showReprintPopup(event) {
-        const labelReIssueDetail = document.createElement('label-details');
-        labelReIssueDetail.boxResultId = event.detail.data.id;
-        labelReIssueDetail.custName = event.detail.data.cust_nm;
-        labelReIssueDetail.invoiceId = event.detail.data.invoice_id ? event.detail.data.invoice_id : event.detail.data.box_id;
-        labelReIssueDetail.locCd = event.detail.data.loc_cd;
+        const reprintPopup = document.createElement('label-details');
+        reprintPopup.boxResultId = event.detail.data.id;
+        reprintPopup.custName = event.detail.data.cust_nm;
+        reprintPopup.invoiceId = event.detail.data.invoice_id ? event.detail.data.invoice_id : event.detail.data.box_id;
+        reprintPopup.locCd = event.detail.data.loc_cd;
 
-        document.dispatchEvent(new CustomEvent('open-dialog', {
+        LOGIS_UTIL.showPopup(t('button.print_label'), reprintPopup, 'fit', 'fit', null, function() {
+          this.searchBoxList();
+        }.bind(this));
+
+        /*document.dispatchEvent(new CustomEvent('open-dialog', {
           detail: {
             title: t('button.print_label'),
-            content: labelReIssueDetail,
+            content: reprintPopup,
             width: 'fit',
             height: 'fit',
             closeCallback: () => {
               this.searchBoxList();
             }
           }
-        }))
+        }))*/
       }
     }
 

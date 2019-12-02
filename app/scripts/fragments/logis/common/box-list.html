@@ -271,7 +271,11 @@ Copyright © HatioLab Inc. All rights reserved.
           mpsBoxListDetail.isBoxCancelEnabled = true;
         }
 
-        document.dispatchEvent(new CustomEvent('open-dialog', {
+        LOGIS_UTIL.showPopup(t('title.inbox_list'), mpsBoxListDetail, null, null, null, function() {
+          this.searchBoxList();
+        }.bind(this));
+
+        /*document.dispatchEvent(new CustomEvent('open-dialog', {
           detail: {
             title: t('title.inbox_list'),
             content: mpsBoxListDetail,
@@ -279,7 +283,7 @@ Copyright © HatioLab Inc. All rights reserved.
               this.searchBoxList();
             }
           }
-        }));
+        }));*/
       }
     }
 

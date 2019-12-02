@@ -492,9 +492,29 @@ Copyright © HatioLab Inc. All rights reserved.
       deviceFound(device) {
         if (this.popupOpened) {
           this.popup.appendDevice(device);
+
         } else {
-          if (!this.popup) this.popup = document.createElement('bluetooth-scanner-selector');
-          document.dispatchEvent(new CustomEvent('open-dialog', {
+          if (!this.popup) {
+            this.popup = document.createElement('bluetooth-scanner-selector');
+          }
+
+          LOGIS_UTIL.showPopup(t('text.select'), this.popup, 'fit', 'fit', function() {
+            this.popupOpened = true;
+            this.popup.clearOptions();
+            this.popup.appendDevice(device);
+
+          }.bind(this), function() {
+            this.popupOpened = false;
+            this.stopScanDevices();
+
+            if (this.popup.selectedDeviceId) {
+              this.deviceId = this.popup.selectedDeviceId;
+              this.deviceName = this.popup.selectedDeviceName;
+              this.connectDevice();
+            }
+          }.bind(this));
+
+          /*document.dispatchEvent(new CustomEvent('open-dialog', {
             detail: {
               content: this.popup,
               title: t('text.select'),
@@ -515,7 +535,7 @@ Copyright © HatioLab Inc. All rights reserved.
                 }
               }
             }
-          }))
+          }))*/
         }
       }
 
@@ -532,7 +552,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * 연결 해제 후 처리를 위해 구현
        */
       afterDisconnect() {
-        this.deviceName = "";
+        this.deviceName = '';
         this.bluetoothIcon = 'device:bluetooth';
       }
     }

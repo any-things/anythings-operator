@@ -26,7 +26,9 @@ Copyright © HatioLab Inc. All rights reserved.
 
   <script>
     class BarcodeField extends Polymer.Element {
-      static get is() { return 'barcode-field'; }
+      static get is() {
+        return 'barcode-field';
+      }
 
       static get properties() {
         return {
@@ -42,7 +44,7 @@ Copyright © HatioLab Inc. All rights reserved.
           items: {
             type: Object,
             notify: true
-            // observer: '_itemsChanged'
+              // observer: '_itemsChanged'
           },
 
           buttonTextCallback: {
@@ -81,25 +83,16 @@ Copyright © HatioLab Inc. All rights reserved.
         popup.items = items;
         popup.hidden = false;
         var input = this.$.input;
-        
-        document.dispatchEvent(new CustomEvent('open-dialog', {
-          detail: {
-            content: popup,
-            width: 'fit',
-            height: 'fit',
-            title: this.popupTitle,
-            closeCallback: () => {
-              if (popup.selectedItem) {
-                this.selectedItem = [ popup.selectedItem ];
-              } else {
-                input.select();
-              }
 
-              popup.items = null;
-              this._resetPopupContainer();
-            }
+        LOGIS_UTIL.showPopup(this.popupTitle, popup, 'fit', 'fit', null, function() {
+          if (popup.selectedItem) {
+            this.selectedItem = [popup.selectedItem];
+          } else {
+            input.select();
           }
-        }))
+          popup.items = null;
+          this._resetPopupContainer();
+        }.bind(this));
       }
 
       _resetPopupContainer() {

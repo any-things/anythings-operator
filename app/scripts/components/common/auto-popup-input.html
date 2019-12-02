@@ -328,23 +328,15 @@ Copyright © HatioLab Inc. All rights reserved.
         popup.displayKey = this.displayKey;
         popup.buttonTxtCallback = this.buttonTxtCallback;
 
-        document.dispatchEvent(new CustomEvent('open-dialog', {
-          detail: {
-            content: popup,
-            width: 'fit',
-            height: 'fit',
-            title: this.popupTitle,
-            closeCallback: () => {
-              if (popup.selectedItem) {
-                this.dispatchEvent(new CustomEvent('item-selected', {
-                  detail: popup.selectedItem
-                }));
-              } else {
-                this.select();
-              }
-            }
+        LOGIS_UTIL.showPopup(this.popupTitle, popup, 'fit', 'fit', null, function() {
+          if (popup.selectedItem) {
+            this.dispatchEvent(new CustomEvent('item-selected', {
+              detail: popup.selectedItem
+            }));
+          } else {
+            this.select();
           }
-        }))
+        }.bind(this));
       }
 
       /**
