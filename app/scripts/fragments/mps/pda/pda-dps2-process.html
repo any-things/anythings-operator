@@ -153,10 +153,10 @@ Copyright © HatioLab Inc. All rights reserved.
     <div id="container">
       <!-- 랙 정보 -->
       <div id="rack-info-container" class="input-row">
-        <label>[[rackNmLabel]]</label>
-        <span id="view-rack-nm">[[rackNm]]</span>
-        <label>[[zoneCdLabel]]</label>
-        <span id="view-zone-nm">[[zoneCd]]</span>
+        <label>[[equipNmLabel]]</label>
+        <span id="view-rack-nm">[[equipNm]]</span>
+        <label>[[stationCdLabel]]</label>
+        <span id="view-zone-nm">[[stationCd]]</span>
       </div>
 
       <div id="input-container">
@@ -211,12 +211,12 @@ Copyright © HatioLab Inc. All rights reserved.
     <!-- 박스 검수 컴포넌트 -->
     <box-process-checker
       id="inspect-box"
-      rack-cd="[[rackCd]]">
+      rack-cd="[[equipCd]]">
     </box-process-checker>
 
     <!-- 로케이션 - 박스 매핑 컴포넌트 -->
     <cell-box-mapper-popup
-      rack-cd="[[rackCd]]"
+      rack-cd="[[equipCd]]"
       input-value="{{inputValue}}"
       on-need-inspect-box="_handleNeedInspectBox">
     </cell-box-mapper-popup>
@@ -494,7 +494,7 @@ Copyright © HatioLab Inc. All rights reserved.
           /**
            * @description 랙 코드 라벨
            */
-          rackNmLabel: {
+          equipNmLabel: {
             type: String,
             value: () => t('label.rack_nm'),
           },
@@ -502,7 +502,7 @@ Copyright © HatioLab Inc. All rights reserved.
           /**
            * @description 존 코드 라벨
            */
-          zoneCdLabel: {
+          stationCdLabel: {
             type: String,
             value: () => t('label.station_cd')
           },
@@ -570,10 +570,10 @@ Copyright © HatioLab Inc. All rights reserved.
            ****************
            * @type {String}
            */
-          rackCd: {
+          equipCd: {
             type: String,
             value: LOGIS_UTIL.getEquipCd(),
-            observer: '_rackCdChanged'
+            observer: '_equipCdChanged'
           },
 
           /**
@@ -581,11 +581,11 @@ Copyright © HatioLab Inc. All rights reserved.
            ****************
            * @type {String}
            */
-          rackNm: {
+          equipNm: {
             type: String,
             notify: true,
             value: LOGIS_UTIL.getEquipNm(),
-            observer: '_rackNmChanged'
+            observer: '_equipNmChanged'
           },
 
           /**
@@ -593,11 +593,11 @@ Copyright © HatioLab Inc. All rights reserved.
            ****************
            * @type {String}
            */
-          zoneCd: {
+          stationCd: {
             type: String,
             notify: true,
             value: LOGIS_UTIL.getStationCd(),
-            observer: '_zoneCdChanged'
+            observer: '_stationCdChanged'
           }
         }
       }
@@ -643,36 +643,36 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * @description 랙 코드 변경 시
+       * @description 설비 코드 변경 시
        *********************
-       * @param {String} rackCd
+       * @param {String} equipCd
        */
-      _rackCdChanged(rackCd) {
-        if (rackCd) {
-          window.localStorage.setItem('setting.equipCd', JSON.stringify(rackCd));
+      _equipCdChanged(equipCd) {
+        if (equipCd) {
+          LOGIS_UTIL.setLocalStorage('setting.equipCd', equipCd);
         }
       }
 
       /**
-       * @description 랙 명 변경 시
+       * @description 설비 명 변경 시
        *********************
-       * @param {String} rackNm
+       * @param {String} equipNm
        */
-      _rackNmChanged(rackNm) {
-        if (rackNm) {
-          window.localStorage.setItem('setting.equipNm', JSON.stringify(rackNm));
+      _equipNmChanged(equipNm) {
+        if (equipNm) {
+          LOGIS_UTIL.setLocalStorage('setting.equipNm', equipNm);
         }
       }
 
       /**
        * @description 작업 존 코드 변경 시
        *********************
-       * @param {String} zoneCd
+       * @param {String} stationCd
        */
-      _zoneCdChanged(zoneCd) {
-        if (zoneCd && this.rackCd) {
-          WEB_MQTT.reset(this.rackCd, zoneCd);
-          window.localStorage.setItem('setting.stationCd', JSON.stringify(zoneCd));
+      _stationCdChanged(stationCd) {
+        if (stationCd && this.equipCd) {
+          WEB_MQTT.reset(this.equipCd, stationCd);
+          LOGIS_UTIL.setLocalStorage('setting.stationCd', stationCd);
         }
       }
 
@@ -704,7 +704,7 @@ Copyright © HatioLab Inc. All rights reserved.
           // 그 외 값은 상품 정보로 판단하여 상품 조회
         } else {
           let ajax = this.$['find-sku-ajax'];
-          ajax.curl = `/tablet_process/find_sku/${this.rackCd}/${inputValue}`;
+          ajax.curl = `/tablet_process/find_sku/${this.equipCd}/${inputValue}`;
           ajax.generateRequest();
         }
       }
@@ -732,7 +732,7 @@ Copyright © HatioLab Inc. All rights reserved.
         if (!this.inspectBtnActive) {
           // 검수 모드가 아니면 투입 처리
           this.doInputTransaction({
-            rackCd: this.rackCd,
+            equipCd: this.equipCd,
             sideCd: this.sideCd,
             comCd: selectedInput.com_cd,
             skuCd: selectedInput.sku_cd,
@@ -830,13 +830,13 @@ Copyright © HatioLab Inc. All rights reserved.
         }
 
         var {
-          rackCd,
-          zoneCd,
+          equipCd,
+          stationCd,
           sideCd,
           showOthersOrder
         } = this;
         var ajax = this.$['input-list-ajax'];
-        ajax.curl = `/tablet_process/input_list/${rackCd}/${zoneCd}/${sideCd}`;
+        ajax.curl = `/tablet_process/input_list/${equipCd}/${stationCd}/${sideCd}`;
         // 대상 외 작업 조회 여부 param setting
         ajax.customParams = {
           show_others_order: showOthersOrder
@@ -850,8 +850,8 @@ Copyright © HatioLab Inc. All rights reserved.
        * @Override
        */
       refreshInputDetails(mpiOnFlag) {
-        let rackCd = this.rackCd;
-        let zoneCd = this.zoneCd;
+        let equipCd = this.equipCd;
+        let stationCd = this.stationCd;
         let sideCd = LOGIS_UTIL.getWorkSideCd();
         let comCd = this.comCd ? this.comCd : '_na_';
         let skuCd = this.skuCd ? this.skuCd : '_na_';
@@ -861,9 +861,9 @@ Copyright © HatioLab Inc. All rights reserved.
         if (skuCd === '_na_') return;
 
         try {
-          this.validationBeforeRefreshDetail(zoneCd, sideCd);
+          this.validationBeforeRefreshDetail(stationCd, sideCd);
           let detailAjax = this.$['input-job-details-ajax'];
-          detailAjax.curl = `/tablet_process/job_details/${rackCd}/${sideCd}/${zoneCd}/${comCd}/${skuCd}`;
+          detailAjax.curl = `/tablet_process/job_details/${equipCd}/${sideCd}/${stationCd}/${comCd}/${skuCd}`;
           detailAjax.generateRequest();
         } catch (error) {
           LOGIS_UTIL.showMessage(error.title, error.message, error.callback);
@@ -947,7 +947,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       doInputTransaction(params) {
         var {
-          rackCd,
+          equipCd,
           sideCd,
           comCd,
           skuCd,
@@ -967,10 +967,10 @@ Copyright © HatioLab Inc. All rights reserved.
 
         // 마지막으로 스캔한 코드가 박스 바코드이면 박스째 투입으로 처리
         if (this.inputValue === boxBarcd) {
-          inputAjax.curl = `/pda_process/box_input/${rackCd}/${sideCd}/${this.zoneCd}/${comCd}/${skuCd}?allow_continous_scan=${isContinousScanAllowed}`;
+          inputAjax.curl = `/pda_process/box_input/${equipCd}/${sideCd}/${this.stationCd}/${comCd}/${skuCd}?allow_continous_scan=${isContinousScanAllowed}`;
           // 그렇지 않으면 단일 상품 투입
         } else {
-          inputAjax.curl = `/pda_process/input_sku/${rackCd}/${sideCd}/${this.zoneCd}/${comCd}/${skuCd}?allow_continous_scan=${isContinousScanAllowed}`;
+          inputAjax.curl = `/pda_process/input_sku/${equipCd}/${sideCd}/${this.stationCd}/${comCd}/${skuCd}?allow_continous_scan=${isContinousScanAllowed}`;
         }
 
         inputAjax.generateRequest();
@@ -989,14 +989,14 @@ Copyright © HatioLab Inc. All rights reserved.
       /**
        * @description 상품 정보 상세 정보 리프레쉬 전 Validation Check
        *********************
-       * @param {Boolean} zoneCd 표시기 점등 여부
+       * @param {Boolean} stationCd 표시기 점등 여부
        * @param {Boolean} sideCd 랙 사이드 코드
        */
-      validationBeforeRefreshDetail(zoneCd, sideCd) {
-        if (!zoneCd) {
+      validationBeforeRefreshDetail(stationCd, sideCd) {
+        if (!stationCd) {
           throw {
             title: t('error.SETTING_ERROR'),
-            message: t('text.zone_code_is_not_set'),
+            message: t('text.station_code_is_not_set'),
             callback: this.moveToSetting
           }
         }
@@ -1004,7 +1004,7 @@ Copyright © HatioLab Inc. All rights reserved.
         if (!sideCd) {
           throw {
             title: t('error.SETTING_ERROR'),
-            message: t('text.rack_side_is_not_set'),
+            message: t('text.work_side_is_not_set'),
             callback: this.moveToSetting
           }
         }
@@ -1057,9 +1057,9 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} event
        */
       _chuteInfoResponse(event) {
-        this.rackNm = event.detail.rack_nm;
-        this.rackCd = event.detail.rack_cd;
-        this.zoneCd = event.detail.chute_no;
+        this.equipNm = event.detail.rack_nm;
+        this.equipCd = event.detail.rack_cd;
+        this.stationCd = event.detail.chute_no;
         showToast('info', `${t('text.chute_changed')}`);
         this._reset();
       }
@@ -1140,8 +1140,8 @@ Copyright © HatioLab Inc. All rights reserved.
        ******************
        */
       _reset(isItemReset) {
-        this.rackCd = this.rackCd;
-        this.zoneCd = this.zoneCd;
+        this.equipCd = this.equipCd;
+        this.stationCd = this.stationCd;
         this.sideCd = LOGIS_UTIL.getWorkSideCd();
         this.showOthersOrder = false;
 

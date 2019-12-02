@@ -88,13 +88,13 @@ Copyright © HatioLab Inc. All rights reserved.
         }
 
         let inputListAjax = this.$['input-list-ajax'];
-        let rackCd = LOGIS_UTIL.getEquipCd();
-        let zoneCd = LOGIS_UTIL.getStationCd();
-        let sideCd = LOGIS_UTIL.getWorkSideCd();
+        let equipCd = LOGIS_UTIL.getEquipCd();
+        let stationCd = LOGIS_UTIL.getStationCd();
+        let workSideCd = LOGIS_UTIL.getWorkSideCd();
         let showOthersOrder = LOGIS_UTIL.getShowOthersOrder();
 
         inputListAjax.curl =
-          `/tablet_process/input_list/${rackCd}/${zoneCd}/${sideCd}`;
+          `/tablet_process/input_list/${equipCd}/${stationCd}/${workSideCd}`;
         // 대상 외 작업 조회 여부 param setting
         inputListAjax.customParams = {
           show_others_order: showOthersOrder
@@ -109,19 +109,20 @@ Copyright © HatioLab Inc. All rights reserved.
       refreshInputDetails(mpiOnFlag) {
         this.setListHeaderColor(this.selectedInput.mpi_color);
         let inputSeqId = this.selectedInput.id;
-        let rackCd = LOGIS_UTIL.getEquipCd();
-        let zoneCd = LOGIS_UTIL.getStationCd();
-        let sideCd = LOGIS_UTIL.getWorkSideCd();
+        let equipCd = LOGIS_UTIL.getEquipCd();
+        let stationCd = LOGIS_UTIL.getStationCd();
+        let workSideCd = LOGIS_UTIL.getWorkSideCd();
+
         try {
-          this.validationBeforeRefreshDetail(zoneCd, sideCd);
+          this.validationBeforeRefreshDetail(stationCd, workSideCd);
           let detailAjax = this.$['input-job-details-ajax'];
 
           if (this.jobType === 'DAS') {
             detailAjax.curl =
-              `/tablet_process/input_details/${rackCd}/${inputSeqId}/${sideCd}/${zoneCd}`;
+              `/tablet_process/input_details/${equipCd}/${inputSeqId}/${workSideCd}/${stationCd}`;
           } else if (this.jobType === 'DPS') {
             detailAjax.curl =
-              `/tablet_process/${this.jobType.toLowerCase()}/input_details/${inputSeqId}/${rackCd}/${zoneCd}/${sideCd}`;
+              `/tablet_process/${this.jobType.toLowerCase()}/input_details/${inputSeqId}/${equipCd}/${stationCd}/${workSideCd}`;
             detailAjax.customParams = {
               mpi_on_flag: mpiOnFlag
             };
@@ -136,22 +137,22 @@ Copyright © HatioLab Inc. All rights reserved.
       /**
        * @description 상품 정보 상세 정보 리프레쉬 전 Validation Check
        *********************
-       * @param {Boolean} zoneCd 표시기 점등 여부
-       * @param {Boolean} sideCd 랙 사이드 코드
+       * @param {Boolean} stationCd 표시기 점등 여부
+       * @param {Boolean} workSideCd 랙 사이드 코드
        */
-      validationBeforeRefreshDetail(zoneCd, sideCd) {
-        /*if (!zoneCd) {
+      validationBeforeRefreshDetail(stationCd, workSideCd) {
+        /*if (!stationCd) {
           throw {
             title: t('error.SETTING_ERROR'),
-            message: t('text.zone_code_is_not_set'),
+            message: t('text.station_code_is_not_set'),
             callback: this.moveToSetting
           }
         }*/
 
-        if (!sideCd) {
+        if (!workSideCd) {
           throw {
             title: t('error.SETTING_ERROR'),
-            message: t('text.rack_side_is_not_set'),
+            message: t('text.work_side_is_not_set'),
             callback: this.moveToSetting
           }
         }
@@ -237,18 +238,21 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Array} inputDetails
        */
       _inputDetailsChanged(inputDetails) {
-        if (inputDetails == null) return;
-        let sideCd = LOGIS_UTIL.getWorkSideCd();
+        if (inputDetails == null) {
+          return;
+        }
 
-        if (sideCd === 'F') {
-          this._updateStatus(inputDetails[sideCd]);
-          this.frontDetailList = LOGIS_UTIL.sortByLeftQty(inputDetails[sideCd]);
+        let workSideCd = LOGIS_UTIL.getWorkSideCd();
 
-        } else if (sideCd === 'R') {
-          this._updateStatus(inputDetails[sideCd]);
-          this.rearDetailList = LOGIS_UTIL.sortByLeftQty(inputDetails[sideCd]);
+        if (workSideCd === 'F') {
+          this._updateStatus(inputDetails[workSideCd]);
+          this.frontDetailList = LOGIS_UTIL.sortByLeftQty(inputDetails[workSideCd]);
 
-        } else if (sideCd === 'ALL') {
+        } else if (workSideCd === 'R') {
+          this._updateStatus(inputDetails[workSideCd]);
+          this.rearDetailList = LOGIS_UTIL.sortByLeftQty(inputDetails[workSideCd]);
+
+        } else if (workSideCd === 'ALL') {
           if (inputDetails['F']) {
             // FIXME: 제품 코드가 처음 입력될때 클라이언트 에러발생, inputDetails['F']가 undefined
             this._updateStatus(inputDetails['F'].concat(inputDetails['R']));
@@ -261,7 +265,7 @@ Copyright © HatioLab Inc. All rights reserved.
             this.rearDetailList = LOGIS_UTIL.sortByLeftQty(inputDetails['R']);
           }
 
-        } else if (sideCd === 'T') {
+        } else if (workSideCd === 'T') {
           // TODO
 
         } else {

@@ -109,6 +109,50 @@ LOGIS_UTIL.getJobType = function() {
  *                        서버에서 장비에 대해서 설정한 내용을 조회
  ******************************************************************************/
 
+// TODO 서버 사이드에서 정의한 모든 장비 설정 항목에 대한 API 정의 필요 ...
+/**
+etc	    display.invoice.shorter.enabled	송장 번호가 길어서 잘라서 표시할 지 여부	true
+etc	    display.invoice.shorter.start.index	송장 번호를 잘라서 표시하는 경우 앞 몇 자리를 스킵할지 (숫자)	8
+etc	    display.sku.shorter.enabled	상품 코드가 길어서 잘라서 표시할 지 여부	true
+etc	    display.sku.shorter.start.index	상품 코드를 잘라서 표시하는 경우 앞 몇 자리를 스킵할지 (숫자)	9
+ind	    indicator.inspection.enabled	표시기를 이용한 검수 기능 활성화 여부	true
+ind	    indicator.reright.enabled	표시기 재점등 기능 활성화 여부	true
+job	    job.inputbox.type	투입 박스 유형 - 박스(ID는 Unique) / 트레이 (재사용 박스, ID는 Non-Unique) (DPS)	box
+job	    job.show.other.orders	설정된 작업 스테이션에 작업이 없는 경우 화면에 박스를 보여줄 지 여부 (DPS)	true
+job	    job.split.fullbox.enabled	분할 Fullbox 기능 활성화 여부 (반품)	true
+job	    job.transaction.enabled	작업 화면에서 작업 옵션 선택 기능 활성화 여부	true
+job	    job.transaction.functions	작업 화면에서 분류 처리 할 수 있는 처리 옵션 [확정(P), 취소(C), 확정 취소(U), 수량 조절(S), Fullbox(F), Fullbox 취소(FC)	P,U,S,F
+etc	    pagination.page.limit	페이지네이션 기능 시 한 페이지에 보여줄 레코드 수	50
+etc	    rack.side.selection.enabled	작업 위치 앞/뒤/전체 선택 기능 활성화 여부	true
+etc	    scanner.bluetooth.enabled	블루투스 스캐너 사용 활성화 여부	true
+etc	    scanner.continuous.scan.enabled	연속 스캔 허용 여부 (반품)	true
+etc	    screen.refresh.interval	화면 새로고침시 새로고침 주기 (초)	30
+etc	    software.version	장비 소프트웨어 버전	1.0.0
+validation	validation.box_barcd.rule	박스 바코드 Validation Rule - 박스 바코드 Validation을 화면에서 처리하는 경우 Validation Rule	
+validation	validation.box_barcd.screen.enabled	박스 바코드 Validation을 화면에서 처리할 지 여부 - false인 경우 서버에서 Validation 처리	true
+validation	validation.cell_cd.rule	셀 코드 Validation Rule - 셀 코드 Validation을 화면에서 처리하는 경우 Validation Rule	
+validation	validation.cell_cd.screen.enabled	셀 코드 Validation을 화면에서 처리할 지 여부 - false인 경우 서버에서 Validation 처리	true
+validation	validation.chute_cd.rule	슈트 번호 Validation Rule - 셀 코드 Validation을 화면에서 처리하는 경우 Validation Rule	
+validation	validation.chute_cd.screen.enabled	슈트 번호 Validation을 화면에서 처리할 지 여부 - false인 경우 서버에서 Validation 처리	true
+validation	validation.ind_cd.rule	표시기 코드 Validation Rule - 셀 코드 Validation을 화면에서 처리하는 경우 Validation Rule	
+validation	validation.ind_cd.screen.enabled	표시기 코드 Validation을 화면에서 처리할 지 여부 - false인 경우 서버에서 Validation 처리	true
+validation	validation.rack_cd.rule	랙 코드 Validation Rule - 랙 코드 Validation을 화면에서 처리하는 경우 Validation Rule	
+validation	validation.rack_cd.screen.enabled	랙 코드 Validation을 화면에서 처리할 지 여부 - false인 경우 서버에서 Validation 처리	true
+validation	validation.sku_barcd.rule	상품 바코드 Validation Rule - 상품 코드 Validation을 화면에서 처리하는 경우 Validation Rule	
+validation	validation.sku_barcd.screen.enabled	상품 바코드 Validation을 화면에서 처리할 지 여부 - false인 경우 서버에서 Validation 처리	true
+validation	validation.sku_cd.rule	상품 코드 Validation Rule - 상품 코드 Validation을 화면에서 처리하는 경우 Validation Rule	
+validation	validation.sku_cd.screen.enabled	상품 코드 Validation을 화면에서 처리할 지 여부 - false인 경우 서버에서 Validation 처리	true
+ */
+
+/**
+ * @description 디바이스 설정 리스트 조회
+ *******************
+ * @return 디바이스 설정 리스트
+ */
+LOGIS_UTIL.getDeviceSettings = function() {
+  return LOGIS_UTIL.getLocalStorage('setting.deviceSettings');
+};
+
 /**
  * @description 작업 스테이션 내 대상 외 주문 정보 표시 여부 리턴 (DPS 유형 설정)
  ********************
@@ -117,7 +161,6 @@ LOGIS_UTIL.getJobType = function() {
 LOGIS_UTIL.getShowOthersOrder = function() {
   return LOGIS_UTIL.getLocalStorage('setting.showOthersOrder');
 };
-
 
 /**
  * @description 현재 태블릿의 자동피킹 여부를 리턴 (DPS 유형 설정)
@@ -142,9 +185,9 @@ LOGIS_UTIL.getShowFullCode = function() {
  ********************
  * @return 표시할 송장 번호 문자열의 시작 인덱스
  */
-LOGIS_UTIL.getInvoiceFieldSubstr = function() {
-  let invFieldSubstrIdx = LOGIS_UTIL.getLocalStorage('setting.invoiceFieldSubstr');
-  return invFieldSubstrIdx ? parseInt(invFieldSubstrIdx) : -1;
+LOGIS_UTIL.getInvoiceNoStartIndex = function() {
+  let invNoStartIdx = LOGIS_UTIL.getLocalStorage('setting.invoiceFieldSubstr');
+  return invNoStartIdx ? parseInt(invNoStartIdx) : -1;
 };
 
 /**
@@ -184,6 +227,17 @@ LOGIS_UTIL.getPrinterId = function() {
   return LOGIS_UTIL.getLocalStorage('setting.printerId');
 };
 
+
+/**
+ * @description 연속 스캔 허용 여부 조회 (반품 설정)
+ ********************
+ * @return 연속 스캔 허용 여부
+ */
+LOGIS_UTIL.isContinousScanAllowed = function() {
+  let continousScanAllowed = LOGIS_UTIL.getLocalStorage('setting.continousScanAllowed');
+  return continousScanAllowed === null ? false : continousScanAllowed;
+};
+
 /**
  * @description 메시지 브로커의 사이트 코드 조회
  ********************
@@ -211,20 +265,9 @@ LOGIS_UTIL.getBrokerPort = function() {
   return LOGIS_UTIL.getLocalStorage('setting.brokerPort');
 };
 
-/**
- * @description 연속 스캔 허용 여부 조회
- ********************
- * @return 연속 스캔 허용 여부
- */
-LOGIS_UTIL.isContinousScanAllowed = function() {
-  let continousScanAllowed = LOGIS_UTIL.getLocalStorage('setting.continousScanAllowed');
-  return continousScanAllowed === null ? false : continousScanAllowed;
-};
-
 /*******************************************************************************
  *                                  유틸리티 함수
  ******************************************************************************/
-
 
 /**
  * @description Warning 팝업 표시
@@ -391,7 +434,8 @@ LOGIS_UTIL.showToastMessage = function(type, message) {
 /**
  * @description items의 내용 중에 left_qty가 0인 항목이 아래로 가도록 소팅
  ******************
- * @param items
+ * @param {Array} items
+ * @return {Array}
  */
 LOGIS_UTIL.sortByLeftQty = function(items) {
   items.sort(function(a, b) {
@@ -405,4 +449,36 @@ LOGIS_UTIL.sortByLeftQty = function(items) {
   });
 
   return items;
+};
+
+/**
+ * @description 콤보 박스의 선택된 값을 리턴 
+ ******************
+ * @param {Object} combo
+ * @param {String} defaultValue
+ * @return {String}
+ */
+LOGIS_UTIL.getComboSelectValue = function(combo, defaultValue) {
+  defaultValue = defaultValue ? defaultValue : null;
+  if (!combo) {
+    return defaultValue;
+  } else {
+    return combo.selectedOptions[0] ? combo.selectedOptions[0].value : defaultValue;
+  }
+};
+
+/**
+ * @description 콤보 박스의 선택된 텍스트를 리턴 
+ ******************
+ * @param {Object} combo
+ * @param {String} defaultValue
+ * @return {String}
+ */
+LOGIS_UTIL.getComboSelectText = function(combo, defaultValue) {
+  defaultValue = defaultValue ? defaultValue : null;
+  if (!combo) {
+    return defaultValue;
+  } else {
+    return combo.selectedOptions[0] ? combo.selectedOptions[0].innerText : defaultValue;
+  }
 };

@@ -156,7 +156,8 @@ Copyright © HatioLab Inc. All rights reserved.
                 fieldname: 'box_id',
                 columnWidth: '0.325fr',
                 displayCallback: (value) => {
-                  return value.substring(LOGIS_UTIL.getInvoiceFieldSubstr());
+                  var idx = LOGIS_UTIL.getInvoiceNoStartIndex();
+                  return (value && idx && idx > 0) ? value.substring(idx) : value;
                 },
                 style: {
                   textAlign: 'center'

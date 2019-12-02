@@ -228,11 +228,11 @@ Copyright © HatioLab Inc. All rights reserved.
        *********************
        */
       _setDefaultValues() {
-        let mgrSiteUrl = this._getLocalStorage('setting.mgrSiteUrl');
+        let mgrSiteUrl = LOGIS_UTIL.getLocalStorage('setting.mgrSiteUrl');
 
         if (!mgrSiteUrl) {
           mgrSiteUrl = location.origin + '/rest';
-          this._setLocalStorage('setting.mgrSiteUrl', mgrSiteUrl);
+          LOGIS_UTIL.setLocalStorage('setting.mgrSiteUrl', mgrSiteUrl);
         }
 
         let currentUrl = new URL(mgrSiteUrl);
@@ -266,7 +266,7 @@ Copyright © HatioLab Inc. All rights reserved.
        **********************
        */
       _checkMgrSiteSession() {
-        const mgrSiteUrl = this._getLocalStorage('setting.mgrSiteUrl');
+        const mgrSiteUrl = LOGIS_UTIL.getLocalStorage('setting.mgrSiteUrl');
 
         if (mgrSiteUrl) {
           const mgrSiteSessionAjax = this._getMgrSiteSessionAjax();
@@ -306,7 +306,7 @@ Copyright © HatioLab Inc. All rights reserved.
        **********************
        */
       _checkDomainSiteSession() {
-        const baseUrl = this._getLocalStorage('setting.baseUrl');
+        const baseUrl = LOGIS_UTIL.getLocalStorage('setting.baseUrl');
 
         if (baseUrl) {
           const domainSessionAjax = this._getDomainsSessionAjax();
@@ -325,7 +325,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _domainSessionResponsed(event) {
         // 1. 사용자 정보 로컬 스토리지에 저장
-        this._setLocalStorage('setting.user', event.detail);
+        LOGIS_UTIL.setLocalStorage('setting.user', event.detail);
         // 2. 세션 OK 응답 이벤트 Fire
         this.dispatchEvent(new CustomEvent('session-responsed', {
           detail: event.detail
@@ -376,14 +376,10 @@ Copyright © HatioLab Inc. All rights reserved.
        **********************
        */
       _showUrlInvalidAlert() {
-        LOGIS_UTIL.showMessage(
-          t('error.BASEURL_ERROR'),
-          t('text.check_baseUrl'),
-          function() {
-            this._moveToSetting();
-            this._getIpInput().select();
-          }.bind(this)
-        );
+        LOGIS_UTIL.showMessage(t('error.BASEURL_ERROR'), t('text.check_baseUrl'), function() {
+          this._moveToSetting();
+          this._getIpInput().select();
+        }.bind(this));
       }
 
       /**
@@ -433,7 +429,7 @@ Copyright © HatioLab Inc. All rights reserved.
           this._clearBaseUrl();
         }
 
-        this._setLocalStorage('setting.mgrSiteUrl', mgrSiteUrl);
+        LOGIS_UTIL.setLocalStorage('setting.mgrSiteUrl', mgrSiteUrl);
       }
 
       /**
@@ -441,8 +437,8 @@ Copyright © HatioLab Inc. All rights reserved.
        ***********************
        */
       _saveLocale() {
-        let val = this._getLocaleSelector().selectedOptions[0].value
-        this._setLocalStorage('setting.locale', val);
+        let val = LOGIS_UTIL.getComboSelectValue(this._getLocaleSelector());
+        LOGIS_UTIL.setLocalStorage('setting.locale', val);
       }
 
       /**
@@ -450,9 +446,8 @@ Copyright © HatioLab Inc. All rights reserved.
        ***********************
        */
       _saveStage() {
-        let selectedOpts = this._getStageCombo().selectedOptions;
-        this.stageCd = (selectedOpts && selectedOpts.length > 0) ? selectedOpts[0].innerText : null;
-        this._setLocalStorage(this.stageCdLSKey, this.stageCd);
+        this.stageCd = LOGIS_UTIL.getComboSelectText(this._getStageCombo());
+        LOGIS_UTIL.setLocalStorage(this.stageCdLSKey, this.stageCd);
       }
 
       /**
@@ -460,9 +455,8 @@ Copyright © HatioLab Inc. All rights reserved.
        ***********************
        */
       _saveEquipType() {
-        let selectedOpts = this._getEquipTypeCombo().selectedOptions;
-        this.equipmentType = (selectedOpts && selectedOpts.length > 0) ? selectedOpts[0].innerText : null;
-        this._setLocalStorage(this.equipmentTypeLSKey, this.equipmentType);
+        this.equipmentType = LOGIS_UTIL.getComboSelectText(this._getEquipTypeCombo());
+        LOGIS_UTIL.setLocalStorage(this.equipmentTypeLSKey, this.equipmentType);
       }
 
       /**
@@ -470,11 +464,11 @@ Copyright © HatioLab Inc. All rights reserved.
        ***********************
        */
       _saveEquipCd() {
-        let selectedOpts = this._getEquipCombo().selectedOptions;
-        this.equipCd = (selectedOpts && selectedOpts.length > 0) ? selectedOpts[0].value : null;
-        this.equipNm = (selectedOpts && selectedOpts.length > 0) ? selectedOpts[0].innerText : null;
-        this._setLocalStorage(this.equipmentCdLSKey, this.equipCd);
-        this._setLocalStorage(this.equipmentNmLSKey, this.equipNm);
+        let equipCombo = this._getEquipCombo();
+        this.equipCd = LOGIS_UTIL.getComboSelectValue(equipCombo);
+        this.equipNm = LOGIS_UTIL.getComboSelectText(equipCombo);
+        LOGIS_UTIL.setLocalStorage(this.equipmentCdLSKey, this.equipCd);
+        LOGIS_UTIL.setLocalStorage(this.equipmentNmLSKey, this.equipNm);
       }
 
       /**
@@ -482,9 +476,8 @@ Copyright © HatioLab Inc. All rights reserved.
        ***********************
        */
       _saveStationCd() {
-        let selectedOpts = this._getStationCombo().selectedOptions;
-        this.stationCd = (selectedOpts && selectedOpts.length > 0) ? selectedOpts[0].value : null;
-        this._setLocalStorage(this.stationCdLSKey, this.stationCd);
+        this.stationCd = LOGIS_UTIL.getComboSelectValue(this._getStationCombo());
+        LOGIS_UTIL.setLocalStorage(this.stationCdLSKey, this.stationCd);
       }
 
       /**
@@ -493,7 +486,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {String} mgrSiteUrl
        */
       isMgrSiteUrlChanged(mgrSiteUrl) {
-        const currentMgrSiteUrl = this._getLocalStorage('setting.mgrSiteUrl');
+        const currentMgrSiteUrl = LOGIS_UTIL.getLocalStorage('setting.mgrSiteUrl');
         return mgrSiteUrl !== currentMgrSiteUrl;
       }
 

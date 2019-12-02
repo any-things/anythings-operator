@@ -329,7 +329,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _setIpAddress() {
         this.getIpAddress(networInfo => {
-          this._setLocalStorage('setting.ipAddress', networInfo.ip);
+          LOGIS_UTIL.setLocalStorage('setting.ipAddress', networInfo.ip);
         }, () => {
           LOGIS_UTIL.showMessage(t('error.SETTING_ERROR'), t('text.check_wifi_setting'));
         });
@@ -393,11 +393,7 @@ Copyright © HatioLab Inc. All rights reserved.
       saveSetting() {
         return new Promise((resolve, reject) => {
           this.updateSetting().then(() => {
-              this._setLocalStorage(this.workSideCdLSKey, 'ALL');
-              //this._setLocalStorage(this.jobTypeLSKey, this._getJobTypeCombo().selectedOptions[0].value);
-              //this._setLocalStorage(this.showOthersOrderLSKey, JSON.parse(this._getSelectedOpt(this._getShowOthersOrderOpts()).value));
-              //this._setLocalStorage(this.showFullCodeLSKey, JSON.parse(this._getSelectedOpt(this._getShowFullCodeOpts()).value));
-              //this._setLocalStorage(this.autoPickingLSKey, this._getAutoPickingInput().checked);
+              LOGIS_UTIL.setLocalStorage(this.workSideCdLSKey, 'ALL');
               resolve();
             })
             .catch(error => {
@@ -412,9 +408,9 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       updateSetting() {
         return new Promise((resolve, reject) => {
-          let equipType = this._getLocalStorage('setting.equipType');
-          let equipCd = this._getLocalStorage('setting.equipCd');
-          let stationCd = this._getLocalStorage('setting.stationCd');
+          let equipType = LOGIS_UTIL.getLocalStorage('setting.equipType');
+          let equipCd = LOGIS_UTIL.getLocalStorage('setting.equipCd');
+          let stationCd = LOGIS_UTIL.getLocalStorage('setting.stationCd');
           let errMsg = null;
 
           if (!equipType) {
@@ -422,7 +418,7 @@ Copyright © HatioLab Inc. All rights reserved.
           } else if (!equipCd) {
             errMsg = t('text.equip_code_is_not_set');
           } else if (!stationCd) {
-            errMsg = t('text.zone_code_is_not_set');
+            errMsg = t('text.station_code_is_not_set');
           }
 
           if (errMsg) {
@@ -484,14 +480,14 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       /*_hiddenDiv() {
         if (this.$['job-type-combo'].value == 'QPS' || this.jobType == 'QPS') {
-          this._setLocalStorage('setting.isQps', true);
+          LOGIS_UTIL.setLocalStorage('setting.isQps', true);
           this.$['other-order'].setAttribute('style', `display: none`);
           this.$['auto-pick'].setAttribute('style', `display: none`);
           this.$['ble-mode'].setAttribute('style', `display: flex;`);
           this.$['ble-img'].setAttribute('src', this.srcUrl + '/images/ble-mode.png');
 
         } else {
-          this._setLocalStorage('setting.isQps', false);
+          LOGIS_UTIL.setLocalStorage('setting.isQps', false);
           this.$['other-order'].setAttribute('style', `display: flex`);
           this.$['auto-pick'].setAttribute('style', `display: flex`);
           this.$['ble-mode'].setAttribute('style', `display: none`);

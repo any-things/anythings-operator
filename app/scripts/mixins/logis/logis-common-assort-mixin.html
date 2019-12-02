@@ -164,10 +164,10 @@ Copyright © HatioLab Inc. All rights reserved.
         let inputListAjax = this.$['input-list-ajax'];
         let equipType = LOGIS_UTIL.getEquipType();
         let equipCd = LOGIS_UTIL.getEquipCd();
-        let zoneCd = LOGIS_UTIL.getStationCd();
+        let stationCd = LOGIS_UTIL.getStationCd();
 
         inputListAjax.curl =
-          `/device_process/search/input_list/${equipType}/${equipCd}/${zoneCd}`;
+          `/device_process/search/input_list/${equipType}/${equipCd}/${stationCd}`;
 
         inputListAjax.generateRequest();
       }
@@ -187,15 +187,15 @@ Copyright © HatioLab Inc. All rights reserved.
         let inputSeqId = this.selectedInput.id;
         let equipType = LOGIS_UTIL.getEquipType();
         let equipCd = LOGIS_UTIL.getEquipCd();
-        let zoneCd = LOGIS_UTIL.getStationCd();
-        let sideCd = LOGIS_UTIL.getWorkSideCd();
+        let stationCd = LOGIS_UTIL.getStationCd();
+        let workSideCd = LOGIS_UTIL.getWorkSideCd();
 
         try {
-          this.validationBeforeRefreshDetail(zoneCd, sideCd);
+          this.validationBeforeRefreshDetail(stationCd, workSideCd);
           let detailAjax = this.$['input-job-details-ajax'];
 
           detailAjax.curl =
-            `/device_process/search/input_jobs/${inputSeqId}/${equipType}/${equipCd}/${zoneCd}/${indOnFlag}`;
+            `/device_process/search/input_jobs/${inputSeqId}/${equipType}/${equipCd}/${stationCd}/${indOnFlag}`;
 
           detailAjax.generateRequest();
         } catch (error) {
@@ -206,22 +206,22 @@ Copyright © HatioLab Inc. All rights reserved.
       /**
        * @description 상품 정보 상세 정보 리프레쉬 전 Validation Check
        *********************
-       * @param {Boolean} zoneCd 표시기 점등 여부
-       * @param {Boolean} sideCd 랙 사이드 코드
+       * @param {Boolean} stationCd 표시기 점등 여부
+       * @param {Boolean} workSideCd 랙 사이드 코드
        */
-      validationBeforeRefreshDetail(zoneCd, sideCd) {
-        if (!zoneCd) {
+      validationBeforeRefreshDetail(stationCd, workSideCd) {
+        if (!stationCd) {
           throw {
             title: t('error.SETTING_ERROR'),
-            message: t('text.zone_code_is_not_set'),
+            message: t('text.station_code_is_not_set'),
             callback: this.moveToSetting
           }
         }
 
-        if (!sideCd) {
+        if (!workSideCd) {
           throw {
             title: t('error.SETTING_ERROR'),
-            message: t('text.rack_side_is_not_set'),
+            message: t('text.work_side_is_not_set'),
             callback: this.moveToSetting
           }
         }
@@ -312,7 +312,7 @@ Copyright © HatioLab Inc. All rights reserved.
           this.rearDetailList = [];
           return;
         }
-        let sideCd = LOGIS_UTIL.getWorkSideCd();
+        let workSideCd = LOGIS_UTIL.getWorkSideCd();
 
         this._updateStatus(inputDetails);
 

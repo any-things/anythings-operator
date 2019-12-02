@@ -111,8 +111,8 @@ Copyright © HatioLab Inc. All rights reserved.
                 },
                 displayCallback: (value, rowData) => {
                   var val = value ? value : rowData.box_id;
-                  var idx = LOGIS_UTIL.getInvoiceFieldSubstr();
-                  return (val && idx > 0) ? val.substring(idx) : val;
+                  var idx = LOGIS_UTIL.getInvoiceNoStartIndex();
+                  return (val && idx && idx > 0) ? val.substring(idx) : val;
                 }
               }, {
                 fieldname: 'id',

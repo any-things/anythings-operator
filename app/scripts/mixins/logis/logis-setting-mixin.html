@@ -298,7 +298,7 @@ Copyright © HatioLab Inc. All rights reserved.
       _getBrokerAddress() {
         let brokerAddrsAjax = this._getBrokerAddrsAjax();
         brokerAddrsAjax.curl = '/settings/show_by_name?name=mw.rabbitmq.broker.address';
-        brokerAddrsAjax.baseUrl = this._getLocalStorage('setting.baseUrl');
+        brokerAddrsAjax.baseUrl = LOGIS_UTIL.getLocalStorage('setting.baseUrl');
         brokerAddrsAjax.generateRequest();
       }
 
@@ -310,7 +310,7 @@ Copyright © HatioLab Inc. All rights reserved.
       _getBrokerPort() {
         let brokerPortAjax = this._getBrokerPortAjax();
         brokerPortAjax.curl = '/settings/show_by_name?name=mw.rabbitmq.web.mqtt.port';
-        brokerPortAjax.baseUrl = this._getLocalStorage('setting.baseUrl');
+        brokerPortAjax.baseUrl = LOGIS_UTIL.getLocalStorage('setting.baseUrl');
         brokerPortAjax.generateRequest();
       }
 
@@ -322,7 +322,7 @@ Copyright © HatioLab Inc. All rights reserved.
       _getBrokerSite() {
         let brokerSiteAjax = this._getBrokerSiteAjax();
         brokerSiteAjax.curl = '/settings/show_by_name?name=mw.rabbitmq.site.code';
-        brokerSiteAjax.baseUrl = this._getLocalStorage('setting.baseUrl');
+        brokerSiteAjax.baseUrl = LOGIS_UTIL.getLocalStorage('setting.baseUrl');
         brokerSiteAjax.generateRequest();
       }
 
@@ -391,7 +391,7 @@ Copyright © HatioLab Inc. All rights reserved.
       _getStageList() {
         const stagesAjax = this._getStageListAjax();
         stagesAjax.curl = `/stages?limit=1000`;
-        stagesAjax.baseUrl = this._getLocalStorage('setting.baseUrl');
+        stagesAjax.baseUrl = LOGIS_UTIL.getLocalStorage('setting.baseUrl');
         stagesAjax.generateRequest();
       }
 
@@ -403,7 +403,7 @@ Copyright © HatioLab Inc. All rights reserved.
       _getEquipList() {
         const rackItemAjax = this._getEquipListAjax();
         rackItemAjax.curl = `/racks?limit=1000`;
-        rackItemAjax.baseUrl = this._getLocalStorage('setting.baseUrl');
+        rackItemAjax.baseUrl = LOGIS_UTIL.getLocalStorage('setting.baseUrl');
         rackItemAjax.generateRequest();
       }
 
@@ -418,7 +418,7 @@ Copyright © HatioLab Inc. All rights reserved.
           const equipCd = selectedOption.value;
           const stationListAjax = this._getStationListAjax();
           stationListAjax.curl = `/racks/${equipCd}/stations`;
-          stationListAjax.baseUrl = this._getLocalStorage('setting.baseUrl');
+          stationListAjax.baseUrl = LOGIS_UTIL.getLocalStorage('setting.baseUrl');
           stationListAjax.generateRequest();
         }
       }
@@ -431,7 +431,7 @@ Copyright © HatioLab Inc. All rights reserved.
       _getJobTypeList() {
         const jobTypeAjax = this._getJobTypeListAjax();
         jobTypeAjax.curl = `/common_codes/show_by_name?name=JOB_TYPE`;
-        jobTypeAjax.baseUrl = this._getLocalStorage('setting.baseUrl');
+        jobTypeAjax.baseUrl = LOGIS_UTIL.getLocalStorage('setting.baseUrl');
         jobTypeAjax.generateRequest();
       }
 
@@ -443,7 +443,7 @@ Copyright © HatioLab Inc. All rights reserved.
       _getEquipTypeList() {
         const equipmentItemAjax = this._getEquipTypeListAjax();
         equipmentItemAjax.curl = `/common_codes/show_by_name?name=EQUIP_TYPE`;
-        equipmentItemAjax.baseUrl = this._getLocalStorage('setting.baseUrl');
+        equipmentItemAjax.baseUrl = LOGIS_UTIL.getLocalStorage('setting.baseUrl');
         equipmentItemAjax.generateRequest();
       }
 
@@ -454,10 +454,10 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _getDeviceSettingList() {
         const deviceSettingAjax = this._getDeviceSettingListAjax();
-        let deviceType = this._getLocalStorage('setting.deviceType');
-        let stageCd = this._getLocalStorage('setting.stageCd');
+        let deviceType = LOGIS_UTIL.getLocalStorage('setting.deviceType');
+        let stageCd = LOGIS_UTIL.getLocalStorage('setting.stageCd');
         deviceSettingAjax.curl = `/device_profiles/configs/${deviceType}/${stageCd}`;
-        deviceSettingAjax.baseUrl = this._getLocalStorage('setting.baseUrl');
+        deviceSettingAjax.baseUrl = LOGIS_UTIL.getLocalStorage('setting.baseUrl');
         deviceSettingAjax.generateRequest();
       }
 
@@ -470,23 +470,6 @@ Copyright © HatioLab Inc. All rights reserved.
         while (combo.childElementCount) {
           combo.removeChild(combo.firstElementChild);
         }
-      }
-
-      /**
-       * @description key로 로컬 스토리지에서 뽑아냄
-       *******************************
-       * @return
-       */
-      _getLocalStorage(key) {
-        return JSON.parse(localStorage.getItem(key));
-      }
-
-      /**
-       * @description 로컬 스토리지에서 key, value로 저장
-       *******************************
-       */
-      _setLocalStorage(key, value) {
-        localStorage.setItem(key, JSON.stringify(value));
       }
 
       /**
@@ -621,7 +604,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Array} deviceSettings
        */
       _deviceSettingsChanged(deviceSettings) {
-        console.log(deviceSettings);
+        LOGIS_UTIL.setLocalStorage('setting.deviceSettings', deviceSettings);
       }
 
       /**
@@ -778,7 +761,7 @@ Copyright © HatioLab Inc. All rights reserved.
         const deviceType = localStorage.getItem('setting.deviceType');
         const updatedItemsAjax = this._getUpdatedItemsAjax();
         updatedItemsAjax.curl = '/device_process/release_notes/' + deviceType;
-        updatedItemsAjax.baseUrl = this._getLocalStorage('setting.baseUrl');
+        updatedItemsAjax.baseUrl = LOGIS_UTIL.getLocalStorage('setting.baseUrl');
         updatedItemsAjax.generateRequest();
       }
 
