@@ -269,6 +269,16 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
+           * @description 장비 설정 리스트
+           *********************
+           * @type {Array}
+           */
+          deviceSettings: {
+            type: Array,
+            observer: '_deviceSettingsChanged'
+          },
+
+          /**
            * @description 업데이트 항목 리스트
            *********************
            * @type {Array}
@@ -438,6 +448,20 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
+       * @description 장비 설정 리스트 조회
+       *******************************
+       * @return
+       */
+      _getDeviceSettingList() {
+        const deviceSettingAjax = this._getDeviceSettingListAjax();
+        let deviceType = this._getLocalStorage('setting.deviceType');
+        let stageCd = this._getLocalStorage('setting.stageCd');
+        deviceSettingAjax.curl = `/device_profiles/configs/${deviceType}/${stageCd}`;
+        deviceSettingAjax.baseUrl = this._getLocalStorage('setting.baseUrl');
+        deviceSettingAjax.generateRequest();
+      }
+
+      /**
        * @description 콤보 클리어
        *******************************
        * @param {Object} combo
@@ -520,6 +544,15 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
+       * @description 장비 설정 리스트 Ajax
+       *******************************
+       * @return {Object} ajax
+       */
+      _getDeviceSettingListAjax() {
+        return this.$['device-settings-ajax'];
+      }
+
+      /**
        * @description return 작업 내역 보기 Ajax
        ***********************
        * @return {Object} ajax
@@ -580,6 +613,15 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _getJobTypeCombo() {
         return this.$['job-type-combo'];
+      }
+
+      /**
+       * @description 장비 설정 리스트 변경시
+       **********************
+       * @param {Array} deviceSettings
+       */
+      _deviceSettingsChanged(deviceSettings) {
+        console.log(deviceSettings);
       }
 
       /**

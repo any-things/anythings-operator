@@ -302,10 +302,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
         codeTypes.forEach(codeType => {
           const option = new Option(codeType.name, codeType.value);
-          if (this.kioskCodeType === codeType.value) {
-            option.selected = true;
-          };
-
+          option.selected = (this.kioskCodeType === codeType.value);
           codeCombo.appendChild(option);
         });
       }
@@ -322,10 +319,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
         inputTypes.forEach(inputType => {
           const option = new Option(inputType.name, inputType.value);
-          if (this.kioskInputType === inputType.value) {
-            option.selected = true;
-          };
-
+          option.selected = (this.kioskInputType === inputType.value);
           inputTypeCombo.appendChild(option);
         });
       }
@@ -336,8 +330,9 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} event
        */
       _moveToScreen(event) {
-        if (this._getScreenCombo().selectedOptions[0] && this._getScreenCombo().selectedOptions[0].value) {
-          const selectedKioskScreen = this._getScreenCombo().selectedOptions[0].value
+        let selectedScreen = this._getScreenCombo().selectedOptions[0];
+        if (selectedScreen && selectedScreen.value) {
+          const selectedKioskScreen = selectedScreen.value
           if (selectedKioskScreen) {
             location.hash = `/${selectedKioskScreen}`;
           }

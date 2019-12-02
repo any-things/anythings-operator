@@ -260,25 +260,27 @@ LOGIS_UTIL.showPopup = function(title, popup, width, height, openCallback, close
 /**
  * @description 현재 작업 위치 변경시
  ******************
- * @param {String} rackSideCd
+ * @param {String} workSideCd
  * @param {String} screen
  */
-LOGIS_UTIL.setWorkSide = function(rackSideCd, screen) {
-  if (!rackSideCd) rackSideCd = 'F';
+LOGIS_UTIL.setWorkSide = function(workSideCd, screen) {
+  if (!workSideCd) {
+    workSideCd = 'F';
+  }
 
   screen.showFront = false;
   screen.showRear = false;
   screen.showTotal = false;
 
-  if (rackSideCd === 'F' || rackSideCd === 'ALL' || rackSideCd === 'f' || rackSideCd === 'all') {
+  if (workSideCd === 'F' || workSideCd === 'ALL' || workSideCd === 'f' || workSideCd === 'all') {
     screen.showFront = true;
   }
 
-  if (rackSideCd === 'R' || rackSideCd === 'ALL' || rackSideCd === 'r' || rackSideCd === 'all') {
+  if (workSideCd === 'R' || workSideCd === 'ALL' || workSideCd === 'r' || workSideCd === 'all') {
     screen.showRear = true;
   }
 
-  if (rackSideCd === 'T') {
+  if (workSideCd === 'T') {
     screen.showTotal = true;
   }
 };

@@ -70,12 +70,10 @@ Copyright © HatioLab Inc. All rights reserved.
 
     <!-- 장비 설정 조회 Ajax -->
     <sys-ajax 
-      id="device-profile-ajax" 
+      id="device-settings-ajax" 
       method="GET" 
-      on-sys-ajax-response="_deviceProfileResponsed"
-      on-sys-ajax-unauthorized="_domainUnauthorized" 
-      custom-error-handler
-      timeout="20000">
+      content-type="application/json" 
+      last-response="{{deviceSettings}}">
     </sys-ajax>
   
     <!-- 애플리케이션 서버 접속 IP -->
@@ -340,6 +338,8 @@ Copyright © HatioLab Inc. All rights reserved.
         // 5. 설비 이름 리스트 조회 - TODO 설비 유형 값이 로컬 스토리지에 존재한다면 설비 이름 조회시 파라미터로 넘어가야함.
         //                            설비 유형 값이 로컬 스토리지에 존재하지 않는다면 설비 유형 리스트 기본값이 설정된 이후에 설비 이름 조회시 파라미터로 넘어가야함
         this._getEquipList();
+        // 6. 설비 유형별 설정 리스트 조회
+        this._getDeviceSettingList();
       }
 
       /**
@@ -384,16 +384,6 @@ Copyright © HatioLab Inc. All rights reserved.
             this._getIpInput().select();
           }
         });
-      }
-
-      /**
-       * @description 장비 설정 프로파일 조회 시 ...
-       **********************
-       * @param {Object} event
-       */
-      _deviceProfileResponsed(event) {
-        console.log('장비 설정 프로파일 조회 성공!');
-        console.log(event);
       }
 
       /**
