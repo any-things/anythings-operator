@@ -214,7 +214,9 @@ Copyright © HatioLab Inc. All rights reserved.
 
   <script>
     class B2BQtyInspection extends Polymer.Element {
-      static get is() { return 'b2b-qty-inspection' }
+      static get is() {
+        return 'b2b-qty-inspection'
+      }
 
       static get properties() {
         return {
@@ -383,7 +385,7 @@ Copyright © HatioLab Inc. All rights reserved.
            ****************
            * @type {String}
            */
-           inspectionStatus: {
+          inspectionStatus: {
             type: String
           },
 
@@ -456,8 +458,9 @@ Copyright © HatioLab Inc. All rights reserved.
                 style: {
                   color: '#ADCBEB',
                   textAlign: 'left'
-                }/*,
-                columnWidth: '350px'*/
+                }
+                /*,
+                                columnWidth: '350px'*/
               }, {
                 display: t('label.sku_barcd'),
                 fieldname: 'sku_barcd',
@@ -499,13 +502,13 @@ Copyright © HatioLab Inc. All rights reserved.
       connectedCallback() {
         super.connectedCallback();
         document.addEventListener('page-changed', event => {
-          if(event.detail.currentPage === location.hash.replace('#/', '')) {
+          if (event.detail.currentPage === location.hash.replace('#/', '')) {
             this.focusInvoiceInput();
           }
         });
 
         document.addEventListener(`alert-closed-at-${location.hash.replace('#/', '')}`, event => {
-          if(!event.detail.hasCallback) {
+          if (!event.detail.hasCallback) {
             this.focusInvoiceInput();
           }
         });
@@ -551,7 +554,7 @@ Copyright © HatioLab Inc. All rights reserved.
        *****************
        */
       validateBeforeLabelScan() {
-        if(!this.invoiceCode) {
+        if (!this.invoiceCode) {
           throw {
             title: t('error.VALIDATION_ERROR'),
             message: t('text.invalid_value'),
@@ -580,7 +583,7 @@ Copyright © HatioLab Inc. All rights reserved.
         if (e.key != 'Enter') return;
 
         // this.items (검수 대상 리스트)가 존재 하지 않는다면 alert
-        if(!this.items || this.items.length == 0) {
+        if (!this.items || this.items.length == 0) {
           e.currentTarget.value = '';
           this.showMessage(t('error.VALIDATION_ERROR'), t('text.target_not_exist'), this.focusInvoiceInput.bind(this));
           return;
@@ -592,7 +595,7 @@ Copyright © HatioLab Inc. All rights reserved.
         });
 
         // found (검수 대상 리스트 중 입력한 상품 코드와 일치하는 것)가 없다면 alert
-        if(!found || found.length == 0) {
+        if (!found || found.length == 0) {
           this.showMessage(t('error.invalid_sku_cd'), t('text.scanned_sku_code_not_exist'), this.focusSkuBarcdInput.bind(this));
           return;
         }
@@ -602,28 +605,66 @@ Copyright © HatioLab Inc. All rights reserved.
         let finishedItem = null;
 
         var newItems = this.items.map((item, index) => {
-          if(skuBarcode == item.sku_cd || skuBarcode == item.sku_barcd) {
-            if(item.diff_qty == 0) {
+          if (skuBarcode == item.sku_cd || skuBarcode == item.sku_barcd) {
+            if (item.diff_qty == 0) {
               this.showMessage(t('error.out_of_valid_qty'), t('text.confirm_qty_out_of_item_qty'), this.focusSkuBarcdInput.bind(this));
               errorFlag = true;
               return;
             }
 
-            if(this.inspectionMethodValue == 'each') {
+            if (this.inspectionMethodValue == 'each') {
               item.confirm_qty = ++item.confirm_qty;
               this.sortSkuPcsQty = this.sortSkuPcsQty + 1;
 
-            } else if(this.inspectionMethodValue == 'total') {
+            } else if (this.inspectionMethodValue == 'total') {
               var calcQty = item.item_qty - item.confirm_qty;
               item.confirm_qty = item.item_qty;
               this.sortSkuPcsQty = this.sortSkuPcsQty + calcQty;
 
-            } else if(this.inspectionMethodValue == 'inputCount') {
+            } else if (this.inspectionMethodValue == 'inputCount') {
               const inputCountPopup = document.createElement('inspection-enter-qty-popup');
               inputCountPopup.item = item;
 
-              if(item.sku_cd == skuBarcode || item.sku_barcd == skuBarcode) {
-                document.dispatchEvent(new CustomEvent('open-dialog', {
+              if (item.sku_cd == skuBarcode || item.sku_barcd == skuBarcode) {
+                LOGIS_UTIL.showPopup(this.qtyInputLabel, inputCountPopup, 'fit', 'fit', function() {
+                  inputCountPopup.initialSetup();
+
+                }.bind(this), function() {
+                  let inputQty = inputCountPopup.inputQty;
+                  if (!inputQty) {
+                    this.$['sku-barcode'].select();
+                    return;
+                  }
+                  this.sortSkuPcsQty = this.sortSkuPcsQty + inputQty;
+
+                  if (this.items[index].diff_qty > 0) {
+                    this.items[index].diff_qty = this.items[index].item_qty - this.items[index].confirm_qty;
+                    if (this.items[index].diff_qty == 0) {
+                      this.sortSkuCnt = this.sortSkuCnt + 1;
+                      finishedItem = this.items[index];
+                    }
+                  }
+
+                  let countItems = this.items;
+
+                  if (!errorFlag) {
+                    if (finishedItem) {
+                      countItems.splice(countItems.indexOf(finishedItem), 1);
+                      countItems.push(finishedItem);
+                    }
+                  }
+
+                  this.set('items', []);
+                  this.set('items', countItems);
+                  this.$['sku-barcode'].select();
+
+                  // 모든 검수가 완료 되었는지 확인하고 완료 되었다면 자동으로 검수 완료 처리
+                  if (this.checkFinished(this.items)) {
+                    this.inspectionComplete();
+                  }
+                }.bind(this));
+
+                /*document.dispatchEvent(new CustomEvent('open-dialog', {
                   detail: {
                     content: inputCountPopup,
                     width: 'fit',
@@ -667,14 +708,14 @@ Copyright © HatioLab Inc. All rights reserved.
                       }
                     }
                   }
-                }));
+                }));*/
               }
             }
 
-            if(this.inspectionMethodValue != 'inputCount') {
-              if(item.diff_qty > 0) {
+            if (this.inspectionMethodValue != 'inputCount') {
+              if (item.diff_qty > 0) {
                 item.diff_qty = item.item_qty - item.confirm_qty;
-                if(item.diff_qty == 0) {
+                if (item.diff_qty == 0) {
                   this.sortSkuCnt = this.sortSkuCnt + 1;
                   finishedItem = item;
                 }
@@ -686,8 +727,8 @@ Copyright © HatioLab Inc. All rights reserved.
         });
 
         // 오류가 없고 항목이 완료되었다면 완료된 항목은 아래로 이동 - 소팅
-        if(!errorFlag) {
-          if(finishedItem) {
+        if (!errorFlag) {
+          if (finishedItem) {
             newItems.splice(newItems.indexOf(finishedItem), 1);
             newItems.push(finishedItem);
           }
@@ -698,7 +739,7 @@ Copyright © HatioLab Inc. All rights reserved.
         this.$['sku-barcode'].value = '';
 
         // 모든 검수가 완료 되었는지 확인하고 완료 되었다면 자동으로 검수 완료 처리
-        if(this.checkFinished(this.items)) {
+        if (this.checkFinished(this.items)) {
           this.inspectionComplete();
         }
       }
@@ -710,8 +751,8 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       checkFinished(items) {
         let finished = true;
-        for(let i = 0; i < items.length; i++) {
-          if(items[i].diff_qty > 0) {
+        for (let i = 0; i < items.length; i++) {
+          if (items[i].diff_qty > 0) {
             finished = false;
             break;
           }
@@ -726,14 +767,14 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} inspection
        */
       _inspectionChanged(inspection) {
-        if(!inspection) return;
+        if (!inspection) return;
 
         let skuPcs = 0;
         this.inspectionStatus = inspection.status;
         // 검수 완료 (E) 이거나 전송 완료 (R)인 경우 완료 상태
         let alreadyEndFlag = (this.inspectionStatus === 'E' || this.inspectionStatus === 'R');
 
-        if(!alreadyEndFlag) {
+        if (!alreadyEndFlag) {
           this.$['inspection-btn'].hidden = false;
           this.$['reset-btn'].hidden = false;
           this.$['reset-all-btn'].hidden = false;
@@ -744,7 +785,7 @@ Copyright © HatioLab Inc. All rights reserved.
           LOGIS_UTIL.showMessage(t('error.already_processed'), t('text.can_re_issue_invoice'), this.focusInvoiceInput.bind(this));
         }
 
-        if(inspection.items) {
+        if (inspection.items) {
           this.items = inspection.items.map((item) => {
             !alreadyEndFlag ? item.confirm_qty = 0 : item.confirm_qty = item.item_qty;
             !alreadyEndFlag ? item.diff_qty = item.item_qty : item.diff_qty = 0;
@@ -786,7 +827,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       inspectionComplete() {
         // 1. 모두 확인하였다면 검수 완료
-        if(this.pickedSkuCnt == this.sortSkuCnt && this.pickedSkuPcsQty == this.sortSkuPcsQty) {
+        if (this.pickedSkuCnt == this.sortSkuCnt && this.pickedSkuPcsQty == this.sortSkuPcsQty) {
           var completeAjax = this.$['inspection-complete-ajax'];
           completeAjax.curl = '/kiosk_process/das/inspection/by_qty/finish/' + this.invoiceCode;
           completeAjax.customParams = {
@@ -794,11 +835,11 @@ Copyright © HatioLab Inc. All rights reserved.
           };
           completeAjax.generateRequest();
 
-        // 2. 하나라도 검수한 다음 검수 완료 버튼을 누르면 송장 분할
-        } else if(this.sortSkuPcsQty > 0 && this.pickedSkuPcsQty > this.sortSkuPcsQty) {
+          // 2. 하나라도 검수한 다음 검수 완료 버튼을 누르면 송장 분할
+        } else if (this.sortSkuPcsQty > 0 && this.pickedSkuPcsQty > this.sortSkuPcsQty) {
           this.showMessage(t('button.confirm'), t('text.split_invoice'), this.splitBox.bind(this));
 
-        // 3. 하나도 검수하지 않았다면 에러 메시지 표시
+          // 3. 하나도 검수하지 않았다면 에러 메시지 표시
         } else {
           this.showMessage(t('button.confirm'), t('text.inspection_not_finished_yet'), this.focusInvoiceInput.bind(this));
         }
@@ -815,7 +856,7 @@ Copyright © HatioLab Inc. All rights reserved.
         let list = event.detail.contentElements;
         list.forEach(row => {
           let data = row.getData();
-          if(data.diff_qty <= 0) {
+          if (data.diff_qty <= 0) {
             row.classList.add('complete');
 
             let columns = Array.from(row.querySelectorAll('span.data-item'));
@@ -831,10 +872,10 @@ Copyright © HatioLab Inc. All rights reserved.
        ****************
        */
       reset() {
-        if(this.items && this.items.length) {
+        if (this.items && this.items.length) {
           this.items = this.items.map((item) => {
-            if(this.prevSkuBarcode == item.sku_cd || this.prevSkuBarcode == item.sku_barcd) {
-              if(item.diff_qty == 0) {
+            if (this.prevSkuBarcode == item.sku_cd || this.prevSkuBarcode == item.sku_barcd) {
+              if (item.diff_qty == 0) {
                 this.sortSkuCnt = this.sortSkuCnt - 1;
               }
 
@@ -848,7 +889,7 @@ Copyright © HatioLab Inc. All rights reserved.
         }
 
         this.$['sku-barcode'].value = '';
-        if(this.$['label-cd'].value) {
+        if (this.$['label-cd'].value) {
           this.focusSkuBarcdInput();
         } else {
           this.focusInvoiceInput();
@@ -860,7 +901,7 @@ Copyright © HatioLab Inc. All rights reserved.
        *****************
        */
       resetAll() {
-        if(this.items && this.items.length) {
+        if (this.items && this.items.length) {
           this.items = this.items.map((item) => {
             item.confirm_qty = 0;
             item.diff_qty = item.item_qty - item.confirm_qty;
@@ -871,7 +912,7 @@ Copyright © HatioLab Inc. All rights reserved.
         this.sortSkuCnt = 0;
         this.sortSkuPcsQty = 0;
         this.$['sku-barcode'].value = '';
-        if(this.$['label-cd'].value) {
+        if (this.$['label-cd'].value) {
           this.focusSkuBarcdInput();
         } else {
           this.focusInvoiceInput();
