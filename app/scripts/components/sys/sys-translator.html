@@ -12,73 +12,123 @@ Copyright © HatioLab Inc. All rights reserved.
   시스템 > 용어 번역 컴포넌트
 -->
 <dom-module id="sys-translator">
-	<template>
+  <template>
 		<style></style>
 	</template>
 
-	<script>
-		class SysTranslator extends Polymer.mixinBehaviors([Polymer.AppLocalizeBehavior], Polymer.Element) {
-			static get is() { return 'sys-translator'; }
+  <script>
+    class SysTranslator extends Polymer.mixinBehaviors([Polymer.AppLocalizeBehavior], Polymer.Element) {
+      static get is() {
+        return 'sys-translator';
+      }
 
-			static get properties() {
-				return {
-					src: {
-						type: String
-					},
+      static get properties() {
+        return {
+          /**
+           * @description 용어 키 
+           *********************
+           * @type {String}
+           */
+          src: {
+            type: String
+          },
 
-					result: {
-						type: String,
-						notify: true,
-						computed: '_computeResult(src, resources, language)'
-					},
+          /**
+           * @description 결과  
+           *********************
+           * @type {String}
+           */
+          result: {
+            type: String,
+            notify: true,
+            computed: '_computeResult(src, resources, language)'
+          },
 
-					resources: {
-						type: Object,
-						observer: '_resourcesChanged'
-					},
+          /**
+           * @description 리소스  
+           *********************
+           * @type {String}
+           */
+          resources: {
+            type: Object,
+            observer: '_resourcesChanged'
+          },
 
-					language: {
-						type: String,
-						observer: '_languageChanged'
-					}
-				};
-			}
+          /**
+           * @description 용어 
+           *********************
+           * @type {String}
+           */
+          language: {
+            type: String,
+            observer: '_languageChanged'
+          }
+        };
+      }
 
-			connectedCallback() {
-				super.connectedCallback();
-			}
+      /**
+       * @description life cycle
+       ***************************
+       */
+      connectedCallback() {
+        super.connectedCallback();
+      }
 
-			_computeResult(src, resources, language) {
-				return this.makeResult();
-			}
+      /**
+       * @description 번역 결과 생성 
+       ***************************
+       * @param {String} src
+       * @param {String} resources
+       * @param {String} language
+       * @return {String} 번역 결과
+       */
+      _computeResult(src, resources, language) {
+        return this.makeResult();
+      }
 
-			_resourcesChanged(resources) {
-				this.result = this.makeResult()
-			}
+      /**
+       * @description 번역 결과 생성 
+       ***************************
+       * @param {String} resources
+       * @return {String} 번역 결과
+       */
+      _resourcesChanged(resources) {
+        this.result = this.makeResult()
+      }
 
-			_languageChanged(language) {
-				if (language) {
-					this.result = this.makeResult();
-				}
-			}
+      /**
+       * @description 언어 변경시  
+       ***************************
+       * @param {String} language
+       */
+      _languageChanged(language) {
+        if (language) {
+          this.result = this.makeResult();
+        }
+      }
 
-			makeResult() {
-				var src = this.src;
-				if (!this.resources) {
-					return this.src;
-				}
+      /**
+       * @description 번역   
+       ***************************
+       * @return
+       */
+      makeResult() {
+        var src = this.src;
+        if (!this.resources) {
+          return this.src;
+        }
 
-				var result = this.localize(src);
-				if (!result) {
-					let idx = src.indexOf('.');
-					result = src.substring(idx + 1);
-				}
+        var result = this.localize(src);
+        if (!result) {
+          let idx = src.indexOf('.');
+          result = src.substring(idx + 1);
+        }
 
-				return result;
-			}
-		}
+        return result;
+      }
+    }
 
-		customElements.define(SysTranslator.is, SysTranslator);
-	</script>
+    customElements.define(SysTranslator.is, SysTranslator);
+  </script>
 
 </dom-module>

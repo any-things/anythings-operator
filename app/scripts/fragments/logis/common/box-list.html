@@ -87,7 +87,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 이 화면의 라우팅 URL
+           * @description 이 화면의 라우팅 URL
            ****************
            * @type {String}
            */
@@ -106,7 +106,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 새로고침 라벨
+           * @description 새로고침 라벨
            ****************
            * @type {String}
            */
@@ -126,7 +126,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 그리드 헤더
+           * @description 그리드 헤더
            ****************
            * @type {Array}
            */
@@ -175,37 +175,14 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 그리드 데이터
+           * @description 그리드 데이터
            ****************
            * @type {Array}
            */
           boxList: {
             type: Array,
             value: function() {
-              return [
-                /*{
-                                box_seq: '1',
-                                cust_nm: '거래처 1',
-                                loc_cd: 'M01-001',
-                                box_id: 'BCD10492850',
-                                batch_id: '',
-                                id: ''
-                              }, {
-                                box_seq: '2',
-                                cust_nm: '거래처 1',
-                                loc_cd: 'M01-001',
-                                box_id: 'BCD10492850',
-                                batch_id: '',
-                                id: ''
-                              }, {
-                                box_seq: '3',
-                                cust_nm: '거래처 1',
-                                loc_cd: 'M01-001',
-                                box_id: 'BCD10492850',
-                                batch_id: '',
-                                id: ''
-                              }*/
-              ];
+              return [];
             }
           }
         }
@@ -281,7 +258,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 박스 내품 팝업 표시
+       * @description 박스 내품 팝업 표시
        *******************
        * @param {Object} boxResult
        */

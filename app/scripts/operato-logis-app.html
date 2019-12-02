@@ -551,10 +551,10 @@ Copyright © HatioLab Inc. All rights reserved.
       _checkDeviceType() {
         this.deviceType = '';
 
-        // 개발 모드일 때 localstorage에서 값을 조회 함
+        // 개발 모드일 때 로컬 스토리지에서 값을 조회 함
         if (CONST.IS_DEV_MODE) {
-          this.deviceType = JSON.parse(localStorage.getItem('setting.deviceType')) ?
-            JSON.parse(localStorage.getItem('setting.deviceType')) : CONST.MY_DEVICE;
+          this.deviceType = LOGIS_UTIL.getLocalStorage('setting.deviceType');
+          this.deviceType = this.deviceType ? this.deviceType : CONST.MY_DEVICE;
           // 운영 모드일 때
         } else {
           this.deviceType = CONST.MY_DEVICE;
@@ -709,38 +709,24 @@ Copyright © HatioLab Inc. All rights reserved.
         try {
           switch (this.deviceType) {
             case CONST.DEVICE_TYPE.KIOSK:
-              /*if (!JSON.parse(localStorage.getItem('setting.equipCd'))) {
+              if (!LOGIS_UTIL.getLocalStorage('setting.equipCd')) {
                 throw {
                   title: t('error.SETTING_ERROR'),
                   message: t('text.rack_code_is_not_set')
                 };
-              } else if (!JSON.parse(localStorage.getItem('setting.workSideCd'))) {
-                throw {
-                  title: t('error.SETTING_ERROR'),
-                  message: t('text.rack_side_is_not_set')
-                };
-              }*/
+              }
               break;
 
-              /*default:
-                  if (!JSON.parse(localStorage.getItem('setting.equipCd'))) {
-                    throw {
-                      title: t('error.SETTING_ERROR'),
-                      message: t('text.rack_code_is_not_set')
-                    };
-                  } else if (!JSON.parse(localStorage.getItem('setting.stationCd'))) {
-                    throw {
-                      title: t('error.SETTING_ERROR'),
-                      message: t('text.zone_code_is_not_set')
-                    };
-              }*/
+            default:
+              if (!LOGIS_UTIL.getLocalStorage('setting.equipCd')) {
+                throw {
+                  title: t('error.SETTING_ERROR'),
+                  message: t('text.rack_code_is_not_set')
+                };
+              }
           }
         } catch (error) {
-          openAlert({
-            title: error.title,
-            message: error.message,
-            confirmCallback: this.toSetting.bind(this)
-          });
+          LOGIS_UTIL.showMessage(error.title, error.message, this.toSetting.bind(this));
         }
       }
 
@@ -751,13 +737,7 @@ Copyright © HatioLab Inc. All rights reserved.
       _sessionError() {
         this.hideHeaderButtons();
         this.isNotLogin = true;
-        openAlert({
-          title: t('error.BASEURL_ERROR'),
-          message: t('text.check_baseUrl'),
-          confirmCallback: () => {
-            this.toSetting();
-          }
-        });
+        LOGIS_UTIL.showMessage(t('error.BASEURL_ERROR'), t('text.check_baseUrl'), this.toSetting.bind(this));
       }
 
       /**
@@ -780,11 +760,7 @@ Copyright © HatioLab Inc. All rights reserved.
         document.dispatchEvent(new CustomEvent('session-unauthorized'));
 
         if (location.hash.indexOf('login') < 0) {
-          openAlert({
-            title: t('error.LOGIN_ERROR'),
-            message: t('error.UNAUTHORIZED'),
-            confirmCallback: this.toLogin.bind(this)
-          });
+          LOGIS_UTIL.showMessage(t('error.LOGIN_ERROR'), t('error.UNAUTHORIZED'), this.toLogin.bind(this));
         }
 
         this.isNotLogin = true;
@@ -800,10 +776,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
         if (route !== 'login' && route !== 'setting') {
           this.toLogin();
-          openAlert({
-            title: t('error.LOGIN_ERROR'),
-            message: t('error.UNAUTHORIZED'),
-          });
+          LOGIS_UTIL.showMessage(t('error.LOGIN_ERROR'), t('error.UNAUTHORIZED'));
         }
       }
 
@@ -831,7 +804,7 @@ Copyright © HatioLab Inc. All rights reserved.
       _moveToDefaultView() {
         // 로그인 후 현재 장비가 kiosk라면 설정된 kiosk 화면으로 이동 설정된 화면이 없다면 any_setting으로 이동
         if (this.deviceType === CONST.DEVICE_TYPE.KIOSK) {
-          const kioskScreen = JSON.parse(localStorage.getItem('setting.kioskScreen'));
+          const kioskScreen = LOGIS_UTIL.getLocalStorage('setting.kioskScreen');
           this.route = {
             prefix: '/',
             path: kioskScreen ? kioskScreen : 'home'
@@ -855,14 +828,10 @@ Copyright © HatioLab Inc. All rights reserved.
        ******************************
        */
       logout() {
-        openConfirm({
-          title: t('button.logout'),
-          message: t('text.Sure to logout'),
-          confirmCallback: () => {
-            const sysLogout = this.$['sys-logout'];
-            sysLogout.logout();
-          }
-        })
+        LOGIS_UTIL.showConfirm(t('button.logout'), t('text.Sure to logout'), null, function() {
+          const sysLogout = this.$['sys-logout'];
+          sysLogout.logout();
+        }.bind(this));
       }
 
       /**
@@ -1027,14 +996,10 @@ Copyright © HatioLab Inc. All rights reserved.
               }
 
             default:
-              //if(this.isNotLogin === undefined) return;
               if (this.isNotLogin && !(page === 'logis_setting' || page === 'login')) {
                 // 로그인 되지 않은 상태에서 setting 화면이나 login 화면이 아닌 다른곳으로 라우팅 시 로그인으로 강제 이동
                 this.toLogin();
-                openAlert({
-                  title: t('error.LOGIN_ERROR'),
-                  message: t('error.UNAUTHORIZED')
-                });
+                LOGIS_UTIL.showMessage(t('error.LOGIN_ERROR'), t('error.UNAUTHORIZED'));
               }
           }
         }

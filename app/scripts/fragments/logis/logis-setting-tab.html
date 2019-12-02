@@ -331,10 +331,7 @@ Copyright © HatioLab Inc. All rights reserved.
         this.getIpAddress(networInfo => {
           this._setLocalStorage('setting.ipAddress', networInfo.ip);
         }, () => {
-          openAlert({
-            title: t('error.SETTING_ERROR'),
-            text: t('text.check_wifi_setting')
-          });
+          LOGIS_UTIL.showMessage(t('error.SETTING_ERROR'), t('text.check_wifi_setting'));
         });
       }
 

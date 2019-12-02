@@ -16,7 +16,10 @@ Copyright © HatioLab Inc. All rights reserved.
   <template>
     <style></style>
 
-    <app-location route="{{route}}" use-hash-as-path></app-location>
+    <app-location 
+      route="{{route}}" 
+      use-hash-as-path>
+    </app-location>
 
     <app-route
       route="{{route}}"
@@ -27,55 +30,112 @@ Copyright © HatioLab Inc. All rights reserved.
 
   <script>
     class SysRoute extends Polymer.mixinBehaviors([Things.LocaleMounter], Polymer.Element) {
-      static get is() { return 'sys-route'; }
+      static get is() {
+        return 'sys-route';
+      }
 
       static get properties() {
         return {
+          /**
+           * @description 라우트 정보
+           *********************
+           * @type {Object}
+           */
           route: {
             type: Object,
             notify: true,
             observer: '_routeChanged'
           },
 
+          /**
+           * @description 라우트 정보
+           *********************
+           * @type {Object}
+           */
           routeData: {
             type: Object
           },
 
-          path: String,
+          /**
+           * @description 경로 정보 
+           *********************
+           * @type {String}
+           */
+          path: {
+            type: String
+          },
 
-          tail: String,
+          /**
+           * @description ?
+           *********************
+           * @type {String}
+           */
+          tail: {
+            type: String
+          },
 
+          /**
+           * @description 라우트 타이틀
+           *********************
+           * @type {String}
+           */
           title: {
             type: String,
             notify: true,
             readonly: true
           },
 
+          /**
+           * @description 페이지 정보
+           *********************
+           * @type {Number}
+           */
           page: {
             type: String,
             notify: true
           },
 
+          /**
+           * @description 로그인 성공 여부
+           *********************
+           * @type {Boolean}
+           */
           loginSuccess: {
             type: Boolean,
             value: false
           },
 
+          /**
+           * @description 라우트 페이지 
+           *********************
+           * @type {Object}
+           */
           routePage: {
             type: Object,
             value: function() {
               return new Map([
-                ['home', {title: 'menu.Home'}],
-                ['login', {title: 'label.login'}],
-                ['logis_setting', {title: 'menu.Settings'}]
+                ['home', {
+                  title: 'menu.Home'
+                }],
+                ['login', {
+                  title: 'label.login'
+                }],
+                ['logis_setting', {
+                  title: 'menu.Settings'
+                }]
               ])
             }
           }
         }
       }
 
+      /**
+       * @description life cycle
+       ***************************
+       */
       connectedCallback() {
         super.connectedCallback();
+
         // 메뉴 정보가 변경 되었을 때 routePage(타이틀 정보)를 초기화 하기 위한 이벤트 핸들러 등록
         document.addEventListener('menu-info-changed', this._setRoutePage.bind(this));
 
@@ -87,39 +147,49 @@ Copyright © HatioLab Inc. All rights reserved.
           const params = dataObj.params;
           const app = document.querySelector('operato-logis-app');
           const ironPages = app.$['main'];
+
           const pageChangeEventHandler = function(event) {
-            if(event.currentTarget.selectedItem) {
+            if (event.currentTarget.selectedItem) {
               event.currentTarget.selectedItem[paramsKey] = params;
               ironPages.removeEventListener('selected-item-changed', pageChangeEventHandler);
             }
           };
 
           ironPages.addEventListener('selected-item-changed', pageChangeEventHandler);
-
           location.hash = route.startsWith('/') ? route : '/' + route;
         });
       }
 
       /**
-       * menu-info-changed event handler
+       * @description menu-info-changed event handler
        * 전달 받은 menu list를 통해 routePage의 값을 추가함
+       ***************************
+       * @param {Object} event
        */
       _setRoutePage(event) {
         const menus = event.detail;
+
         menus.forEach(menu => {
           this.routePage.set(menu.routing, {
             title: `menu.${menu.name}`
           });
         });
 
-        if(!this.title || this.title.length <= 0) this._setTitle(this.page);
+        if (!this.title || this.title.length <= 0) {
+          this._setTitle(this.page);
+        }
       }
 
+      /**
+       * @description 라우팅 경로 변경시
+       ***************************
+       * @param {Object} route
+       */
       _routeChanged(route) {
         const oldPath = this.page;
         const newPath = route.path.replace('/', '')
 
-        if(!route || oldPath === newPath) return;
+        if (!route || oldPath === newPath) return;
 
         // 페이지 변경 전에 발생하는 이벤트
         const beforeChangeEvent = new CustomEvent('before-page-change', {
@@ -130,10 +200,10 @@ Copyright © HatioLab Inc. All rights reserved.
           cancelable: true
         });
 
-        if(document.dispatchEvent(beforeChangeEvent)) {
+        if (document.dispatchEvent(beforeChangeEvent)) {
           this.path = newPath;
-          if (newPath === "" || newPath === "/") {
-            window.location.hash = "/home";
+          if (newPath === '' || newPath === '/') {
+            window.location.hash = '/home';
             return;
           } else {
             this.page = this.routeData.page;
@@ -142,22 +212,37 @@ Copyright © HatioLab Inc. All rights reserved.
 
           setTimeout(() => {
             // TODO: hash change 이후에 발생하도록 수정 현재 setTimeout 방식은 불안정적임
-            document.dispatchEvent(new CustomEvent('page-changed', { detail: {
-              prevPage: oldPath,
-              currentPage: newPath
-            }}));
+            document.dispatchEvent(new CustomEvent('page-changed', {
+              detail: {
+                prevPage: oldPath,
+                currentPage: newPath
+              }
+            }));
           }, 100);
         }
       }
 
+      /**
+       * @description 페이지 정보 변경시
+       ***************************
+       * @param {Object} page
+       */
       _pageChanged(page) {
         this._page(page);
       }
 
+      /**
+       * @description 404 에러시 이동 라우팅
+       ***************************
+       */
       _showPage404() {
         this.toHome();
       }
 
+      /**
+       * @description 홈으로 이동
+       ***************************
+       */
       toHome() {
         this.route = {
           prefix: '',
@@ -165,6 +250,10 @@ Copyright © HatioLab Inc. All rights reserved.
         };
       }
 
+      /**
+       * @description 로그인 페이지로 이동
+       ***************************
+       */
       toLogin() {
         this.route = {
           prefix: '',
@@ -173,36 +262,21 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * route가 변경되면 호출됨
-       * this.routePage에서 page값을 통해 타이틀을 조회하고 다국어 처리 결과를
-       * this.title에 초기화함
+       * @description route가 변경되면 호출됨
+       * this.routePage에서 page값을 통해 타이틀을 조회하고 다국어 처리 결과를 this.title에 초기화함
+       ****************************
+       * @param {Object} page
        */
       _setTitle(page) {
-        if(this.routePage && this.routePage.size > 0) {
+        if (this.routePage && this.routePage.size > 0) {
           let titleInfo = this.routePage.get(page);
-          if(titleInfo && titleInfo.title) {
+          if (titleInfo && titleInfo.title) {
             this.title = t(titleInfo.title);
           } else {
             this.title = '';
           }
         }
       }
-
-      // // FIXME
-      // _getUrl() {
-      //   var partiallyEncodedPath = window.encodeURI(
-      //       this.path).replace(/\#/g, '%23').replace(/\?/g, '%3F');
-      //   var partiallyEncodedQuery = '';
-      //   if (this.query) {
-      //     partiallyEncodedQuery = '?' + this.query.replace(/\#/g, '%23');
-      //   }
-      //   var partiallyEncodedHash = '';
-      //   if (this.hash) {
-      //     partiallyEncodedHash = '#' + window.encodeURI(this.hash);
-      //   }
-      //   return (
-      //       partiallyEncodedPath + partiallyEncodedQuery + partiallyEncodedHash);
-      // }
     }
 
     customElements.define(SysRoute.is, SysRoute);

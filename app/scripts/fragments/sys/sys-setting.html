@@ -41,6 +41,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
     </style>
 
+    <!-- 세션 정보 체크 URL -->
     <sys-ajax
       auto
       id="ajax-session"
@@ -52,6 +53,7 @@ Copyright © HatioLab Inc. All rights reserved.
       on-sys-unauthorized-session="_sessionUnauthorized">
     </sys-ajax>
 
+    <!-- 사용자 정보 로컬 스토리지 -->
     <iron-localstorage
       name="setting.user"
       value="{{user}}">
@@ -80,13 +82,15 @@ Copyright © HatioLab Inc. All rights reserved.
 
   <script>
     class SysSetting extends Polymer.Element {
-      static get is() { return 'sys-setting'; }
+      static get is() {
+        return 'sys-setting';
+      }
 
       static get properties() {
         return {
           /**
-           * license reference URL
-           * ******
+           * @description license reference URL
+           *********************
            * @type {String}
            */
           licenseRefUrl: {
@@ -94,35 +98,79 @@ Copyright © HatioLab Inc. All rights reserved.
             value: 'http://license.hatiolab.com/references/things-factory/'
           },
 
-          baseUrl: String,
+          /**
+           * @description 서버 Base URL
+           *********************
+           * @type {String}
+           */
+          baseUrl: {
+            type: String
+          },
 
+          /**
+           * @description 사용자 정보
+           *********************
+           * @type {Object}
+           */
           user: {
             type: Object
           },
 
+          /**
+           * @description 세션 체크 URL
+           *********************
+           * @type {Object}
+           */
           sessionUrl: {
             type: String,
             value: '/session_info'
           },
 
-          domainObj: Object,
+          /**
+           * @description 도메인 정보 
+           *********************
+           * @type {Object}
+           */
+          domainObj: {
+            type: Object
+          },
 
+          /**
+           * @description 장비 유형
+           *********************
+           * @type {Array}
+           */
           deviceTypeItems: {
             type: Array,
             value: function() {
-              return [ 'TABLET', 'PDA', 'KIOSK']
+              return ['TABLET', 'PDA', 'KIOSK']
             }
           },
 
+          /**
+           * @description 장비 유형
+           *********************
+           * @type {String}
+           */
           deviceType: {
             type: String,
             notify: true
           },
 
+          /**
+           * @description 개발 모드 유형
+           *********************
+           * @type {Boolean}
+           */
           isDevMode: {
             type: Boolean
           },
 
+          /**
+           * @description 로그인 성공 여부
+           *********************
+           * @type {Boolean}
+           */
           loginSuccess: {
             type: Boolean,
             notify: true,
@@ -132,8 +180,8 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * sys-setting load 완료 후 userInfo를 조회하여
-       * 로그인 여부를 확인함
+       * @description sys-setting load 완료 후 userInfo를 조회하여 로그인 여부를 확인함
+       **********************
        */
       connectedCallback() {
         super.connectedCallback();
@@ -141,14 +189,16 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * user info 조회 호출
+       * @description 사용자 정보 조회 
+       **********************
        */
       getUserInfo() {
         this.$['ajax-session'].generateRequest();
       }
 
       /**
-       * session이 response되면 device type을 체크
+       * @description session이 response되면 device type을 체크
+       ***********************
        */
       _sessionResponsed() {
         this.loginSuccess = true;
@@ -156,22 +206,24 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * session check 실패시 이벤트 발생
+       * @description session check 실패시 이벤트 발생
+       ************************
        */
       _sessionError() {
         this.dispatchEvent(new CustomEvent('sys-session-error'));
       }
 
       /**
-       * sessin check시 로그인 이전이라면 이벤트 발생
+       * @description sessin check시 로그인 이전이라면 이벤트 발생
+       ************************
        */
       _sessionUnauthorized() {
         this.dispatchEvent(new CustomEvent('sys-session-unauthorized'));
       }
 
       /**
-       * 개발용도
-       * deviceType 콤보 박스 변경시 화면 리프레시
+       * @description 개발용도 deviceType 콤보 박스 변경시 화면 리프레시
+       ************************
        */
       _deviceTypeSelected() {
         location.reload(true);

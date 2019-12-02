@@ -111,7 +111,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * @description 로그인 여부 flag
+           * @description 로그인 여부
            *********************
            * @type {Boolean}
            */
@@ -395,26 +395,11 @@ Copyright © HatioLab Inc. All rights reserved.
             .catch(error => {
               let title = error.detail ? error.detail.code : 'Error';
               let message = error.detail ? error.detail.msg : 'Error occured while saving setting.';
-              this._showErrorMessage(title, message, () => {
+              LOGIS_UTIL.showMessage(title, message, () => {
                 location.hash = '/logis_setting'
               });
             });
         }
-      }
-
-      /**
-       * @description 에러 메시치 출력 공통 method
-       *********************
-       * @param {String} title
-       * @param {String} message
-       * @param {Function} confirmCallback
-       */
-      _showErrorMessage(title, message, confirmCallback) {
-        openAlert({
-          title: title,
-          message: message,
-          confirmCallback: confirmCallback
-        });
       }
 
       /**

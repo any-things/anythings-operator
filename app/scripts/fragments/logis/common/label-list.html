@@ -36,13 +36,15 @@ Copyright © HatioLab Inc. All rights reserved.
       last-response="{{boxList}}">
     </sys-ajax>
 
+    <!-- 박스 리스트 -->
     <item-list
-      id="cust-list"
+      id="box-list"
       header="[[header]]"
       data="[[boxList]]"
       on-data-list-click="_showReprintPopup">
     </item-list>
 
+    <!-- 버튼 리스트 -->
     <div id="button-container">
       <button is-pda$="[[isPda]]"on-click="searchBoxList">[[refreshBtnLabel]]</button>
     </div>
@@ -56,12 +58,17 @@ Copyright © HatioLab Inc. All rights reserved.
 
       static get properties() {
         return {
+          /**
+           * @description PDA인지 여부
+           ****************
+           * @type {Boolean}
+           */
           isPda: {
             type: Boolean
           },
 
           /**
-           * 새로고침 라벨
+           * @description 새로고침 라벨
            ****************
            * @type {Array}
            */
@@ -71,7 +78,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 그리드 헤더
+           * @description 그리드 헤더
            ****************
            * @type {Array}
            */
@@ -104,7 +111,8 @@ Copyright © HatioLab Inc. All rights reserved.
                 },
                 displayCallback: (value, rowData) => {
                   var val = value ? value : rowData.box_id;
-                  return val.substring(LOGIS_UTIL.getInvoiceFieldSubstr());
+                  var idx = LOGIS_UTIL.getInvoiceFieldSubstr();
+                  return (val && idx > 0) ? val.substring(idx) : val;
                 }
               }, {
                 fieldname: 'id',
@@ -120,38 +128,22 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 그리드 데이터
+           * @description 그리드 데이터
            ****************
            * @type {Array}
            */
           boxList: {
             type: Array,
             value: function() {
-              return [
-                /*{
-                                box_seq: '1',
-                                cust_nm: '거래처 1',
-                                loc_cd: 'M01-001',
-                                invoice_id: 'BCD10492850'
-                              }, {
-                                box_seq: '2',
-                                cust_nm: '거래처 1',
-                                loc_cd: 'M01-001',
-                                invoice_id: 'BCD10492850'
-                              }, {
-                                box_seq: '3',
-                                cust_nm: '거래처 1',
-                                loc_cd: 'M01-001',
-                                invoice_id: 'BCD10492850'
-                              }*/
-              ];
+              return [];
             }
           }
         }
       }
 
       /**
-       * connectedCallback
+       * @description connectedCallback
+       ****************************
        */
       connectedCallback() {
         super.connectedCallback();
@@ -165,7 +157,8 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 송장 번호가 발행된 박스 리스트 조회
+       * @description 송장 번호가 발행된 박스 리스트 조회
+       ***************************
        */
       searchBoxList() {
         var ajax = this.$['box-list-ajax'];
@@ -178,7 +171,9 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 리스트에서 선택한 로우를 활성화 함
+       * @description 리스트에서 선택한 로우를 활성화 함
+       ****************************
+       * @param {Object} event
        */
       _showReprintPopup(event) {
         const labelReIssueDetail = document.createElement('label-details');

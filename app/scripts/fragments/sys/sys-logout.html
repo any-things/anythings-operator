@@ -11,60 +11,87 @@ Copyright © HatioLab Inc. All rights reserved.
   공통 로그아웃 기능
 -->
 <dom-module id="sys-logout">
-	<template>
+  <template>
+		<!-- 로그아웃 Ajax -->
 		<sys-ajax
 			curl="[[logoutUrl]]"
 			method="POST"
 			on-iron-ajax-response="_handleAjaxResponse">
 		</sys-ajax>
 
+		<!-- 사용자 정보 로컬 스토리지 -->
     <iron-localstorage
       name="setting.user"
       value="{{user}}">
     </iron-localstorage>
 	</template>
-	<script>
-		class SysLogout extends Polymer.Element {
-			static get is() { return 'sys-logout'; }
 
-			static get properties() {
-				return {
-					logoutUrl: {
-						type: String,
-						value: '/logout'
-					},
+  <script>
+    class SysLogout extends Polymer.Element {
+      static get is() {
+        return 'sys-logout';
+      }
 
-					/**
-					 * signout에 사용될 ajax, iron-ajax
-					 * ***
-					 * @type {Object}
-					 */
-					_signoutAjax: {
-						type: Object,
-						value: {}
-					},
+      static get properties() {
+        return {
+          /**
+           * @description 로그아웃 URL
+           *********************
+           * @type {String}
+           */
+          logoutUrl: {
+            type: String,
+            value: '/logout'
+          },
 
-					user: Object,
-				};
-			}
+          /**
+           * @description signout에 사용될 ajax, iron-ajax
+           *********************
+           * @type {Object}
+           */
+          _signoutAjax: {
+            type: Object,
+            value: {}
+          },
 
-			logout(e) {
-				this.shadowRoot.querySelector('sys-ajax').generateRequest();
-			}
+          /**
+           * @description 사용자 정보
+           *********************
+           * @type {Object}
+           */
+          user: {
+            type: Object
+          }
+        };
+      }
 
-			_handleAjaxResponse(e) {
-				localStorage.removeItem('setting.user');
+      /**
+       * @description 로그아웃 수행
+       ******************
+       * @param {Object} e
+       */
+      logout(e) {
+        this.shadowRoot.querySelector('sys-ajax').generateRequest();
+      }
 
-				this.dispatchEvent(new CustomEvent('log-out', {
-					bubbles: true,
-					composed: true,
-					detail: true
-				}));
+      /**
+       * @description 로그아웃 이후 수행 절차
+       ******************
+       * @param {Object} e
+       */
+      _handleAjaxResponse(e) {
+        localStorage.removeItem('setting.user');
 
-				window.location.hash = "/login";
-			}
-		}
+        this.dispatchEvent(new CustomEvent('log-out', {
+          bubbles: true,
+          composed: true,
+          detail: true
+        }));
 
-		window.customElements.define(SysLogout.is, SysLogout);
-	</script>
+        window.location.hash = '/login';
+      }
+    }
+
+    window.customElements.define(SysLogout.is, SysLogout);
+  </script>
 </dom-module>

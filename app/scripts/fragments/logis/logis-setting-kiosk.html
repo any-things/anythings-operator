@@ -275,19 +275,17 @@ Copyright © HatioLab Inc. All rights reserved.
         const screenCombo = this._getScreenCombo();
         this._clearCombo(screenCombo);
 
-        if (!screenList || screenList.length === 0) {
-          return;
+        if (screenList && screenList.length > 0) {
+          screenList.forEach(screen => {
+            const option = new Option(t('menu.' + screen.name), screen.routing);
+            option.selected = (this.kioskScreen === screen.routing);
+            screenCombo.appendChild(option);
+          });
+
+          document.dispatchEvent(new CustomEvent('menu-info-changed', {
+            detail: screenList
+          }));
         }
-
-        screenList.forEach(screen => {
-          const option = new Option(t('menu.' + screen.name), screen.routing);
-          option.selected = (this.kioskScreen === screen.routing);
-          screenCombo.appendChild(option);
-        });
-
-        document.dispatchEvent(new CustomEvent('menu-info-changed', {
-          detail: screenList
-        }));
       }
 
       /**

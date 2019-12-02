@@ -376,14 +376,14 @@ Copyright © HatioLab Inc. All rights reserved.
        **********************
        */
       _showUrlInvalidAlert() {
-        openAlert({
-          title: t('error.BASEURL_ERROR'),
-          message: t('text.check_baseUrl'),
-          confirmCallback: () => {
+        LOGIS_UTIL.showMessage(
+          t('error.BASEURL_ERROR'),
+          t('text.check_baseUrl'),
+          function() {
             this._moveToSetting();
             this._getIpInput().select();
-          }
-        });
+          }.bind(this)
+        );
       }
 
       /**
@@ -523,6 +523,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description return locale select element
+       ************************
        */
       _getLocaleSelector() {
         return this.$['locale'];

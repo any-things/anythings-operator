@@ -10,165 +10,205 @@
 LOGIS_UTIL = {};
 
 /**
- * @description 디바이스 타입 조회
- *******************
+ * @description key로 로컬 스토리지에서 뽑아냄
+ *******************************
+ * @param {String} key
+ * @return 로컬 스토리지 값
  */
-LOGIS_UTIL.getDeviceType = function() {
-  return JSON.parse(localStorage.getItem('setting.deviceType'));
+LOGIS_UTIL.getLocalStorage = function(key) {
+  return JSON.parse(localStorage.getItem(key));
 };
 
 /**
- * @description 대상 외 주문 보이기 여부 리턴
+ * @description 로컬 스토리지에서 key, value로 저장
+ *******************************
+ * @param {String} key
+ * @param {String} value
+ */
+LOGIS_UTIL.setLocalStorage = function(key, value) {
+  localStorage.setItem(key, JSON.stringify(value));
+};
+
+/**
+ * @description 디바이스 타입 조회
+ *******************
+ * @return 디바이스 타입
+ */
+LOGIS_UTIL.getDeviceType = function() {
+  return LOGIS_UTIL.getLocalStorage('setting.deviceType');
+};
+
+/**
+ * @description 작업 스테이션 내 대상 외 주문 정보 표시 여부 리턴 (DPS 유형 설정)
  ********************
+ * @return 작업 스테이션 내 대상 외 주문 정보 표시 여부
  */
 LOGIS_UTIL.getShowOthersOrder = function() {
-  return JSON.parse(localStorage.getItem('setting.showOthersOrder'));
+  return LOGIS_UTIL.getLocalStorage('setting.showOthersOrder');
 };
 
 /**
  * @description 현재 설정에서 선택한 설비 유형 리턴
  ********************
+ * @return 설비 유형
  */
 LOGIS_UTIL.getEquipType = function() {
-  return JSON.parse(localStorage.getItem('setting.equipType'));
+  return LOGIS_UTIL.getLocalStorage('setting.equipType');
 };
 
 /**
  * @description 현재 설정에서 선택한 설비 코드를 리턴
  ********************
+ * @return 설비 코드
  */
 LOGIS_UTIL.getEquipCd = function() {
-  return JSON.parse(localStorage.getItem('setting.equipCd'));
+  return LOGIS_UTIL.getLocalStorage('setting.equipCd');
 };
 
 /**
  * @description 현재 설정에서 선택한 설비 이름을 리턴
  ********************
+ * @return 설비 이름
  */
 LOGIS_UTIL.getEquipNm = function() {
-  return JSON.parse(localStorage.getItem('setting.equipNm'));
+  return LOGIS_UTIL.getLocalStorage('setting.equipNm');
 };
 
 /**
  * @description 현재 설정에서 선택한 스테이지 코드를 리턴 
  ********************
+ * @return 스테이지 코드
  */
 LOGIS_UTIL.getStageCd = function() {
-  return JSON.parse(localStorage.getItem('setting.stageCd'));
+  return LOGIS_UTIL.getLocalStorage('setting.stageCd');
 };
 
 /**
  * @description 현재 설정에서 선택한 작업 스테이션을 리턴
  ********************
+ * @return 스테이션 코드
  */
 LOGIS_UTIL.getStationCd = function() {
-  return JSON.parse(localStorage.getItem('setting.stationCd'));
+  return LOGIS_UTIL.getLocalStorage('setting.stationCd');
 };
 
 /**
  * @description 현재 설정에서 선택한 작업 사이드를 리턴
  ********************
+ * @return 작업 사이드 코드
  */
 LOGIS_UTIL.getWorkSideCd = function() {
-  return JSON.parse(localStorage.getItem('setting.workSideCd'));
+  return LOGIS_UTIL.getLocalStorage('setting.workSideCd');
 };
 
 /**
- * @description 현재 태블릿의 자동피킹 여부를 리턴
+ * @description 현재 태블릿의 자동피킹 여부를 리턴 (DPS 유형 설정)
  ********************
+ * @return 자동 피킹 
  */
 LOGIS_UTIL.getAutoPicking = function() {
-  return JSON.parse(localStorage.getItem('setting.autoPicking'));
+  return LOGIS_UTIL.getLocalStorage('setting.autoPicking');
 };
 
 /**
- * @description 현재 태블릿의 상품코드 전부 보기 여부를 리턴
+ * @description 현재 태블릿의 상품 코드 전부 보기 여부를 리턴
  ********************
+ * @return 상품 Full로 표시할 지 여부
  */
 LOGIS_UTIL.getShowFullCode = function() {
-  return JSON.parse(localStorage.getItem('setting.showFullCode'));
+  return LOGIS_UTIL.getLocalStorage('setting.showFullCode');
 };
 
 /**
  * @description 표시할 송장 번호 문자열의 시작 인덱스를 리턴
  ********************
+ * @return 표시할 송장 번호 문자열의 시작 인덱스
  */
 LOGIS_UTIL.getInvoiceFieldSubstr = function() {
-  return parseInt(JSON.parse(localStorage.getItem('setting.invoiceFieldSubstr')));
+  let invFieldSubstrIdx = LOGIS_UTIL.getLocalStorage('setting.invoiceFieldSubstr');
+  return invFieldSubstrIdx ? parseInt(invFieldSubstrIdx) : -1;
 };
 
 /**
  * @description 작업 유형 리턴
  ********************
+ * @return 작업 유형
  */
 LOGIS_UTIL.getJobType = function() {
-  return JSON.parse(localStorage.getItem('setting.jobType'));
+  return LOGIS_UTIL.getLocalStorage('setting.jobType');
 };
 
 /**
  * @description 화면에서 데이터 리프레쉬 주기
  ********************
+ * @return 데이터 리프레쉬 주기
  */
 LOGIS_UTIL.getRefreshInterval = function() {
-  let interval = JSON.parse(localStorage.getItem('setting.refreshInterval'));
-  interval = Number(interval) * 1000;
-  return interval;
+  let interval = LOGIS_UTIL.getLocalStorage('setting.refreshInterval');
+  return (interval && !isNaN(interval)) ? Number(interval) * 1000 : 30 * 1000;
 };
 
 /**
  * @description 사용하는 바코드 유형을 리턴
  ********************
+ * @return 바코드 유형
  */
 LOGIS_UTIL.getBarcodeType = function() {
-  return JSON.parse(localStorage.getItem('setting.barcodeType'));
+  return LOGIS_UTIL.getLocalStorage('setting.barcodeType');
 };
 
 /**
  * @description B2C 투입 박스 유형
  ********************
+ * @return 투입 박스 유형
  */
 LOGIS_UTIL.getB2CInputBoxType = function() {
-  return JSON.parse(localStorage.getItem('setting.b2cKioskInputType'));
+  return LOGIS_UTIL.getLocalStorage('setting.b2cKioskInputType');
 };
 
 /**
  * @description 사용할 프린터 아이디 리턴
  ********************
+ * @return 사용할 프린터 아이디
  */
 LOGIS_UTIL.getPrinterId = function() {
-  return JSON.parse(localStorage.getItem('setting.printerId'));
+  return LOGIS_UTIL.getLocalStorage('setting.printerId');
 };
 
 /**
  * @description 메시지 브로커의 사이트 코드 조회
  ********************
+ * @return 메시지 브로커의 사이트 코드
  */
 LOGIS_UTIL.getBrokerSiteCd = function() {
-  return localStorage.getItem('setting.brokerSite');
+  return LOGIS_UTIL.getLocalStorage('setting.brokerSite');
 };
 
 /**
  * @description 메시지 브로커 주소 조회
  ********************
+ * @return 메시지 브로커의 주소
  */
 LOGIS_UTIL.getBrokerAddress = function() {
-  return localStorage.getItem('setting.brokerAddress');
+  return LOGIS_UTIL.getLocalStorage('setting.brokerAddress');
 };
 
 /**
  * @description 메시지 브로커 포트 조회
  ********************
+ * @return 메시지 브로커 포트
  */
 LOGIS_UTIL.getBrokerPort = function() {
-  return localStorage.getItem('setting.brokerPort');
+  return LOGIS_UTIL.getLocalStorage('setting.brokerPort');
 };
 
 /**
  * @description 연속 스캔 허용 여부 조회
  ********************
+ * @return 연속 스캔 허용 여부
  */
 LOGIS_UTIL.isContinousScanAllowed = function() {
-  let continousScanAllowed = localStorage.getItem('setting.continousScanAllowed');
+  let continousScanAllowed = LOGIS_UTIL.getLocalStorage('setting.continousScanAllowed');
   return continousScanAllowed === null ? false : continousScanAllowed;
 };
 
@@ -208,7 +248,7 @@ LOGIS_UTIL.showConfirm = function(title, message, cancelCallback, confirmCallbac
  ********************
  */
 LOGIS_UTIL.handleRequiredSettingEmpty = function() {
-  LOGIS_UTIL.showMessage(t('text.selecting_rack'), t('text.select_rack'), function() {
+  LOGIS_UTIL.showMessage(t('text.selecting_equipment'), t('text.select_equipment'), function() {
     location.hash = '/logis_setting';
   });
 };
@@ -286,31 +326,19 @@ LOGIS_UTIL.setWorkSide = function(workSideCd, screen) {
 };
 
 /**
- * @description 다국어 처리된 완료 상태 값
- ******************
- */
-LOGIS_UTIL.getFinishedStatusName = function() {
-  return t('label.finished');
-};
-
-/**
- * @description 다국어 처리된 미완료 상태 값
- ******************
- */
-LOGIS_UTIL.getUnfinishedStatusName = function() {
-  return t('label.unfinished');
-};
-
-/**
  * @description items의 내용 중에 left_qty가 0인 항목이 아래로 가도록 소팅
  ******************
  * @param items
  */
 LOGIS_UTIL.sortByLeftQty = function(items) {
   items.sort(function(a, b) {
-    if (a.left_qty == b.left_qty) return 0;
-    else if (a.left_qty > 0 && b.left_qty == 0) return -1;
-    else return 1;
+    if (a.left_qty == b.left_qty) {
+      return 0;
+    } else if (a.left_qty > 0 && b.left_qty == 0) {
+      return -1;
+    } else {
+      return 1;
+    }
   });
 
   return items;

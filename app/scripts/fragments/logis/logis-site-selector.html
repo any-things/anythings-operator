@@ -121,12 +121,12 @@ Copyright © HatioLab Inc. All rights reserved.
        * prod-mode일 경우에 선택한 사이트 URL + /rest (웹서버를 통한 리다이렉트를 수행하기 때문에 클라이언트 포트와 서버 포트가 동일함)
        * prod-mode가 아닐 경우 관리 사이트로 요청을 보냄 (localStorage로 가정)
        ******************
-       * @param {Array} siteList
+       * @param {Object} selectedSite
        */
       _computeReqUrl(selectedSite) {
         const prodMode = selectedSite.hasAttribute('prod-mode');
         const siteUrl = selectedSite.value;
-        return prodMode ? `http://${siteUrl}/rest` : JSON.parse(localStorage.getItem('setting.mgrSiteUrl'));
+        return prodMode ? `http://${siteUrl}/rest` : LOGIS_UTIL.getLocalStorage('setting.mgrSiteUrl');
       }
 
       /**
@@ -138,8 +138,9 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * @description return site select element
+       * @description 선택한 사이트 리턴
        *******************
+       * @return {Object}
        */
       _getSiteSelectElement() {
         return this.$['site-select'];

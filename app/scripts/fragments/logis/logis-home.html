@@ -7,6 +7,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
 <!--
   물류 > 홈 화면
+  TODO 메뉴 리스트 ...
 -->
 <dom-module id="logis-home">
   <template>
@@ -155,7 +156,9 @@ Copyright © HatioLab Inc. All rights reserved.
 
   <script>
     class LogisHome extends Polymer.Element {
-      static get is() { return 'logis-home' };
+      static get is() {
+        return 'logis-home'
+      };
 
       static get properties() {
         return {
@@ -173,19 +176,7 @@ Copyright © HatioLab Inc. All rights reserved.
                   }
                 },
                 columnWidth: '220px'
-              }/*, {
-                display: 'ID',
-                fieldname: 'id'
               }, {
-                display: 'Code',
-                fieldname: 'code'
-              }, {
-                display: 'Error Type',
-                fieldname: 'error_type',
-                style: {
-                  textAlign: 'center'
-                }
-              }*/, {
                 display: 'Message',
                 fieldname: 'message'
               }]
@@ -194,31 +185,52 @@ Copyright © HatioLab Inc. All rights reserved.
         }
       }
 
+      /**
+       * @description life cycle
+       *********************
+       */
       connectedCallback() {
         super.connectedCallback();
-        // this.getErrorLogs();
+        // this.searchMenuList();
       }
 
-      getErrorLogs(page, limit) {
-        const errorLogAjax = this.$['error-log-ajax'];
+      /**
+       * @description 메뉴 리스트 조회
+       *********************
+       * @param {Number} page
+       * @param {Number} limit
+       */
+      searchMenuList(page, limit) {
+        const menuListAjax = this.$['menu-list-ajax'];
+        let category = LOGIS_UTIL.getDeviceType().toUpperCase();
         let currentPage = page ? page : 1;
         let currentLimit = limit ? limit : 50;
 
+        const query = JSON.stringify([{
+          field: 'category',
+          value: category
+        }]);
+
         const sort = JSON.stringify([{
-          field: 'issue_date',
+          field: 'rank',
           ascending: false
         }]);
 
-        errorLogAjax.curl = '/error_logs';
-        errorLogAjax.params = {
+        menuListAjax.curl = '/memus';
+        menuListAjax.params = {
           page: currentPage,
-          limit: 20,
-          sort: sort
+          limit: currentLimit,
+          sort: sort,
+          query: query
         };
-
-        errorLogAjax.generateRequest();
+        menuListAjax.generateRequest();
       }
 
+      /**
+       * @description 에러 로그 조회 성공시
+       *********************
+       * @param {Object} event
+       */
       _errorLogResponsed(event) {
         event.detail.items.forEach(item => {
           item.src = `https://picsum.photos/200/200/?image=${Math.floor((Math.random() * 50) + 1)}`
@@ -226,12 +238,22 @@ Copyright © HatioLab Inc. All rights reserved.
         this.modifiedData = event.detail.items;
       }
 
+      /**
+       * @description 페이지 변경시
+       *********************
+       * @param {Object} event
+       */
       _pageChanged(event) {
         let page = event.detail.page;
         let limit = event.detail.limit;
-        this.getErrorLogs(page, limit);
+        this.searchMenuList(page, limit);
       }
 
+      /**
+       * @description 데이터 클릭시
+       *********************
+       * @param {Object} event
+       */
       _onDataListClick(event) {
         console.log(event);
       }

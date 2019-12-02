@@ -65,6 +65,7 @@ Copyright © HatioLab Inc. All rights reserved.
       value="{{mgrSiteUrl}}">
     </iron-localstorage>
 
+    <!-- 로그인 Ajax -->
     <sys-ajax
       id="sign-in-ajax"
       method="POST"
@@ -73,6 +74,7 @@ Copyright © HatioLab Inc. All rights reserved.
       on-sys-ajax-error="_signInError">
     </sys-ajax>
 
+    <!-- 로그인 폼 -->
     <iron-form id="login-form"
       on-iron-form-response="_handleResponseSuccess",
       on-iron-form-error="_handleResponseError"
@@ -93,6 +95,7 @@ Copyright © HatioLab Inc. All rights reserved.
       background-url="/images/mobile_brand.png">
     </portal-display>
 
+    <!-- 로그인 폼 -->
     <form
       id="input-form"
       on-keypress="_handlerKeypress">
@@ -205,7 +208,7 @@ Copyright © HatioLab Inc. All rights reserved.
           this.$['email-input'].value = btoa(this.getEmailInputValue());
           this.$['password-input'].value = this.sha256(this.getPasswordInputValue());
           this.$['requester-id-input'].value = this._uuidGen();
-          this.$['form'].action = `${JSON.parse(localStorage.getItem('setting.mgrSiteUrl'))}${this.loginPath}`;
+          this.$['form'].action = `${LOGIS_UTIL.getLocalStorage('setting.mgrSiteUrl')}${this.loginPath}`;
           this.$['login-form'].submit();
         }
       }
@@ -219,17 +222,11 @@ Copyright © HatioLab Inc. All rights reserved.
         let result = true;
 
         if (!this.getEmailInputValue()) {
-          openAlert({
-            title: this.loginFailureLabel,
-            message: this.loginNotTypedLabel
-          });
+          LOGIS_UTIL.showMessage(this.loginFailureLabel, this.loginNotTypedLabel);
           result = false;
 
         } else if (!this.getPasswordInputValue()) {
-          openAlert({
-            title: this.loginFailureLabel,
-            message: this.passwordNotTypedLabel
-          });
+          LOGIS_UTIL.showMessage(this.loginFailureLabel, this.passwordNotTypedLabel);
           result = false;
         }
 
@@ -259,13 +256,7 @@ Copyright © HatioLab Inc. All rights reserved.
           this._reqSignIn(this._computeReqUrl(siteList[0]), siteList[0].id);
 
         } else {
-          openAlert({
-            title: t('error.BASEURL_ERROR'),
-            message: t('text.not_mgr_site_ip'),
-            confirmCallback: () => {
-              this._moveToSetting();
-            }
-          })
+          LOGIS_UTIL.showMessage(t('error.BASEURL_ERROR'), t('text.not_mgr_site_ip'), this._moveToSetting);
         }
       }
 
@@ -276,26 +267,14 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _checkUserStatus(userInfo) {
         const status = userInfo.status;
-        let title;
-        let message;
 
         switch (status) {
           case 'password_change':
-            title = t('title.password_need_change');
-            message = t('text.ask_password_change');
-            openAlert({
-              title: title,
-              message: message
-            });
+            LOGIS_UTIL.showMessage(t('title.password_need_change'), t('text.ask_password_change'));
             break;
 
           case 'password_expired':
-            title = t('title.password_expired');
-            message = t('text.ask_password_extend');
-            openAlert({
-              title: title,
-              message: message
-            });
+            LOGIS_UTIL.showMessage(t('title.password_expired'), t('text.ask_password_extend'));
             break;
         };
       }
@@ -309,7 +288,7 @@ Copyright © HatioLab Inc. All rights reserved.
       _computeReqUrl(selectedSite) {
         const prodMode = selectedSite['production_mode'];
         const siteUrl = selectedSite.subdomain;
-        return prodMode ? `http://${siteUrl}/rest` : JSON.parse(localStorage.getItem('setting.mgrSiteUrl'));
+        return prodMode ? `http://${siteUrl}/rest` : LOGIS_UTIL.getLocalStorage('setting.mgrSiteUrl');
       }
 
       /**
@@ -386,10 +365,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} event
        */
       _signInError(event) {
-        openAlert({
-          title: this.loginFailureLabel,
-          message: t('error.please_check_site_info')
-        });
+        LOGIS_UTIL.showMessage(this.loginFailureLabel, t('error.please_check_site_info'));
       }
 
       /**
@@ -398,7 +374,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {String} url
        */
       setBaseUrl(url) {
-        localStorage.setItem('setting.baseUrl', JSON.stringify(url));
+        LOGIS_UTIL.setLocalStorage('setting.baseUrl', url);
         document.dispatchEvent(new CustomEvent('base-url-changed', {
           detail: url
         }));
@@ -421,12 +397,11 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _handleResponseError(event) {
         this.$['submit-btn'].disabled = false;
-        var response = event.detail.request.xhr.response
+        var response = event.detail.request.xhr.response;
+
         if (response) {
-          openAlert({
-            title: this.loginFailureLabel,
-            message: response.msg ? response.msg : response.message
-          });
+          let msg = response.msg ? response.msg : response.message;
+          LOGIS_UTIL.showMessage(this.loginFailureLabel, msg);
         }
       }
 

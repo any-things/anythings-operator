@@ -225,11 +225,13 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * @description return 송장 번호 필드 문자 제한 수 인풋
+       * @description 송장 번호 필드 문자 제한 수 인풋 리턴
        ******************
+       * @return 송장 번호 필드 문자 제한 수
        */
       _getInvoiceFieldSubstrInput() {
         return this.$['invoice-field-substr-input'];
+        //return LOGIS_UTIL.getInvoiceFieldSubstr();
       }
 
       /**
