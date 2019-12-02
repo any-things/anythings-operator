@@ -387,11 +387,7 @@ Copyright © HatioLab Inc. All rights reserved.
           execJobMappingAjax.generateRequest();
 
         } catch (error) {
-          openAlert({
-            title: error.title,
-            message: error.message,
-            confirmCallback: error.confirmCallback
-          });
+          LOGIS_UTIL.showMessage(error.title, error.message, error.confirmCallback.bind(this));
         }
       }
 

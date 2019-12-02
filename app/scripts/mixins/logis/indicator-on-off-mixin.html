@@ -76,17 +76,12 @@ Copyright © HatioLab Inc. All rights reserved.
        *******************
        */
       _indOnRequest() {
-        openConfirm({
-          title: t('button.led_on'),
-          message: t('text.Sure to process'),
-          confirmCallback: () => {
-            const rackCd = LOGIS_UTIL.getEquipCd();
-            const indOnAjax = this._getIndOnAjax();
-            indOnAjax.curl = `/kiosk_process/restore_mpi/${rackCd}`;
-            indOnAjax.generateRequest();
-          },
-          cancelCallback: () => {}
-        });
+        LOGIS_UTIL.showConfirm(t('button.led_on'), t('text.Sure to process'), null, function() {
+          const equipCd = LOGIS_UTIL.getEquipCd();
+          const indOnAjax = this._getIndOnAjax();
+          indOnAjax.curl = `/kiosk_process/restore_mpi/${equipCd}`;
+          indOnAjax.generateRequest();
+        }.bind(this));
       }
 
       /**
@@ -94,17 +89,12 @@ Copyright © HatioLab Inc. All rights reserved.
        *******************
        */
       _indOffRequest() {
-        openConfirm({
-          title: t('button.led_off'),
-          message: t('text.Sure to process'),
-          confirmCallback: () => {
-            const rackCd = LOGIS_UTIL.getEquipCd();
-            const indOffAjax = this._getIndOffAjax();
-            indOffAjax.curl = `/kiosk_process/ind_off_all/${rackCd}`;
-            indOffAjax.generateRequest();
-          },
-          cancelCallback: () => {}
-        });
+        LOGIS_UTIL.showConfirm(t('button.led_off'), t('text.Sure to process'), null, function() {
+          const equipCd = LOGIS_UTIL.getEquipCd();
+          const indOffAjax = this._getIndOffAjax();
+          indOffAjax.curl = `/kiosk_process/ind_off_all/${equipCd}`;
+          indOffAjax.generateRequest();
+        }.bind(this));
       }
     };
   };

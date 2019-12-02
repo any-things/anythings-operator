@@ -625,13 +625,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * alert 출력을 위한 공통 function
        */
       _commonAlert(message) {
-        openAlert({
-          title: t('error.VALIDATION_ERROR'),
-          message: message,
-          confirmCallback: () => {
-            this._getBoxIdInput().select()
-          }
-        });
+        LOGIS_UTIL.showMessage(t('error.VALIDATION_ERROR'), message, this._getBoxIdInput().select.bind(this));
       }
 
       /**

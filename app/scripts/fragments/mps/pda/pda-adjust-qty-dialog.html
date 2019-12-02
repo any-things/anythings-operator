@@ -71,7 +71,9 @@ Copyright © HatioLab Inc. All rights reserved.
 
   <script>
     class PdaAdjustQtyDialog extends Polymer.Element {
-      static get is() { return 'pda-adjust-qty-popup' }
+      static get is() {
+        return 'pda-adjust-qty-popup'
+      }
 
       static get properties() {
         return {
@@ -126,11 +128,9 @@ Copyright © HatioLab Inc. All rights reserved.
       adjustQty() {
         const adjustQty = parseInt(this._getAdjustQtyInput().value);
         const currentQty = parseInt(this._getCurrentQtyInput().value);
-        if(adjustQty >= currentQty) {
-          openAlert({
-            title: t('text.invalid_value'),
-            message: t('text.adjust_value_invalid')
-          });
+
+        if (adjustQty >= currentQty) {
+          LOGIS_UTIL.showMessage(t('text.invalid_value'), t('text.adjust_value_invalid'));
         } else {
           const adjustQtyAjax = this._getAdjustQtyAjax();
           adjustQtyAjax.curl = `/tablet_process/split_job/${this.jobId}`;

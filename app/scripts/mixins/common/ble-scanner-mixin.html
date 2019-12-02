@@ -66,13 +66,13 @@ Copyright © HatioLab Inc. All rights reserved.
           const currentPage = event.detail.currentPage;
           const prevPage = event.detail.prevPage;
 
-          if(!this.isCurrentPage(currentPage) && 'ble' in window) {
+          if (!this.isCurrentPage(currentPage) && 'ble' in window) {
             this.isConnected().then(isConnected => {
-              if(isConnected) this.disconnectDevice();
+              if (isConnected) this.disconnectDevice();
             });
           } else if ('ble' in window) {
             this.isConnected().then(isConnected => {
-              if(!isConnected) this.connectDevice();
+              if (!isConnected) this.connectDevice();
             })
           }
         });
@@ -98,48 +98,48 @@ Copyright © HatioLab Inc. All rights reserved.
        ****************************
        */
       connectDevice() {
-        if(this.deviceId) {
+        if (this.deviceId) {
           this.isEnabled()
-              .then(isEnabled => {
-                if(isEnabled) {
-                  return this.isConnected();
-                } else {
-                  document.dispatchEvent(new CustomEvent('show-toast', {
-                    detail:{
-                      type: t('error.SETTING_ERROR'),
-                      message: t('text.bluetooth_is_not_on')
-                    }
-                  }));
+            .then(isEnabled => {
+              if (isEnabled) {
+                return this.isConnected();
+              } else {
+                document.dispatchEvent(new CustomEvent('show-toast', {
+                  detail: {
+                    type: t('error.SETTING_ERROR'),
+                    message: t('text.bluetooth_is_not_on')
+                  }
+                }));
+              }
+            })
+            .then(isConnected => {
+              if (isConnected) {
+                document.dispatchEvent(new CustomEvent('show-toast', {
+                  detail: {
+                    type: t('title.connect_scanner'),
+                    message: t('text.bluetooth_scanner_connected')
+                  }
+                }));
+
+              } else {
+                this.stopScanDevices();
+
+                if (this.beforeConnect && typeof this.beforeConnect === 'function') {
+                  this.beforeConnect();
                 }
-              })
-              .then(isConnected => {
-                if(isConnected) {
+
+                ble.connect(this.deviceId, () => {
+                  this.startNotification();
                   document.dispatchEvent(new CustomEvent('show-toast', {
-                    detail:{
+                    detail: {
                       type: t('title.connect_scanner'),
                       message: t('text.bluetooth_scanner_connected')
                     }
                   }));
-
-                } else {
-                  this.stopScanDevices();
-
-                  if(this.beforeConnect && typeof this.beforeConnect === 'function') {
-                    this.beforeConnect();
-                  }
-
-                  ble.connect(this.deviceId, () => {
-                    this.startNotification();
-                    document.dispatchEvent(new CustomEvent('show-toast',{
-                      detail:{
-                        type: t('title.connect_scanner'),
-                        message: t('text.bluetooth_scanner_connected')
-                      }
-                    }));
-                    if(this.afterConnect && typeof this.afterConnect === 'function') this.afterConnect();
-                  });
-                }
-              })
+                  if (this.afterConnect && typeof this.afterConnect === 'function') this.afterConnect();
+                });
+              }
+            })
         } else {
           this.scanDevices()
         }
@@ -152,7 +152,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       scanDevices() {
         ble.startScan([], device => {
-          if(this.deviceFound && typeof this.deviceFound === 'function') {
+          if (this.deviceFound && typeof this.deviceFound === 'function') {
             this.deviceFound(device);
           } else {
             throw new Error('deviceFound callback function is not defined.');
@@ -173,16 +173,16 @@ Copyright © HatioLab Inc. All rights reserved.
        ****************************
        */
       disconnectDevice() {
-        if(this.beforeDisconnect && typeof this.beforeDisconnect === 'function') this.beforeDisconnect();
+        if (this.beforeDisconnect && typeof this.beforeDisconnect === 'function') this.beforeDisconnect();
 
         ble.disconnect(this.deviceId, () => {
-          document.dispatchEvent(new CustomEvent('show-toast',{
-            detail:{
+          document.dispatchEvent(new CustomEvent('show-toast', {
+            detail: {
               type: t('title.disconnect_scanner'),
               message: t('text.bluetooth_scanner_disconnected')
             }
           }));
-          if(this.afterDisconnect && typeof this.afterDisconnect === 'function') this.afterDisconnect();
+          if (this.afterDisconnect && typeof this.afterDisconnect === 'function') this.afterDisconnect();
         });
       }
 
@@ -194,7 +194,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       startNotification() {
         ble.startNotification(this.deviceId, this.serviceUUID, this.characteristicUUID, buffer => {
-          if(this.scanned && typeof this.scanned === 'function') {
+          if (this.scanned && typeof this.scanned === 'function') {
             this.scanned(String.fromCharCode.apply(null, new Uint8Array(buffer)));
           } else {
             throw new Error('scanned callback function is not defined');
@@ -246,11 +246,8 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {String} fail 에러 메시지를 리턴함
        */
       _failCallback(fail) {
-        if(typeof fail === 'string' && fail.length > 0 && fail.toLowerCase().indexOf('location service') >= 0) {
-          openAlert({
-            title: t('error.SETTING_ERROR'),
-            message: t('text.location_service_is_not_on')
-          });
+        if (typeof fail === 'string' && fail.length > 0 && fail.toLowerCase().indexOf('location service') >= 0) {
+          LOGIS_UTIL.showMessage(t('error.SETTING_ERROR'), t('text.location_service_is_not_on'));
         }
 
         throw new Error(fail);

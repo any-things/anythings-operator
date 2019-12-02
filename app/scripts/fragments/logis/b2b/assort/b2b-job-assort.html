@@ -581,10 +581,7 @@ Copyright © HatioLab Inc. All rights reserved.
           inputAjax.curl = `/tablet_process/input_sku/${rackCd}/${sideCd}/${zoneCd}/${comCd}/${skuCd}`;
           inputAjax.generateRequest();
         } catch (error) {
-          openAlert({
-            title: t('error.VALIDATION_ERROR'),
-            message: error
-          });
+          LOGIS_UTIL.showMessage(t('error.VALIDATION_ERROR'), error);
         }
       }
 

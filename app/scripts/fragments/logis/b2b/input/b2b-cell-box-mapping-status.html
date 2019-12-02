@@ -78,7 +78,9 @@ Copyright © HatioLab Inc. All rights reserved.
 
   <script>
     class B2BCellBoxMappingStatus extends BarcodeScannerMixin(Polymer.Element) {
-      static get is() { return 'b2b-cell-box-mapping-status' }
+      static get is() {
+        return 'b2b-cell-box-mapping-status'
+      }
 
       static get properties() {
         return {
@@ -102,24 +104,26 @@ Copyright © HatioLab Inc. All rights reserved.
             type: Array,
             value: () => {
               return [{
-                display: t('label.location'),
-                fieldname: 'loc_cd'
-              }, {
-                display: t('label.bucket_cd'),
-                fieldname: 'box_id',
-                style: {
-                  textAlign: 'center'
+                  display: t('label.location'),
+                  fieldname: 'loc_cd'
+                }, {
+                  display: t('label.bucket_cd'),
+                  fieldname: 'box_id',
+                  style: {
+                    textAlign: 'center'
+                  }
                 }
-              }/*, {
-                display: t('menu.BucketAssign'),
-                fieldname: 'result',
-                displayCallback: value => {
-                  return t('label.success');
-                },
-                style: {
-                  textAlign: 'center'
-                }
-              }*/]
+                /*, {
+                                display: t('menu.BucketAssign'),
+                                fieldname: 'result',
+                                displayCallback: value => {
+                                  return t('label.success');
+                                },
+                                style: {
+                                  textAlign: 'center'
+                                }
+                              }*/
+              ]
             }
           },
 
@@ -135,7 +139,7 @@ Copyright © HatioLab Inc. All rights reserved.
       connectedCallback() {
         super.connectedCallback();
         document.addEventListener(`alert-closed-at-${location.hash.replace('#/', '')}`, event => {
-          if(!event.detail.hasCallback) {
+          if (!event.detail.hasCallback) {
             this._initialSetup();
           }
         });
@@ -146,7 +150,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * loc-cd 바코드 스캔시 bucket-cd 필드로 이동
        */
       _locInputKeypress(event) {
-        if(event.charCode === 13) { // press enter
+        if (event.charCode === 13) { // press enter
           this.$['bucket-cd'].select();
         }
       }
@@ -156,7 +160,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * bucket-cd 바코드 스캔시 job mapping trasaction 시도
        */
       _bucketInputKeypress(event) {
-        if(event.charCode === 13) {
+        if (event.charCode === 13) {
           this.executeJobMapping();
         }
       }
@@ -173,11 +177,7 @@ Copyright © HatioLab Inc. All rights reserved.
           execJobMappingAjax.curl = `/pda_process/das/loc_box_mapping/${locCd}/${boxId}`;
           execJobMappingAjax.generateRequest();
         } catch (error) {
-          openAlert({
-            title: error.title,
-            message: error.message,
-            confirmCallback: error.confirmCallback
-          });
+          LOGIS_UTIL.showMessage(error.title, error.message, error.confirmCallback.bind(this));
         }
       }
 
@@ -187,13 +187,13 @@ Copyright © HatioLab Inc. All rights reserved.
       validateBeforeMapping() {
         let locCd = this.$['loc-cd'].value;
         let bucketCd = this.$['bucket-cd'].value;
-        if(!locCd) {
+        if (!locCd) {
           throw {
             title: t('error.VALIDATION_ERROR'),
             message: t('error.loc_cd_invalid'),
             confirmCallback: this._clearView
           }
-        } else if(!bucketCd) {
+        } else if (!bucketCd) {
           throw {
             title: t('error.VALIDATION_ERROR'),
             message: t('error.bucket_cd_invalid'),
@@ -220,7 +220,7 @@ Copyright © HatioLab Inc. All rights reserved.
         const maxCnt = 20;
         let tempItems = this.data;
         tempItems.unshift(newItem);
-        if(tempItems.length > maxCnt) {
+        if (tempItems.length > maxCnt) {
           tempItems.pop();
         }
 

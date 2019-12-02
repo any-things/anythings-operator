@@ -66,9 +66,11 @@ Copyright © HatioLab Inc. All rights reserved.
         outline:none
       }
     </style>
+
     <div id="modal">
       <div id="msg-box">
         <div id="title">[[title]]</div>
+        
         <dom-if if="[[message.length]]">
           <template>
             <div id="message">
@@ -76,67 +78,111 @@ Copyright © HatioLab Inc. All rights reserved.
               <span id="critical-message">[[criticalMessage]]</span>
             </div>
           </template>
-        </dom-if>
+  </dom-if>
 
-        <div id="button-container">
-          <dom-if if="[[showCancelBtn]]">
-            <template>
+  <div id="button-container">
+    <dom-if if="[[showCancelBtn]]">
+      <template>
               <button id="cancel-btn" on-click="cancelBtnClicked">[[cancelText]]</button>
             </template>
-          </dom-if>
+    </dom-if>
 
-          <button id="confirm-btn" on-click="confirmBtnClicked">[[confirmText]]</button>
-        </div>
-      </div>
-    </div>
+    <button id="confirm-btn" on-click="confirmBtnClicked">[[confirmText]]</button>
+  </div>
+  </div>
+  </div>
   </template>
 
   <script>
     class MsgAlert extends Polymer.Element {
-      static get is() { return 'msg-alert' }
+      static get is() {
+        return 'msg-alert'
+      }
       static get properties() {
         return {
+          /**
+           * @description 메시지 타이틀
+           ***********************
+           * @type {String} 
+           */
           title: {
             type: String
           },
 
+          /**
+           * @description 표시 여부
+           ***********************
+           * @type {Boolean} 
+           */
           visible: {
             type: Boolean,
             value: false
           },
 
+          /**
+           * @description 메시지
+           ***********************
+           * @type {String} 
+           */
           message: {
             type: String,
             value: ''
           },
 
           /**
-           * 메시지 강조 표시 여부
+           * @description 메시지 강조 표시 여부
+           ***********************
+           * @type {Boolean} 
            */
           critical: {
             type: Boolean,
             value: false
           },
 
+          /**
+           * @description Normal 메시지
+           ***********************
+           * @type {String} 
+           */
           normalMessage: {
             type: String,
             value: ''
           },
 
+          /**
+           * @description Critical 메시지
+           ***********************
+           * @type {String} 
+           */
           criticalMessage: {
             type: String,
             value: ''
           },
 
+          /**
+           * @description 취소 버튼 표시 여부
+           ***********************
+           * @type {Boolean} 
+           */
           showCancelBtn: {
             type: Boolean,
             value: false
           },
 
+          /**
+           * @description 취소 버튼에 표시할 문자열
+           ***********************
+           * @type {Boolean} 
+           */
           cancelText: {
             type: String
           },
 
+          /**
+           * @description 확인 버튼에 표시할 문자열
+           ***********************
+           * @type {Boolean} 
+           */
           confirmText: {
             type: String
           }
@@ -150,14 +196,14 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 메시지 변경 시 내용 강조 표시 여부
+       * @description 메시지 변경 시 내용 강조 표시 여부
+       ************************
+       * @param {String} message
+       * @param {Boolean} critical
        */
       _messageChanged(message, critical) {
-        if(message) {
-          this.visible = true;
-        } else {
-          this.visible = false;
-        }
+        this.visible = message ? true : false;
+
         if (critical) {
           this.criticalMessage = message;
           this.normalMessage = '';
@@ -168,18 +214,22 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 컴퍼넌트 로드 완료 후
+       * @description 컴퍼넌트 로드 완료 후
        * window 객체에 openAlert, openConfirm 등록
+       ****************************
        */
       connectedCallback() {
         super.connectedCallback();
+
         window.MsgAlert = this;
         window.openAlert = this.openAlert.bind(this);
         window.openConfirm = this.openConfirm.bind(this);
       }
 
       /**
-       * deviceType에 따라 alert 처리
+       * @description 장비 유형에 따라 alert 처리
+       *****************************
+       * @param {Object} opt
        */
       openAlert(opt) {
         try {
@@ -189,12 +239,19 @@ Copyright © HatioLab Inc. All rights reserved.
         }
       }
 
+      /**
+       * @description 모바일용  처리
+       *****************************
+       * @param {Object} opt
+       */
       mobileAlert(opt) {
         this.message = opt.message;
+
         navigator.notification.alert(opt.message, () => {
-          if(opt.confirmCallback) {
+          if (opt.confirmCallback) {
             opt.confirmCallback();
           }
+
           this.message = '';
           document.dispatchEvent(new CustomEvent(`alert-closed-at-${location.hash.replace('#/', '')}`, {
             detail: {
@@ -202,20 +259,27 @@ Copyright © HatioLab Inc. All rights reserved.
             }
           }));
         }, opt.title, opt.confirmText);
+
         // 옵션이 있으면 소리 재생
         switch (opt.sound) {
-          case 'info': {
-            SOUND.playInfoSound();
-          } break;
-          case 'error': {
-            SOUND.playErrorSound();
-          } break;
+          case 'info':
+            {
+              SOUND.playInfoSound();
+            }
+            break;
+          case 'error':
+            {
+              SOUND.playErrorSound();
+            }
+            break;
         }
       }
 
       /**
-       * 웹에서의 타입의 alert
+       * @description 웹 타입의 alert
        * alert은 confirm button, confirm callback 만 사용할 수 있음
+       ******************************
+       * @params {Object} opt
        */
       webAlert(opt) {
         this.title = opt.title;
@@ -226,19 +290,26 @@ Copyright © HatioLab Inc. All rights reserved.
         this.confirmCallback = opt.confirmCallback;
         this.$['modal'].style.display = 'grid';
         this.blurOtherElement();
+
         // 옵션이 있으면 소리 재생
         switch (opt.sound) {
-          case 'info': {
-            SOUND.playInfoSound();
-          } break;
-          case 'error': {
-            SOUND.playErrorSound();
-          } break;
+          case 'info':
+            {
+              SOUND.playInfoSound();
+            }
+            break;
+          case 'error':
+            {
+              SOUND.playErrorSound();
+            }
+            break;
         }
       }
 
       /**
-       * deviceType에 따라 confirm 처리
+       * @description 장비 유형에 따라 confirm 처리
+       ******************************
+       * @params {Object} opt
        */
       openConfirm(opt) {
         try {
@@ -248,6 +319,11 @@ Copyright © HatioLab Inc. All rights reserved.
         }
       }
 
+      /**
+       * @description 모바일 용 confirm 처리
+       ******************************
+       * @params {Object} opt
+       */
       mobileConfirm(opt) {
         this.title = opt.title;
         this.message = opt.message;
@@ -257,12 +333,12 @@ Copyright © HatioLab Inc. All rights reserved.
 
         navigator.notification.confirm(opt.message, (event) => {
           let selectedBtn = event;
-          if(selectedBtn === 1) { // confirm
-            if(opt.confirmCallback) {
+          if (selectedBtn === 1) { // confirm
+            if (opt.confirmCallback) {
               opt.confirmCallback();
             }
-          } else if(selectedBtn === 2) {
-            if(opt.cancelCallback) {
+          } else if (selectedBtn === 2) {
+            if (opt.cancelCallback) {
               opt.cancelCallback();
             }
           }
@@ -270,8 +346,10 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * kiosk 타입의 confirm
+       * @description KIOSK 장비 유형인 경우 Confirm
        * confirm은 confirm butt, confirm callback cancel button, cancel callback을 사용할 수 있음
+       ******************************
+       * @params {Object} opt
        */
       webConfirm(opt) {
         this.title = opt.title;
@@ -287,14 +365,16 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 현재 화면의 버튼에 포커스를 이동해 다른 엘리먼트에 있을 수 있는 포커스를 제거함
+       * @description 현재 화면의 버튼에 포커스를 이동해 다른 엘리먼트에 있을 수 있는 포커스를 제거함
+       *******************************
        */
       blurOtherElement() {
         this.$['confirm-btn'].focus();
       }
 
       /**
-       * 메시지 박스 가리고 옵션값 제거
+       * @description 메시지 박스 가리고 옵션값 제거
+       *******************************
        */
       close() {
         this.$['modal'].style.display = 'none';
@@ -302,26 +382,28 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * kiosk 타입의 cancel button click event handler
+       * @description kiosk 타입의 cancel button click event handler
        * 메시지 박스를 가리고 cancel callback이 있다면 실행함
        * resetOpt를 통해 초기화 되었던 옵션 값들을 제거
+       *******************************
        */
       cancelBtnClicked() {
         this.$['modal'].style.display = 'none';
-        if(this.cancelCallback) {
+        if (this.cancelCallback) {
           this.cancelCallback();
         }
         this.resetOpt();
       }
 
       /**
-       * kiosk 타입의 confirm button click event handler
+       * @description kiosk 타입의 confirm button click event handler
        * 메시지 박스를 가리고 confirm callback이 있다면 실행함
        * resetOpt를 통해 초기화 되었던 옵션 값들을 제거
+       *******************************
        */
       confirmBtnClicked() {
         this.$['modal'].style.display = 'none';
-        if(this.confirmCallback) {
+        if (this.confirmCallback) {
           this.confirmCallback();
         }
 
@@ -335,7 +417,8 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 옵션 값들을 제거
+       * @description 옵션 값들을 제거
+       *******************************
        */
       resetOpt() {
         this.title = '';

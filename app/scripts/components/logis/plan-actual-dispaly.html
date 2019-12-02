@@ -44,20 +44,22 @@ Copyright © HatioLab Inc. All rights reserved.
           <span>[[labelPickedQty]]/[[labelPickQty]]</span>
           <span class="qty">[[pickedQty]] / [[pickQty]]</span>
         </template>
-      </dom-if>
+  </dom-if>
 
-      <dom-if if="[[isOneQty]]">
-        <template>
+  <dom-if if="[[isOneQty]]">
+    <template>
           <span>[[labelPickedQty]]</span>
           <span class="qty">[[pickedQty]]</span>
         </template>
-      </dom-if>
-    </div>
+  </dom-if>
+  </div>
   </template>
 
   <script>
     class PlanActualDisplay extends Polymer.Element {
-      static get is() { return 'plan-actual-display' }
+      static get is() {
+        return 'plan-actual-display'
+      }
       static get properties() {
         return {
           data: {
@@ -71,15 +73,21 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           labelCustCnt: {
-            value: () => { return t('label.cust_cnt'); }
+            value: () => {
+              return t('label.cust_cnt');
+            }
           },
 
           labelPickedQty: {
-            value: () => { return t('label.picked_qty'); }
+            value: () => {
+              return t('label.picked_qty');
+            }
           },
 
           labelPickQty: {
-            value: () => { return t('label.pick_qty'); }
+            value: () => {
+              return t('label.pick_qty');
+            }
           },
 
           isOneQty: {
@@ -111,7 +119,6 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * 컴퍼넌트 로드 완료 후
-       * window 객체에 openAlert, openConfirm 등록
        */
       connectedCallback() {
         super.connectedCallback();

@@ -979,13 +979,7 @@ Copyright © HatioLab Inc. All rights reserved.
         try {
           this.validateBeforeRequest();
         } catch (error) {
-          openAlert({
-            title: t('error.VALIDATION_ERROR'),
-            message: error,
-            confirmCallback: () => {
-              this._initFocus();
-            }
-          });
+          LOGIS_UTIL.showMessage(t('error.VALIDATION_ERROR'), error, this._initFocus.bind(this));
           return;
         }
 

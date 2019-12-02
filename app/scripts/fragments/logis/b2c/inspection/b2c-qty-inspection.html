@@ -718,7 +718,7 @@ Copyright © HatioLab Inc. All rights reserved.
           ajaxLabel.curl = '/kiosk_process/dps/inspection/by_qty/ready/by_box/' + inputType + '/' + this.bucketCd;
           ajaxLabel.generateRequest();
         } catch (error) {
-          this.showMessage(error.title, error.message, error.confirmCallback);
+          LOGIS_UTIL.showMessage(error.title, error.message, error.confirmCallback);
         }
       }
 
@@ -742,7 +742,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       onInspectionError(event) {
         this.clearView();
-        this.showMessage(event.detail.code, event.detail.msg, this.focusBucketInput.bind(this))
+        LOGIS_UTIL.showMessage(event.detail.code, event.detail.msg, this.focusBucketInput.bind(this));
       }
 
       /**
@@ -759,7 +759,7 @@ Copyright © HatioLab Inc. All rights reserved.
           ajaxLabel.curl = '/kiosk_process/dps/inspection/by_qty/ready/by_order/' + this.orderId;
           ajaxLabel.generateRequest();
         } catch (error) {
-          this.showMessage(error.title, error.message, error.confirmCallback);
+          LOGIS_UTIL.showMessage(error.title, error.message, error.confirmCallback);
         }
       }
 
@@ -787,7 +787,7 @@ Copyright © HatioLab Inc. All rights reserved.
         // this.items (검수 대상 리스트)가 존재 하지 않는다면 alert
         if (!this.items || this.items.length == 0) {
           e.currentTarget.value = '';
-          this.showMessage(t('error.VALIDATION_ERROR'), t('text.target_not_exist'), this.focusBucketInput.bind(this));
+          LOGIS_UTIL.showMessage(t('error.VALIDATION_ERROR'), t('text.target_not_exist'), this.focusBucketInput.bind(this));
           return;
         }
 
@@ -798,7 +798,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
         // found (검수 대상 리스트 중 입력한 상품 코드와 일치하는 것)가 없다면 alert
         if (!found || found.length == 0) {
-          this.showMessage(t('error.invalid_sku_cd'), t('text.scanned_sku_code_not_exist'), this.focusSkuBarcdInput.bind(this));
+          LOGIS_UTIL.showMessage(t('error.invalid_sku_cd'), t('text.scanned_sku_code_not_exist'), this.focusSkuBarcdInput.bind(this));
           return;
         }
 
@@ -814,7 +814,7 @@ Copyright © HatioLab Inc. All rights reserved.
             }
 
             if (item.diff_qty == 0) {
-              this.showMessage(t('error.out_of_valid_qty'), t('text.confirm_qty_out_of_item_qty'), this.focusSkuBarcdInput.bind(this));
+              LOGIS_UTIL.showMessage(t('error.out_of_valid_qty'), t('text.confirm_qty_out_of_item_qty'), this.focusSkuBarcdInput.bind(this));
               errorFlag = true;
               return null;
             }
@@ -1110,12 +1110,12 @@ Copyright © HatioLab Inc. All rights reserved.
         }
         // 2. 하나라도 검수한 다음 검수 완료 버튼을 누르면 송장 분할--> 박스는 제투입하지 않을 것이기에 박스가 전체 완료되어야 함.
         // else if(this.confirmSkuPcsQty > 0 && this.pickedSkuPcsQty > this.confirmSkuPcsQty) {
-        //   this.showMessage(t('button.confirm'), '송장 분할하시겠습니까?', this.splitBox.bind(this));
+        //   LOGIS_UTIL.showMessage(t('button.confirm'), '송장 분할하시겠습니까?', this.splitBox.bind(this));
         //
         // }
         // 3. 검수 완료되지 않았다면 에러 메시지 표시
         else {
-          this.showMessage(t('button.confirm'), t('text.inspection_not_finished_yet'), this.focusBucketInput.bind(this));
+          LOGIS_UTIL.showMessage(t('button.confirm'), t('text.inspection_not_finished_yet'), this.focusBucketInput.bind(this));
         }
         // try {
         //   this.validateBeforeComplete();
@@ -1123,7 +1123,7 @@ Copyright © HatioLab Inc. All rights reserved.
         //   completeAjax.curl = '/kiosk_process/dps/inspection/by_qty/finish/' + this.currentOrderId;
         //   completeAjax.generateRequest();
         // } catch (error) {
-        //   this.showMessage(error.title, error.message, error.confirmCallback);
+        //   LOGIS_UTIL.showMessage(error.title, error.message, error.confirmCallback);
         // }
       }
 
@@ -1210,7 +1210,7 @@ Copyright © HatioLab Inc. All rights reserved.
           };
           reprintAjax.generateRequest();
         } else {
-          this.showMessage(t('button.confirm'), t('text.reprint_error_msg_1'), this.focusBucketInput.bind(this));
+          LOGIS_UTIL.showMessage(t('button.confirm'), t('text.reprint_error_msg_1'), this.focusBucketInput.bind(this));
         }
       }
 
@@ -1223,7 +1223,7 @@ Copyright © HatioLab Inc. All rights reserved.
           this._inspectionResultChanged();
         } else {
           // 재발행 실패했을 경우
-          this.showMessage(t('button.confirm'), t('text.reprint_event_listener_error'), this.focusBucketInput.bind(this));
+          LOGIS_UTIL.showMessage(t('button.confirm'), t('text.reprint_event_listener_error'), this.focusBucketInput.bind(this));
         }
       }
 
@@ -1243,7 +1243,7 @@ Copyright © HatioLab Inc. All rights reserved.
       _splitBoxResponsed(event) {
         var newBox = event.detail;
         this.resetAll();
-        this.showMessage(t('button.confirm'), t('text.split_invoice_complete'), function() {
+        LOGIS_UTIL.showMessage(t('button.confirm'), t('text.split_invoice_complete'), function() {
           this.refreshInspection(newBox.box_id);
         }.bind(this));
       }
@@ -1255,20 +1255,6 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _handleInspectionMethodClick(e) {
         this.inspectionMethodValue = e.currentTarget.value;
-      }
-
-      /**
-       * Warning 팝업 표시
-       ******************
-       * @param {String} title
-       * @param {String} message
-       */
-      showMessage(title, message, confirmCallback) {
-        openAlert({
-          title: title,
-          message: message,
-          confirmCallback: confirmCallback
-        });
       }
 
       /**

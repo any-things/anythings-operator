@@ -276,10 +276,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       cancelConfirmation() {
         if (!this.selectedItem) {
-          openAlert({
-            title: t('title.info'),
-            message: t('text.NOTHING_SELECTED')
-          })
+          LOGIS_UTIL.showMessage(t('title.info'), t('text.NOTHING_SELECTED'));
           return;
         }
 

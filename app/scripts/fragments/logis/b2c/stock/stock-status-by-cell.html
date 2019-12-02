@@ -486,21 +486,6 @@ Copyright © HatioLab Inc. All rights reserved.
           combobox.removeChild(combobox.firstChild);
         }
       }
-
-      /**
-       * @description 메시지 출력
-       **************************
-       * @param {String} title
-       * @param {String} message
-       * @param {Function} confirmCallback
-       */
-      showMessage(title, message, confirmCallback) {
-        openAlert({
-          title: title,
-          message: message,
-          confirmCallback: confirmCallback
-        });
-      }
     }
     customElements.define(StockStatusByCell.is, StockStatusByCell);
   </script>

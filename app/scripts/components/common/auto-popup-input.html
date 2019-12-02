@@ -213,13 +213,7 @@ Copyright © HatioLab Inc. All rights reserved.
             if (this.customInputValidation && this.customInputValidation === 'function') this.customAjaxHandler(event.currentTarget.value);
             this._triggerAjax();
           } else {
-            openAlert({
-              title: t('error.VALIDATION_ERROR'),
-              message: t('text.invalid_value'),
-              confirmCallback: () => {
-                this.select();
-              }
-            })
+            LOGIS_UTIL.showMessage(t('error.VALIDATION_ERROR'), t('text.invalid_value'), this.select.bind(this));
           }
         }
       }

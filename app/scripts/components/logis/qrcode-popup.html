@@ -192,34 +192,28 @@ Copyright © HatioLab Inc. All rights reserved.
       doTransaction() {
         try {
           this.validateBeforeTrx();
-          openConfirm({
-            title: this.title,
-            message: t('text.Sure to process'),
-            confirmCallback: () => {
-              const trxAjax = this.$['trx-ajax'];
-              let rackCd = LOGIS_UTIL.getEquipCd();
-              let sideCd = LOGIS_UTIL.getWorkSideCd();
 
-              if (this.actionType === 'mpi-off') {
-                trxAjax.curl = '/kiosk_process/mpi_off_all/' + rackCd;
-              } else if (this.actionType == 'batch-full-box') {
-                trxAjax.curl = '/kiosk_process/das/fullbox_all/' + rackCd + '/' + sideCd;
-              } else if (this.actionType == 'mpi-on-last') {
-                trxAjax.curl = '/kiosk_process/restore_mpi/' + rackCd;
-              }
+          LOGIS_UTIL.showConfirm(this.title, t('text.Sure to process'), function() {
+            this.initialSetup();
 
-              trxAjax.generateRequest();
-            },
-            cancelCallback: () => {
-              this.initialSetup();
+          }.bind(this), function() {
+            const trxAjax = this.$['trx-ajax'];
+            let equipCd = LOGIS_UTIL.getEquipCd();
+            let sideCd = LOGIS_UTIL.getWorkSideCd();
+
+            if (this.actionType === 'mpi-off') {
+              trxAjax.curl = '/kiosk_process/mpi_off_all/' + equipCd;
+            } else if (this.actionType == 'batch-full-box') {
+              trxAjax.curl = '/kiosk_process/das/fullbox_all/' + equipCd + '/' + sideCd;
+            } else if (this.actionType == 'mpi-on-last') {
+              trxAjax.curl = '/kiosk_process/restore_mpi/' + equipCd;
             }
-          })
+
+            trxAjax.generateRequest();
+          }.bind(this));
+
         } catch (error) {
-          openAlert({
-            title: error.title,
-            message: error.message,
-            confirmCallback: this.initialSetup.bind(this)
-          });
+          LOGIS_UTIL.showMessage(error.title, error.message, this.initialSetup.bind(this));
         }
       }
 

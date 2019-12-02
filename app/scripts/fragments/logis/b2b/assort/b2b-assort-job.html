@@ -607,14 +607,14 @@ Copyright © HatioLab Inc. All rights reserved.
         this.$['sku-nm'].value = skuInfo.sku_nm;
         this.$['com-cd'].value = comCd;
         this.$['box-in-qty'].value = skuInfo.box_in_qty;
-        const rackCd = LOGIS_UTIL.getEquipCd();
+        const equipCd = LOGIS_UTIL.getEquipCd();
         const sideCd = LOGIS_UTIL.getWorkSideCd();
-        this.doInputTransaction(rackCd, sideCd, comCd, skuCd);
+        this.doInputTransaction(equipCd, sideCd, comCd, skuCd);
 
         // if(this.currentMode === 'input-mode') {
-        //   this.doInputTransaction(rackCd, sideCd, comCd, skuCd);
+        //   this.doInputTransaction(equipCd, sideCd, comCd, skuCd);
         // } else if (this.currentMode === 'inspection-mode') {
-        //   this.doInspectTransaction(rackCd, sideCd, comCd, skuCd);
+        //   this.doInspectTransaction(equipCd, sideCd, comCd, skuCd);
         // }
         // this.doTransaction('input-sku-ajax', url);
       }
@@ -641,10 +641,10 @@ Copyright © HatioLab Inc. All rights reserved.
 
           if (comCd && skuCd) {
             const ajax = this.$['search-job-ajax'];
-            const rackCd = LOGIS_UTIL.getEquipCd();
+            const equipCd = LOGIS_UTIL.getEquipCd();
             const sideCd = LOGIS_UTIL.getWorkSideCd();
             let zoneCd = LOGIS_UTIL.getStationCd();
-            ajax.curl = `/pda_process/search_jobs/${rackCd}/${sideCd}/${zoneCd}/${comCd}/${skuCd}`;
+            ajax.curl = `/pda_process/search_jobs/${equipCd}/${sideCd}/${zoneCd}/${comCd}/${skuCd}`;
             ajax.generateRequest();
           }
         }
@@ -671,54 +671,42 @@ Copyright © HatioLab Inc. All rights reserved.
       /**
        * @description 상품 투입 api 호출
        ******************
-       * @param {String} rackCd
+       * @param {String} equipCd
        * @param {String} sideCd
        * @param {String} comCd
        * @param {String} skuCd
        */
-      doInputTransaction(rackCd, sideCd, comCd, skuCd) {
+      doInputTransaction(equipCd, sideCd, comCd, skuCd) {
         try {
           this.validateBeforeRequest();
           const inputAjax = this._getInputAjax();
           let zoneCd = LOGIS_UTIL.getStationCd();
-          inputAjax.curl = `/pda_process/input_sku/${rackCd}/${sideCd}/${zoneCd}/${comCd}/${skuCd}`;
+          inputAjax.curl = `/pda_process/input_sku/${equipCd}/${sideCd}/${zoneCd}/${comCd}/${skuCd}`;
           inputAjax.generateRequest();
 
         } catch (error) {
-          openAlert({
-            title: t('error.VALIDATION_ERROR'),
-            message: error,
-            confirmCallback: () => {
-              this._initialSetup();
-            }
-          });
+          LOGIS_UTIL.showMessage(t('error.VALIDATION_ERROR'), error, this._initialSetup.bind(this));
         }
       }
 
       /**
        * @description 상품 검수 api 호출
        ******************
-       * @param {String} rackCd
+       * @param {String} equipCd
        * @param {String} sideCd
        * @param {String} zoneCd
        * @param {String} comCd
        * @param {String} skuCd
        */
-      doInspectTransaction(rackCd, sideCd, zoneCd, comCd, skuCd) {
+      doInspectTransaction(equipCd, sideCd, zoneCd, comCd, skuCd) {
         try {
           this.validateBeforeRequest();
           const inspectAjax = this._getInspectAjax();
-          inspectAjax.curl = `/pda_process/inspection_by_mpi/${rackCd}/${sideCd}/${zoneCd}/${comCd}/${skuCd}`
+          inspectAjax.curl = `/pda_process/inspection_by_mpi/${equipCd}/${sideCd}/${zoneCd}/${comCd}/${skuCd}`
           inspectAjax.generateRequest();
 
         } catch (error) {
-          openAlert({
-            title: t('error.VALIDATION_ERROR'),
-            message: error,
-            confirmCallback: () => {
-              this._initialSetup();
-            }
-          });
+          LOGIS_UTIL.showMessage(t('error.VALIDATION_ERROR'), error, this._initialSetup.bind(this));
         }
       }
 
@@ -774,28 +762,22 @@ Copyright © HatioLab Inc. All rights reserved.
         var detail = event.detail ? event.detail : event.detail.body;
 
         if (detail && detail.msg == 'already-input-sku') {
-          openConfirm({
-            title: t('text.checking_inspection'),
-            message: t('text.check_inspection'),
-            confirmCallback: () => {
-              const rackCd = LOGIS_UTIL.getEquipCd();
-              const sideCd = LOGIS_UTIL.getWorkSideCd();
-              let zoneCd = LOGIS_UTIL.getStationCd();
-              let comCd = this.getComCd();
-              let skuCd = this.getSkuCd();
-              this.doInspectTransaction(rackCd, sideCd, zoneCd, comCd, skuCd);
-              this._initialSetup();
-            },
-            cancelCallback: () => {
-              this.clearView();
-            }
-          });
+          LOGIS_UTIL.showConfirm(t('text.checking_inspection'), t('text.check_inspection'), function() {
+            this.clearView();
+
+          }.bind(this), function() {
+            const equipCd = LOGIS_UTIL.getEquipCd();
+            const sideCd = LOGIS_UTIL.getWorkSideCd();
+            let zoneCd = LOGIS_UTIL.getStationCd();
+            let comCd = this.getComCd();
+            let skuCd = this.getSkuCd();
+            this.doInspectTransaction(equipCd, sideCd, zoneCd, comCd, skuCd);
+            this._initialSetup();
+
+          }.bind(this));
+
         } else {
-          openAlert({
-            title: detail ? detail.code : '',
-            message: detail ? detail.msg : '',
-            confirmCallback: this._initialSetup.bind(this)
-          });
+          LOGIS_UTIL.showMessage(detail ? detail.code : '', detail ? detail.msg : '', this._initialSetup.bind(this));
         }
       }
 
@@ -819,13 +801,7 @@ Copyright © HatioLab Inc. All rights reserved.
           LOGIS_UTIL.showPopup(t('title.job_select'), popup, '70%', 'fit', null, this.refresh.bind(this));
 
         } else if (status !== 'F' && status !== 'P') {
-          openAlert({
-            title: t('error.VALIDATION_ERROR'),
-            message: t('text.precedence_is_not_finished_yet'),
-            confirmCallback: () => {
-              this.refresh();
-            }
-          })
+          LOGIS_UTIL.showMessage(t('error.VALIDATION_ERROR'), t('text.precedence_is_not_finished_yet'), this.refresh.bind(this));
         }
       }
 
@@ -873,10 +849,10 @@ Copyright © HatioLab Inc. All rights reserved.
       _popupButtonClick(buttonId) {
         switch (buttonId) {
           case 'mpi-on':
-            this._mpiOnRequest();
+            this._indOnRequest();
             break;
           case 'mpi-off':
-            this._mpiOffRequest();
+            this._indOffRequest();
             break;
           case 'cancel-input':
             this._cancelInputRequest();
@@ -888,42 +864,28 @@ Copyright © HatioLab Inc. All rights reserved.
        * @description mpi 점등 버튼 클릭 이벤트 핸들러
        ******************
        */
-      _mpiOnRequest() {
-        openConfirm({
-          title: t('button.led_on'),
-          message: t('text.Sure to process'),
-          confirmCallback: () => {
-            const rackCd = LOGIS_UTIL.getEquipCd();
-            const mpiOnAjax = this._getMpiOnAjax();
-            mpiOnAjax.curl = `/kiosk_process/restore_mpi/${rackCd}`;
-            mpiOnAjax.generateRequest();
-            this._initialSetup();
-          },
-          cancelCallback: () => {
-            this._initialSetup();
-          }
-        })
+      _indOnRequest() {
+        LOGIS_UTIL.showConfirm(t('text.led_on'), t('text.Sure to process'), this._initialSetup.bind(this), function() {
+          const equipCd = LOGIS_UTIL.getEquipCd();
+          const indOnAjax = this._getIndOnAjax();
+          indOnAjax.curl = `/kiosk_process/restore_mpi/${equipCd}`;
+          indOnAjax.generateRequest();
+          this._initialSetup();
+        }.bind(this));
       }
 
       /**
-       * @description mpi 소등 버튼 클릭 이벤트 핸들러
+       * @description 표시기 소등 버튼 클릭 이벤트 핸들러
        ******************
        */
-      _mpiOffRequest() {
-        openConfirm({
-          title: t('button.led_off'),
-          message: t('text.Sure to process'),
-          confirmCallback: () => {
-            const rackCd = LOGIS_UTIL.getEquipCd();
-            const mpiOffAjax = this._getMpiOffAjax();
-            mpiOffAjax.curl = `/kiosk_process/mpi_off_all/${rackCd}`;
-            mpiOffAjax.generateRequest();
-            this._initialSetup();
-          },
-          cancelCallback: () => {
-            this._initialSetup();
-          }
-        })
+      _indOffRequest() {
+        LOGIS_UTIL.showConfirm(t('text.led_off'), t('text.Sure to process'), this._initialSetup.bind(this), function() {
+          const equipCd = LOGIS_UTIL.getEquipCd();
+          const indOffAjax = this._getIndOffAjax();
+          indOffAjax.curl = `/kiosk_process/mpi_off_all/${equipCd}`;
+          indOffAjax.generateRequest();
+          this._initialSetup();
+        }.bind(this));
       }
 
       /**
@@ -931,17 +893,10 @@ Copyright © HatioLab Inc. All rights reserved.
        ******************
        */
       _cancelInputRequest() {
-        openConfirm({
-          title: t('button.cancel_input'),
-          message: t('text.Sure to process'),
-          confirmCallback: () => {
-            console.log('TODO: Request cancel input');
-            this._initialSetup();
-          },
-          cancelCallback: () => {
-            this._initialSetup();
-          }
-        })
+        LOGIS_UTIL.showConfirm(t('button.cancel_input'), t('text.Sure to process'), this._initialSetup.bind(this), function() {
+          console.log('TODO: Request cancel input');
+          this._initialSetup();
+        }.bind(this));
       }
 
       /**
@@ -949,7 +904,7 @@ Copyright © HatioLab Inc. All rights reserved.
        ******************
        * @return {Object} ind-on-ajax
        */
-      _getMpiOnAjax() {
+      _getIndOnAjax() {
         return this.$['ind-on-ajax'];
       }
 
@@ -958,7 +913,7 @@ Copyright © HatioLab Inc. All rights reserved.
        ******************
        * @return {Object} ind-off-ajax
        */
-      _getMpiOffAjax() {
+      _getIndOffAjax() {
         return this.$['ind-off-ajax'];
       }
 
@@ -1038,13 +993,7 @@ Copyright © HatioLab Inc. All rights reserved.
           ajax.generateRequest();
 
         } catch (error) {
-          openAlert({
-            title: t('error.VALIDATION_ERROR'),
-            message: error,
-            confirmCallback: () => {
-              this._initialSetup();
-            }
-          });
+          LOGIS_UTIL.showMessage(t('error.VALIDATION_ERROR'), error, this._initialSetup.bind(this));
         }
       }*/
     }

@@ -60,7 +60,9 @@ Copyright © HatioLab Inc. All rights reserved.
 
   <script>
     class InspectionEnterQtyPopup extends Polymer.Element {
-      static get is() { return 'inspection-enter-qty-popup' }
+      static get is() {
+        return 'inspection-enter-qty-popup'
+      }
 
       static get properties() {
         return {
@@ -112,7 +114,7 @@ Copyright © HatioLab Inc. All rights reserved.
         super.connectedCallback();
 
         document.addEventListener(`alert-closed-at-${location.hash.replace('#/', '')}`, event => {
-          if(!event.detail.hasCallback) {
+          if (!event.detail.hasCallback) {
             this._initialSetup();
           }
         });
@@ -124,7 +126,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} event
        */
       _keypressHandler(event) {
-        if(event.charCode === 13) {
+        if (event.charCode === 13) {
           this.doInspection();
         }
       }
@@ -140,11 +142,7 @@ Copyright © HatioLab Inc. All rights reserved.
           this.closeDialog();
 
         } catch (error) {
-          openAlert({
-            title: error.title,
-            message: error.message,
-            confirmCallback: this._initialSetup.bind(this)
-          });
+          LOGIS_UTIL.showMessage(error.title, error.message, this._initialSetup.bind(this));
         }
       }
 
@@ -154,7 +152,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       validateBeforeInspection() {
         this.inputQty = parseInt(this.$['input-count'].value);
-        if(isNaN(this.inputQty) || !this.inputQty || this.inputQty < 0) {
+        if (isNaN(this.inputQty) || !this.inputQty || this.inputQty < 0) {
           throw {
             title: t('error.VALIDATION_ERROR'),
             message: t('text.invalid_value')

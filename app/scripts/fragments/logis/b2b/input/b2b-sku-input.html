@@ -728,7 +728,7 @@ Copyright © HatioLab Inc. All rights reserved.
           this._routingChanged(e);
         });
 
-        // 3. 랙 선택 체크
+        // 3. 설비 선택 체크
         if (!LOGIS_UTIL.getEquipCd()) {
           LOGIS_UTIL.showMessage(t('text.selecting_equipment'), t('text.select_equipment'));
         }
@@ -840,11 +840,11 @@ Copyright © HatioLab Inc. All rights reserved.
        ***********************
        */
       getBatchSummary() {
-        const rackCd = LOGIS_UTIL.getEquipCd();
-        if (rackCd) {
+        const equipCd = LOGIS_UTIL.getEquipCd();
+        if (equipCd) {
           const batchSummaryAjax = this.$['batch-summary-ajax'];
           let status = this.$['unfinished-only'].checked == true ? 'U' : '';
-          batchSummaryAjax.curl = `/kiosk_process/das/batch_summary/${rackCd}?status=${status}`;
+          batchSummaryAjax.curl = `/kiosk_process/das/batch_summary/${equipCd}?status=${status}`;
           batchSummaryAjax.params = {
             page: this.page,
             limit: this.limit
@@ -939,12 +939,12 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       inputSku(comCd, skuCd, skuBarcd) {
         if (skuCd && skuCd.length >= 3) {
-          var rackCd = LOGIS_UTIL.getEquipCd();
-          var rackSide = LOGIS_UTIL.getWorkSideCd();
+          var equipCd = LOGIS_UTIL.getEquipCd();
+          var workSideCd = LOGIS_UTIL.getWorkSideCd();
           var startAssortAjax = this.$['input-sku-ajax'];
           let status = this.$['unfinished-only'].checked == true ? 'U' : '';
 
-          var url = `/kiosk_process/das/input/${rackCd}/${rackSide}/${comCd}/${skuCd}`;
+          var url = `/kiosk_process/das/input/${equipCd}/${workSideCd}/${comCd}/${skuCd}`;
           url = url + '?page=' + this.page + '&limit=' + this.limit;
           if (status && status.length > 0) {
             url = url + '&status=' + status;
@@ -1002,23 +1002,17 @@ Copyright © HatioLab Inc. All rights reserved.
         var detail = event.detail ? event.detail : event.detail.body;
 
         if (detail && detail.msg == 'already-input-sku') {
-          openConfirm({
-            title: t('text.checking_inspection'),
-            message: t('text.check_inspection'),
-            confirmCallback: () => {
-              const rackCd = LOGIS_UTIL.getEquipCd();
-              const sideCd = LOGIS_UTIL.getWorkSideCd();
-              let zoneCd = LOGIS_UTIL.getStationCd();
-              let comCd = this.sku.com_cd;
-              let skuCd = this.sku.sku_cd;
-              this.doInspectTransaction(rackCd, sideCd, zoneCd, comCd, skuCd);
-              this._initialSetup();
-              this._scannedFlag = false;
-            },
-            cancelCallback: () => {
-              this._barcodeInputReset();
-            }
-          });
+          LOGIS_UTIL.showConfirm(t('text.checking_inspection'), t('text.check_inspection'), this._barcodeInputReset.bind(this), function() {
+            const equipCd = LOGIS_UTIL.getEquipCd();
+            const workSideCd = LOGIS_UTIL.getWorkSideCd();
+            let stationCd = LOGIS_UTIL.getStationCd();
+            let comCd = this.sku.com_cd;
+            let skuCd = this.sku.sku_cd;
+            this.doInspectTransaction(equipCd, workSideCd, stationCd, comCd, skuCd);
+            this._initialSetup();
+            this._scannedFlag = false;
+          }.bind(this));
+
         } else {
           LOGIS_UTIL.showMessage(detail.code, detail.msg, () => {
             this._initialSetup();
@@ -1039,28 +1033,23 @@ Copyright © HatioLab Inc. All rights reserved.
       /**
        * @description 상품 검수 api 호출
        ******************
-       * @param {String} rackCd
-       * @param {String} sideCd
-       * @param {String} zoneCd
+       * @param {String} equipCd
+       * @param {String} workSideCd
+       * @param {String} stationCd
        * @param {String} comCd
        * @param {String} skuCd
        */
-      doInspectTransaction(rackCd, sideCd, zoneCd, comCd, skuCd) {
+      doInspectTransaction(equipCd, workSideCd, stationCd, comCd, skuCd) {
         try {
           if (!skuCd || skuCd.length < 4) {
             throw t('error.sku_barcd_invalid');
           }
+
           const inspectAjax = this.$['inspect-sku-ajax'];
-          inspectAjax.curl = `/pda_process/inspection_by_mpi/${rackCd}/${sideCd}/${zoneCd}/${comCd}/${skuCd}`
+          inspectAjax.curl = `/pda_process/inspection_by_mpi/${equipCd}/${workSideCd}/${stationCd}/${comCd}/${skuCd}`
           inspectAjax.generateRequest();
         } catch (error) {
-          openAlert({
-            title: t('error.VALIDATION_ERROR'),
-            message: error,
-            confirmCallback: () => {
-              this._initialSetup();
-            }
-          });
+          LOGIS_UTIL.showMessage(t('error.VALIDATION_ERROR'), error, this._initialSetup.bind(this));
         }
       }
 
@@ -1070,13 +1059,13 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} event
        */
       showDetailList(event) {
-        const rackCd = LOGIS_UTIL.getEquipCd();
+        const equipCd = LOGIS_UTIL.getEquipCd();
         const inputSeq = event.detail.data.input_seq;
         document.dispatchEvent(new CustomEvent('open-form-list-dialog', {
           detail: {
             title: t('title.das_order_info_detail') + ' [' + event.detail.data.sku_nm + ']',
             listFields: this.detailListFields,
-            listDataReqUrl: `/kiosk_process/das/input_details/${rackCd}/${inputSeq}`,
+            listDataReqUrl: `/kiosk_process/das/input_details/${equipCd}/${inputSeq}`,
             handleListDataAfterSet: params => {
               const rows = params.listElement.getRows();
               rows.forEach(row => {

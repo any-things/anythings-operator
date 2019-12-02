@@ -194,20 +194,15 @@ Copyright © HatioLab Inc. All rights reserved.
         const currentQty = parseInt(this._getCurrentQtyInput().value);
 
         if (adjustQty >= currentQty) {
-          openAlert({
-            title: t('text.invalid_value'),
-            message: t('text.adjust_value_invalid')
-          });
-
+          LOGIS_UTIL.showMessage(t('text.invalid_value'), t('text.adjust_value_invalid'));
         } else {
-          let equipType = LOGIS_UTIL.getEquipType() || "Rack";
+          let equipType = LOGIS_UTIL.getEquipType() || 'Rack';
           let equipCd = LOGIS_UTIL.getEquipCd();
           let deviceType = LOGIS_UTIL.getDeviceType();
           const adjustQtyAjax = this._getAdjustQtyAjax();
 
           adjustQtyAjax.curl = `/device_process/classify/split/${deviceType}/${equipType}/${equipCd}/${this.jobId}`
           adjustQtyAjax.method = 'POST';
-
           var params = {
             req_qty: currentQty,
             res_qty: adjustQty

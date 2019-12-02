@@ -683,13 +683,7 @@ Copyright © HatioLab Inc. All rights reserved.
         try {
           this.validateBeforeRequest();
         } catch (error) {
-          openAlert({
-            title: t('error.VALIDATION_ERROR'),
-            message: error,
-            confirmCallback: () => {
-              this._initFocus();
-            }
-          });
+          LOGIS_UTIL.showMessage(t('error.VALIDATION_ERROR'), error, this._initFocus.bind(this));
           return;
         }
 
@@ -900,19 +894,13 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} event
        */
       _fullboxRemainsError(event) {
-        if (!event || !event.detail) return;
+        if (event && event.detail) {
+          const response = event.detail;
 
-        const response = event.detail;
-        if (response.msg) {
-          this.message = response.msg;
-
-          openAlert({
-            title: response.code,
-            message: response.msg,
-            confirmCallback: () => {
-              this._initFocus();
-            }
-          });
+          if (response.msg) {
+            this.message = response.msg;
+            LOGIS_UTIL.showMessage(response.code, response.msg, this._initFocus.bind(this));
+          }
         }
       }
 

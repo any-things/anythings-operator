@@ -788,16 +788,11 @@ Copyright © HatioLab Inc. All rights reserved.
       _initPage(event) {
         const pageInput = event.currentTarget;
         const page = parseInt(pageInput.value);
+
         if (page && page > 0 && !this.noMorePage(page)) {
           this.page = page;
         } else {
-          openAlert({
-            title: t('error.page_is_not_valid'),
-            message: t('text.please_type_valid_page'),
-            confirmCallback: () => {
-              pageInput.select();
-            }
-          });
+          LOGIS_UTIL.showMessage(t('error.page_is_not_valid'), t('text.please_type_valid_page'), pageInput.select.bind(this));
         }
       }
 
@@ -814,13 +809,8 @@ Copyright © HatioLab Inc. All rights reserved.
         if (limit <= this.maxLimit && limit >= this.minLimit) {
           this.limit = limit;
         } else {
-          openAlert({
-            title: t('error.out_of_range'),
-            message: `${'text.valid_range'}: ${this.minLimit} ~ ${this.maxLimit}`,
-            confirmCallback: () => {
-              limitInput.select();
-            }
-          });
+          var message = `${'text.valid_range'}: ${this.minLimit} ~ ${this.maxLimit}`;
+          LOGIS_UTIL.showMessage(t('error.out_of_range'), messgae, limitInput.select.bind(this));
         }
       }
 
