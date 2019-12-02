@@ -312,6 +312,14 @@ LOGIS_UTIL.showPopup = function(title, popup, width, height, openCallback, close
 };
 
 /**
+ * @description 팝업 닫기
+ ******************
+ */
+LOGIS_UTIL.closePopup = function(event) {
+  document.dispatchEvent(new CustomEvent('close-dialog', event ? event : {}));
+}
+
+/**
  * @description 현재 작업 위치 변경시
  ******************
  * @param {String} workSideCd

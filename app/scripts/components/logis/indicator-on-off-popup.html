@@ -39,17 +39,19 @@ Copyright © HatioLab Inc. All rights reserved.
         <template is="dom-repeat" items="[[buttons]]">
           <button class="action-button" id="[[item.id]]" on-click="_clickHandler">[[item.label]]</button>
         </template>
-      </div>
+  </div>
 
-      <div id="button-container">
-        <button on-click="_closeDialog">[[closeBtnLabel]]</button>
-      </div>
-    </div>
+  <div id="button-container">
+    <button on-click="_closeDialog">[[closeBtnLabel]]</button>
+  </div>
+  </div>
   </template>
 
   <script>
     class IndicatorOnOffPopup extends Polymer.Element {
-      static get is() { return 'indicator-on-off-popup' }
+      static get is() {
+        return 'indicator-on-off-popup'
+      }
 
       static get properties() {
         return {
@@ -66,8 +68,7 @@ Copyright © HatioLab Inc. All rights reserved.
             }, {
               id: 'mpi-off',
               label: t('button.end_inspection')
-            }
-            ]
+            }]
           }
         }
       }
@@ -82,7 +83,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       _closeDialog() {
-        document.dispatchEvent(new CustomEvent('close-dialog'));
+        LOGIS_UTIL.closePopup();
       }
     }
 

@@ -36,17 +36,19 @@ Copyright © HatioLab Inc. All rights reserved.
         <template is="dom-repeat" items="[[buttons]]">
           <button class="action-button" id="[[item.id]]" on-click="_clickHandler">[[item.label]]</button>
         </template>
-      </div>
+  </div>
 
-      <div id="button-container">
-        <button on-click="_closeDialog">[[closeBtnLabel]]</button>
-      </div>
-    </div>
+  <div id="button-container">
+    <button on-click="_closeDialog">[[closeBtnLabel]]</button>
+  </div>
+  </div>
   </template>
 
   <script>
     class PdaDas2ProcessBtnPopup extends Polymer.Element {
-      static get is() { return 'pda-das2-process-btn-popup' }
+      static get is() {
+        return 'pda-das2-process-btn-popup'
+      }
 
       static get properties() {
         return {
@@ -58,16 +60,16 @@ Copyright © HatioLab Inc. All rights reserved.
           buttons: {
             type: Array,
             value: () => [{
-              id: 'mpi-on',
-              label: t('button.start_job')
-            }, {
-              id: 'mpi-off',
-              label: t('button.end_inspection')
-            }
-            // , {
-            //   id: 'cancel-input',
-            //   label: t('button.cancel_input')
-            // }
+                id: 'mpi-on',
+                label: t('button.start_job')
+              }, {
+                id: 'mpi-off',
+                label: t('button.end_inspection')
+              }
+              // , {
+              //   id: 'cancel-input',
+              //   label: t('button.cancel_input')
+              // }
             ]
           }
         }
@@ -83,7 +85,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       _closeDialog() {
-        document.dispatchEvent(new CustomEvent('close-dialog'));
+        LOGIS_UTIL.closePopup();
       }
     }
 

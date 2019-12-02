@@ -46,7 +46,9 @@ Copyright © HatioLab Inc. All rights reserved.
 
   <script>
     class SkuSelectionPopup extends Polymer.Element {
-      static get is() { return 'sku-selection-popup' }
+      static get is() {
+        return 'sku-selection-popup'
+      }
 
       static get properties() {
         return {
@@ -99,7 +101,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} event
        */
       _skuSelected(event) {
-        if(this.selectedSkuEl) {
+        if (this.selectedSkuEl) {
           this.selectedSkuEl.classList.remove('complete');
         }
 
@@ -113,7 +115,7 @@ Copyright © HatioLab Inc. All rights reserved.
        *******************************
        */
       closeDialog() {
-        document.dispatchEvent(new CustomEvent('close-dialog'));
+        LOGIS_UTIL.closePopup();
       }
     }
 

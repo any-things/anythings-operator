@@ -397,7 +397,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} event
        */
       closeDialog(event) {
-        document.dispatchEvent(new CustomEvent('close-dialog', event));
+        LOGIS_UTIL.closePopup(event);
       }
     }
 

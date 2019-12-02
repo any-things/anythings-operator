@@ -10,7 +10,7 @@ Copyright © HatioLab Inc. All rights reserved.
   물류 > B2C > 포장 팝업 화면
 -->
 <dom-module id="b2c-packing-popup">
-    <template>
+  <template>
         <style include="shared-styles">
             :host {
                 display: grid;
@@ -48,33 +48,36 @@ Copyright © HatioLab Inc. All rights reserved.
         </div>
     </template>
 
-    <script>
-        class B2CPackingPopup extends Polymer.Element {
-            static get is() {
-                return 'b2c-packing-popup';
-            }
-            static get properties() {
-                return {
-                    firstRow:{
-                        type: String
-                    },
-                    secondRow:{
-                        type: String
-                    },
-                    imgSrc:{
-                        type:String
-                    },
-                    closeBtnLabel: { type: String, value: () => t('button.close') },
-                };
-            }
-            connectedCallback() {
-                super.connectedCallback();
-            }
-            _closeDialog(){
-                document.dispatchEvent(new CustomEvent('close-dialog'));
-            }
-        }
+  <script>
+    class B2CPackingPopup extends Polymer.Element {
+      static get is() {
+        return 'b2c-packing-popup';
+      }
+      static get properties() {
+        return {
+          firstRow: {
+            type: String
+          },
+          secondRow: {
+            type: String
+          },
+          imgSrc: {
+            type: String
+          },
+          closeBtnLabel: {
+            type: String,
+            value: () => t('button.close')
+          },
+        };
+      }
+      connectedCallback() {
+        super.connectedCallback();
+      }
+      _closeDialog() {
+        LOGIS_UTIL.closePopup();
+      }
+    }
 
-        window.customElements.define(B2CPackingPopup.is, B2CPackingPopup);
-    </script>
+    window.customElements.define(B2CPackingPopup.is, B2CPackingPopup);
+  </script>
 </dom-module>

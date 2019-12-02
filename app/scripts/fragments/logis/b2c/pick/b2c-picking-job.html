@@ -617,7 +617,7 @@ Copyright © HatioLab Inc. All rights reserved.
             dataList = dataList.concat(this.inputDetails.F, this.inputDetails.R);
 
             if (selectedBCd == data.sku_barcd) {
-              document.dispatchEvent(new CustomEvent('close-dialog'));
+              LOGIS_UTIL.closePopup();
             }
           } else {
             if (data.side_cd == 'F') {

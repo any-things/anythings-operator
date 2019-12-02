@@ -108,7 +108,9 @@ Copyright © HatioLab Inc. All rights reserved.
 
   <script>
     class FormListPopup extends Polymer.Element {
-      static get is() { return 'form-list-popup' }
+      static get is() {
+        return 'form-list-popup'
+      }
 
       static get properties() {
         return {
@@ -120,7 +122,7 @@ Copyright © HatioLab Inc. All rights reserved.
             type: Number,
             value: () => {
               const deviceType = JSON.parse(localStorage.getItem('setting.deviceType'))
-              if(deviceType === 'PDA' || deviceType === 'TABLET') {
+              if (deviceType === 'PDA' || deviceType === 'TABLET') {
                 return 1;
               } else {
                 return 2;
@@ -231,7 +233,7 @@ Copyright © HatioLab Inc. All rights reserved.
         const formContainer = this._getFormContainer();
         formContainer.classList.remove('single-column', 'multiple-columns');
 
-        if(formColumnCount === 1) {
+        if (formColumnCount === 1) {
           formContainer.classList.add('single-column');
         } else {
           formContainer.style.gridTemplateColumns = `repeat(${formColumnCount}, 1fr)`;
@@ -246,15 +248,15 @@ Copyright © HatioLab Inc. All rights reserved.
        * 3. 전달 받은 formFields가 html element일 경우 해당 엘리먼트를 form-container에 appending (element-type)
        */
       _renderForm(formFields) {
-        if(!formFields || formFields.length === 0) {
+        if (!formFields || formFields.length === 0) {
           this._deactivateForm();
           return;
         };
 
-        if(Array.isArray(formFields)) {
+        if (Array.isArray(formFields)) {
           formFields.forEach(formField => {
             const fieldContainer = this._renderFieldContainer();
-            if(!formField.name) {
+            if (!formField.name) {
               this.throwException('Form field name is not defined.');
             }
             const formLabel = this._renderFormLabel(formField.display ? formField.display : formField.name ? formField.name : '');
@@ -268,7 +270,7 @@ Copyright © HatioLab Inc. All rights reserved.
             formContainer.appendChild(fieldContainer);
           });
 
-        } else if (formFields.setAttribute &&  typeof formFields.setAttribute === 'function') { // 엘리먼트로 추정
+        } else if (formFields.setAttribute && typeof formFields.setAttribute === 'function') { // 엘리먼트로 추정
           const formContainer = this._getFormContainer();
           formContainer.classList.add('element-type');
           formContainer.appendChild(formFields);
@@ -278,7 +280,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       _listFieldsChanged(listFields) {
-        if(!listFields || listFields.length === 0) {
+        if (!listFields || listFields.length === 0) {
           this._deactivateList();
           return;
         }
@@ -289,7 +291,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * 컬럼 구성이 완료 되고 전달받은 dataListClickHandler가 존재한다면 리스트 클릭에 대한 이벤트 리스너를 등록함
        */
       _onHeaderConfiguredHandler() {
-        if(this.dataListClickHandler && typeof this.dataListClickHandler === 'function') this._getList().addEventListener('data-list-click', this.dataListClickHandler);
+        if (this.dataListClickHandler && typeof this.dataListClickHandler === 'function') this._getList().addEventListener('data-list-click', this.dataListClickHandler);
         this.isListHeaderConfigured = true;
       }
 
@@ -299,9 +301,9 @@ Copyright © HatioLab Inc. All rights reserved.
        * formData 또는 listData가 이미 존재한다면 서버를 통해 조회하지 않음
        */
       _isFormListPopupConfigured(isFormConfigured, isListHeaderConfigured) {
-        if(isFormConfigured && isListHeaderConfigured) {
-          if((!this.formData || typeof this.formData !== 'object') && !this.isFormDeactivated) this.getFormData();
-          if((!this.listData || !Array.isArray(this.listData)) && !this.isListDeactivated) this.getListData();
+        if (isFormConfigured && isListHeaderConfigured) {
+          if ((!this.formData || typeof this.formData !== 'object') && !this.isFormDeactivated) this.getFormData();
+          if ((!this.listData || !Array.isArray(this.listData)) && !this.isListDeactivated) this.getListData();
         }
       }
 
@@ -310,10 +312,10 @@ Copyright © HatioLab Inc. All rights reserved.
        * formDataReqUrl을 통해 서비스 요청을 수행하고 결과를 formData에 초기화함
        */
       getFormData() {
-        if(!this.formDataReqUrl) return;
+        if (!this.formDataReqUrl) return;
 
         const formDataAjax = this._getFormDataAjax();
-        if(this.formDataAjaxHandler && typeof this.formDataAjaxHandler === 'function') {
+        if (this.formDataAjaxHandler && typeof this.formDataAjaxHandler === 'function') {
           this.formDataAjaxHandler();
         }
 
@@ -321,7 +323,7 @@ Copyright © HatioLab Inc. All rights reserved.
           this.formData = event.detail;
         });
 
-        if(!formDataAjax.baseUrl) formDataAjax.baseUrl = this._getBaseUrl();
+        if (!formDataAjax.baseUrl) formDataAjax.baseUrl = this._getBaseUrl();
         formDataAjax.generateRequest();
       }
 
@@ -330,10 +332,10 @@ Copyright © HatioLab Inc. All rights reserved.
        * listDataReqUrl 통해 서비스 요청을 수행하고 결과를 _setListData를 호출하여 listData를 초기화함
        */
       getListData() {
-        if(!this.listDataReqUrl) return;
+        if (!this.listDataReqUrl) return;
 
         const listDataAjax = this._getListDataAjax();
-        if(this.listDataAjaxHandler && typeof this.listDataAjaxHandler === 'function') {
+        if (this.listDataAjaxHandler && typeof this.listDataAjaxHandler === 'function') {
           this.listDataAjaxHandler();
         }
 
@@ -341,7 +343,7 @@ Copyright © HatioLab Inc. All rights reserved.
           this._setListData(event.detail);
         });
 
-        if(!listDataAjax.baseUrl) listDataAjax.baseUrl = this._getBaseUrl();
+        if (!listDataAjax.baseUrl) listDataAjax.baseUrl = this._getBaseUrl();
         listDataAjax.generateRequest();
       }
 
@@ -353,7 +355,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * 3. handleFormDataAfterSet이 정의되어 있다면 해당 함수를 호출하여 데이터 맵핑 후에 추가 작업을 수행함
        */
       setFormData(formData) {
-        if(this.handleFormDataBeforeSet && typeof this.handleFormDataBeforeSet === 'function') this.handleFormDataBeforeSet({
+        if (this.handleFormDataBeforeSet && typeof this.handleFormDataBeforeSet === 'function') this.handleFormDataBeforeSet({
           popupElement: this,
           formElement: this._getFormContainer().children,
           formData: formData,
@@ -361,24 +363,24 @@ Copyright © HatioLab Inc. All rights reserved.
           listData: this.listData
         });
 
-        if(!formData || typeof formData !== 'object') {
+        if (!formData || typeof formData !== 'object') {
           return;
         }
 
         const formContainer = this._getFormContainer();
         const inputFields = Array.from(formContainer.querySelectorAll('input'));
 
-        for(let key in formData) {
+        for (let key in formData) {
           const targetInput = inputFields.filter(input => {
             return input.getAttribute('name') === key;
           });
 
-          if(targetInput && targetInput.length > 0) {
+          if (targetInput && targetInput.length > 0) {
             targetInput[0].value = formData[key];
           }
         }
 
-        if(this.handleFormDataAfterSet && typeof this.handleFormDataAfterSet === 'function') this.handleFormDataAfterSet({
+        if (this.handleFormDataAfterSet && typeof this.handleFormDataAfterSet === 'function') this.handleFormDataAfterSet({
           popupElement: this,
           formElement: this._getFormContainer().children,
           formData: formData,
@@ -395,7 +397,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * 3. handleListDataAfterSet이 정의되어 있다면 해당 함수를 호출하여 데이터 맵핑 후에 추가 작업을 수행함
        */
       _setListData(listData) {
-        if(this.handleListDataBeforeSet && typeof this.handleListDataBeforeSet === 'function') this.handleListDataBeforeSet({
+        if (this.handleListDataBeforeSet && typeof this.handleListDataBeforeSet === 'function') this.handleListDataBeforeSet({
           popupElement: this,
           formElement: this._getFormContainer(),
           formData: this.formData,
@@ -403,13 +405,13 @@ Copyright © HatioLab Inc. All rights reserved.
           listData: listData
         });
 
-        if(!listData || !Array.isArray(listData)) {
+        if (!listData || !Array.isArray(listData)) {
           return;
         }
 
         this.listData = listData;
 
-        if(this.handleListDataAfterSet && typeof this.handleListDataAfterSet === 'function') this.handleListDataAfterSet({
+        if (this.handleListDataAfterSet && typeof this.handleListDataAfterSet === 'function') this.handleListDataAfterSet({
           popupElement: this,
           formElement: this._getFormContainer(),
           formData: this.formData,
@@ -460,18 +462,18 @@ Copyright © HatioLab Inc. All rights reserved.
         const formInput = document.createElement('input');
         formInput.setAttribute('name', name);
         formInput.classList.add('form-input');
-        if(!field.editable || field.editable === undefined) {
+        if (!field.editable || field.editable === undefined) {
           formInput.setAttribute('readonly', '');
         }
 
-        if(field.attributes && typeof field.attributes === 'object') {
-          for(let key in field.attributes) {
+        if (field.attributes && typeof field.attributes === 'object') {
+          for (let key in field.attributes) {
             formInput.setAttribute(key, field.attributes[key]);
           }
         }
 
-        if(field.styles && typeof field.styles === 'object') {
-          for(let key in field.styles) {
+        if (field.styles && typeof field.styles === 'object') {
+          for (let key in field.styles) {
             formInput.style[key] = field.styles[key];
           }
         }
@@ -484,7 +486,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @description close-btn click event handler 다이얼로그 닫기
        */
       _closeDialog() {
-        document.dispatchEvent(new CustomEvent('close-dialog'));
+        LOGIS_UTIL.closePopup();
       }
 
       _getFormContainer() {

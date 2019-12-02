@@ -76,7 +76,9 @@ Copyright © HatioLab Inc. All rights reserved.
 
   <script>
     class OutAssortTransaction extends Polymer.Element {
-      static get is() { return 'out-assort-transaction' }
+      static get is() {
+        return 'out-assort-transaction'
+      }
       static get properties() {
         return {
           custNmLabel: {
@@ -174,7 +176,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       _pickQtyChanged(pickQty) {
-        if(pickQty <= 1) {
+        if (pickQty <= 1) {
           this.hideAdjustBtn = true;
         } else {
           this.hideAdjustBtn = false;
@@ -262,7 +264,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * 팝업 닫기
        */
       closeDialog(event) {
-        document.dispatchEvent(new CustomEvent('close-dialog', event));
+        LOGIS_UTIL.closePopup(event);
       }
     }
 

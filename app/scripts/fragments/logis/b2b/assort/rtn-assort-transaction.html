@@ -73,11 +73,13 @@ Copyright © HatioLab Inc. All rights reserved.
         <button id="close-btn" on-click="closeDialog">[[closeDialogLabel]]</button>
       </div>
     </div>
-  </template> 
+  </template>
 
   <script>
     class RtnAssortTransaction extends Polymer.Element {
-      static get is() { return 'rtn-assort-transaction' }
+      static get is() {
+        return 'rtn-assort-transaction'
+      }
 
       static get properties() {
         return {
@@ -218,7 +220,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Number} pickQty
        */
       _pickQtyChanged(pickQty) {
-        if(pickQty <= 1) {
+        if (pickQty <= 1) {
           this.hideAdjustBtn = true;
         } else {
           this.hideAdjustBtn = false;
@@ -257,7 +259,7 @@ Copyright © HatioLab Inc. All rights reserved.
        *********************
        */
       jobCancel() {
-        let jobCancelAjax = this.getJobHandleAjax({ 
+        let jobCancelAjax = this.getJobHandleAjax({
           curl: `/device_process/classify/cancel/${deviceType}/${equipType}/${equipCd}/${this.jobId}`,
           method: 'PUT',
           responseCallback: this._jobCancelResponsed.bind(this)
@@ -319,7 +321,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} event
        */
       closeDialog(event) {
-        document.dispatchEvent(new CustomEvent('close-dialog', event));
+        LOGIS_UTIL.closePopup(event);
       }
     }
 

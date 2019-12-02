@@ -177,7 +177,9 @@ Copyright © HatioLab Inc. All rights reserved.
 
   <script>
     class BoxDetails extends Polymer.Element {
-      static get is() { return 'box-details' }
+      static get is() {
+        return 'box-details'
+      }
       static get properties() {
         return {
           /**
@@ -256,7 +258,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           header: {
             type: Array,
-            value: function () {
+            value: function() {
               return [{
                 display: t('label.sku_nm'),
                 fieldname: 'sku_nm'
@@ -279,7 +281,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} boxResult
        */
       _boxResultChanged(boxResult) {
-        if(boxResult && boxResult.id) {
+        if (boxResult && boxResult.id) {
           this.boxResultId = boxResult.id;
           this.boxInfo = `${boxResult.box_id} [${boxResult.loc_cd}(${boxResult.box_seq})]`;
         }
@@ -322,7 +324,7 @@ Copyright © HatioLab Inc. All rights reserved.
        ****************
        */
       closeDialog() {
-        document.dispatchEvent(new CustomEvent('close-dialog'));
+        LOGIS_UTIL.closePopup();
       }
     }
 

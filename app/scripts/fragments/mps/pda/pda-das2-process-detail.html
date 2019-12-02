@@ -75,7 +75,9 @@ Copyright © HatioLab Inc. All rights reserved.
 
   <script>
     class PdaDas2ProcessDetail extends Polymer.Element {
-      static get is() { return 'pda-das2-process-detail' }
+      static get is() {
+        return 'pda-das2-process-detail'
+      }
       static get properties() {
         return {
           custNmLabel: {
@@ -173,7 +175,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       _pickQtyChanged(pickQty) {
-        if(pickQty <= 1) {
+        if (pickQty <= 1) {
           this.hideAdjustBtn = true;
         } else {
           this.hideAdjustBtn = false;
@@ -264,7 +266,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * 팝업 닫기
        */
       closeDialog(event) {
-        document.dispatchEvent(new CustomEvent('close-dialog', event));
+        LOGIS_UTIL.closePopup(event);
       }
     }
 

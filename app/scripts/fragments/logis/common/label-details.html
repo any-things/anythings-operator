@@ -76,7 +76,9 @@ Copyright © HatioLab Inc. All rights reserved.
 
   <script>
     class LabelDetails extends Polymer.Element {
-      static get is() { return 'label-details' }
+      static get is() {
+        return 'label-details'
+      }
       static get properties() {
         return {
           /**
@@ -219,7 +221,7 @@ Copyright © HatioLab Inc. All rights reserved.
        ****************************
        */
       _closeDialog() {
-        document.dispatchEvent(new CustomEvent('close-dialog'));
+        LOGIS_UTIL.closePopup();
       }
 
       /**

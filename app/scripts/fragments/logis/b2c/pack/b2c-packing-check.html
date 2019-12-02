@@ -239,7 +239,8 @@ Copyright © HatioLab Inc. All rights reserved.
       //박스 데이터를 호출, 화면에 표시
       _boxSelected(e) {
         if (e.key == 'Enter') {
-          document.dispatchEvent(new CustomEvent('close-dialog'));
+          LOGIS_UTIL.closePopup();
+
           if (/^[bcdfghiBCDFGHI][0-9]{7}$/.exec(this.$['box-id'].value)) {
             this.reprint();
             var boxId = this.$['box-id'].value

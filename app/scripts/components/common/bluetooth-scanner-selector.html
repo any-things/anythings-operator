@@ -44,7 +44,9 @@ Copyright © HatioLab Inc. All rights reserved.
 
   <script>
     class BluetoothScannerSelector extends Polymer.Element {
-      static get is() { return 'bluetooth-scanner-selector' }
+      static get is() {
+        return 'bluetooth-scanner-selector'
+      }
 
       static get properties() {
         return {
@@ -54,7 +56,8 @@ Copyright © HatioLab Inc. All rights reserved.
            * @type {String}
            */
           cancelLabel: {
-            type: String, value: () => t('button.cancel'),
+            type: String,
+            value: () => t('button.cancel'),
           },
 
           /**
@@ -63,7 +66,8 @@ Copyright © HatioLab Inc. All rights reserved.
            * @type {String}
            */
           confirmLabel: {
-            type: String, value: () => t('button.confirm')
+            type: String,
+            value: () => t('button.confirm')
           },
 
           /**
@@ -94,7 +98,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} device
        */
       appendDevice(device) {
-        if(!this.isDuplicate(device.id) && device.id && device.name) {
+        if (!this.isDuplicate(device.id) && device.id && device.name) {
           this.$['device-select'].appendChild(new Option(device.name, device.id));
         }
       }
@@ -108,8 +112,8 @@ Copyright © HatioLab Inc. All rights reserved.
         const options = Array.from(this.$['device-select'].options);
         let result = false;
 
-        for(let i = 0; i < options.length; i++) {
-          if(options[i].value === deviceId) {
+        for (let i = 0; i < options.length; i++) {
+          if (options[i].value === deviceId) {
             result = true;
             break;
           }
@@ -133,7 +137,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _cancelClicked() {
         this.selectedDeviceId = null;
-        document.dispatchEvent(new CustomEvent('close-dialog'));
+        LOGIS_UTIL.closePopup();
       }
 
       /**
@@ -143,8 +147,8 @@ Copyright © HatioLab Inc. All rights reserved.
       _confirmClicked() {
         var devName = this.$['device-select'].selectedOptions[0].label;
         this.selectedDeviceId = this.$['device-select'].selectedOptions[0].value;
-        this.selectedDeviceName = devName.slice(devName.length-6, devName.length);
-        document.dispatchEvent(new CustomEvent('close-dialog'));
+        this.selectedDeviceName = devName.slice(devName.length - 6, devName.length);
+        LOGIS_UTIL.closePopup();
       }
     }
 
