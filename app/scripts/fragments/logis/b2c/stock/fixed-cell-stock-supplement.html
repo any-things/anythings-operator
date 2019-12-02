@@ -277,13 +277,9 @@ Copyright © HatioLab Inc. All rights reserved.
           this.skuCd = skuInfo.sku_cd;
           // 적치 대상 로케이션 리스트를 조회
           this._getLocationList(skuInfo);
+
         } else {
-          document.dispatchEvent(new CustomEvent('show-toast', {
-            detail: {
-              type: t('text.is_not_fixed_location'),
-              message: t('text.is_not_fixed_location')
-            }
-          }));
+          LOGIS_UTIL.showToastWarnMessage(t('text.is_not_fixed_location'));
         }
       }
 
@@ -341,19 +337,9 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       validateBeforeOrderStockAjax() {
         if (!this.locCd) {
-          document.dispatchEvent(new CustomEvent('show-toast', {
-            detail: {
-              type: t('error.VALIDATION_ERROR'),
-              message: t('error.loc_cd_invalid')
-            }
-          }));
+          LOGIS_UTIL.showToastWarnMessage(t('error.loc_cd_invalid'));
         } else if (!this.skuCd) {
-          document.dispatchEvent(new CustomEvent('show-toast', {
-            detail: {
-              type: t('error.VALIDATION_ERROR'),
-              message: t('error.invalid_sku_cd')
-            }
-          }));
+          LOGIS_UTIL.showToastWarnMessage(t('error.invalid_sku_cd'));
         }
       }
 
@@ -369,12 +355,7 @@ Copyright © HatioLab Inc. All rights reserved.
           orderStockAjax.curl = `/pda_process/dps/find_order_stock/fixed_location/${rackCd}/${this.locCd}/${this.skuCd}`;
           orderStockAjax.generateRequest();
         } catch (error) {
-          document.dispatchEvent(new CustomEvent('show-toast', {
-            detail: {
-              type: `${error.title}`,
-              message: `${error.message}`
-            }
-          }));
+          LOGIS_UTIL.showToastErrorMessage(error.message);
         }
       }
 
@@ -413,12 +394,7 @@ Copyright © HatioLab Inc. All rights reserved.
       _inputQtyKeypressHandler(event) {
         if (event.charCode === 13) {
           if (Number(this.$['order-qty'].value) - Number(this.$['stock-qty'].value) < Number(this.$['input-qty'].value)) {
-            document.dispatchEvent(new CustomEvent('show-toast', {
-              detail: {
-                type: t('error.VALIDATION_ERROR'),
-                message: t('error.out_of_valid_qty')
-              }
-            }));
+            LOGIS_UTIL.showToastWarnMessage(t('error.out_of_valid_qty'));
           } else {
             this.$['change-loc'].select();
           }
@@ -433,25 +409,17 @@ Copyright © HatioLab Inc. All rights reserved.
       _locScanHandler(event) {
         if (event.keyCode === 13 && /([FR]{1}[0-9]{2}[-]{1}[0-9]{3}[-]{1}[0-9]{2})/g.exec(this.$['change-loc'].value)) {
           if (this.$['change-loc'].value != this.$['location'].value) {
-            document.dispatchEvent(new CustomEvent('show-toast', {
-              detail: {
-                type: t('error.loc_cd_invalid'),
-                message: t('error.loc_cd_invalid')
-              }
-            }));
+            LOGIS_UTIL.showToastWarnMessage(t('error.loc_cd_invalid'));
+
           } else {
             this.locCd = null;
             this.locCd = this.$['change-loc'].value;
             this.$['change-loc'].select();
             this._load();
           }
+
         } else if (event.keyCode === 13) {
-          document.dispatchEvent(new CustomEvent('show-toast', {
-            detail: {
-              type: t(''),
-              message: t("error.loc_cd_invalid")
-            }
-          }));
+          LOGIS_UTIL.showToastWarnMessage(t('error.loc_cd_invalid'));
           this.$['change-loc'].value = '';
           this.$['change-loc'].select();
         }
@@ -465,26 +433,13 @@ Copyright © HatioLab Inc. All rights reserved.
         this.inputQty = this.$['input-qty'].value;
 
         if (!this.locCd) {
-          document.dispatchEvent(new CustomEvent('show-toast', {
-            detail: {
-              type: t('error.VALIDATION_ERROR'),
-              message: t('text.location_is_not_set')
-            }
-          }));
+          LOGIS_UTIL.showToastWarnMessage(t('text.location_is_not_set'));
+
         } else if (!this.inputQty || this.inputQty <= 0) {
-          document.dispatchEvent(new CustomEvent('show-toast', {
-            detail: {
-              type: t('error.VALIDATION_ERROR'),
-              message: t('text.invalid_value')
-            }
-          }));
+          LOGIS_UTIL.showToastWarnMessage(t('text.invalid_value'));
+
         } else if (!this.skuCd) {
-          document.dispatchEvent(new CustomEvent('show-toast', {
-            detail: {
-              type: t('error.VALIDATION_ERROR'),
-              message: t('error.invalid_sku_cd')
-            }
-          }));
+          LOGIS_UTIL.showToastWarnMessage(t('error.invalid_sku_cd'));
         }
       }
 
@@ -493,8 +448,11 @@ Copyright © HatioLab Inc. All rights reserved.
        ******************
        */
       _load() {
-        if (this.$['change-loc'].value == this.$['location'].value && Number(this.$['order-qty'].value) - Number(this.$['stock-qty'].value) >= Number(this.$['input-qty'].value) && /([FR]{1}[0-9]{2}[-]{1}[0-9]{3}[-]{1}[0-9]{2})/g.exec(this.$[
-            'location'].value) && Number(this.$['input-qty'].value) > 0 && this.$['location'].value.length > 0) {
+        if (this.$['change-loc'].value == this.$['location'].value &&
+          Number(this.$['order-qty'].value) - Number(this.$['stock-qty'].value) >= Number(this.$['input-qty'].value) &&
+          /([FR]{1}[0-9]{2}[-]{1}[0-9]{3}[-]{1}[0-9]{2})/g.exec(this.$['location'].value) &&
+          Number(this.$['input-qty'].value) > 0 &&
+          this.$['location'].value.length > 0) {
           try {
             // 재고 적치전 validation 수행
             this.validateBeforeLoadStock();
@@ -504,54 +462,29 @@ Copyright © HatioLab Inc. All rights reserved.
             const loadStockAjax = this.$['load-stock-ajax'];
             loadStockAjax.curl = `/pda_process/dps/load_stock/${rackCd}/${this.$['location'].value}/${this.skuCd}/${loadQty}/${qtyUnit}/${this.comCd}`;
             loadStockAjax.generateRequest();
+
           } catch (error) {
-            document.dispatchEvent(new CustomEvent('show-toast', {
-              detail: {
-                type: `${error.title}`,
-                message: `${error.message}`
-              }
-            }));
+            LOGIS_UTIL.showToastErrorMessage(error.message);
             this.$['input-qty'].select();
           }
         } else {
           if (Number(this.$['order-qty'].value) - Number(this.$['stock-qty'].value) < Number(this.$['input-qty'].value)) {
-            document.dispatchEvent(new CustomEvent('show-toast', {
-              detail: {
-                type: t('error.VALIDATION_ERROR'),
-                message: t('error.out_of_valid_qty')
-              }
-            }));
+            LOGIS_UTIL.showToastWarnMessage(t('error.out_of_valid_qty'));
             this.$['input-qty'].select();
+
           } else if (this.$['location'].value == null || this.$['location'].value == '') {
-            document.dispatchEvent(new CustomEvent('show-toast', {
-              detail: {
-                type: t('error.loc_cd_invalid'),
-                message: t('error.loc_cd_invalid')
-              }
-            }));
+            LOGIS_UTIL.showToastWarnMessage(t('error.loc_cd_invalid'));
             this.$['input-qty'].select();
+
           } else if (Number(this.$['input-qty'].value) <= 0 || this.$['input-qty'].value == '' || this.$['input-qty'].value == undefined) {
-            document.dispatchEvent(new CustomEvent('show-toast', {
-              detail: {
-                type: t('text.input_qty_none'),
-                message: t('text.input_qty_none')
-              }
-            }));
+            LOGIS_UTIL.showToastInfoMessage(t('text.input_qty_none'));
             this.$['input-qty'].select();
+
           } else if (this.$['change-loc'].value != this.$['location'].value) {
-            document.dispatchEvent(new CustomEvent('show-toast', {
-              detail: {
-                type: t('error.loc_cd_invalid'),
-                message: t('error.loc_cd_invalid')
-              }
-            }));
+            LOGIS_UTIL.showToastWarnMessage(t('error.loc_cd_invalid'));
+
           } else {
-            document.dispatchEvent(new CustomEvent('show-toast', {
-              detail: {
-                type: t('text.invalid_value'),
-                message: t('text.invalid_value')
-              }
-            }));
+            LOGIS_UTIL.showToastWarnMessage(t('text.invalid_value'));
             this.$['input-qty'].select();
           }
         }
@@ -583,13 +516,7 @@ Copyright © HatioLab Inc. All rights reserved.
        ******************
        */
       _stockSuccess() {
-        document.dispatchEvent(new CustomEvent('show-toast', {
-          detail: {
-            type: '',
-            message: t('text.stock_load_success')
-          }
-        }));
-
+        LOGIS_UTIL.showToastInfoMessage(t('text.stock_load_success'));
         this._clearView();
       }
 

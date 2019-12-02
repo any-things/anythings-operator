@@ -256,12 +256,7 @@ Copyright © HatioLab Inc. All rights reserved.
               this.$['box-id'].select();
             }
           } else {
-            document.dispatchEvent(new CustomEvent('show-toast', {
-              detail: {
-                type: t('text.box_form_check'),
-                message: t('text.box_form_check')
-              }
-            }));
+            LOGIS_UTIL.showToastWarnMessage(t('text.box_form_check'));
             this.$['box-id'].select();
           }
         }
@@ -308,13 +303,7 @@ Copyright © HatioLab Inc. All rights reserved.
           this.items ? this.set('items', this.items.slice(this.items.length)) : null;
           this.$['box-id'].select();
           this.$['box-in-qty'].value = '';
-
-          document.dispatchEvent(new CustomEvent('show-toast', {
-            detail: {
-              type: t('text.wrapping_not_need'),
-              message: t('text.wrapping_not_need')
-            }
-          }));
+          LOGIS_UTIL.showToastWarnMessage(t('text.wrapping_not_need'));
         }
       }
 

@@ -714,24 +714,19 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _findSkuResponseChanged(findSkuResponse) {
         if (!findSkuResponse || findSkuResponse.length === 0) {
-          document.dispatchEvent(new CustomEvent('show-toast', {
-            detail: {
-              type: t('error.VALIDATION_ERROR'),
-              message: t('text.cant_find_result_by_input')
-            }
-          }));
-
+          LOGIS_UTIL.showToastWarnMessage(t('text.cant_find_result_by_input'));
           this._initFocus();
           return;
         }
 
         if (findSkuResponse.length > 1) {
           this.$.input.openPopup(findSkuResponse);
+
         } else {
           var selectedInput = findSkuResponse[0];
           this.selectedInput = selectedInput;
 
-          // 투입 cjfl
+          // 투입 처리
           this.doInputTransaction({
             rackCd: this.rackCd,
             sideCd: this.sideCd,

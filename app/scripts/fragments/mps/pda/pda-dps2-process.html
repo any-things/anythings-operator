@@ -716,13 +716,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _findSkuResponseChanged(findSkuResponse) {
         if (!findSkuResponse || findSkuResponse.length === 0) {
-          document.dispatchEvent(new CustomEvent('show-toast', {
-            detail: {
-              type: t('error.VALIDATION_ERROR'),
-              message: t('text.cant_find_result_by_input')
-            }
-          }));
-
+          LOGIS_UTIL.showToastWarnMessage(t('text.cant_find_result_by_input'));
           this._initFocus();
           return;
         }

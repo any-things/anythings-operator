@@ -390,30 +390,30 @@ Copyright © HatioLab Inc. All rights reserved.
         this.orderList = event.detail.order_list;
         const orderCombo = this._getOrderListCombo();
         this._clearCombobox(orderCombo);
+
         this.orderList.forEach(order => {
           const option = document.createElement('option');
           option.innerText = order.batch_id + ' / ' + order.order_qty;
           option.setAttribute('order-pcs', order);
           orderCombo.appendChild(option);
         });
+
         this.picking_qty = item.picking_qty;
         this.order_qty = item.order_qty;
         this._getBoxIdInput().value = item.box_id;
         this._getOrderQtyInput().value = this.picking_qty + '/' + this.order_qty;
         this.mapId = item.id;
         this.recomendedBoxType = item.box_type_cd;
+
         if (item.status == 'PICKING') {
           this._getSkuCdInput().select();
+
         } else if (item.status == 'PICKED') {
           this.mapId = null;
           this._resetView();
           this._getBoxIdInput().select();
-          document.dispatchEvent(new CustomEvent('show-toast', {
-            detail: {
-              title: t('text.order_already_picked'),
-              message: t('text.order_already_picked')
-            }
-          }));
+          LOGIS_UTIL.showToastWarnMessage(t('text.order_already_picked'));
+
         } else if (item.status == 'READY') {
           this._getBoxIdInput().select();
         }
@@ -426,33 +426,27 @@ Copyright © HatioLab Inc. All rights reserved.
       _handleKeypress(event) {
         if (event.keyCode === 13) {
           if (this.order_qty < this.picking_qty) {
-            document.dispatchEvent(new CustomEvent('show-toast', {
-              detail: {
-                title: t('text.reprint_error_msg_1'),
-                message: t('text.reprint_error_msg_1'),
-              }
-            }));
+            LOGIS_UTIL.showToastWarnMessage(t('text.reprint_error_msg_1'));
             this._getSkuCdInput().select();
+
           } else {
             const boxId = event.currentTarget.value;
             var boxInput = this._getBoxIdInput();
+
             if (/^[bcdfghiBCDFGHI][0-9]{7}$/.exec(boxId)) {
               try {
                 if (!boxId) throw t('error.box_id_invalid');
                 if (!this._validateBoxId(boxId)) throw t('error.not_recommanded_box');
-                this._requestSkuMapping(boxId)
+                this._requestSkuMapping(boxId);
+
               } catch (error) {
                 boxInput.value = '';
                 boxInput.select();
                 this._commonAlert(error)
               }
+
             } else {
-              document.dispatchEvent(new CustomEvent('show-toast', {
-                detail: {
-                  title: t('title.box_form_check'),
-                  message: t('text.box_form_check'),
-                }
-              }));
+              LOGIS_UTIL.showToastWarnMessage(t('text.box_form_check'));
               this._getSkuCdInput().value = boxInput.value;
               boxInput.value = '';
               this._getSkuCdInput().select();
@@ -502,12 +496,7 @@ Copyright © HatioLab Inc. All rights reserved.
           this._getSkuCdInput().select();
 
         } else if (item.status == 'CANCEL') {
-          document.dispatchEvent(new CustomEvent('show-toast', {
-            detail: {
-              type: t('text.sku_canceled'),
-              message: t('text.sku_canceled'),
-            }
-          }));
+          LOGIS_UTIL.showToastWarnMessage(t('text.sku_canceled'));
           this._resetView();
         }
       }
@@ -570,21 +559,12 @@ Copyright © HatioLab Inc. All rights reserved.
           this.mapId = null;
           this._toggleMessageSpinner();
           this.refreshSummary();
-          document.dispatchEvent(new CustomEvent('show-toast', {
-            detail: {
-              type: t('text.box_mapping_complete'),
-              message: t('text.box_mapping_complete'),
-            }
-          }));
+          LOGIS_UTIL.showToastInfoMessage(t('text.box_mapping_complete'));
           this._resetView();
+
         } else if (event.detail.status.toUpperCase() === 'PICKING') {
           this._getSkuCdInput().select();
-          document.dispatchEvent(new CustomEvent('show-toast', {
-            detail: {
-              type: t('text.box_mapping_complete'),
-              message: t('text.box_mapping_complete'),
-            }
-          }));
+          LOGIS_UTIL.showToastInfoMessage(t('text.box_mapping_complete'));
         }
       }
 

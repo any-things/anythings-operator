@@ -850,12 +850,7 @@ Copyright © HatioLab Inc. All rights reserved.
             this._scannedFlag = true;
 
           } else {
-            document.dispatchEvent(new CustomEvent('show-toast', {
-              detail: {
-                type: t('text.box_form_check'),
-                message: t('text.box_form_check')
-              }
-            }));
+            LOGIS_UTIL.showToastWarnMessage(t('text.box_form_check'));
           }
         }
       }

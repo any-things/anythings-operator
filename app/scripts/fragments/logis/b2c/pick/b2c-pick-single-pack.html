@@ -472,19 +472,14 @@ Copyright © HatioLab Inc. All rights reserved.
               // 박스 맵핑 후 작업 완료된 건에 대해서는 .... 
               if (this.currentJobInstance && this.currentJobInstance.status != 'P') {
                 // 이미 처리 완료된 박스 입니다.
-                document.dispatchEvent(new CustomEvent('show-toast', {
-                  detail: {
-                    title: t('text.single_box_done'),
-                    message: t('text.single_box_done'),
-                  }
-                }));
-
+                LOGIS_UTIL.showToastWarnMessage(t('text.single_box_done'));
                 return;
               }
 
               // 박스 ID 가 있으면 피킹 
               self._getBoxAjax().curl = `/device_process/dynamic/dps/single_pack/pick?jobId=${self.currentJobInstance.id}`;
               self._getBoxAjax().generateRequest();
+
             } else {
               // 대상 상품 변경 
               self._getSkuAjax().curl = `/device_process/dynamic/dps/single_pack/sku_change?equipType=${LOGIS_UTIL.getEquipType()}&equipCd=${self.rackCd}&skuCd=${skuCode}`;
@@ -524,20 +519,15 @@ Copyright © HatioLab Inc. All rights reserved.
         if (e.detail && e.detail.result && e.detail.result[0]) {
           this.boxPicking = e.detail.result[0].tot_cnt;
           this.boxPicked = e.detail.result[0].comp_cnt;
-
           this.orderQty = '';
           this.boxType = '';
-
           this._doGetSkuData(e.detail.result);
+
         } else {
-          document.dispatchEvent(new CustomEvent('show-toast', {
-            detail: {
-              title: t('text.order_not_exist'),
-              message: t('text.order_not_exist'),
-            }
-          }));
+          LOGIS_UTIL.showToastWarnMessage(t('text.order_not_exist'));
           this.refresh();
         }
+
         this._setInputFocus();
       }
 
@@ -581,33 +571,21 @@ Copyright © HatioLab Inc. All rights reserved.
           if (e.detail.result.job_instance) {
             var job = e.detail.result.job_instance;
             this.currentJobInstance = job;
-
             this.orderQty = (job.picked_qty + job.picking_qty) + '/' + job.pick_qty;
             this.boxType = job.box_type_cd;
 
             // 피킹중 상태가 아니면 완료된 작업에 대한 조회 
             if (job.status != 'P') {
               // 이미 처리 완료된 박스 입니다.
-              document.dispatchEvent(new CustomEvent('show-toast', {
-                detail: {
-                  title: t('text.single_box_done'),
-                  message: t('text.single_box_done'),
-                }
-              }));
+              LOGIS_UTIL.showToastWarnMessage(t('text.single_box_done'));
             }
           } else {
             this._getBoxIdInput().value = '';
             this.currentJobInstance = null;
             this.orderQty = '';
             this.boxType = '';
-
             // 작업이 완료 되었습니다.
-            document.dispatchEvent(new CustomEvent('show-toast', {
-              detail: {
-                title: t('text.single_box_complete'),
-                message: t('text.single_box_complete'),
-              }
-            }));
+            LOGIS_UTIL.showToastInfoMessage(t('text.single_box_complete'));
           }
         }
 
@@ -657,13 +635,7 @@ Copyright © HatioLab Inc. All rights reserved.
           }
 
         } else {
-          document.dispatchEvent(new CustomEvent('show-toast', {
-            detail: {
-              type: t('text.box_mapping_complete'),
-              message: t('text.box_mapping_complete')
-            }
-          }));
-
+          LOGIS_UTIL.showToastInfoMessage(t('text.box_mapping_complete'));
           this.refresh();
           this.items = [];
           this.set('items', this.items.slice());

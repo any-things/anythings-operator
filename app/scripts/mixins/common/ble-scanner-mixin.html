@@ -104,22 +104,12 @@ Copyright © HatioLab Inc. All rights reserved.
               if (isEnabled) {
                 return this.isConnected();
               } else {
-                document.dispatchEvent(new CustomEvent('show-toast', {
-                  detail: {
-                    type: t('error.SETTING_ERROR'),
-                    message: t('text.bluetooth_is_not_on')
-                  }
-                }));
+                LOGIS_UTIL.showToastWarnMessage(t('text.bluetooth_is_not_on'));
               }
             })
             .then(isConnected => {
               if (isConnected) {
-                document.dispatchEvent(new CustomEvent('show-toast', {
-                  detail: {
-                    type: t('title.connect_scanner'),
-                    message: t('text.bluetooth_scanner_connected')
-                  }
-                }));
+                LOGIS_UTIL.showToastInfoMessage(t('text.bluetooth_scanner_connected'));
 
               } else {
                 this.stopScanDevices();
@@ -130,13 +120,11 @@ Copyright © HatioLab Inc. All rights reserved.
 
                 ble.connect(this.deviceId, () => {
                   this.startNotification();
-                  document.dispatchEvent(new CustomEvent('show-toast', {
-                    detail: {
-                      type: t('title.connect_scanner'),
-                      message: t('text.bluetooth_scanner_connected')
-                    }
-                  }));
-                  if (this.afterConnect && typeof this.afterConnect === 'function') this.afterConnect();
+                  LOGIS_UTIL.showToastInfoMessage(t('text.bluetooth_scanner_connected'));
+
+                  if (this.afterConnect && typeof this.afterConnect === 'function') {
+                    this.afterConnect();
+                  }
                 });
               }
             })
@@ -176,12 +164,7 @@ Copyright © HatioLab Inc. All rights reserved.
         if (this.beforeDisconnect && typeof this.beforeDisconnect === 'function') this.beforeDisconnect();
 
         ble.disconnect(this.deviceId, () => {
-          document.dispatchEvent(new CustomEvent('show-toast', {
-            detail: {
-              type: t('title.disconnect_scanner'),
-              message: t('text.bluetooth_scanner_disconnected')
-            }
-          }));
+          LOGIS_UTIL.showToastInfoMessage(t('text.bluetooth_scanner_disconnected'));
           if (this.afterDisconnect && typeof this.afterDisconnect === 'function') this.afterDisconnect();
         });
       }

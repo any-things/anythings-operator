@@ -988,22 +988,20 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _inspectionChanged(inspection) {
         if (inspection == null) return;
+
         if (!(/([BRES])/.test(inspection.status))) {
-          document.dispatchEvent(new CustomEvent('show-toast', {
-            detail: {
-              type: t('text.cannot_inspection_now'),
-              message: t('text.cannot_inspection_now')
-            }
-          }));
+          LOGIS_UTIL.showToastWarnMessage(t('text.cannot_inspection_now'));
           this.clearView();
           this.focusBucketInput();
           return;
         }
+
         this.currentOrderId = inspection.order_id;
         this.custOrderId = inspection.cust_order_id;
         this.currentBucketCd = inspection.box_id;
         this.$['order-cd'].value = this.currentOrderId;
         this.$['bucket-cd'].value = this.currentBucketCd;
+
         if (inspection.job_type === 'QPS') {
           this.jobType = true;
           if (inspection.status === 'R') this.rejectStatus = true;
@@ -1020,6 +1018,7 @@ Copyright © HatioLab Inc. All rights reserved.
           this.$['inspection-btn'].hidden = false;
           this.$['reset-btn'].hidden = false;
           this.$['reset-all-btn'].hidden = false;
+
         } else {
           this.$['inspection-btn'].hidden = true;
           this.$['reset-btn'].hidden = true;

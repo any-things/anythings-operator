@@ -340,6 +340,47 @@ LOGIS_UTIL.setWorkSide = function(workSideCd, screen) {
 };
 
 /**
+ * @description 알림성 토스트 메시지 출력
+ ******************
+ * @param message
+ */
+LOGIS_UTIL.showToastInfoMessage = function(message) {
+  LOGIS_UTIL.showToastMessage('info', message);
+};
+
+/**
+ * @description 경고성 토스트 메시지 출력
+ ******************
+ * @param message
+ */
+LOGIS_UTIL.showToastWarnMessage = function(message) {
+  LOGIS_UTIL.showToastMessage('warn', message);
+};
+
+/**
+ * @description 오류성 토스트 메시지 출력
+ ******************
+ * @param message
+ */
+LOGIS_UTIL.showToastErrorMessage = function(message) {
+  LOGIS_UTIL.showToastMessage('error', message);
+};
+
+/**
+ * @description 토스트 메시지 출력
+ ******************
+ * @param message
+ */
+LOGIS_UTIL.showToastMessage = function(type, message) {
+  document.dispatchEvent(new CustomEvent('show-toast', {
+    detail: {
+      type: type ? type : 'info',
+      message: message
+    }
+  }));
+};
+
+/**
  * @description items의 내용 중에 left_qty가 0인 항목이 아래로 가도록 소팅
  ******************
  * @param items

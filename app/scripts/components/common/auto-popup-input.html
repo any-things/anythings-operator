@@ -285,12 +285,7 @@ Copyright © HatioLab Inc. All rights reserved.
         }
 
         if (Array.isArray(data) && data.length === 0 || !data || Object.keys(data).length === 0) {
-          document.dispatchEvent(new CustomEvent('show-toast', {
-            detail: {
-              type: t('error.VALIDATION_ERROR'),
-              message: t('text.cant_find_result_by_input')
-            }
-          }));
+          LOGIS_UTIL.showToastWarnMessage(t('text.cant_find_result_by_input'));
           this.select();
           return;
         }
