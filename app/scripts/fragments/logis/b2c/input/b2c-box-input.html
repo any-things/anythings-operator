@@ -751,14 +751,12 @@ Copyright © HatioLab Inc. All rights reserved.
           } catch (e) {}
         }
 
-        let interval = 20 * 1000;
+        let interval = 0;
         try {
           interval = LOGIS_UTIL.getRefreshInterval();
-          // interval 설정 값이 없으면 20 초 기본 셋팅 
-          if (!interval) {
-            interval = 20 * 1000;
-          }
-        } catch (e) {}
+        } catch (e) {
+          interval = 20 * 10000;
+        }
 
         setTimeout(function() {
           this.startAutoRefresh();
@@ -838,13 +836,11 @@ Copyright © HatioLab Inc. All rights reserved.
             event.currentTarget.value = '';
             this.inputBox(boxCd);
 
-            /*
-            if (LOGIS_UTIL.getB2CInputBoxType() === 'box') {
+            /*if (LOGIS_UTIL.isBoxTypeBoxInput()) {
               this.inputBox(boxCd);
             } else {
               this.inputTray(boxCd);
-            }
-            */
+            }*/
 
             SOUND.playInfoSound();
             this._scannedFlag = true;
@@ -862,18 +858,18 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       refresh(event) {
         this._barcodeInputReset();
-        var rackCd = LOGIS_UTIL.getEquipCd();
+        var equipCd = LOGIS_UTIL.getEquipCd();
         var equipType = LOGIS_UTIL.getEquipType();
 
-        if (rackCd) {
+        if (equipCd) {
           var showOrderAjax = this.$['batch-summary-ajax'];
           var url = '/device_process/dynamic/dps/batch_summary';
           url += '?page=' + this.page + '&limit=' + this.limit;
-          url += '&equipType=' + equipType + '&equipCd=' + rackCd;
+          url += '&equipType=' + equipType + '&equipCd=' + equipCd;
           showOrderAjax.curl = url;
           showOrderAjax.generateRequest();
         } else {
-          LOGIS_UTIL.showMessage(t('title.selecting_rack'), t('text.select_rack'));
+          LOGIS_UTIL.showMessage(t('text.selecting_equipment'), t('text.select_equipment'));
         }
       }
 
@@ -907,19 +903,19 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       inputBox(boxId) {
         if (boxId) {
-          var rackCd = LOGIS_UTIL.getEquipCd();
+          var equipCd = LOGIS_UTIL.getEquipCd();
           var equipType = LOGIS_UTIL.getEquipType();
 
-          if (rackCd) {
+          if (equipCd) {
             var inputBoxAjax = this.$['input-ajax'];
             var url = '/device_process/dynamic/dps/input_bucket';
             url += '?page=' + this.page + '&limit=' + this.limit;
-            url += '&equipType=' + equipType + '&equipCd=' + rackCd + '&bucketCd=' + boxId;
-            url += '&inputType=' + LOGIS_UTIL.getB2CInputBoxType();
+            url += '&equipType=' + equipType + '&equipCd=' + equipCd + '&bucketCd=' + boxId;
+            url += '&inputType=' + LOGIS_UTIL.getInputBoxType();
             inputBoxAjax.curl = url;
             inputBoxAjax.generateRequest();
           } else {
-            LOGIS_UTIL.showMessage(t('title.selecting_rack'), t('text.select_rack'));
+            LOGIS_UTIL.showMessage(t('text.selecting_equipment'), t('text.select_equipment'));
           }
         }
       }

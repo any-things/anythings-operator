@@ -155,7 +155,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @returns {String} qrImgSrc
        */
       _computeQRImgSrc(actionType) {
-        const kioskCodeType = LOGIS_UTIL.getBarcodeType();
+        const kioskCodeType = LOGIS_UTIL.getQrGenerateSourceType();
         const basePath = './static/assets/kiosk_codes/';
 
         if (actionType === 'mpi-off') {

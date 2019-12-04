@@ -714,7 +714,7 @@ Copyright © HatioLab Inc. All rights reserved.
           this.bucketCd = bucketCd;
           this.validateBeforeBucketScan();
           var ajaxLabel = this.$['inspection-items-ajax'];
-          var inputType = LOGIS_UTIL.getB2CInputBoxType();
+          var inputType = LOGIS_UTIL.getInputBoxType();
           ajaxLabel.curl = '/kiosk_process/dps/inspection/by_qty/ready/by_box/' + inputType + '/' + this.bucketCd;
           ajaxLabel.generateRequest();
         } catch (error) {
@@ -1310,7 +1310,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
       changeInspectionStatus() {
         var boxId = this.$['bucket-cd'].value;
-        var inputType = LOGIS_UTIL.getB2CInputBoxType();
+        var inputType = LOGIS_UTIL.getInputBoxType();
         var changeStatusAjax = this.$['change-status-ajax'];
         changeStatusAjax.curl = '/kiosk_process/dps/inspection/by_qty/again/' + inputType + '/' + boxId;
         changeStatusAjax.generateRequest();

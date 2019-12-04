@@ -91,7 +91,7 @@ Copyright © HatioLab Inc. All rights reserved.
         let equipCd = LOGIS_UTIL.getEquipCd();
         let stationCd = LOGIS_UTIL.getStationCd();
         let workSideCd = LOGIS_UTIL.getWorkSideCd();
-        let showOthersOrder = LOGIS_UTIL.getShowOthersOrder();
+        let showOthersOrder = LOGIS_UTIL.isShowOthersOrder();
 
         inputListAjax.curl =
           `/tablet_process/input_list/${equipCd}/${stationCd}/${workSideCd}`;

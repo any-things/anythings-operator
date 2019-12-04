@@ -259,7 +259,7 @@ Copyright © HatioLab Inc. All rights reserved.
           showFullCode: {
             type: Boolean,
             value: () => {
-              return LOGIS_UTIL.getShowFullCode()
+              return LOGIS_UTIL.isShowFullSkuCode()
             }
           },
 
@@ -332,7 +332,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _updateStatus(inputDetails) {
         // input detail의 내용이 없을 경우 다음 아이템을 선택함 == 나와 관계 없는 작업들 처리...
-        if (inputDetails.length === 0 && !this.holdIndicator && LOGIS_UTIL.getAutoPicking()) {
+        if (inputDetails.length === 0 && !this.holdIndicator && LOGIS_UTIL.isAutoSelectionNextOrder()) {
           if (!this.$['das-job-indicator'].selectNextItem()) {
             this.refreshInputList();
           }
@@ -371,7 +371,7 @@ Copyright © HatioLab Inc. All rights reserved.
         this._updateBlockChart(this.pickedPercent);
 
         // 작업률 100% & 자동피킹이 true로 설정 && 사용자에 의해 클릭을 통해 변경되지 않은 경우 => true
-        if (pickedCanceldPercent === 100 && LOGIS_UTIL.getAutoPicking() && !this.holdIndicator) {
+        if (pickedCanceldPercent === 100 && LOGIS_UTIL.isAutoSelectionNextOrder() && !this.holdIndicator) {
           // 다음 아이템이 없을 경우 false를 리턴함
           if (!this.$['das-job-indicator'].selectNextItem()) {
             // 마지막 아이템일 경우 input list를 다시 조회
@@ -542,7 +542,7 @@ Copyright © HatioLab Inc. All rights reserved.
         let sideCd = LOGIS_UTIL.getWorkSideCd();
         let pageAjax = this.$['input-list-pages-ajax'];
         pageAjax.customParams = {
-          show_others_order: LOGIS_UTIL.getShowOthersOrder()
+          show_others_order: LOGIS_UTIL.isShowOthersOrder()
         };
         pageAjax.curl = `/tablet_process/input_pages/${rackCd}/${zoneCd}/${sideCd}/${upDownMode}/${startInputSeq}`;
         pageAjax.generateRequest();
