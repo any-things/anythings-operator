@@ -14,14 +14,6 @@ Copyright © HatioLab Inc. All rights reserved.
   <template>
     <style include="shared-styles any-setting-styles"></style>
 
-    <!-- 작업 유형 리스트 조회 Ajax -->
-    <sys-ajax 
-      id="job-types-ajax" 
-      method="GET" 
-      content-type="application/json"
-      on-sys-ajax-response="_renderJobTypeCombo">
-    </sys-ajax>
-
     <!-- 작업 위치 (앞, 뒤, 앞/뒤, 전체 등) 조회 Ajax -->
     <sys-ajax 
       auto 
@@ -71,26 +63,6 @@ Copyright © HatioLab Inc. All rights reserved.
       static get properties() {
         return {
           /**
-           * @description 자동 피킹 라벨
-           ***************
-           * @type {String}
-           */
-          autoPickingLabel: {
-            type: String,
-            value: () => t('label.auto_picking')
-          },
-
-          /**
-           * @description 작업 대상 외 주문 보기
-           ***************
-           * @type {String}
-           */
-          othersOrdLabel: {
-            type: String,
-            value: () => t('label.show_others_order')
-          },
-
-          /**
            * @description 보이기 라벨
            ***************
            * @type {String}
@@ -108,16 +80,6 @@ Copyright © HatioLab Inc. All rights reserved.
           hideLabel: {
             type: String,
             value: () => t('label.hide')
-          },
-
-          /**
-           * @description 투입 코드 모두 보기 라벨
-           ***************
-           * @type {String}
-           */
-          showFullCodeLabel: {
-            type: String,
-            value: () => t('label.show_full_code')
           },
 
           /**
@@ -171,76 +133,6 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * @description 나와 관계 없는 주문 보기 설정 값
-           ***************
-           * @type {String}
-           */
-          showOthersOrder: {
-            type: Boolean,
-            value: () => JSON.parse(localStorage.getItem('setting.showOthersOrder'))
-          },
-
-          /**
-           * @description 나와 관계 없는 주문 보기 설정 값 변경을 위한 localStorage key
-           ***************
-           * @type {String}
-           */
-          showOthersOrderLSKey: {
-            type: String,
-            value: 'setting.showOthersOrder'
-          },
-
-          /**
-           * @description 투입 코드 모두 보기 설정 값
-           ***************
-           * @type {String}
-           */
-          showFullCode: {
-            type: Boolean,
-            value: () => JSON.parse(localStorage.getItem('setting.showFullCode'))
-          },
-
-          /**
-           * @description 투입 코드 모두 보기 설정 값 변경을 위한 localStorage key
-           ***************
-           * @type {String}
-           */
-          showFullCodeLSKey: {
-            type: String,
-            value: 'setting.showFullCode'
-          },
-
-          /**
-           * @description 자동 피킹 여부 설정 값
-           ***************
-           * @type {String}
-           */
-          autoPicking: {
-            type: Boolean,
-            value: () => JSON.parse(localStorage.getItem('setting.autoPicking'))
-          },
-
-          /**
-           * @description 자동 피킹 여부 설정 값 변경을 위한 localStorage key
-           ***************
-           * @type {String}
-           */
-          autoPickingLSKey: {
-            type: String,
-            value: 'setting.autoPicking'
-          },
-
-          /**
-           * @description 화면 소스 URL
-           ***************
-           * @type {String}
-           */
-          srcUrl: {
-            type: String,
-            value: JSON.parse(localStorage.getItem('setting.srcUrl'))
-          },
-
-          /**
            * @description 내역 보기 버튼 라벨
            *********************
            * @type {String}
@@ -280,8 +172,6 @@ Copyright © HatioLab Inc. All rights reserved.
         super.connectedCallback();
         this._setIpAddress();
         this._setDefaultValues();
-        this._getJobTypeList();
-        //this._hiddenDiv();
       }
 
       /**
@@ -317,47 +207,6 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _setDefaultValues() {
         this._setWorkSideDefaultValue();
-        //this._setFullCodeDefaultValue();
-        //this._setAutoPickingDefaultValue();
-        //this._setShowOthersOrderDefaultValue();
-      }
-
-      /**
-       * @description connectedCallback에 의해 호출 되며 현재 설정된 설정 값을
-       * 로컬스토리지를 통해 조회하고 초기화 함
-       *******************
-       */
-      _setShowOthersOrderDefaultValue() {
-        const showOthersOrderOpts = this._getShowOthersOrderOpts();
-        showOthersOrderOpts.forEach(showOthersOrderOpt => {
-          if (this.showOthersOrder === JSON.parse(showOthersOrderOpt.value)) {
-            showOthersOrderOpt.checked = true;
-          }
-        });
-      }
-
-      /**
-       * @description connectedCallback에 의해 호출 되며 현재 설정된 설정 값을
-       * 로컬스토리지를 통해 조회하고 초기화 함
-       *******************
-       */
-      _setFullCodeDefaultValue() {
-        const showFullCodeOpts = this._getShowFullCodeOpts();
-        showFullCodeOpts.forEach(showFullCodeOpt => {
-          if (this.showFullCode === JSON.parse(showFullCodeOpt.value)) {
-            showFullCodeOpt.checked = true;
-          }
-        });
-      }
-
-      /**
-       * @description connectedCallback에 의해 호출 되며 현재 설정된 설정 값을
-       * 로컬스토리지를 통해 조회하고 초기화 함
-       *******************
-       */
-      _setAutoPickingDefaultValue() {
-        const autoPickingInput = this._getAutoPickingInput();
-        autoPickingInput.checked = this.autoPicking;
       }
 
       /**
@@ -369,6 +218,7 @@ Copyright © HatioLab Inc. All rights reserved.
       saveSetting() {
         return new Promise((resolve, reject) => {
           this.updateSetting().then(() => {
+              // FIXME
               LOGIS_UTIL.setLocalStorage(this.workSideCdLSKey, 'ALL');
               resolve();
             })
@@ -425,50 +275,6 @@ Copyright © HatioLab Inc. All rights reserved.
           updateSettingAjax.generateRequest();
         });
       }
-
-      /**
-       * @description return 나와 관계 없는 주문 보기 input elements
-       *******************
-       */
-      _getShowOthersOrderOpts() {
-        return Array.from(this.$['other-order'].querySelectorAll('input[name=others-order]'));
-      }
-
-      /**
-       * @description return 투입 코드 모두 보기 input elements
-       *******************
-       */
-      _getShowFullCodeOpts() {
-        return Array.from(this.$['show-full-code'].querySelectorAll('input[name=show-full-code]'));
-      }
-
-      /**
-       * @description return 자동 피킹 input element
-       *******************
-       */
-      _getAutoPickingInput() {
-        return this.$['auto-pick-input'];
-      }
-
-      /**
-       * @description div 숨기기
-       *******************
-       */
-      /*_hiddenDiv() {
-        if (this.$['job-type-combo'].value == 'QPS' || this.jobType == 'QPS') {
-          LOGIS_UTIL.setLocalStorage('setting.isQps', true);
-          this.$['other-order'].setAttribute('style', `display: none`);
-          this.$['auto-pick'].setAttribute('style', `display: none`);
-          this.$['ble-mode'].setAttribute('style', `display: flex;`);
-          this.$['ble-img'].setAttribute('src', this.srcUrl + '/images/ble-mode.png');
-
-        } else {
-          LOGIS_UTIL.setLocalStorage('setting.isQps', false);
-          this.$['other-order'].setAttribute('style', `display: flex`);
-          this.$['auto-pick'].setAttribute('style', `display: flex`);
-          this.$['ble-mode'].setAttribute('style', `display: none`);
-        }
-      }*/
 
       /**
        * @description app refresh

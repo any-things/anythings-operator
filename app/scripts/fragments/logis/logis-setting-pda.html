@@ -12,14 +12,6 @@ Copyright © HatioLab Inc. All rights reserved.
   <template>
     <style include="shared-styles any-setting-styles"></style>
 
-    <!-- 작업 유형 리스트 조회를 위한 Ajax -->
-    <sys-ajax 
-      id="job-types-ajax" 
-      method="GET" 
-      content-type="application/json" 
-      on-sys-ajax-response="_renderJobTypeCombo">
-    </sys-ajax>
-
     <!-- 업데이트 내역 조회 -->
     <sys-ajax 
       id="update-ajax" 
@@ -70,16 +62,6 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * @description 송장 번호 표시 시작점 라벨
-           ***************
-           * @type {String}
-           */
-          invoiceFieldSubstrLabel: {
-            type: String,
-            value: () => t('label.invoice_field_substr')
-          },
-
-          /**
            * @description 내역 보기 버튼 라벨
            *********************
            * @type {String}
@@ -118,7 +100,6 @@ Copyright © HatioLab Inc. All rights reserved.
       connectedCallback() {
         super.connectedCallback();
         this._setDefaultValues();
-        //this._getJobTypeList();
       }
 
       /**
@@ -193,71 +174,6 @@ Copyright © HatioLab Inc. All rights reserved.
           updateSettingAjax.generateRequest();
         })
       }
-
-      /**
-       * @description 설비 설정 리셋
-       ******************
-       */
-      /*resetRackInfo() {
-        // 랙 코드 값 저장
-        if (this.$['job-type-combo'].value != 'QPS' || this.jobType != 'QPS') {
-          var rackCd = JSON.parse(localStorage.getItem(this.equipmentCdLSKey))
-          var rackNm = JSON.parse(localStorage.getItem(this.equipmentNmLSKey))
-
-          if (rackCd && rackNm) {
-            this._getEquipCombo().value = rackCd;
-          }
-
-          // 작업 스테이션 값 저장
-          var stationCd = JSON.parse(localStorage.getItem(this.stationCodeLSKey));
-          if (!stationCd) {
-            return;
-          }
-
-          var stationCombo = this._getStationCombo();
-          var options = stationCombo.options;
-
-          var items = [];
-          for (let i = 0; i < options.length; i++) {
-            items.push(options[i].value);
-          }
-
-          if (items.indexOf(stationCd) < 0) {
-            const option = new Option(stationCd);
-            option.selected = true;
-            this.stationCd = stationCd;
-            stationCombo.appendChild(option);
-          } else {
-            stationCombo.value = stationCd;
-          }
-        }
-      }*/
-
-      /**
-       * @description 랙 정보 숨기기
-       ******************
-       */
-      /*_hideRack() {
-        if (this._getJobTypeCombo().selectedOptions.length > 0) {
-          this.jobType = this._getJobTypeCombo().selectedOptions[0].value;
-        }
-
-        if (this.$['job-type-combo'].value == 'QPS' || this.jobType == 'QPS') {
-          this.$['zone'].style.display = 'none';
-          this.$['rack'].style.display = 'none';
-          this.$['work-side'].style.display = 'none';
-          LOGIS_UTIL.setLocalStorage('setting.equipCd', 'NA');
-          LOGIS_UTIL.setLocalStorage('setting.equipNm', 'NA');
-          LOGIS_UTIL.setLocalStorage('setting.stationCd', 'NA');
-          LOGIS_UTIL.setLocalStorage('setting.isQps', true);
-
-        } else {
-          this.$['zone'].style.display = 'flex';
-          this.$['rack'].style.display = 'flex';
-          this.$['work-side'].style.display = 'flex';
-          LOGIS_UTIL.setLocalStorage('setting.isQps', false);
-        }
-      }*/
     }
 
     customElements.define(LogisSettingPda.is, LogisSettingPda);

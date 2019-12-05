@@ -179,16 +179,6 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * @description 작업 이름 로컬 스토리지 키
-           ****************
-           * @type {String}
-           */
-          jobTypeLSKey: {
-            type: String,
-            value: 'setting.jobType'
-          },
-
-          /**
            * @description 스테이지 코드
            ****************
            * @type {String}
@@ -259,16 +249,6 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * @description 작업 유형
-           ****************
-           * @type {String}
-           */
-          jobType: {
-            type: String,
-            value: () => JSON.parse(localStorage.getItem('setting.jobType'))
-          },
-
-          /**
            * @description 장비 설정 리스트
            *********************
            * @type {Array}
@@ -328,18 +308,6 @@ Copyright © HatioLab Inc. All rights reserved.
           stationListAjax.baseUrl = LOGIS_UTIL.getLocalStorage('setting.baseUrl');
           stationListAjax.generateRequest();
         }
-      }
-
-      /**
-       * @description 작업 유형 리스트 조회
-       *******************************
-       * @return
-       */
-      _getJobTypeList() {
-        const jobTypeAjax = this._getJobTypeListAjax();
-        jobTypeAjax.curl = `/common_codes/show_by_name?name=JOB_TYPE`;
-        jobTypeAjax.baseUrl = LOGIS_UTIL.getLocalStorage('setting.baseUrl');
-        jobTypeAjax.generateRequest();
       }
 
       /**
@@ -425,15 +393,6 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * @description 작업 유형 리스트 Ajax
-       *******************************
-       * @return {Object} ajax
-       */
-      _getJobTypeListAjax() {
-        return this.$['job-types-ajax'];
-      }
-
-      /**
        * @description 장비 설정 리스트 Ajax
        *******************************
        * @return {Object} ajax
@@ -497,23 +456,12 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * @description 작업 유형 리스트 콤보 리턴
-       *******************************
-       * @return {Object} combo
-       */
-      _getJobTypeCombo() {
-        return this.$['job-type-combo'];
-      }
-
-      /**
        * @description 장비 설정 리스트 변경시
        **********************
        * @param {Array} deviceSettings
        */
       _deviceSettingsChanged(deviceSettings) {
         LOGIS_UTIL.setLocalStorage('setting.deviceSettings', deviceSettings);
-
-        // TODO rabbitmq 초기화 ...
       }
 
       /**
@@ -639,26 +587,6 @@ Copyright © HatioLab Inc. All rights reserved.
           option.selected = (this.stationCd === station);
           stationCombo.appendChild(option);
         });
-      }
-
-      /**
-       * @description 작업 유형 콤보 렌더링
-       *******************************
-       * @param {Object} event
-       */
-      _renderJobTypeCombo(event) {
-        const jobTypeCombo = this._getJobTypeCombo();
-
-        if (jobTypeCombo) {
-          this._clearCombo(jobTypeCombo);
-          let jobTypes = (event && event.detail && event.detail.items) ? event.detail.items : [];
-
-          jobTypes.forEach(job => {
-            const option = new Option(job.description, job.name);
-            option.selected = (this.jobType === job.name);
-            jobTypeCombo.appendChild(option);
-          })
-        }
       }
 
       /**

@@ -155,36 +155,6 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * @description 키오스크 코드 타입 설정 값 저장을 위한 localStorage key
-           *********************
-           * @type {String}
-           */
-          kioskCodeTypeLSKey: {
-            type: String,
-            value: 'setting.barcodeType'
-          },
-
-          /**
-           * @description 키오스크 투입 유형 설정 값
-           *********************
-           * @type {String}
-           */
-          kioskInputType: {
-            type: String,
-            value: () => JSON.parse(localStorage.getItem('setting.b2cKioskInputType'))
-          },
-
-          /**
-           * @description 키오스크 투입 유형 설정 값 저장을 위한 localStorage key
-           *********************
-           * @type {String}
-           */
-          kioskInputTypeLSKey: {
-            type: String,
-            value: 'setting.b2cKioskInputType'
-          },
-
-          /**
            * @description 키오스크 메뉴 리스트
            *********************
            * @type {Array}
@@ -263,40 +233,6 @@ Copyright © HatioLab Inc. All rights reserved.
             detail: screenList
           }));
         }
-      }
-
-      /**
-       * @description 코드 유형 리스트 change event handler
-       * 코드 유형 리스트가 변경되면 코드 유헝 설정 콤보를 출력
-       **********************
-       * @param {Array} codeTypes
-       */
-      _renderCodeCombo(codeTypes) {
-        const codeCombo = this._getCodeTypeCombo();
-        this._clearCombo(codeCombo);
-
-        codeTypes.forEach(codeType => {
-          const option = new Option(codeType.name, codeType.value);
-          option.selected = (this.kioskCodeType === codeType.value);
-          codeCombo.appendChild(option);
-        });
-      }
-
-      /**
-       * @description 투입 유형 리스트 change event handler
-       * 투입 유형 리스트가 변경되면 투입 유형 설정 콤보를 출력
-       **********************
-       * @param {Array} inputTypes
-       */
-      _renderInputTypeCombo(inputTypes) {
-        const inputTypeCombo = this._getInputTypeCombo();
-        this._clearCombo(inputTypeCombo);
-
-        inputTypes.forEach(inputType => {
-          const option = new Option(inputType.name, inputType.value);
-          option.selected = (this.kioskInputType === inputType.value);
-          inputTypeCombo.appendChild(option);
-        });
       }
 
       /**
@@ -379,33 +315,6 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _getScreenCombo() {
         return this.$['screen-combo']
-      }
-
-      /**
-       * @description return 키오스크 데이터 조회 주기 input element
-       ***********************
-       * @return {Object} input field
-       */
-      _getKioskIntervalInput() {
-        return this.$['interval-input']
-      }
-
-      /**
-       * @description return 코드 유형 select element
-       ***********************
-       * @return {Object} combo box
-       */
-      _getCodeTypeCombo() {
-        return this.$['code-type-combo'];
-      }
-
-      /**
-       * @description return 투입 유형 select element
-       ***********************
-       * @return {Object} combo box
-       */
-      _getInputTypeCombo() {
-        return this.$['input-type-combo'];
       }
     }
 
