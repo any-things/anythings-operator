@@ -352,22 +352,208 @@ LOGIS_UTIL.getQrGenerateSourceType = function() {
   return LOGIS_UTIL.getDeviceSettingValue('qrcode.generate.source.type');
 };
 
-/*
-TODO
-validation	validation.box_barcd.rule	박스 바코드 Validation Rule - 박스 바코드 Validation을 화면에서 처리하는 경우 Validation Rule	
-validation	validation.box_barcd.screen.enabled	박스 바코드 Validation을 화면에서 처리할 지 여부 - false인 경우 서버에서 Validation 처리	true
-validation	validation.cell_cd.rule	셀 코드 Validation Rule - 셀 코드 Validation을 화면에서 처리하는 경우 Validation Rule	
-validation	validation.cell_cd.screen.enabled	셀 코드 Validation을 화면에서 처리할 지 여부 - false인 경우 서버에서 Validation 처리	true
-validation	validation.chute_cd.rule	슈트 번호 Validation Rule - 셀 코드 Validation을 화면에서 처리하는 경우 Validation Rule	
-validation	validation.chute_cd.screen.enabled	슈트 번호 Validation을 화면에서 처리할 지 여부 - false인 경우 서버에서 Validation 처리	true
-validation	validation.ind_cd.rule	표시기 코드 Validation Rule - 셀 코드 Validation을 화면에서 처리하는 경우 Validation Rule	
-validation	validation.ind_cd.screen.enabled	표시기 코드 Validation을 화면에서 처리할 지 여부 - false인 경우 서버에서 Validation 처리	true
-validation	validation.rack_cd.rule	랙 코드 Validation Rule - 랙 코드 Validation을 화면에서 처리하는 경우 Validation Rule	
-validation	validation.rack_cd.screen.enabled	랙 코드 Validation을 화면에서 처리할 지 여부 - false인 경우 서버에서 Validation 처리	true
-validation	validation.sku_barcd.rule	상품 바코드 Validation Rule - 상품 코드 Validation을 화면에서 처리하는 경우 Validation Rule	
-validation	validation.sku_barcd.screen.enabled	상품 바코드 Validation을 화면에서 처리할 지 여부 - false인 경우 서버에서 Validation 처리	true
-validation	validation.sku_cd.rule	상품 코드 Validation Rule - 상품 코드 Validation을 화면에서 처리하는 경우 Validation Rule	
-validation	validation.sku_cd.screen.enabled	상품 코드 Validation을 화면에서 처리할 지 여부 - false인 경우 서버에서 Validation 처리	true*/
+/**
+ * @description 박스 바코드 Validation을 화면에서 처리할 지 여부
+ ********************
+ * @return
+ */
+LOGIS_UTIL.isBoxIdValidationEnabled = function() {
+  return LOGIS_UTIL.getBooleanDeviceSetting('validation.box_barcd.screen.enabled');
+};
+
+/**
+ * @description 박스 바코드 Validation Rule
+ ********************
+ * @return
+ */
+LOGIS_UTIL.getBoxIdValidationRule = function() {
+  return LOGIS_UTIL.getDeviceSettingValue('validation.box_barcd.rule');
+};
+
+/**
+ * @description 박스 바코드 유효성 체크
+ ********************
+ * @param {String} boxId
+ * @return
+ */
+LOGIS_UTIL.isBoxIdValid = function(boxId) {
+  let rule = new RegExp(LOGIS_UTIL.getBoxIdValidationRule());
+  return rule.test(boxId);
+};
+
+/**
+ * @description 셀 코드 Validation을 화면에서 처리할 지 여부
+ ********************
+ * @return
+ */
+LOGIS_UTIL.isCellCdValidationEnabled = function() {
+  return LOGIS_UTIL.getBooleanDeviceSetting('validation.cell_cd.screen.enabled');
+};
+
+/**
+ * @description 셀 코드 Validation Rule
+ ********************
+ * @return
+ */
+LOGIS_UTIL.getCellCdValidationRule = function() {
+  return LOGIS_UTIL.getDeviceSettingValue('validation.cell_cd.rule');
+};
+
+/**
+ * @description 셀 코드 유효성 체크
+ ********************
+ * @param {String} cellCd
+ * @return
+ */
+LOGIS_UTIL.isCellCdValid = function(cellCd) {
+  let rule = new RegExp(LOGIS_UTIL.getCellCdValidationRule());
+  return rule.test(cellCd);
+};
+
+/**
+ * @description 슈트 코드 Validation을 화면에서 처리할 지 여부
+ ********************
+ * @return
+ */
+LOGIS_UTIL.isChuteCdValidationEnabled = function() {
+  return LOGIS_UTIL.getBooleanDeviceSetting('validation.chute_cd.screen.enabled');
+};
+
+/**
+ * @description 슈트 코드 Validation Rule
+ ********************
+ * @return
+ */
+LOGIS_UTIL.getChuteCdValidationRule = function() {
+  return LOGIS_UTIL.getDeviceSettingValue('validation.chute_cd.rule');
+};
+
+/**
+ * @description 슈트 코드 유효성 체크
+ ********************
+ * @param {String} chuteCd
+ * @return
+ */
+LOGIS_UTIL.isChuteCdValid = function(chuteCd) {
+  let rule = new RegExp(LOGIS_UTIL.getCellCgetChuteCdValidationRuledValidationRule());
+  return rule.test(chuteCd);
+};
+
+/**
+ * @description 표시기 코드 Validation을 화면에서 처리할 지 여부
+ ********************
+ * @return
+ */
+LOGIS_UTIL.isIndCdValidationEnabled = function() {
+  return LOGIS_UTIL.getBooleanDeviceSetting('validation.ind_cd.screen.enabled');
+};
+
+/**
+ * @description 표시기 코드 Validation Rule
+ ********************
+ * @return
+ */
+LOGIS_UTIL.getIndCdValidationRule = function() {
+  return LOGIS_UTIL.getDeviceSettingValue('validation.ind_cd.rule');
+};
+
+/**
+ * @description 표시기 코드 유효성 체크
+ ********************
+ * @param {String} indCd
+ * @return
+ */
+LOGIS_UTIL.isIndCdValid = function(indCd) {
+  let rule = new RegExp(LOGIS_UTIL.getIndCdValidationRule());
+  return rule.test(indCd);
+};
+
+/**
+ * @description 랙 코드 Validation을 화면에서 처리할 지 여부
+ ********************
+ * @return
+ */
+LOGIS_UTIL.isRackCdValidationEnabled = function() {
+  return LOGIS_UTIL.getBooleanDeviceSetting('validation.rack_cd.screen.enabled');
+};
+
+/**
+ * @description 랙 코드 Validation Rule
+ ********************
+ * @return
+ */
+LOGIS_UTIL.getRackCdValidationRule = function() {
+  return LOGIS_UTIL.getDeviceSettingValue('validation.rack_cd.rule');
+};
+
+/**
+ * @description 랙 코드 유효성 체크
+ ********************
+ * @param {String} rackCd
+ * @return
+ */
+LOGIS_UTIL.isRackCdValid = function(rackCd) {
+  let rule = new RegExp(LOGIS_UTIL.getRackCdValidationRule());
+  return rule.test(rackCd);
+};
+
+/**
+ * @description 상품 바코드 Validation을 화면에서 처리할 지 여부
+ ********************
+ * @return
+ */
+LOGIS_UTIL.isSkuBarcdValidationEnabled = function() {
+  return LOGIS_UTIL.getBooleanDeviceSetting('validation.sku_barcd.screen.enabled');
+};
+
+/**
+ * @description 상품 바코드 Validation Rule
+ ********************
+ * @return
+ */
+LOGIS_UTIL.getSkuBarcdValidationRule = function() {
+  return LOGIS_UTIL.getDeviceSettingValue('validation.sku_barcd.rule');
+};
+
+/**
+ * @description 상품 바코드 유효성 체크
+ ********************
+ * @param {String} skuBarcd
+ * @return
+ */
+LOGIS_UTIL.isSkuBarcdValid = function(skuBarcd) {
+  let rule = new RegExp(LOGIS_UTIL.getSkuBarcdValidationRule());
+  return rule.test(skuBarcd);
+};
+
+/**
+ * @description 상품 코드 Validation을 화면에서 처리할 지 여부
+ ********************
+ * @return
+ */
+LOGIS_UTIL.isSkuCdValidationEnabled = function() {
+  return LOGIS_UTIL.getBooleanDeviceSetting('validation.sku_cd.screen.enabled');
+};
+
+/**
+ * @description 상품 코드 Validation Rule
+ ********************
+ * @return
+ */
+LOGIS_UTIL.getSkuCdValidationRule = function() {
+  return LOGIS_UTIL.getDeviceSettingValue('validation.sku_cd.rule');
+};
+
+/**
+ * @description 상품 코드 유효성 체크
+ ********************
+ * @param {String} skuCd
+ * @return
+ */
+LOGIS_UTIL.isSkuCdValid = function(skuCd) {
+  let rule = new RegExp(LOGIS_UTIL.getSkuCdValidationRule());
+  return rule.test(skuCd);
+};
 
 /**
  * @description 메시지 브로커의 사이트 코드 조회
