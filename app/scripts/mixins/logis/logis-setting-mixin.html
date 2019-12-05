@@ -291,99 +291,6 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * @description broker address를 조회
-       *******************************
-       * @return
-       */
-      _getBrokerAddress() {
-        let brokerAddrsAjax = this._getBrokerAddrsAjax();
-        brokerAddrsAjax.curl = '/settings/show_by_name?name=mw.rabbitmq.broker.address';
-        brokerAddrsAjax.baseUrl = LOGIS_UTIL.getLocalStorage('setting.baseUrl');
-        brokerAddrsAjax.generateRequest();
-      }
-
-      /**
-       * @description broker port를 조회
-       *******************************
-       * @return
-       */
-      _getBrokerPort() {
-        let brokerPortAjax = this._getBrokerPortAjax();
-        brokerPortAjax.curl = '/settings/show_by_name?name=mw.rabbitmq.web.mqtt.port';
-        brokerPortAjax.baseUrl = LOGIS_UTIL.getLocalStorage('setting.baseUrl');
-        brokerPortAjax.generateRequest();
-      }
-
-      /**
-       * @description broker site를 조회
-       *******************************
-       * @return
-       */
-      _getBrokerSite() {
-        let brokerSiteAjax = this._getBrokerSiteAjax();
-        brokerSiteAjax.curl = '/settings/show_by_name?name=mw.rabbitmq.site.code';
-        brokerSiteAjax.baseUrl = LOGIS_UTIL.getLocalStorage('setting.baseUrl');
-        brokerSiteAjax.generateRequest();
-      }
-
-      /**
-       * @description return broker-addrs-ajax
-       *******************************
-       * @return
-       */
-      _getBrokerAddrsAjax() {
-        return this.$['broker-addrs-ajax'];
-      }
-
-      /**
-       * @description return broker-port-ajax
-       *******************************
-       * @return
-       */
-      _getBrokerPortAjax() {
-        return this.$['broker-port-ajax'];
-      }
-
-      /**
-       * @description return broker-site-ajax
-       *******************************
-       * @return
-       */
-      _getBrokerSiteAjax() {
-        return this.$['broker-site-ajax'];
-      }
-
-      /**
-       * @description 조회한 broker address를 localStorage에 저장함
-       *******************************
-       */
-      _setBrokerAddress(response) {
-        if (response && response.detail) {
-          localStorage.setItem('setting.brokerAddress', response.detail.value);
-        }
-      }
-
-      /**
-       * @description 조회한 broker port를 localStorage에 저장함
-       *******************************
-       */
-      _setBrokerPort(response) {
-        if (response && response.detail) {
-          localStorage.setItem('setting.brokerPort', response.detail.value);
-        }
-      }
-
-      /**
-       * @description 조회한 broker site를 localStorage에 저장함
-       *******************************
-       */
-      _setBrokerSite(response) {
-        if (response && response.detail) {
-          localStorage.setItem('setting.brokerSite', response.detail.value);
-        }
-      }
-
-      /**
        * @description 스테이지 리스트를 조회
        *******************************
        * @return
@@ -605,6 +512,8 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _deviceSettingsChanged(deviceSettings) {
         LOGIS_UTIL.setLocalStorage('setting.deviceSettings', deviceSettings);
+
+        // TODO rabbitmq 초기화 ...
       }
 
       /**

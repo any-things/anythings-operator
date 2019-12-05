@@ -170,6 +170,33 @@ LOGIS_UTIL.getDeviceSwVersion = function() {
 };
 
 /**
+ * @description 메시지 브로커의 사이트 코드 조회
+ ********************
+ * @return 메시지 브로커의 사이트 코드
+ */
+LOGIS_UTIL.getBrokerSiteCd = function() {
+  return LOGIS_UTIL.getDeviceSettingValue('mw.rabbitmq.site.code');
+};
+
+/**
+ * @description 메시지 브로커 주소 조회
+ ********************
+ * @return 메시지 브로커의 주소
+ */
+LOGIS_UTIL.getBrokerAddress = function() {
+  return LOGIS_UTIL.getDeviceSettingValue('mw.rabbitmq.broker.address');
+};
+
+/**
+ * @description 메시지 브로커 포트 조회
+ ********************
+ * @return 메시지 브로커 포트
+ */
+LOGIS_UTIL.getBrokerPort = function() {
+  return LOGIS_UTIL.getDeviceSettingValue('mw.rabbitmq.web.mqtt.port');
+};
+
+/**
  * @description 작업 스테이션 내 대상 외 주문 정보 표시 여부 리턴 (DPS 유형 설정)
  ********************
  * @return 작업 스테이션 내 대상 외 주문 정보 표시 여부
@@ -581,33 +608,6 @@ LOGIS_UTIL.isSkuCdValid = function(skuCd) {
     let rule = new RegExp(LOGIS_UTIL.getSkuCdValidationRule());
     return rule.test(skuCd);
   }
-};
-
-/**
- * @description 메시지 브로커의 사이트 코드 조회
- ********************
- * @return 메시지 브로커의 사이트 코드
- */
-LOGIS_UTIL.getBrokerSiteCd = function() {
-  return LOGIS_UTIL.getLocalStorage('setting.brokerSite');
-};
-
-/**
- * @description 메시지 브로커 주소 조회
- ********************
- * @return 메시지 브로커의 주소
- */
-LOGIS_UTIL.getBrokerAddress = function() {
-  return LOGIS_UTIL.getLocalStorage('setting.brokerAddress');
-};
-
-/**
- * @description 메시지 브로커 포트 조회
- ********************
- * @return 메시지 브로커 포트
- */
-LOGIS_UTIL.getBrokerPort = function() {
-  return LOGIS_UTIL.getLocalStorage('setting.brokerPort');
 };
 
 /*******************************************************************************

@@ -14,30 +14,6 @@ Copyright © HatioLab Inc. All rights reserved.
         margin-left: .5rem;
       }
     </style>
-
-    <!-- 메시지 통신을 위한 메시지 브로커 주소 조회 -->
-    <sys-ajax 
-      id="broker-addrs-ajax" 
-      method="GET" 
-      content-type="application/json"
-      on-sys-ajax-response="_setBrokerAddress">
-    </sys-ajax>
-
-    <!-- 메시지 통신을 위한 메시지 브로커 포트 조회 -->
-    <sys-ajax 
-      id="broker-port-ajax" 
-      method="GET" 
-      content-type="application/json" 
-      on-sys-ajax-response="_setBrokerPort">
-    </sys-ajax>
-
-    <!-- 메시지 통신을 위한 사이트 코드 조회 -->
-    <sys-ajax 
-      id="broker-site-ajax" 
-      method="GET" 
-      content-type="application/json" 
-      on-sys-ajax-response="_setBrokerSite">
-    </sys-ajax>
     
     <!-- KIOSK 메뉴 리스트 조회 -->
     <sys-ajax id="kiosk-menu-ajax" last-response="{{kioskMenuList}}">

@@ -11,21 +11,19 @@ if (!(typeof WEB_MQTT === 'object')) {
   WEB_MQTT = {
     mqtt: null,
 
-    EQUIP_TYPE: null,
-
+    SITE_CD: null,
     BROKER_ADDRESS: null,
     BROKER_PORT: null,
 
-    REGION_CD: null,
-    ZONE_CD: null,
-
-    STATUS_ID: null,
+    EQUIP_TYPE: null,
+    EQUIP_CD: null,
+    STATION_CD: null,
 
     CLIENT_ID: null,
     SOURCE_ID: null,
-    SITE_CD: null,
-    SERVER_TOPIC: 'mps_server',
     TOPICS: null,
+
+    STATUS_ID: null,
 
     ACTION: {
       CONNECT: 'EQUIP_CONNECT',
@@ -40,14 +38,14 @@ if (!(typeof WEB_MQTT === 'object')) {
         equip_type: '',
         rack_cd: '',
         action: 'EQUIP_CONNECT',
-        message: 'MPS 미들웨어 서버와 연결이 완료되었습니다.'
+        message: '미들웨어 서버와 연결이 완료되었습니다.'
       },
 
       CLOSE: {
         equip_type: '',
         rack_cd: '',
         action: 'EQUIP_CLOSE',
-        message: 'MPS 미들웨어 서버와 연결을 종료합니다.'
+        message: '미들웨어 서버와 연결을 종료합니다.'
       },
 
       REFRESH: {
@@ -77,7 +75,7 @@ if (!(typeof WEB_MQTT === 'object')) {
   };
 
   /**
-   * MQTT 접속
+   * @description MQTT 접속
    *******************
    * @param {Function} openCallback
    * @param {Function} errorCallback
@@ -90,7 +88,6 @@ if (!(typeof WEB_MQTT === 'object')) {
       );
       return;
     }
-    // console.log('Mqtt connecting to [' + this.BROKER_ADDRESS + ']');
 
     // 미들웨어 주소 설정
     var addresses = this.BROKER_ADDRESS.split(',');
@@ -109,16 +106,9 @@ if (!(typeof WEB_MQTT === 'object')) {
       password: 'admin',
       keepalive: 10,
       reconnectPeriod: 1000
-      // will : {
-      //   topic : this.SERVER_TOPIC,
-      //   payload : this.getSendJsonString(this.getStatusReportObject('disconnect')),
-      //   qos : 0,
-      //   retain : false
-      // }
     };
 
     // 1. MQTT 생성
-    // this.mqtt = mqtt.connect({'servers':mwAddress, 'clientId': this.CLIENT_ID, 'clean':true, username: this.SITE_CD +':admin', password:'admin', keepalive:10, reconnectPeriod:1000});
     this.mqtt = mqtt.connect(mqttConnObj);
 
     // 2. 접속 에러 발생시 ...
@@ -139,7 +129,6 @@ if (!(typeof WEB_MQTT === 'object')) {
       }
 
       // 설정된 토픽을 구독
-      // console.log(this.TOPICS)
       this.mqtt.subscribe(this.TOPICS, { qos: 1 }, function(err, granted) {
         console.log('WEB_MQTT client subscribe: ', err, granted);
       });
@@ -156,7 +145,8 @@ if (!(typeof WEB_MQTT === 'object')) {
     // 5. 서버로 부터 메시지를 전달받은 경우
     this.mqtt.on('message', (topic, message, packet) => {
       if (message) {
-        console.log(`topic: ${topic}`)
+        //console.log(`topic: ${topic}`)
+
         var data = JSON.parse(message).body;
         document.dispatchEvent(
           new CustomEvent('mqtt-message-received', { detail: data })
@@ -166,51 +156,54 @@ if (!(typeof WEB_MQTT === 'object')) {
   };
 
   /**
-   * 메시지 전송
+   * @description 미들웨어를 통해 메시지 전송
    *******************
    * @param {String} msg
    */
   WEB_MQTT.sendMessage = function(msg) {
     if (msg && this.mqtt) {
-      this.mqtt.publish(this.SERVER_TOPIC, this.getSendJsonString(msg), {
+      let destId = LOGIS_UTIL.getStageCd();
+      this.mqtt.publish(destId, this.getSendJsonString(msg), {
         qos: 1
       });
     }
   };
 
   /**
-   * MQTT 커넥션이 체크 모니터링을 시작
+   * @description MQTT 커넥션이 체크 모니터링을 시작
    *******************
-   * @param {String} rackCd
-   * @param {String} zoneCd
+   * @param {String} equipCd
+   * @param {String} stationCd
    * @param {String} deviceType
    * @param {String} brokerAddress
    * @param {String} brokerPort
    * @param {String} brokerSiteCd
    */
   WEB_MQTT.startConnectionMonitor = function(
-    rackCd,
-    zoneCd,
+    equipCd,
+    stationCd,
     deviceType,
     brokerAddress,
     brokerPort,
     brokerSiteCd
   ) {
     if (!this.STATUS_ID) {
-      let equipType = ''; // 장비 타입: kiosk, mobile
-      let deviceTopic = []; // 장비 토픽
-
       if (!deviceType) {
         return;
       }
+
+      let equipType = ''; // 장비 타입: kiosk, mobile
+      let deviceTopic = []; // 장비 토픽
 
       // 장비 타입에 따라 토픽 결정
       if (deviceType.toLowerCase() == 'tablet') {
         equipType = 'mobile';
         deviceTopic.push('tablet', 'mobile');
+
       } else if (deviceType.toLowerCase() == 'pda') {
         equipType = 'mobile';
         deviceTopic.push('pda', 'mobile');
+
       } else {
         equipType = 'kiosk';
         deviceTopic.push('kiosk');
@@ -218,19 +211,19 @@ if (!(typeof WEB_MQTT === 'object')) {
 
       // 장비 설정 저장
       this.EQUIP_TYPE = deviceTopic[0];
-      this.REGION_CD = rackCd;
+      this.EQUIP_CD = equipCd;
       this.SITE_CD = brokerSiteCd;
 
       // 장비 타입에 따라 미들웨어에서 사용할 ID 설정
       if (equipType === 'mobile') {
-        this.SOURCE_ID = [brokerSiteCd, this.EQUIP_TYPE, rackCd, zoneCd].join(
-          '/'
-        );
-        this.ZONE_CD = zoneCd;
+        this.SOURCE_ID = [brokerSiteCd, this.EQUIP_TYPE, equipCd, stationCd].join('/');
+        this.STATION_CD = stationCd;
+
       } else {
-        this.SOURCE_ID = [brokerSiteCd, this.EQUIP_TYPE, rackCd].join('/');
-        this.ZONE_CD = null;
+        this.SOURCE_ID = [brokerSiteCd, this.EQUIP_TYPE, equipCd].join('/');
+        this.STATION_CD = null;
       }
+
       this.CLIENT_ID = [
         this.SOURCE_ID,
         Date.now(),
@@ -240,14 +233,13 @@ if (!(typeof WEB_MQTT === 'object')) {
       // 장비 타입에 따라 토픽 설정
       // 장비 존 토픽은 모바일 기기에서만 사용
       this.TOPICS = [];
+
       deviceTopic.forEach(topic => {
-        this.TOPICS.push(
-          [brokerSiteCd, topic].join('/'),
-          [brokerSiteCd, topic, rackCd].join('/'),
-          equipType === 'mobile'
-            ? [brokerSiteCd, topic, rackCd, zoneCd].join('/')
-            : undefined
-        );
+        this.TOPICS.push([brokerSiteCd, topic].join('/'), [brokerSiteCd, topic, equipCd].join('/'));
+
+        if (equipType === 'mobile') {
+          this.TOPICS.push([brokerSiteCd, topic, equipCd, stationCd].join('/'));
+        }
       });
 
       // 미들웨어 주소 설정 후 연결
@@ -258,14 +250,13 @@ if (!(typeof WEB_MQTT === 'object')) {
   };
 
   /**
-   * 웹 소켓 커넥션 체크 모니터링을 종료
+   * @description 웹 소켓 커넥션 체크 모니터링을 종료
+   *******************
    */
   WEB_MQTT.stopConnectionMonitor = function() {
     if (this.STATUS_ID) {
-      // clearInterval(this.STATUS_ID);
-      this.ZONE_CD = null;
-      this.REGION_CD = null;
-      // this.STATUS_ID = null
+      this.STATION_CD = null;
+      this.EQUIP_CD = null;
       this.STATUS_ID = false;
     }
 
@@ -276,7 +267,8 @@ if (!(typeof WEB_MQTT === 'object')) {
   };
 
   /**
-   * 웹 소켓 접속 종료
+   * @description 웹 소켓 접속 종료
+   ********************
    */
   WEB_MQTT.closeMqtt = function() {
     try {
@@ -287,16 +279,17 @@ if (!(typeof WEB_MQTT === 'object')) {
   };
 
   /**
-   * MQTT 상태 보고
+   * @description MQTT 상태 보고
+   **********************
    */
   WEB_MQTT.statusReport = function() {
-    // if(this.STATUS_ID && this.REGION_CD ) {
+    // if(this.STATUS_ID && this.EQUIP_CD) {
     //   this.sendMessage(this.getStatusReportObject('ok'));
     // }
   };
 
   /**
-   * MQTT 상태 보고 오브젝트 생성 후 리턴
+   * @description MQTT 상태 보고 오브젝트 생성 후 리턴
    *******************
    * @param {String} statusMsg
    */
@@ -304,22 +297,23 @@ if (!(typeof WEB_MQTT === 'object')) {
     let status = {
       equip_type: this.EQUIP_TYPE.toLowerCase(),
       job_type: this.JOB_TYPE,
-      rack_cd: this.REGION_CD,
+      rack_cd: this.EQUIP_CD,
       action: 'EQUIP_STATUS',
       message: statusMsg
     };
 
-    if (this.ZONE_CD) {
-      status.zone_cd = this.ZONE_CD;
+    if (this.STATION_CD) {
+      status.zone_cd = this.STATION_CD;
     }
 
     return status;
   };
 
   /**
-   * 전송 JSON 문자를 생성 후 리턴
+   * @description 전송 JSON 문자를 생성 후 리턴
    *******************
    * @param {Object} msgObj
+   * @return {String}
    */
   WEB_MQTT.getSendJsonString = function(msgObj) {
     let sendObject = {
@@ -333,38 +327,27 @@ if (!(typeof WEB_MQTT === 'object')) {
   /**
    * 랙 코드 변경
    *******************
-   * @param {String} rackCd
-   * @param {String} zoneCd
+   * @param {String} equipCd
+   * @param {String} stationCd
    */
-  WEB_MQTT.reset = function(rackCd, zoneCd) {
+  WEB_MQTT.reset = function(equipCd, stationCd) {
     this.closeMqtt();
 
-    var deviceType = JSON.parse(localStorage.getItem('setting.deviceType'));
-
-    if (!this.BROKER_ADDRESS) {
-      return
+    if (this.BROKER_ADDRESS && this.BROKER_PORT && this.SITE_CD) {
+      this.startConnectionMonitor(
+        equipCd,
+        stationCd,
+        LOGIS_UTIL.getDeviceType(),
+        this.BROKER_ADDRESS,
+        this.BROKER_PORT,
+        this.SITE_CD
+      );
     }
-
-    if (!this.BROKER_PORT) {
-      return
-    }
-
-    if (!this.SITE_CD) {
-      return
-    }
-
-    this.startConnectionMonitor(
-      rackCd,
-      zoneCd,
-      deviceType,
-      this.BROKER_ADDRESS,
-      this.BROKER_PORT,
-      this.SITE_CD
-    )
   };
 
   /**
-   * 메시지 프로퍼티를 생성
+   * @description 메시지 프로퍼티를 생성
+   **********************
    */
   WEB_MQTT.generateMessageProperties = function() {
     return {
@@ -375,9 +358,10 @@ if (!(typeof WEB_MQTT === 'object')) {
         ).toString(16)
       ),
       time: Date.now(),
-      dest_id: this.SERVER_TOPIC,
+      dest_id: LOGIS_UTIL.getStageCd(),
       source_id: this.CLIENT_ID,
       is_reply: false
     };
   };
+
 }

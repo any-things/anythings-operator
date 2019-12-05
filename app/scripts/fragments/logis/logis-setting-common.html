@@ -455,7 +455,7 @@ Copyright © HatioLab Inc. All rights reserved.
        ***********************
        */
       _saveEquipType() {
-        this.equipmentType = LOGIS_UTIL.getComboSelectText(this._getEquipTypeCombo());
+        this.equipmentType = LOGIS_UTIL.getComboSelectValue(this._getEquipTypeCombo());
         LOGIS_UTIL.setLocalStorage(this.equipmentTypeLSKey, this.equipmentType);
       }
 

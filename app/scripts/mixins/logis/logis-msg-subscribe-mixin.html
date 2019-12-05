@@ -35,23 +35,31 @@ Copyright © HatioLab Inc. All rights reserved.
       connectedCallback() {
         super.connectedCallback();
 
+        let equipCd = LOGIS_UTIL.getEquipCd();
+        let stationCd = LOGIS_UTIL.getStationCd();
+        let deviceType = LOGIS_UTIL.getDeviceType();
+        let brokerAddr = LOGIS_UTIL.getBrokerAddress();
+        let brokerPort = LOGIS_UTIL.getBrokerPort();
+        let brokerSiteCd = LOGIS_UTIL.getBrokerSiteCd();
+
         // MQTT 연결
         WEB_MQTT.startConnectionMonitor(
-          LOGIS_UTIL.getEquipCd(),
-          LOGIS_UTIL.getStationCd(),
-          LOGIS_UTIL.getDeviceType(),
-          LOGIS_UTIL.getBrokerAddress(),
-          LOGIS_UTIL.getBrokerPort(),
-          LOGIS_UTIL.getBrokerSiteCd()
+          equipCd,
+          stationCd,
+          deviceType,
+          brokerAddr,
+          brokerPort,
+          brokerSiteCd
         );
 
         // 메시지 수신 이벤트
         document.addEventListener('mqtt-message-received', event => {
           // 실제 나타나지 않은 화면이라면 동작 없음
-          if (!this.visible) return;
+          if (!this.visible) {
+            return;
 
-          // 메시지 내용이 프로토콜에 의해 포맷된 메시지일 경우
-          else if (typeof event.detail === 'object') {
+            // 메시지 내용이 프로토콜에 의해 포맷된 메시지일 경우
+          } else if (typeof event.detail === 'object') {
             var {
               equip_type: equipType,
               job_type: jobType,

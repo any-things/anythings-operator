@@ -356,12 +356,6 @@ Copyright © HatioLab Inc. All rights reserved.
         this.dispatchEvent(new CustomEvent('session-responsed', {
           detail: event.detail
         }));
-
-        // 현재 사용중인 장비가 PDA 혹은 KIOSK이고 로그인이 정상적으로 완료 되었을 경우
-        // 서버를 통해 broker address, broker port, broker site를 조회 하고 결과를 localStorage에 저장함
-        this.setting._getBrokerAddress();
-        this.setting._getBrokerPort();
-        this.setting._getBrokerSite();
       }
 
       /**
