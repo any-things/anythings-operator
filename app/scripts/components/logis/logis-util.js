@@ -377,8 +377,12 @@ LOGIS_UTIL.getBoxIdValidationRule = function() {
  * @return
  */
 LOGIS_UTIL.isBoxIdValid = function(boxId) {
-  let rule = new RegExp(LOGIS_UTIL.getBoxIdValidationRule());
-  return rule.test(boxId);
+  if (!LOGIS_UTIL.isBoxIdValidationEnabled()) {
+    return true;
+  } else {
+    let rule = new RegExp(LOGIS_UTIL.getBoxIdValidationRule());
+    return rule.test(boxId);
+  }
 };
 
 /**
@@ -406,8 +410,12 @@ LOGIS_UTIL.getCellCdValidationRule = function() {
  * @return
  */
 LOGIS_UTIL.isCellCdValid = function(cellCd) {
-  let rule = new RegExp(LOGIS_UTIL.getCellCdValidationRule());
-  return rule.test(cellCd);
+  if (!LOGIS_UTIL.isCellCdValidationEnabled()) {
+    return true;
+  } else {
+    let rule = new RegExp(LOGIS_UTIL.getCellCdValidationRule());
+    return rule.test(cellCd);
+  }
 };
 
 /**
@@ -435,8 +443,12 @@ LOGIS_UTIL.getChuteCdValidationRule = function() {
  * @return
  */
 LOGIS_UTIL.isChuteCdValid = function(chuteCd) {
-  let rule = new RegExp(LOGIS_UTIL.getCellCgetChuteCdValidationRuledValidationRule());
-  return rule.test(chuteCd);
+  if (!LOGIS_UTIL.isChuteCdValidationEnabled()) {
+    return true;
+  } else {
+    let rule = new RegExp(LOGIS_UTIL.getChuteCdValidationRule());
+    return rule.test(chuteCd);
+  }
 };
 
 /**
@@ -464,8 +476,12 @@ LOGIS_UTIL.getIndCdValidationRule = function() {
  * @return
  */
 LOGIS_UTIL.isIndCdValid = function(indCd) {
-  let rule = new RegExp(LOGIS_UTIL.getIndCdValidationRule());
-  return rule.test(indCd);
+  if (!LOGIS_UTIL.isIndCdValidationEnabled()) {
+    return true;
+  } else {
+    let rule = new RegExp(LOGIS_UTIL.getIndCdValidationRule());
+    return rule.test(indCd);
+  }
 };
 
 /**
@@ -493,8 +509,12 @@ LOGIS_UTIL.getRackCdValidationRule = function() {
  * @return
  */
 LOGIS_UTIL.isRackCdValid = function(rackCd) {
-  let rule = new RegExp(LOGIS_UTIL.getRackCdValidationRule());
-  return rule.test(rackCd);
+  if (!LOGIS_UTIL.isRackCdValidationEnabled()) {
+    return true;
+  } else {
+    let rule = new RegExp(LOGIS_UTIL.getRackCdValidationRule());
+    return rule.test(rackCd);
+  }
 };
 
 /**
@@ -522,8 +542,12 @@ LOGIS_UTIL.getSkuBarcdValidationRule = function() {
  * @return
  */
 LOGIS_UTIL.isSkuBarcdValid = function(skuBarcd) {
-  let rule = new RegExp(LOGIS_UTIL.getSkuBarcdValidationRule());
-  return rule.test(skuBarcd);
+  if (!LOGIS_UTIL.isSkuBarcdValidationEnabled()) {
+    return true;
+  } else {
+    let rule = new RegExp(LOGIS_UTIL.getSkuBarcdValidationRule());
+    return rule.test(skuBarcd);
+  }
 };
 
 /**
@@ -551,8 +575,12 @@ LOGIS_UTIL.getSkuCdValidationRule = function() {
  * @return
  */
 LOGIS_UTIL.isSkuCdValid = function(skuCd) {
-  let rule = new RegExp(LOGIS_UTIL.getSkuCdValidationRule());
-  return rule.test(skuCd);
+  if (!LOGIS_UTIL.isSkuCdValidationEnabled()) {
+    return true;
+  } else {
+    let rule = new RegExp(LOGIS_UTIL.getSkuCdValidationRule());
+    return rule.test(skuCd);
+  }
 };
 
 /**
