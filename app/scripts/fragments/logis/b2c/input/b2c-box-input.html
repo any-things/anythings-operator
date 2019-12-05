@@ -821,27 +821,18 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * @description 버킷 스캔값 변경 핸들러
+       * @description 박스 ID 스캔 값 변경 핸들러
        *********************
        * @param {Object} event
        */
       _onBoxIdScan(event) {
         if (event.key === 'Enter') {
           var boxCd = event.currentTarget.value;
-          // TODO : 박스 아이디 체크 정규식 가져오기 필요 
-          // var regExBox = /^[bcdfghiBCDFGHI][0-9]{7}$/;
-          var regExBox = /^[A-Z][0-9]{7}$/; // SAMPLE 첫문자 알파벳 대문자 + 숫자 7자리  ( 총 8 자리 )
+          // var regExBox = /^[A-Z][0-9]{7}$/; // SAMPLE 첫문자 알파벳 대문자 + 숫자 7자리  ( 총 8 자리 )
 
-          if (regExBox.exec(boxCd)) {
+          if (LOGIS_UTIL.isBoxIdValidationEnabled() && LOGIS_UTIL.isBoxIdValid(boxCd)) {
             event.currentTarget.value = '';
             this.inputBox(boxCd);
-
-            /*if (LOGIS_UTIL.isBoxTypeBoxInput()) {
-              this.inputBox(boxCd);
-            } else {
-              this.inputTray(boxCd);
-            }*/
-
             SOUND.playInfoSound();
             this._scannedFlag = true;
 
@@ -914,6 +905,7 @@ Copyright © HatioLab Inc. All rights reserved.
             url += '&inputType=' + LOGIS_UTIL.getInputBoxType();
             inputBoxAjax.curl = url;
             inputBoxAjax.generateRequest();
+
           } else {
             LOGIS_UTIL.showMessage(t('text.selecting_equipment'), t('text.select_equipment'));
           }
