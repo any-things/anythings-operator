@@ -595,7 +595,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} event
        */
       _viewUpdateContent(event) {
-        const deviceType = localStorage.getItem('setting.deviceType');
+        const deviceType = LOGIS_UTIL.getDeviceType();
         const updatedItemsAjax = this._getUpdatedItemsAjax();
         updatedItemsAjax.curl = '/device_process/release_notes/' + deviceType;
         updatedItemsAjax.baseUrl = LOGIS_UTIL.getLocalStorage('setting.baseUrl');
@@ -604,10 +604,9 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description web view cache clear
-       **************************
        * windows에 CacheClear가 있다면 (cordova plugin 사용 가능한 상태)
-       * webview cache를 클리어한 후 리로드
-       * 없을 경우 리로드
+       * webview cache를 클리어한 후 리로드, 없을 경우 리로드
+       ***************************
        */
       reloadApp() {
         if ('CacheClear' in window) {
