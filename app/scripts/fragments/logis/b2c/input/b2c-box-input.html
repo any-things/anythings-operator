@@ -828,7 +828,6 @@ Copyright © HatioLab Inc. All rights reserved.
       _onBoxIdScan(event) {
         if (event.key === 'Enter') {
           var boxCd = event.currentTarget.value;
-          // var regExBox = /^[A-Z][0-9]{7}$/; // SAMPLE 첫문자 알파벳 대문자 + 숫자 7자리  ( 총 8 자리 )
 
           if (LOGIS_UTIL.isBoxIdValid(boxCd)) {
             event.currentTarget.value = '';

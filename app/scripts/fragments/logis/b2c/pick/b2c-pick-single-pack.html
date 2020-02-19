@@ -17,10 +17,9 @@ Copyright © HatioLab Inc. All rights reserved.
     <style include="shared-styles">
       :host {
         display: grid;
-        grid-template-columns: 30% 70%;
-        grid-auto-rows: 95% 5%;
-        height: calc(100% - 40px);
-        padding: 20px;
+        grid-template-columns: 35% 65%;
+        height: calc(100% - 20px);
+        padding: 10px;
         border-radius: var(--things-default-border-radius);
         color: rgba(255, 255, 255, .8);
         text-align: center;
@@ -32,11 +31,11 @@ Copyright © HatioLab Inc. All rights reserved.
 
       #right-container {
         display: grid;
-        grid-template-rows: 50% 50%;
+        grid-template-rows: 45% 45% 10%;
       }
 
       #top-container {
-        margin: 10px;
+        margin: 5px 5px 10px 10px;
         display: grid;
         grid-template-columns: 30% 70%;
         background-color: var(--things-white-opacity-background-color);
@@ -45,9 +44,9 @@ Copyright © HatioLab Inc. All rights reserved.
 
       #bottom-container {
         display: grid;
-        grid-template-rows: 15% 85%;
+        grid-template-rows: 25% 75%;
         grid-template-columns: 50% 50%;
-        margin: 10px;
+        margin: 5px 5px 10px 10px;
         background-color: var(--things-white-opacity-background-color);
         border-radius: var(--things-default-border-radius);
       }
@@ -110,14 +109,12 @@ Copyright © HatioLab Inc. All rights reserved.
       .bigproc b {
         display: block;
         color: #fff;
-        font-size: 6rem;
+        font-size: 5rem;
         text-shadow: 1px 3px 3px rgba(0, 0, 0, .3);
         line-height: 1.3;
       }
 
       #input-container {
-        grid-column-start: 1;
-        grid-column-end: 3;
         text-align: right;
         align-self: center;
       }
@@ -127,13 +124,13 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       item-list {
-        height: 80%;
-        margin: 10px;
+        height: 67%;
+        margin: 10px 10px 10px 5px;
       }
 
       #left-top-container {
-        margin: 10px;
-        height: 20%;
+        margin: 5px;
+        height: 30%;
         display: grid;
         grid-template-columns: 50% 50%;
         background-color: var(--things-white-opacity-background-color);
@@ -141,10 +138,12 @@ Copyright © HatioLab Inc. All rights reserved.
       }
     </style>
 
-    <sys-ajax id="get-sku-ajax" method="GET" content-type="application/json" on-sys-ajax-response="_getSkuData">
+    <!-- 상품 코드 조회를 위한 Ajax -->
+    <sys-ajax id="get-sku-ajax" method="GET" content-type="application/json" on-sys-ajax-response="_skuFound">
     </sys-ajax>
 
-    <sys-ajax id="box-put-ajax" method="PUT" content-type="application/json" on-sys-ajax-response="_getBoxData"
+    <!-- 박스 투입 처리를 위한 Ajax -->
+    <sys-ajax id="box-put-ajax" method="PUT" content-type="application/json" on-sys-ajax-response="_boxInputResponsed"
       on-sys-ajax-error="_handleStatusError">
     </sys-ajax>
 
@@ -153,29 +152,41 @@ Copyright © HatioLab Inc. All rights reserved.
       content-type="application/json" on-sys-ajax-response="_reprintSucceed">
     </sys-ajax>
 
+    <!-- 좌측 컨테이너 -->
     <div id="left-container">
+      <!-- 좌측 상단 작업 진행 요약 컨테이너 -->
       <div id="left-top-container">
+        <!-- 전체 박스 수량 표시 컨테이너 -->
         <div class="order">
           <span class="smalltitle">[[total]] [[box]]</span>
           <span class="proc"><b>[[boxPicking]]</b></span>
         </div>
 
+        <!-- 완료 박스 수량 표시 컨테이너 -->
         <div class="order">
           <span class="smalltitle">[[finished]] [[box]]</span>
           <span class="proc"><b>[[boxPicked]]</b></span>
         </div>
       </div>
 
-      <item-list id="item-list" header="[[header]]" data="[[items]]" on-configured="_addOrderStatusAttr">
+      <!-- 좌측 하단 그리드 컨테이너 -->
+      <item-list id="item-list" header="[[header]]" data="[[items]]" on-configured="_changeGridRowStyle">
       </item-list>
     </div>
 
+    <!-- 우측 컨테이너 -->
     <div id="right-container">
+      <!-- 우측 상단 작업 진행 요약 컨테이너 -->
       <div id="top-container">
         <span class="label">[[skuCdLabel]]</span>
 
-        <auto-popup-input hide-keyboard id="sku-code" resource-url="[[getSkuAjaxUrl]]" popup-title="[[popupTitleLabel]]"
-          button-txt-callback="[[_skuButtonTxtCallback]]" on-item-selected="skuChange"
+        <!-- 상품 코드 Input -->
+        <auto-popup-input 
+          hide-keyboard id="sku-code" 
+          resource-url="[[getSkuAjaxUrl]]" 
+          popup-title="[[popupTitleLabel]]"
+          button-txt-callback="[[_skuButtonTxtCallback]]" 
+          on-item-selected="skuSelectionChanged"
           on-sys-ajax-error="_findSkuError">
         </auto-popup-input>
 
@@ -183,22 +194,24 @@ Copyright © HatioLab Inc. All rights reserved.
         <input id="sku-name" readonly>
 
         <span class="label">[[boxIdLabel]]</span>
-        <input id="box-id" on-keypress="_boxChange">
+        <input id="box-id" on-keypress="_boxIdChanged">
       </div>
 
+      <!-- 우측 하단 단포 진행 요약 컨테이너 -->
       <div id="bottom-container">
         <span id='box-type-label' class="big-label">[[boxTypeLabel]]</span>
         <span id='order-qty-label' class="big-label">[[orderQtyLabel]]</span>
         <span id='box-type' class="bigproc"><b>[[boxType]]</b></span>
         <span id='order-qty' class="bigproc"><b>[[orderQty]]</b></span>
       </div>
-    </div>
 
-    <div id="input-container">
-      <input id="print-check" type="checkbox">
-      <label>[[reprintLabel]]</label>
-      <input id="redo-check" type="checkbox" on-click="refresh">
-      <label>[[redoLabel]]</label>
+      <!-- 우측 최하단 옵션 컨테이너 -->
+      <div id="input-container">
+        <input id="print-check" type="checkbox">
+        <label>[[reprintLabel]]</label>
+        <input id="redo-check" type="checkbox" on-click="refresh">
+        <label>[[redoLabel]]</label>
+      </div>  
     </div>
   </template>
 
@@ -209,39 +222,49 @@ Copyright © HatioLab Inc. All rights reserved.
       }
       static get properties() {
         return {
+          /**
+           * @description 그리드 데이터 
+           ****************
+           * @type {Array}
+           */
           items: {
             type: Array
           },
 
+          /**
+           * @description 그리드 헤더 
+           ****************
+           * @type {Array}
+           */
           header: {
             type: Array,
             value: function() {
-              // a. 피스 수량/ 박스타입/ 주문 수/ 완료주문 수
+              // 피스 수량/ 박스타입/ 주문 수/ 완료주문 수
               return [{
                 display: t('label.pcs_qty'),
                 fieldname: 'pick_qty',
-                columnWidth: '0.25fr',
+                columnWidth: '0.15fr',
                 style: {
                   textAlign: 'center',
                 }
               }, {
                 display: t('label.box_type'),
                 fieldname: 'box_type_cd',
-                columnWidth: '0.25fr',
+                columnWidth: '0.3fr',
                 style: {
                   textAlign: 'center',
                 },
               }, {
                 display: t('label.order_cnt'),
                 fieldname: 'tot_order_cnt',
-                columnWidth: '0.25fr',
+                columnWidth: '0.3fr',
                 style: {
                   textAlign: 'center',
                 },
               }, {
                 display: t('label.com_cnt'),
                 fieldname: 'comp_order_cnt',
-                columnWidth: '0.25fr',
+                columnWidth: '0.3fr',
                 style: {
                   textAlign: 'center',
                 },
@@ -252,6 +275,11 @@ Copyright © HatioLab Inc. All rights reserved.
             }
           },
 
+          /**
+           * @description 랙 코드 
+           ****************
+           * @type {String}
+           */
           rackCd: {
             type: String,
             value: function() {
@@ -259,6 +287,11 @@ Copyright © HatioLab Inc. All rights reserved.
             }
           },
 
+          /**
+           * @description 상품 코드 
+           ****************
+           * @type {String}
+           */
           skuCdLabel: {
             type: String,
             value: function() {
@@ -266,6 +299,11 @@ Copyright © HatioLab Inc. All rights reserved.
             }
           },
 
+          /**
+           * @description 상품 명 
+           ****************
+           * @type {String}
+           */
           skuNmLabel: {
             type: String,
             value: function() {
@@ -273,6 +311,11 @@ Copyright © HatioLab Inc. All rights reserved.
             }
           },
 
+          /**
+           * @description 박스 유형 라벨 
+           ****************
+           * @type {String}
+           */
           boxTypeLabel: {
             type: String,
             value: function() {
@@ -280,6 +323,11 @@ Copyright © HatioLab Inc. All rights reserved.
             }
           },
 
+          /**
+           * @description 박스 ID 라벨 
+           ****************
+           * @type {String}
+           */
           boxIdLabel: {
             type: String,
             value: function() {
@@ -287,6 +335,11 @@ Copyright © HatioLab Inc. All rights reserved.
             }
           },
 
+          /**
+           * @description 총 라벨 
+           ****************
+           * @type {String}
+           */
           total: {
             type: String,
             value: function() {
@@ -294,6 +347,11 @@ Copyright © HatioLab Inc. All rights reserved.
             }
           },
 
+          /**
+           * @description 완료 라벨 
+           ****************
+           * @type {String}
+           */
           finished: {
             type: String,
             value: function() {
@@ -301,6 +359,11 @@ Copyright © HatioLab Inc. All rights reserved.
             }
           },
 
+          /**
+           * @description 주문 건수 라벨 
+           ****************
+           * @type {String}
+           */
           order_qty: {
             type: String,
             value: function() {
@@ -308,6 +371,11 @@ Copyright © HatioLab Inc. All rights reserved.
             }
           },
 
+          /**
+           * @description 박스  라벨 
+           ****************
+           * @type {String}
+           */
           box: {
             type: String,
             value: function() {
@@ -315,6 +383,11 @@ Copyright © HatioLab Inc. All rights reserved.
             }
           },
 
+          /**
+           * @description 주문 수량 라벨 
+           ****************
+           * @type {String}
+           */
           orderQtyLabel: {
             type: String,
             value: function() {
@@ -323,7 +396,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * SKU 수량
+           * @description 수량 라벨
            ****************
            * @type {String}
            */
@@ -334,6 +407,11 @@ Copyright © HatioLab Inc. All rights reserved.
             }
           },
 
+          /**
+           * @description 재작업 라벨
+           ****************
+           * @type {String}
+           */
           redoLabel: {
             type: String,
             value: function() {
@@ -342,7 +420,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * SKU 정보 조회 후 복수개가 조회된 경우 사용자가 고를 수 있는 팝업이 실행되는데 그 팝업에 표시할 타이틀
+           * @description SKU 정보 조회 후 복수개가 조회된 경우 사용자가 고를 수 있는 팝업이 실행되는데 그 팝업에 표시할 타이틀
            ****************
            * @type {String}
            */
@@ -352,7 +430,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * SKU 정보 조회를 위한 URL
+           * @description SKU 정보 조회를 위한 URL
            ****************
            * @type {String}
            */
@@ -362,7 +440,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 재발행 라벨
+           * @description 재발행 라벨
            ****************
            * @type {String}
            */
@@ -372,7 +450,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 페이지 정보
+           * @description 페이지 정보
            ****************
            * @type {Number}
            */
@@ -382,7 +460,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * Limit 정보
+           * @description Limit 정보
            ****************
            * @type {Number}
            */
@@ -392,14 +470,18 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 현재 선택된 상품 정보 
+           * @description 현재 선택된 상품 정보 
+           ****************
+           * @type {Object}
            */
           selectedSkuInfo: {
             type: Object
           },
 
           /**
-           * 현재 작업의 Instance 정보 
+           * @description 현재 작업의 Instance 정보 
+           ****************
+           * @type {Object}
            */
           currentJobInstance: {
             type: Object
@@ -413,26 +495,39 @@ Copyright © HatioLab Inc. All rights reserved.
         }
       }
 
-      //페이지 변경시 상품코드 select
+      /**
+       * @description life cycle
+       *******************
+       */
       connectedCallback() {
         super.connectedCallback();
 
         document.addEventListener('page-changed', event => {
           if (event.detail.currentPage === location.hash.replace('#/', '')) {
-            this._focusLabelInput(event);
+            this._focusDefaultInput(event);
           }
         });
 
-        this._focusLabelInput();
+        this._focusDefaultInput();
       }
 
-      _focusLabelInput() {
-        this.skuChange();
+      /**
+       * @description 기본 Input Box로 (상품 코드 Input) 포커스 이동
+       *******************
+       */
+      _focusDefaultInput() {
+        this.skuSelectionChanged();
         this._getSkuCdInput().select();
       }
 
-      _addOrderStatusAttr(event) {
+      /**
+       * @description 그리드 행에 대한 스타일 변경
+       *******************
+       * @param {Object} event
+       */
+      _changeGridRowStyle(event) {
         let list = event.detail.contentElements;
+
         list.forEach(row => {
           let data = row.getData();
           if (data.selected_job == 1) {
@@ -444,7 +539,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * SKU 정보 조회 시 복수개가 조회된 경우 사용자가 고를 수 있는 버튼이 실행되는데 그 버튼에 표시할 내용
+       * @description SKU 정보 조회 시 복수개가 조회된 경우 사용자가 고를 수 있는 버튼이 실행되는데 그 버튼에 표시할 내용
        *******************
        * @param {Object} item
        */
@@ -453,8 +548,12 @@ Copyright © HatioLab Inc. All rights reserved.
                   ${item.sku_nm}`;
       }
 
-      // 입력된 상품코드로 서버에 정보 요청
-      skuChange(event) {
+      /**
+       * @description 상품 선택이 변경된 경우 처리
+       *******************
+       * @param {Object} event
+       */
+      skuSelectionChanged(event) {
         var self = this;
         this.boxId = this._getBoxIdInput().value;
 
@@ -465,7 +564,6 @@ Copyright © HatioLab Inc. All rights reserved.
           } else {
             // 같은 상품 계속 scan 
             this.selectedSkuInfo = event.detail;
-
             let skuCode = event.detail.sku_cd;
 
             if (self.boxId) {
@@ -490,7 +588,9 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 상품 코드 변경시 메시지 처리  
+       * @description 상품 코드 변경시 메시지 처리
+       *******************
+       * @param {Object} event
        */
       _skuChangeConfirm(skuInform) {
         var self = this;
@@ -515,7 +615,12 @@ Copyright © HatioLab Inc. All rights reserved.
         this.blur();
       }
 
-      _getSkuData(e) {
+      /**
+       * @description 상품 정보 조회 완료시 
+       *******************
+       * @param {Object} e
+       */
+      _skuFound(e) {
         if (e.detail && e.detail.result && e.detail.result[0]) {
           this.boxPicking = e.detail.result[0].tot_cnt;
           this.boxPicked = e.detail.result[0].comp_cnt;
@@ -531,26 +636,35 @@ Copyright © HatioLab Inc. All rights reserved.
         this._setInputFocus();
       }
 
+      /**
+       * @description ? 
+       *******************
+       * @param {Array} items
+       */
       _doGetSkuData(items) {
         this.items = items;
         this._getSkuNmInput().value = this.selectedSkuInfo.sku_nm;
         this._setInputFocus();
       }
 
-      //박스아이디 형식에 맞으면 아이디 매핑 아니면 SKU조회B2323211
-      _boxChange(e) {
+      /**
+       * @description 박스 ID 스캔 (매핑) 시 
+       *******************
+       * @param {Object} e
+       */
+      _boxIdChanged(e) {
         if (e.key == 'Enter') {
           var boxId = this._getBoxIdInput().value.toUpperCase();
           var skuCode = this.selectedSkuInfo.sku_cd;
 
-          // 박스 아이디 정규식에 맞으면 박스 투입 // TODO 박스 ID 정합성 .... 
-          if (/^[bcdfghiBCDFGHI][0-9]{7}$/.exec(boxId)) {
-            this._getBoxAjax().curl = `/device_process/dynamic/dps/single_pack/box_input?equipType=${LOGIS_UTIL.getEquipType()}&equipCd=${LOGIS_UTIL.getEquipCd()}&skuCd=${skuCode}&bucketCd=${boxId}`;;
+          // 박스 아이디 정규식에 맞으면 박스 투입
+          if (LOGIS_UTIL.isBoxIdValid(boxId)) {
+            this._getBoxAjax().curl = `/device_process/dynamic/dps/single_pack/box_input?equipType=${LOGIS_UTIL.getEquipType()}&equipCd=${LOGIS_UTIL.getEquipCd()}&skuCd=${skuCode}&bucketCd=${boxId}`;
             this._getBoxAjax().generateRequest();
-          } else {
-            // BoxID 정규식에 맞지 않으면 SKU 으로 인식 상품 검색 
-            let skuBarcd = this._getBoxIdInput().value;
 
+            // BoxID 정규식에 맞지 않으면 상품 코드로 인식하여 상품 검색 
+          } else {
+            let skuBarcd = this._getBoxIdInput().value;
             if (skuBarcd && skuBarcd != '') {
               this._getBoxIdInput().value = this.boxId
               this.$['sku-code'].set('value', skuBarcd)
@@ -560,24 +674,32 @@ Copyright © HatioLab Inc. All rights reserved.
         }
       }
 
-      //박스 매핑 후 화면 리프레시 & 주문건수 업데이트
-      _getBoxData(e) {
+      /**
+       * @description 박스 투입 처리 후
+       *******************
+       * @param {Object} e
+       */
+      _boxInputResponsed(e) {
         this.reprint();
 
-        if (e.detail) {
-          var summary = e.detail.result.summary;
-          this.items = summary;
+        if (e && e.detail && e.detail.result) {
+          this.items = e.detail.result.summary;
+          var job = e.detail.result.job_instance;
 
-          if (e.detail.result.job_instance) {
-            var job = e.detail.result.job_instance;
+          if (job) {
             this.currentJobInstance = job;
             this.orderQty = (job.picked_qty + job.picking_qty) + '/' + job.pick_qty;
             this.boxType = job.box_type_cd;
 
-            // 피킹중 상태가 아니면 완료된 작업에 대한 조회 
+            // 피킹 중 상태가 아니면 완료된 작업에 대한 조회 
             if (job.status != 'P') {
               // 이미 처리 완료된 박스 입니다.
               LOGIS_UTIL.showToastWarnMessage(t('text.single_box_done'));
+              // 박스 ID 입력 박스에 포커스
+              this._getBoxIdInput().select();
+
+            } else {
+              this._getSkuCdInput().select();
             }
           } else {
             this._getBoxIdInput().value = '';
@@ -586,81 +708,34 @@ Copyright © HatioLab Inc. All rights reserved.
             this.boxType = '';
             // 작업이 완료 되었습니다.
             LOGIS_UTIL.showToastInfoMessage(t('text.single_box_complete'));
+            this._getSkuCdInput().select();
           }
         }
-
-        /*
-        if (skuInfo) {
-          if (this.$['continue-box-scan'].checked) {
-            if (e.detail[0].sku_cd == undefined || e.detail[0].pick_qty > 1) {
-              this.refresh();
-              this.items = [];
-              this.set('items', this.items.slice());
-
-            } else {
-              var cnt = 0;
-              e.detail.forEach(item => {
-                if (item.pick_qty == 1) cnt++;
-              })
-
-              this.boxQty = cnt;
-              this.boxType = e.detail[0].box_type_cd;
-              this._getBoxIdInput().value = '';
-              this.boxId = '';
-              this._getBoxIdInput().select();
-            }
-
-          } else {
-            if (skuInfo.picking_qty == 0 && !skuInfo.bucket_cd) {
-              if (this.skuItem && this.skuItem.pick_qty != skuInfo.pick_qty) {
-                var self = this;
-                LOGIS_UTIL.showMessage(t('button.confirm'), t('text.confirm_qty_change'), function () {
-                  self._getBoxIdInput().select();
-                });
-                e.target.blur();
-              }
-
-              this.orderQty = skuInfo.picking_qty + '/' + skuInfo.pick_qty;
-              this.boxType = skuInfo.box_type_cd;
-              this.skuItem = skuInfo;
-              this._getBoxIdInput().value = '';
-              this.boxId = '';
-              this._getBoxIdInput().select();
-
-            } else if (skuInfo.picking_qty < skuInfo.pick_qty) {
-              this.orderQty = skuInfo.picking_qty + '/' + skuInfo.pick_qty;
-              this.boxType = skuInfo.box_type_cd;
-              this._getSkuCdInput().select();
-            }
-          }
-
-        } else {
-          LOGIS_UTIL.showToastInfoMessage(t('text.box_mapping_complete'));
-          this.refresh();
-          this.items = [];
-          this.set('items', this.items.slice());
-        }
-        */
       }
 
+      /**
+       * @description 새로 고침
+       *******************
+       */
       refresh() {
-        this._getSkuCdInput().value = "";
-        this._getSkuNmInput().value = "";
-        this._getBoxIdInput().value = "";
+        this._getSkuCdInput().value = '';
+        this._getSkuNmInput().value = '';
+        this._getBoxIdInput().value = '';
         this._getSkuCdInput().select();
-        this.boxType = "";
-        this.orderQty = "";
+        this.boxType = '';
+        this.orderQty = '';
         this.items = [];
-        this.boxPicking = "";
-        this.boxPicked = "";
+        this.boxPicking = '';
+        this.boxPicked = '';
         this.selectedSkuInfo = null;
         this.currentJobInstance = null;
       }
 
+      /**
+       * @description 송장 발행
+       *******************
+       */
       reprint() {
-        // 송장 발행 ? 
-        // TODO Option 처리 
-
         // if (this.$['print-check'].checked) {
         //   var reprintAjax = this.$['reprint-invoice-ajax'];
         //   reprintAjax.curl = '/kiosk_process/dps/packing/print/' + this._getBoxIdInput().value;
@@ -671,6 +746,11 @@ Copyright © HatioLab Inc. All rights reserved.
         // }
       }
 
+      /**
+       * @description 송장 발행 처리 후
+       *******************
+       * @param {Object} e
+       */
       _reprintSucceed(e) {
         if (e.detail.result.toLowerCase() === 'ok') {
           this.inspectionStatus = '';
@@ -681,47 +761,75 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 박스 작업 맵핑시 오류 처리 
-       * 
+       * @description 박스 작업 맵핑시 오류 처리
+       *******************
        */
       _handleStatusError() {
         this._getBoxIdInput().value = '';
         this._getBoxIdInput().select();
         this.boxId = null;
         this.currentJobInstance = null;
-
         this.orderQty = '';
         this.boxType = '';
       }
 
+      /**
+       * @description 상품 조회 에러시 
+       *******************
+       */
       _findSkuError() {
         this.refresh();
         this.items = [];
       }
 
+      /**
+       * @description 상품 조회 Ajax 리턴
+       *******************
+       * @return 
+       */
       _getSkuAjax() {
         return this.$['get-sku-ajax']
       }
 
+      /**
+       * @description 박스 투입 Ajax 리턴
+       *******************
+       * @return 
+       */
       _getBoxAjax() {
         return this.$['box-put-ajax']
       }
 
+      /**
+       * @description 상품 코드 입력 박스 리턴
+       *******************
+       * @return 
+       */
       _getSkuCdInput() {
         return this.$['sku-code']
       }
 
+      /**
+       * @description 상품 명 입력 박스 리턴
+       *******************
+       * @return 
+       */
       _getSkuNmInput() {
         return this.$['sku-name']
       }
 
+      /**
+       * @description 박스 ID 입력 박스 리턴
+       *******************
+       * @return 
+       */
       _getBoxIdInput() {
         return this.$['box-id']
       }
 
-
       /**
-       * 인풋 박스 상태에 따라 포커스 이동 
+       * @description 인풋 박스 상태에 따라 포커스 이동 
+       *******************
        */
       _setInputFocus() {
         let inputBoxValue = this._getBoxIdInput().value;
@@ -729,10 +837,13 @@ Copyright © HatioLab Inc. All rights reserved.
 
         if (!inputSkuValue && !inputBoxValue) {
           this._getSkuCdInput().focus();
+
         } else if (!inputSkuValue) {
           this._getSkuCdInput().focus();
+
         } else if (!inputBoxValue) {
           this._getBoxIdInput().focus();
+
         } else {
           this._getSkuCdInput().focus();
         }
