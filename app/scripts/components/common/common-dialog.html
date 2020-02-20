@@ -65,15 +65,27 @@ Copyright © HatioLab Inc. All rights reserved.
 
   <script>
     class CommonDialog extends CommonPopupMixin(Polymer.Element) {
-      static get is() { return 'common-dialog' }
+      static get is() {
+        return 'common-dialog'
+      }
 
       static get properties() {
         return {
+          /**
+           * @description 기본 팝업 너비 
+           ****************
+           * @type {String}
+           */
           basicWidth: {
             type: String,
             value: '80%'
           },
 
+          /**
+           * @description 기본 팝업 높이
+           ****************
+           * @type {String}
+           */
           basicHeight: {
             type: String,
             value: '80%'
@@ -81,8 +93,14 @@ Copyright © HatioLab Inc. All rights reserved.
         }
       }
 
+      /**
+       * @description ready
+       *******************
+       */
       connectedCallback() {
         super.connectedCallback();
+
+        // 1. open-dialog 이벤트 리스터 
         document.addEventListener('open-dialog', event => {
           this.closeByModalClick = event.detail.closeByModalClick;
           let content = event.detail.content;
@@ -95,19 +113,33 @@ Copyright © HatioLab Inc. All rights reserved.
           this.openDialog(content, title, width, height, openCallback, closeCallback);
         });
 
+        // 2. open-form-list-dialog 이벤트 리스너
         document.addEventListener('open-form-list-dialog', event => {
           const options = event.detail;
           this.openFormListPopup(options);
         });
 
+        // 3. close-dialog 이벤트 리스너
         document.addEventListener('close-dialog', event => {
           this.closeDialog(event.detail);
         });
       }
 
+      /**
+       * @description 팝업 오픈
+       *******************
+       * @param {String} content
+       * @param {String} title
+       * @param {String} width
+       * @param {String} height
+       * @param {Function} openCallback
+       * @param {Function} closeCallback
+       */
       openDialog(content, title, width, height, openCallback, closeCallback) {
         this.title = title;
-        if(!this.title) { // 타이틀이 없다면 title section을 hidden 처리
+
+        // 타이틀이 없다면 title section을 hidden 처리
+        if (!this.title) {
           this.$['title'].hidden = true;
         } else {
           this.$['title'].hidden = false;
@@ -117,8 +149,10 @@ Copyright © HatioLab Inc. All rights reserved.
         const modal = this.$['modal'];
         this.removeContent(container);
         container.appendChild(content);
-        dialog.style.width = width === 'fit' ? '' : width; // 길이 값을 fit으로 주면 다이얼로그 내부의 화면 넓이를 다이얼로그에 적용함
-        dialog.style.height = height === 'fit' ? '' : width; // 높이 값을 fit으로 주면 다이얼로그 내부의 화면 높이를 다이얼로그에 적용함
+        // 길이 값을 fit으로 주면 다이얼로그 내부의 화면 넓이를 다이얼로그에 적용함
+        dialog.style.width = width === 'fit' ? '' : width;
+        // 높이 값을 fit으로 주면 다이얼로그 내부의 화면 높이를 다이얼로그에 적용함
+        dialog.style.height = height === 'fit' ? '' : width;
         modal.style.display = 'flex';
 
         document.dispatchEvent(new CustomEvent('dialog-opened', {
@@ -127,30 +161,44 @@ Copyright © HatioLab Inc. All rights reserved.
           }
         }));
 
-        if(openCallback && typeof openCallback === 'function') openCallback();
-        if(closeCallback) this.closeCallback = closeCallback;
+        if (openCallback && typeof openCallback === 'function') openCallback();
+        if (closeCallback) this.closeCallback = closeCallback;
       }
 
+      /**
+       * @description 팝업 닫기
+       *******************
+       * @param {Object} closeParam
+       */
       closeDialog(closeParam) {
         const container = this.$['container'];
         const modal = this.$['modal'];
         this.removeContent(container);
         modal.style.display = 'none';
 
-        if(this.closeCallback && typeof this.closeCallback === 'function') {
+        if (this.closeCallback && typeof this.closeCallback === 'function') {
           this.closeCallback(closeParam);
           this.closeCallback = null;
         }
       }
 
+      /**
+       * @description 팝업 내용 컨텐트 삭제
+       *******************
+       * @param {Object} container
+       */
       removeContent(container) {
-        while(container.children.length) {
+        while (container.children.length) {
           container.removeChild(container.firstChild);
         }
       }
 
+      /**
+       * @description ?
+       *******************
+       */
       onModalClick() {
-        if(this.closeByModalClick) {
+        if (this.closeByModalClick) {
           this.closeDialog();
         }
       }

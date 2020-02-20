@@ -5,6 +5,8 @@ Copyright © HatioLab Inc. All rights reserved.
 
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
 
+<link rel="import" href="./item-list.html">
+
 <!--
   상단 Form과 하단 리스트로 구성되어 있는 공통 팝업 엘리먼트
 -->
@@ -340,7 +342,8 @@ Copyright © HatioLab Inc. All rights reserved.
         }
 
         listDataAjax.addEventListener('sys-ajax-response', event => {
-          this._setListData(event.detail);
+          var list = Array.isArray(event.detail) ? event.detail : (Array.isArray(event.detail.result) ? event.detail.result : []);
+          this._setListData(list);
         });
 
         if (!listDataAjax.baseUrl) listDataAjax.baseUrl = this._getBaseUrl();
@@ -355,13 +358,15 @@ Copyright © HatioLab Inc. All rights reserved.
        * 3. handleFormDataAfterSet이 정의되어 있다면 해당 함수를 호출하여 데이터 맵핑 후에 추가 작업을 수행함
        */
       setFormData(formData) {
-        if (this.handleFormDataBeforeSet && typeof this.handleFormDataBeforeSet === 'function') this.handleFormDataBeforeSet({
-          popupElement: this,
-          formElement: this._getFormContainer().children,
-          formData: formData,
-          listElement: this._getList(),
-          listData: this.listData
-        });
+        if (this.handleFormDataBeforeSet && typeof this.handleFormDataBeforeSet === 'function') {
+          this.handleFormDataBeforeSet({
+            popupElement: this,
+            formElement: this._getFormContainer().children,
+            formData: formData,
+            listElement: this._getList(),
+            listData: this.listData
+          });
+        }
 
         if (!formData || typeof formData !== 'object') {
           return;
@@ -380,13 +385,15 @@ Copyright © HatioLab Inc. All rights reserved.
           }
         }
 
-        if (this.handleFormDataAfterSet && typeof this.handleFormDataAfterSet === 'function') this.handleFormDataAfterSet({
-          popupElement: this,
-          formElement: this._getFormContainer().children,
-          formData: formData,
-          listElement: this._getList(),
-          listData: this.listData
-        });
+        if (this.handleFormDataAfterSet && typeof this.handleFormDataAfterSet === 'function') {
+          this.handleFormDataAfterSet({
+            popupElement: this,
+            formElement: this._getFormContainer().children,
+            formData: formData,
+            listElement: this._getList(),
+            listData: this.listData
+          });
+        }
       }
 
       /**
@@ -397,13 +404,15 @@ Copyright © HatioLab Inc. All rights reserved.
        * 3. handleListDataAfterSet이 정의되어 있다면 해당 함수를 호출하여 데이터 맵핑 후에 추가 작업을 수행함
        */
       _setListData(listData) {
-        if (this.handleListDataBeforeSet && typeof this.handleListDataBeforeSet === 'function') this.handleListDataBeforeSet({
-          popupElement: this,
-          formElement: this._getFormContainer(),
-          formData: this.formData,
-          listElement: this._getList(),
-          listData: listData
-        });
+        if (this.handleListDataBeforeSet && typeof this.handleListDataBeforeSet === 'function') {
+          this.handleListDataBeforeSet({
+            popupElement: this,
+            formElement: this._getFormContainer(),
+            formData: this.formData,
+            listElement: this._getList(),
+            listData: listData
+          });
+        }
 
         if (!listData || !Array.isArray(listData)) {
           return;
@@ -411,13 +420,15 @@ Copyright © HatioLab Inc. All rights reserved.
 
         this.listData = listData;
 
-        if (this.handleListDataAfterSet && typeof this.handleListDataAfterSet === 'function') this.handleListDataAfterSet({
-          popupElement: this,
-          formElement: this._getFormContainer(),
-          formData: this.formData,
-          listElement: this._getList(),
-          listData: listData
-        });
+        if (this.handleListDataAfterSet && typeof this.handleListDataAfterSet === 'function') {
+          this.handleListDataAfterSet({
+            popupElement: this,
+            formElement: this._getFormContainer(),
+            formData: this.formData,
+            listElement: this._getList(),
+            listData: listData
+          });
+        }
       }
 
       /**

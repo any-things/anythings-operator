@@ -241,14 +241,22 @@ Copyright © HatioLab Inc. All rights reserved.
     </style>
 
     <!-- 주문 정보 표시를 위한 Ajax -->
-    <sys-ajax id="batch-summary-ajax" method="GET" content-type="application/json" last-response="{{orderDataSet}}">
+    <sys-ajax 
+      id="batch-summary-ajax" 
+      method="GET" 
+      content-type="application/json" 
+      last-response="{{orderDataSet}}">
     </sys-ajax>
 
     <!-- 공박스 투입을 위한 Ajax -->
-    <sys-ajax id="input-ajax" method="PUT" content-type="application/json" last-response="{{orderDataSet}}"
+    <sys-ajax 
+      id="input-ajax" 
+      method="PUT" 
+      content-type="application/json" 
+      last-response="{{orderDataSet}}"
       on-sys-ajax-error="_onBoxIdScanError">
     </sys-ajax>
-
+      
     <div id="container">
       <div id="top-container">
         <!-- 투입 가능 박스 수 -->
@@ -588,6 +596,12 @@ Copyright © HatioLab Inc. All rights reserved.
                   color: '#fff'
                 }
               }, {
+                display: t('label.rack'),
+                fieldname: 'equip_cd',
+                style: {
+                  textAlign: 'center'
+                }
+              }, {
                 display: t('label.box_type'),
                 fieldname: 'box_type',
                 style: {
@@ -622,7 +636,10 @@ Copyright © HatioLab Inc. All rights reserved.
               }, {
                 display: t('label.order_no'),
                 fieldname: 'order_no',
-                columnWidth: '1.75fr'
+                columnWidth: '1.75fr',
+                style: {
+                  textAlign: 'center'
+                }
               }, {
                 display: t('label.sku_qty'),
                 fieldname: 'sku_qty',
@@ -667,34 +684,27 @@ Copyright © HatioLab Inc. All rights reserved.
             value: () => [{
               display: t('label.sku_nm'),
               fieldname: 'sku_nm',
-              columnWidth: '1.2fr',
+              columnWidth: '1.8fr',
             }, {
-              display: t('label.location'),
-              fieldname: 'loc_cd',
-              columnWidth: '1fr',
+              display: t('label.cell'),
+              fieldname: 'sub_equip_cd',
+              columnWidth: '1.1fr',
               style: {
-                textAlign: 'center'
+                textAlign: 'right'
               }
             }, {
               display: t('label.picked_qty'),
               fieldname: 'picked_qty',
-              columnWidth: '.2fr',
+              columnWidth: '.5fr',
               style: {
                 textAlign: 'right'
               }
             }, {
               display: t('label.pick_qty'),
               fieldname: 'pick_qty',
-              columnWidth: '.2fr',
+              columnWidth: '.5fr',
               style: {
                 textAlign: 'right'
-              }
-            }, {
-              display: t('label.status'),
-              fieldname: 'status',
-              columnWidth: '.3fr',
-              style: {
-                textAlign: 'center'
               }
             }]
           }
@@ -917,9 +927,9 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} e
        */
       _onBoxIdScanError(e) {
-        // LOGIS_UTIL.showMessage(e.detail.code, e.detail.msg, () => {
-        //   this._initialSetup();
-        // });
+        /*LOGIS_UTIL.showMessage(e.detail.code, e.detail.msg, () => {
+           this._initialSetup();
+        });*/
       }
 
       /**
@@ -929,12 +939,14 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       showOrderItems(event) {
         const data = event.detail.data;
+        var equipCd = LOGIS_UTIL.getEquipCd();
+        var equipType = LOGIS_UTIL.getEquipType();
 
         document.dispatchEvent(new CustomEvent('open-form-list-dialog', {
           detail: {
-            title: '[' + data.order_no + '] ' + t('title.dps_order_info_detail'),
+            title: t('title.dps_order_info_detail') + ' [' + data.order_no + ']',
             listFields: this.detailListFields,
-            listDataReqUrl: `/device_process/dps/${data.order_no}/order_items`, // FIXME URL 체크
+            listDataReqUrl: `/device_process/dynamic/dps/order_items?equipType=${equipType}&equipCd=${equipCd}&orderNo=${data.order_no}`,
             handleListDataAfterSet: params => {
               const rows = params.listElement.getRows();
               rows.forEach(row => {
