@@ -100,6 +100,8 @@ window.locales['zh-CN'] = {
   'label.box_id': '箱编码',
   'label.box_type': '箱号',
   'label.box_qty': '装箱数量',
+  'label.input_box_qty': '투입 박스 수량',
+  'label.input_plan_qty': '투입 예정 수량',
   'label.img_number': '图片数量',
   'label.default_printer': '默认打印机',
   'label.adjust_qty': '调整数量',
@@ -139,6 +141,7 @@ window.locales['zh-CN'] = {
   'label.equipment_name': 'Equipment Code',
   'label.complete': '완료',
   'label.incomplete': '미완료',
+  'label.box_arrived': '박스도착',
 
   // menu list
   'menu.Settings': '设置',
@@ -148,6 +151,7 @@ window.locales['zh-CN'] = {
   'menu.QpsOrderInfo': 'QPS作业',
   'menu.B2BSkuInput': '상품 투입',
   'menu.B2CBoxInput': '박스 투입',
+  'menu.B2CBoxRequirement': '박스 소요량',
   'menu.KioskQpsOrderInfo': 'QPS作业信息',
   'menu.B2BAssortJob': 'B2B作业处理',
   'menu.Das2JobProcess': 'DAS2作业处理',

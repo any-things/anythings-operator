@@ -106,11 +106,12 @@ Copyright © HatioLab Inc. All rights reserved.
       content-type="application/json">
     </sys-ajax>
 
-    <!-- DPS출발   -->
+    <!-- 박스 출발 -->
     <sys-ajax id="depart-ajax" method="PUT" curl="/device_process/dynamic/dps/bucket_depart"
       content-type="application/json">
     </sys-ajax>
-    <!-- DPS도착   -->
+
+    <!-- 박스 도착 -->
     <sys-ajax id="arrive-ajax" method="PUT" curl="/device_process/dynamic/dps/bucket_arrive"
       content-type="application/json" on-sys-ajax-response="_arriveBucketResponsed">
     </sys-ajax>
@@ -137,28 +138,26 @@ Copyright © HatioLab Inc. All rights reserved.
         <span>[[orderNoLabel]]</span>
         <span class="prodname">[[orderNo]]</span>
       </div>
-      <!-- 개발 모드일때만 인풋 박스 표시 -->
-      <dom-if if="[[isDevMode]]">
-        <template>
-          <div id="prod-info-right">
-            <label>[[bucketCdLabel]]</label>
-            <input id="bucket-code" placeholder="개발 모드" class="row" on-keypress="_onBucketCodeChanged">
-          </div>
-        </template>
-  </dom-if>
 
-  <div id="icon-section">
-    <div id="ble-section">
-      <label id="ble-id">[[deviceName]]</label>
-      <iron-icon id="bluetooth-btn" icon="[[bluetoothIcon]]" on-click="bluetoothIconClicked"></iron-icon>
-    </div>
-    <img id="qr-done" src="./static/assets/tab_codes/done_by_qr.png" />
-    <button id="done-btn" on-click="doneIconClicked">
-          <!-- <iron-icon id="done-btn" icon="[[doneIcon]]" on-click="doneIconClicked"></iron-icon> -->
-          [[finishLabel]]
+      <div id="prod-info-right">
+        <label>[[boxArrivedLabel]]</label>
+        <input id="bucket-code" class="row" on-keypress="_onBucketCodeChanged">
+      </div>
+
+      <div id="icon-section">
+        <div id="ble-section">
+          <label id="ble-id">[[deviceName]]</label>
+          <iron-icon id="bluetooth-btn" icon="[[bluetoothIcon]]" on-click="bluetoothIconClicked"></iron-icon>
+        </div>
+
+        <img id="qr-done" src="./static/assets/tab_codes/done_by_qr.png" />
+
+        <button id="done-btn" on-click="doneIconClicked">
+          <!--iron-icon id="done-btn" icon="[[doneIcon]]" on-click="doneIconClicked"></iron-icon-->
+          [[boxDepartureLabel]]
         </button>
-  </div>
-  </div>
+      </div>
+    </div>
 
   <div id="content">
     <dom-if if="[[showFront]]">
@@ -171,13 +170,13 @@ Copyright © HatioLab Inc. All rights reserved.
             </item-list>
           </div>
         </template>
-    </dom-if>
+  </dom-if>
 
-    <job-progress-bar id="dps-job-indicator" job-type="[[jobType]]" selected-input="{{selectedInput}}" on-item-selected="_selectedInputChanged" on-item-selected-by-click="_selectedInputChanged" input-list="[[inputList]]" on-configured="_addJobStatusAttr">
-    </job-progress-bar>
+  <job-progress-bar id="dps-job-indicator" job-type="[[jobType]]" selected-input="{{selectedInput}}" on-item-selected="_selectedInputChanged" on-item-selected-by-click="_selectedInputChanged" input-list="[[inputList]]" on-configured="_addJobStatusAttr">
+  </job-progress-bar>
 
-    <dom-if if="[[showRear]]">
-      <template>
+  <dom-if if="[[showRear]]">
+    <template>
           <div id="right-section">
             <button class="list-header-btn" disabled>[[rearBtnLabel]]</button>
 
@@ -186,10 +185,10 @@ Copyright © HatioLab Inc. All rights reserved.
             </item-list>
           </div>
         </template>
-    </dom-if>
+  </dom-if>
 
-    <dom-if if="[[showTotal]]">
-      <template>
+  <dom-if if="[[showTotal]]">
+    <template>
           <div id="total-section">
             <button class="list-header-btn" disabled>[[totalBtnLabel]]</button>
 
@@ -198,7 +197,7 @@ Copyright © HatioLab Inc. All rights reserved.
             </item-list>
           </div>
         </template>
-    </dom-if>
+  </dom-if>
   </div>
 
   </template>
@@ -226,7 +225,7 @@ Copyright © HatioLab Inc. All rights reserved.
            ****************
            * @type {String}
            */
-          finishLabel: {
+          boxDepartureLabel: {
             type: String,
             value: () => t('label.finished')
           },
@@ -242,13 +241,13 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 개발 모드에서 사용하는 버킷 코드의 라벨
+           * 박스 도착
            ****************
            * @type {String}
            */
-          bucketCdLabel: {
+          boxArrivedLabel: {
             type: String,
-            value: () => t('label.bucket')
+            value: () => t('label.box_arrived')
           },
 
           /**
@@ -290,7 +289,7 @@ Copyright © HatioLab Inc. All rights reserved.
             type: Array,
             value: function() {
               return [{
-                fieldname: 'sub_equip_cd',
+                fieldname: 'side_nm',
                 columnWidth: 'auto',
                 displayCallback: value => '(' + value + ')'
               }, {
@@ -298,7 +297,13 @@ Copyright © HatioLab Inc. All rights reserved.
                 columnWidth: 'auto',
                 hidden: true
               }, {}, {
+                fieldname: 'sub_equip_cd',
+                style: {
+                  textAlign: 'left'
+                },
+              }, {
                 fieldname: 'sku_nm',
+                columnWidth: 'auto'
               }, {
                 fieldname: 'picking_sum',
                 style: {
@@ -707,10 +712,10 @@ Copyright © HatioLab Inc. All rights reserved.
         let equipType = LOGIS_UTIL.getEquipType();
         let equipCd = LOGIS_UTIL.getEquipCd();
         let zoneCd = LOGIS_UTIL.getStationCd();
-        let jobType = LOGIS_UTIL.getJobType();
+        //let jobType = LOGIS_UTIL.getJobType();
         let bucketCd = scannedBarcode;
 
-        bucketArriveAjax.curl = `/device_process/dynamic/${jobType}/bucket_arrive?equipType=${equipType}&equipCd=${equipCd}&equipZone=${zoneCd}&bucketCd=${bucketCd}`;
+        bucketArriveAjax.curl = `/device_process/dynamic/dps/bucket_arrive?equipType=${equipType}&equipCd=${equipCd}&equipZone=${zoneCd}&bucketCd=${bucketCd}`;
 
         bucketArriveAjax.generateRequest();
       }

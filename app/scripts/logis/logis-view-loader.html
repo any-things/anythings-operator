@@ -11,7 +11,9 @@ Copyright © HatioLab Inc. All rights reserved.
 <dom-module id='logis-view-loader'>
   <script>
     class LogisViewLoader extends Polymer.Element {
-      static get is() { return 'logis-view-loader' }
+      static get is() {
+        return 'logis-view-loader'
+      }
 
       static get properties() {
         return {
@@ -89,6 +91,9 @@ Copyright © HatioLab Inc. All rights reserved.
               route: 'b2c_box_input',
               src: './scripts/fragments/logis/b2c/input/b2c-box-input.html'
             }, {
+              route: 'b2c_box_requirement',
+              src: './scripts/fragments/logis/b2c/input/b2c-box-requirement.html'
+            }, {
               route: 'b2b_out_middle_assort',
               src: './scripts/fragments/logis/b2b/assort/b2b-out-middle-assort.html'
             }, {
@@ -109,13 +114,13 @@ Copyright © HatioLab Inc. All rights reserved.
             }, {
               route: 'b2c_pick_single_pack',
               src: './scripts/fragments/logis/b2c/pick/b2c-pick-single-pack.html'
-            },{
+            }, {
               route: 'b2c_packing_check',
               src: './scripts/fragments/logis/b2c/pack/b2c-packing-check.html'
-            },{
+            }, {
               route: 'b2c_packing_popup',
               src: './scripts/fragments/logis/b2c/pack/b2c-packing-popup.html'
-            },{
+            }, {
               route: 'label_list',
               src: './scripts/fragments/logis/common/label-list.html'
             }, {
@@ -158,14 +163,14 @@ Copyright © HatioLab Inc. All rights reserved.
 
           this.viewElements.forEach((element, index) => {
             // viewElements 중 현재 라우팅의 src를 찾아서 targetElement와 targetIndex를 초기화
-            if(element.route === event.detail.currentPage) {
+            if (element.route === event.detail.currentPage) {
               targetIndex = index;
               targetElement.push(element);
             }
           });
 
           // 임포트 대상 엘리먼트가 있다면
-          if(targetElement && targetElement.length > 0) {
+          if (targetElement && targetElement.length > 0) {
             // 대상 엘리먼트를 임포트
             this.loadViews(targetElement);
             // viewElements리스트에서 임포트 엘리먼트를 제거
@@ -189,7 +194,7 @@ Copyright © HatioLab Inc. All rights reserved.
            * 2. 프로덕션 모드일 경우
            *    1) CONST.SRC_URL을 통해 컴퍼넌트를 임포트 함
            */
-          if(!CONST.IS_DEV_MODE) {
+          if (!CONST.IS_DEV_MODE) {
             const srcUrl = JSON.parse(localStorage.getItem('setting.srcUrl'));
             element.src = element.src.replace('./', `${srcUrl}/`);
           }

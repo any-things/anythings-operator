@@ -100,6 +100,8 @@ window.locales['en-US'] = {
   'label.box_id': 'Box Id',
   'label.box_type': 'Box Type',
   'label.box_qty': 'Box Qty',
+  'label.input_box_qty': 'Box Input Qty',
+  'label.input_plan_qty': 'Plan Input Qty',
   'label.img_number': 'Number of Image',
   'label.default_printer': 'Printer To Use',
   'label.adjust_qty': 'Adjusted QTY',
@@ -139,6 +141,7 @@ window.locales['en-US'] = {
   'label.equipment_name': 'Equipment Code',
   'label.complete': '완료',
   'label.incomplete': '미완료',
+  'label.box_arrived': 'Box Arrived',
 
   // menu list
   'menu.Settings': 'Setting',
@@ -148,6 +151,7 @@ window.locales['en-US'] = {
   'menu.QpsOrderInfo': 'QPS Task',
   'menu.B2BSkuInput': 'SKU Input',
   'menu.B2CBoxInput': 'Box Input',
+  'menu.B2CBoxRequirement': 'Box Requirement',
   'menu.KioskQpsOrderInfo': 'QPS Task',
   'menu.B2BAssortJob': 'B2B Assorting',
   'menu.DasJob2Process': 'DAS2 Process',

@@ -100,6 +100,8 @@ window.locales['ko-KR'] = {
   'label.box_id': '박스 ID',
   'label.box_type': '박스 타입',
   'label.box_qty': '박스 수량',
+  'label.input_box_qty': '투입 박스 수량',
+  'label.input_plan_qty': '투입 예정 수량',
   'label.img_number': '이미지 개수',
   'label.default_printer': '사용할 프린터',
   'label.adjust_qty': '조정 수량',
@@ -139,6 +141,8 @@ window.locales['ko-KR'] = {
   'label.equipment_name': '설비 이름',
   'label.complete': '완료',
   'label.incomplete': '미완료',
+  'label.box_arrived': '박스 도착',
+  'label.box_departure': '박스 출발',
 
   // menu list
   'menu.Settings': '설정',
@@ -148,6 +152,7 @@ window.locales['ko-KR'] = {
   'menu.QpsOrderInfo': 'QPS 작업',
   'menu.B2BSkuInput': '상품 투입',
   'menu.B2CBoxInput': '박스 투입',
+  'menu.B2CBoxRequirement': '박스 소요량',
   'menu.KioskQpsOrderInfo': 'QPS 작업',
   'menu.B2BAssortJob': 'B2B 분류작업',
   'menu.Das2JobProcess': '출고(2차분류)',
