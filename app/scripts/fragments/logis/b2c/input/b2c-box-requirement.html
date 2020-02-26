@@ -14,11 +14,11 @@ Copyright © HatioLab Inc. All rights reserved.
   <template>
     <style include="shared-styles">
       :host {
-          display: flex;
-          flex-direction: column;
-          height: calc(100% - 20px);
-          font-size: 40;
-          padding: 10px;
+        display: flex;
+        flex-direction: column;
+        height: calc(100% - 20px);
+        font-size: 40;
+        padding: 10px;
       }
 
       #container {
@@ -36,19 +36,12 @@ Copyright © HatioLab Inc. All rights reserved.
     </style>
 
     <!-- 박스 유형별 예정 / 처리 수량 조회 -->
-    <sys-ajax
-      id="box-requirement-ajax"
-      method="GET"
-      content-type="application/json"
-      last-response="{{items}}">
+    <sys-ajax id="box-requirement-ajax" method="GET" content-type="application/json" last-response="{{items}}">
     </sys-ajax>
 
     <div id="container">
       <!-- 그리드 -->
-      <item-list
-        id="item-list"
-        header="[[header]]"
-        data="[[items]]">
+      <item-list id="item-list" header="[[header]]" data="[[items.result]]">
       </item-list>
 
       <!-- 새로 고침 버튼  -->
@@ -73,7 +66,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           refreshLabel: {
             type: String,
-            value: function() {
+            value: function () {
               return t('button.refresh');
             }
           },
@@ -103,28 +96,36 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           header: {
             type: Array,
-            value: function() {
+            value: function () {
               return [{
                 display: t('label.box_type'),
                 fieldname: 'box_type_cd',
                 columnWidth: '1fr',
                 style: {
-                  'color': 'red'
+                  'color': 'red',
+                  textAlign: 'center'
                 }
               }, {
                 display: t('label.input_plan_qty'),
                 fieldname: 'input_plan_qty',
-                columnWidth: '1fr'
+                columnWidth: '1fr',
+                style: {
+                  textAlign: 'right'
+                }
               }, {
                 display: t('label.input_box_qty'),
                 fieldname: 'input_box_qty',
-                columnWidth: '1fr'
+                columnWidth: '1fr',
+                style: {
+                  textAlign: 'right'
+                }
               }, {
                 display: t('label.diff_qty'),
                 fieldname: 'remain_qty',
                 columnWidth: '1fr',
                 style: {
-                  'color': 'red'
+                  'color': 'red',
+                  textAlign: 'right'
                 }
               }]
             }
@@ -187,7 +188,7 @@ Copyright © HatioLab Inc. All rights reserved.
           this.refresh();
         }
 
-        setTimeout(function() {
+        setTimeout(function () {
           this.startAutoRefresh();
         }.bind(this), LOGIS_UTIL.getRefreshInterval());
       }
@@ -199,10 +200,11 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       refresh(event) {
         var equipCd = LOGIS_UTIL.getEquipCd();
+        var equipType = LOGIS_UTIL.getEquipType();
 
         if (equipCd) {
           var requestAjax = this.$['box-requirement-ajax'];
-          requestAjax.curl = `/device_process/dynamic/dps/box_requirement/${equipCd}`;
+          requestAjax.curl = `/device_process/dynamic/dps/box_requirement?equipCd=${equipCd}&equipType=${equipType}`;
           requestAjax.generateRequest();
         }
       }
