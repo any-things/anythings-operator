@@ -361,7 +361,7 @@ window.locales['en-US'] = {
   'text.box_no_process': 'The box has not been processed!',
   'text.single_box_done': '이미 처리 완료된 박스 입니다.',
   'text.single_box_complete': '처리 완료 되었습니다.',
-
+  'text.printer_is_not_set': '프린터가 설정되지 않았습니다. 설정화면에서 설정하세요.',
 
   // title list
   'title.confirm_inspect': 'Confirm Inspection',
@@ -402,5 +402,6 @@ window.locales['en-US'] = {
   'error.please_check_site_info': 'Please check site information.',
   'error.box_id_invalid': 'Box ID is not valid.',
   'error.no_scan_mpi_code': 'Please scan first MPICode.',
-  'error.not_recommanded_box': 'It is not recommanded box.'
+  'error.not_recommanded_box': 'It is not recommanded box.',
+  'error.transaction_failed': 'An error occurred during processing.'
 };

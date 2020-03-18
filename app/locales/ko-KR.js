@@ -362,7 +362,7 @@ window.locales['ko-KR'] = {
   'text.box_no_process': '박스 처리 안 됨!',
   'text.single_box_done': '이미 처리 완료된 박스 입니다.',
   'text.single_box_complete': '처리 완료 되었습니다.',
-
+  'text.printer_is_not_set': '프린터가 설정되지 않았습니다. 설정화면에서 설정하세요.',
 
   // title list
   'title.confirm_inspect': '검수 확인',
@@ -404,5 +404,6 @@ window.locales['ko-KR'] = {
   'error.please_check_site_info': '사이트 정보를 확인 하세요.',
   'error.box_id_invalid': '박스 ID가 유효하지 않습니다.',
   'error.no_scan_mpi_code': '표시기 코드부터 스캔해주세요.',
-  'error.not_recommanded_box': '추천 박스가 아닙니다.'
+  'error.not_recommanded_box': '추천 박스가 아닙니다.',
+  'error.transaction_failed': '처리 도중 에러가 발생했습니다.'
 };

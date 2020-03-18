@@ -361,7 +361,7 @@ window.locales['zh-CN'] = {
   'text.box_no_process': '此箱无法处理！',
   'text.single_box_done': '이미 처리 완료된 박스 입니다.',
   'text.single_box_complete': '처리 완료 되었습니다.',
-
+  'text.printer_is_not_set': '프린터가 설정되지 않았습니다. 설정화면에서 설정하세요.',
 
   // title list
   'title.confirm_inspect': '检验结束',
@@ -402,5 +402,6 @@ window.locales['zh-CN'] = {
   'error.please_check_site_info': '请确认Site信息。',
   'error.box_id_invalid': '箱编码无效。',
   'error.no_scan_mpi_code': '请先扫描MPI编码。',
-  'error.not_recommanded_box': '非推荐的箱号。'
+  'error.not_recommanded_box': '非推荐的箱号。',
+  'error.transaction_failed': '처리 도중 에러가 발생했습니다.'
 };

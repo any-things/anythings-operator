@@ -3,9 +3,9 @@
 Copyright © HatioLab Inc. All rights reserved.
 -->
 
-<link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
-<link rel="import" href="../../../units/mps/mps-list.html">
-<link rel="import" href="../../../units/sys-ajax.html">
+<link rel="import" href="../../../../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../../../components/common/item-list.html">
+<link rel="import" href="../../../../components/sys/sys-ajax.html">
 
 <!--
   물류 > B2C > DPS 박스 소요량 (KIOSK)
@@ -66,7 +66,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           refreshLabel: {
             type: String,
-            value: function () {
+            value: function() {
               return t('button.refresh');
             }
           },
@@ -96,7 +96,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           header: {
             type: Array,
-            value: function () {
+            value: function() {
               return [{
                 display: t('label.box_type'),
                 fieldname: 'box_type_cd',
@@ -120,7 +120,7 @@ Copyright © HatioLab Inc. All rights reserved.
                   textAlign: 'right'
                 }
               }, {
-                display: t('label.diff_qty'),
+                display: t('label.inputable_boxes'),
                 fieldname: 'remain_qty',
                 columnWidth: '1fr',
                 style: {
@@ -188,7 +188,7 @@ Copyright © HatioLab Inc. All rights reserved.
           this.refresh();
         }
 
-        setTimeout(function () {
+        setTimeout(function() {
           this.startAutoRefresh();
         }.bind(this), LOGIS_UTIL.getRefreshInterval());
       }
