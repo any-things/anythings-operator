@@ -276,7 +276,7 @@ window.locales['zh-CN'] = {
   'text.switch_to_inspection': '是否转换为检验完毕状态。',
   'text.switch_to_input': '是否转换为已投入状态。',
   'text.stock_load_done': '产品已补充完毕。',
-  'text.location_is_null': '库位中没有产品。',
+  'text.cell_is_empty': '库位中没有产品。',
   'text.stock_load_success': '补充成功。',
   'text.box_form_check': '箱编码格式错误。',
   'text.single_stock_done': '商品已处理完毕。',

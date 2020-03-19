@@ -277,7 +277,7 @@ window.locales['ko-KR'] = {
   'text.switch_to_inspection': '검수 상태로 전환하시겠습니까?',
   'text.switch_to_input': '투입 상태로 전환하시겠습니까?',
   'text.stock_load_done': '이미 적치가 완료된 상품입니다.',
-  'text.location_is_null': '셀에 상품이 없습니다.',
+  'text.cell_is_empty': '셀에 상품이 없습니다.',
   'text.stock_load_success': '적치가 완료되었습니다.',
   'text.box_form_check': '박스 형식이 잘못되었습니다.',
   'text.single_stock_done': '이미 처리가 완료된 상품입니다',

@@ -146,7 +146,7 @@ LOGIS_UTIL.getDeviceSettingValue = function(key) {
  * @param {String} key 설정 명 
  */
 LOGIS_UTIL.getBooleanDeviceSetting = function(key) {
-  let value = LOGIS_UTIL.getDeviceSettingValue();
+  let value = LOGIS_UTIL.getDeviceSettingValue(key);
   return value ? Boolean(value) : false;
 };
 
@@ -156,7 +156,7 @@ LOGIS_UTIL.getBooleanDeviceSetting = function(key) {
  * @param {String} key 설정 명 
  */
 LOGIS_UTIL.getNumberDeviceSetting = function(key) {
-  let value = LOGIS_UTIL.getDeviceSettingValue();
+  let value = LOGIS_UTIL.getDeviceSettingValue(key);
   return (value && !isNaN(value)) ? Number(value) : 0;
 };
 

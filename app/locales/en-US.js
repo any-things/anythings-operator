@@ -276,7 +276,7 @@ window.locales['en-US'] = {
   'text.switch_to_inspection': 'Are you sure to switch mode to Inspection?',
   'text.switch_to_input': 'Are you sure to switch mode to Input?',
   'text.stock_load_done': 'This item has been already loaded.',
-  'text.location_is_null': 'There is no sku in location',
+  'text.cell_is_empty': 'There is no sku in location',
   'text.stock_load_success': 'Loading is completed.',
   'text.box_form_check': 'This box form is wrong.',
   'text.single_stock_done': 'This item has been already processed.',

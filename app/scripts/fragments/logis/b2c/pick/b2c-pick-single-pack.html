@@ -140,19 +140,29 @@ Copyright © HatioLab Inc. All rights reserved.
     </style>
 
     <!-- 상품 코드로 단포 작업 현황 조회를 위한 Ajax -->
-    <sys-ajax id="single-pack-summary-ajax" method="GET" content-type="application/json" 
+    <sys-ajax 
+      id="single-pack-summary-ajax" 
+      method="GET" 
+      content-type="application/json" 
       on-sys-ajax-response="_onSearchSinglePackSummary">
     </sys-ajax>
 
     <!-- 박스 투입 처리를 위한 Ajax -->
-    <sys-ajax id="box-input-ajax" method="PUT" content-type="application/json" 
+    <sys-ajax 
+      id="box-input-ajax" 
+      method="PUT" 
+      content-type="application/json" 
       on-sys-ajax-response="_boxInputResponsed"
       on-sys-ajax-error="_handleStatusError">
     </sys-ajax>
 
     <!-- 송장 발행을 위한 Ajax -->
-    <sys-ajax id="print-invoice-ajax" curl="/device_process/dynamic/dps/print_invoice" method="PUT"
-      content-type="application/json" on-sys-ajax-response="_printLabelSucceed">
+    <sys-ajax 
+      id="print-invoice-ajax" 
+      curl="/device_process/dynamic/dps/print_invoice" 
+      method="PUT"
+      content-type="application/json" 
+      on-sys-ajax-response="_printLabelSucceed">
     </sys-ajax>
 
     <!-- 좌측 컨테이너 -->
@@ -181,6 +191,7 @@ Copyright © HatioLab Inc. All rights reserved.
     <div id="right-container">
       <!-- 우측 상단 작업 진행 요약 컨테이너 -->
       <div id="top-container">
+        <!-- 상품 코드 라벨 -->
         <span class="label">[[skuCdLabel]]</span>
 
         <!-- 상품 코드 Input -->
@@ -193,9 +204,11 @@ Copyright © HatioLab Inc. All rights reserved.
           on-sys-ajax-error="_findSkuError">
         </auto-popup-input>
 
+        <!-- 상품 명 -->
         <span class="label">[[skuNmLabel]]</span>
         <input id="sku-name" readonly>
 
+        <!-- 박스 ID -->
         <span class="label">[[boxIdLabel]]</span>
         <input id="box-id" on-keypress="_boxIdChanged">
       </div>

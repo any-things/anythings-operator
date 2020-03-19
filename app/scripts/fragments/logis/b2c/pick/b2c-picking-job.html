@@ -706,18 +706,18 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {String} scannedBarcode 스캔은 박스 도착 박스 ID 
        */
       scanned(scannedBarcode) {
-        // TODO : BOX ID 체크 룰 필요 
         // 박스 도착 이벤트 발생 
         const bucketArriveAjax = this.$['arrive-ajax'];
         let equipType = LOGIS_UTIL.getEquipType();
         let equipCd = LOGIS_UTIL.getEquipCd();
-        let zoneCd = LOGIS_UTIL.getStationCd();
-        //let jobType = LOGIS_UTIL.getJobType();
+        let stationCd = LOGIS_UTIL.getStationCd();
         let bucketCd = scannedBarcode;
 
-        bucketArriveAjax.curl = `/device_process/dynamic/dps/bucket_arrive?equipType=${equipType}&equipCd=${equipCd}&equipZone=${zoneCd}&bucketCd=${bucketCd}`;
-
-        bucketArriveAjax.generateRequest();
+        // TODO 버킷인 경우 처리 ...
+        if (LOGIS_UTIL.isBoxIdValid(bucketCd)) {
+          bucketArriveAjax.curl = `/device_process/dynamic/dps/bucket_arrive?equipType=${equipType}&equipCd=${equipCd}&stationCd=${stationCd}&bucketCd=${bucketCd}`;
+          bucketArriveAjax.generateRequest();
+        }
       }
 
       /**

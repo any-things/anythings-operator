@@ -79,62 +79,53 @@ Copyright © HatioLab Inc. All rights reserved.
 
     <!-- 로케이션 정보 조회를 위한 Ajax -->
     <sys-ajax
-      id="location-ajax"
+      id="recommend-cells-ajax"
       method="GET"
       content-type="application/json"
-      on-sys-ajax-response="_renderLocationCombo">
-    </sys-ajax>
-
-    <!-- 고객사코드 정보 조회 Ajax -->
-    <sys-ajax
-      id="company-get-ajax"
-      method="GET"
-      content-type="application/json"
-      on-sys-ajax-response="_companySetting">
-    </sys-ajax>
-
-    <!-- 로케이션 리스트에서 선택시에 해당 로케이션의 재고 정보 조회를 위한 Ajax -->
-    <sys-ajax
-      id="order-stock-ajax"
-      method="GET"
-      content-type="application/json"
-      on-sys-ajax-response="_fillOrderStockInfo">
+      on-sys-ajax-response="_renderCellCombo">
     </sys-ajax>
 
     <div id="container">
       <div class="input-container">
 
+        <!-- 바코드 -->
         <span class="label">[[barcodeLabel]]</span>
         <auto-popup-input
           hide-keyboard
           id="barcode"
-          on-before-request = "_customAjaxHandler"
-          resource-url="[[getSkuAjaxUrl]]"
+          on-before-request = "_beforeFindSkuHandler"
+          resource-url="[[findSkuUrl]]"
           popup-title="[[popupTitleLabel]]"
           button-txt-callback="[[_skuButtonTxtCallback]]"
-          on-item-selected="_searchRecommendLocations">
+          on-item-selected="_onFoundStock">
         </auto-popup-input>
 
+        <!-- 상품 코드 -->
         <span class="label">[[skuCdLabel]]</span>
         <input id="sku-cd" type="text" name="sku_cd" readonly>
 
+        <!-- 상품 바코드 -->
         <span class="label">[[skuBarcdLabel]]</span>
         <input id="sku-barcd" type="text" name="sku_barcd" readonly>
 
+        <!-- 상품 명 -->
         <span class="label">[[skuNmLabel]]</span>
         <input id="sku-nm" type="text" name="sku_nm" readonly>
 
-        <span class="label">[[locationLabel]]</span>
-        <select id="location" on-change="_locationSelected">
+        <!-- 로케이션 -->
+        <span class="label">[[cellLabel]]</span>
+        <select id="cell" on-change="_cellSelected">
           <option></option>
         </select>
 
+        <!-- 재고 수량 -->
         <span class="label">[[stockQtyLabel]]</span>
         <input id="stock-qty" type="text" name="stock_qty" readonly>
       </div>
 
+      <!-- 초기화 버튼 -->
       <div class="button-container">
-        <button id = "clear-btn" class= 'btn' on-click="_clearView">[[resetBtnLabel]]</button>
+        <button id="clear-btn" class="btn" on-click="_clearView">[[resetBtnLabel]]</button>
       </div>
     </div>
   </template>
@@ -182,9 +173,9 @@ Copyright © HatioLab Inc. All rights reserved.
            ****************
            * @type {String}
            */
-          locationLabel: {
+          cellLabel: {
             type: String,
-            value: () => t('label.location')
+            value: () => t('label.cell')
           },
 
           /**
@@ -242,7 +233,7 @@ Copyright © HatioLab Inc. All rights reserved.
            ****************
            * @type {String}
            */
-          getSkuAjaxUrl: {
+          findSkuUrl: {
             type: String
           },
 
@@ -269,8 +260,6 @@ Copyright © HatioLab Inc. All rights reserved.
             this._initialSetup();
           }
         });
-
-        this._getComCd();
       }
 
       /**
@@ -284,55 +273,50 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * @description
+       * @description 상품 조회 전 핸들러
        **************************
        * @param {Object} event
        */
-      _customAjaxHandler(event) {
-        if (/([FR]{1}[0-9]{2}[-]{1}[0-9]{3}[-]{1}[0-9]{2})/g.exec(this.$['barcode'].value)) {
-          this._clearCombobox(this.$['location']);
-          this.getSkuAjaxUrl = `/pda_process/dps/find_stock/${LOGIS_UTIL.getEquipCd()}/${this.$['barcode'].value}`
+      _beforeFindSkuHandler(event) {
+        var barcd = this.$['barcode'].value;
+
+        if (LOGIS_UTIL.isCellCdValid(barcd)) {
+          this._clearCombobox(this.$['cell']);
+          this.findSkuUrl = `/stocks/find_by_cell/${LOGIS_UTIL.getEquipType()}/${LOGIS_UTIL.getEquipCd()}/${barcd}`;
+
         } else {
-          this._clearCombobox(this.$['location']);
-          this.getSkuAjaxUrl = `/pda_process/find_stock_sku/${LOGIS_UTIL.getEquipCd()}/:inputValue`
+          this._clearCombobox(this.$['cell']);
+          this.findSkuUrl = `/sku/search/${LOGIS_UTIL.getEquipType()}/${LOGIS_UTIL.getEquipCd()}/${barcd}`;
         }
       }
 
       /**
-       * @description 추천 셀 검색
+       * @description 재고 조회 이후 
        **************************
        * @param {Object} event
        */
-      _searchRecommendLocations(event) {
+      _onFoundStock(event) {
+        if (!event || !event.detail) return;
+
         let skuInfo = event.detail;
+        let barcd = this.$['barcode'].value;
+        this.comCd = skuInfo.com_cd;
+        this.skuCd = skuInfo.sku_cd;
         this.$['sku-cd'].value = skuInfo.sku_cd;
         this.$['sku-nm'].value = skuInfo.sku_nm;
         this.$['sku-barcd'].value = skuInfo.sku_barcd;
-        this.comCd = skuInfo.com_cd;
 
-        if (/([FR]{1}[0-9]{2}[-]{1}[0-9]{3}[-]{1}[0-9]{2})/g.exec(this.$['barcode'].value)) {
-          if (skuInfo.stock_qty == undefined || skuInfo.stock_qty <= 0) {
-            LOGIS_UTIL.showToastWarnMessage(t('text.location_is_null'));
-            this._clearView();
+        // 1. 읽힌 정보가 셀 코드이면
+        if (LOGIS_UTIL.isCellCdValid(barcd)) {
+          this.$['stock-qty'].value = skuInfo.stock_qty;
+          this._createCellOption(this.$['cell'], skuInfo.cell_cd, skuInfo.stock_qty, true);
+          this.$['barcode'].select();
 
-          } else {
-            this.$['sku-barcd'].value = skuInfo.box_barcd;
-            this.$['stock-qty'].value = skuInfo.stock_qty;
-            const option = document.createElement('option');
-            option.innerText = skuInfo.loc_cd;
-            option.selected = true;
-            this.$['location'].appendChild(option);
-            this.$['barcode'].select();
-          }
-
+          // 2. 읽힌 정보가 상품 코드 혹은 상품 바코드이면
         } else {
-          // order stock을 조회하기 위해 this.skuCd 초기화
-          this.skuCd = skuInfo.sku_cd;
-          // 적치 대상 로케이션 리스트를 조회
-          const locInfoAjax = this.$['location-ajax'];
-          let rackCd = JSON.parse(localStorage.getItem('setting.equipCd'));
-          locInfoAjax.curl = `/pda_process/dps/load_locs/${rackCd}/${this.skuCd}/${this.comCd}`;
-          locInfoAjax.generateRequest();
+          const cellAjax = this.$['recommend-cells-ajax'];
+          cellAjax.curl = `/stocks/search_by_sku/${LOGIS_UTIL.getEquipType()}/${LOGIS_UTIL.getEquipCd()}/${this.comCd}/${this.skuCd}`;
+          cellAjax.generateRequest();
         }
       }
 
@@ -341,62 +325,44 @@ Copyright © HatioLab Inc. All rights reserved.
        **************************
        * @param {Object} response
        */
-      _renderLocationCombo(response) {
-        const locationCombo = this.$['location'];
-        this._clearCombobox(locationCombo);
+      _renderCellCombo(response) {
+        if (!response || !response.detail) return;
 
-        if (/([FR]{1}[0-9]{2}[-]{1}[0-9]{3}[-]{1}[0-9]{2})/g.exec(this.$['barcode'].value)) {
-          const option = document.createElement('option');
-          option.innerText = this.$['barcode'].value;
-          option.setAttribute('loc-id', this.$['barcode'].value);
-          locationCombo.appendChild(option);
+        const cellCombo = this.$['cell'];
+        this._clearCombobox(cellCombo);
+        let barcd = this.$['barcode'].value;
+
+        if (LOGIS_UTIL.isCellCdValid(barcd)) {
+          this._createCellOption(cellCombo, barcd, 0, false);
 
         } else {
-          let locations = response.detail;
-          locations.forEach(location => {
-            const option = document.createElement('option');
-            option.innerText = location;
-            option.setAttribute('loc-id', location);
-            locationCombo.appendChild(option);
-          });
+          let stocks = response.detail;
 
-          this.locCd = null;
-          if (locationCombo.options.length <= 0 || locationCombo.options.length == undefined) {
-            LOGIS_UTIL.showToastWarnMessage(t('text.location_is_null'));
-            this._clearView();
+          if (stocks) {
+            stocks.forEach(stock => {
+              this._createCellOption(cellCombo, stock.cell_cd, stock.stock_qty, false);
+            });
 
-          } else {
-            this.locCd = locationCombo.selectedOptions[0].getAttribute('loc-id');
-            this.getOrderStockInfo();
+            this._cellSelected();
           }
         }
       }
 
       /**
-       * @description 추천 로케이션 리스트에서 선택시에 해당 로케이션의 재고 정보를 조회한다
+       * @description 셀 코드로 셀 옵션 생성
        **************************
+       * @param {Object} cellCombo
+       * @param {String} cellCd
+       * @param {Number} stockQty
+       * @param {Boolean} selected
        */
-      getOrderStockInfo() {
-        try {
-          const rackCd = LOGIS_UTIL.getEquipCd();
-          const orderStockAjax = this.$['order-stock-ajax'];
-          orderStockAjax.curl = `/pda_process/dps/find_order_stock_by_loc/${rackCd}/${this.locCd}/${this.skuCd}`;
-          orderStockAjax.generateRequest();
-
-        } catch (error) {
-          LOGIS_UTIL.showToastErrorMessage(error.message);
-        }
-      }
-
-      /**
-       * @description 재고 정보 표시
-       **************************
-       * @param {Object} event
-       */
-      _fillOrderStockInfo(event) {
-        var items = event.detail;
-        this.$['stock-qty'].value = items.stock_qty;
-        this.$['barcode'].select();
+      _createCellOption(cellCombo, cellCd, stockQty, selected) {
+        const option = document.createElement('option');
+        option.innerText = cellCd;
+        option.setAttribute('cell-id', cellCd);
+        option.setAttribute('stock-qty', stockQty);
+        if (selected) option.selected = true;
+        cellCombo.appendChild(option);
       }
 
       /**
@@ -407,58 +373,26 @@ Copyright © HatioLab Inc. All rights reserved.
         this.$['sku-cd'].value = '';
         this.$['sku-barcd'].value = '';
         this.$['sku-nm'].value = '';
-        this.$['location'].value = '';
+        this.$['cell'].value = '';
         this.$['stock-qty'].value = '';
         this.$['barcode'].select();
 
-        this._clearCombobox(this.$['location']);
+        this._clearCombobox(this.$['cell']);
         this._initialSetup();
       }
 
       /**
-       * @description 고객사 조회
+       * @description 셀 선택시 선택된 재고 정보 표시
        ***************************
        */
-      _getComCd() {
-        const companyGetAjax = this.$['company-get-ajax'];
-        companyGetAjax.baseUrl = JSON.parse(localStorage.getItem('setting.baseUrl'));
+      _cellSelected() {
+        const cellCombo = this.$['cell'];
 
-        companyGetAjax.customParams = {
-          select: 'com_cd',
-          sort: [{
-            field: 'com_cd',
-            ascending: true
-          }],
-          query: [{
-            name: 'belongs_to_site',
-            operator: 'eq',
-            value: 'true'
-          }],
-          belongs_to_domain: true
-        };
-
-        companyGetAjax.curl = `/company`;
-        companyGetAjax.generateRequest();
-      }
-
-      /**
-       * @description 셀 선택시
-       ***************************
-       */
-      _locationSelected() {
-        const locationCombo = this.$['location'];
-        this.locCd = null;
-        this.locCd = locationCombo.selectedOptions[0].getAttribute('loc-id');
-        this.getOrderStockInfo();
-      }
-
-      /**
-       * @description 고객사 설정
-       ***************************
-       * @param {Object} combobox
-       */
-      _companySetting(event) {
-        this.comCd = event.detail.items[0].com_cd;
+        if (cellCombo.selectedOptions && cellCombo.selectedOptions.length >= 1) {
+          let selection = cellCombo.selectedOptions[0];
+          this.cellCd = selection.getAttribute('cell-id');
+          this.$['stock-qty'].value = selection.getAttribute('stock-qty');
+        }
       }
 
       /**
