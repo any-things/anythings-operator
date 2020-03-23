@@ -1,0 +1,747 @@
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+
+<link rel="import" href="../../../../../bower_components/polymer/polymer-element.html">
+
+<!--
+  물류 > B2C > 재고 보충 화면 (PDA)
+-->
+<dom-module id="stock-supplement">
+  <template>
+    <style include="shared-styles">
+      :host {
+        display: block;
+        padding: 10px;
+        height: calc(100% - 40px);
+        overflow-y: auto;
+      }
+      #container {
+        padding: 20px;
+        background-color: var(--things-white-opacity-background-color);
+        border-radius: var(--things-default-border-radius);
+        color: rgba(255,255,255,.8);
+      }
+      .input-container {
+        display: grid;
+        grid-template-columns: 35% 65%;
+        grid-gap:7px 0;
+      }
+      .label {
+        font-size:.8rem;
+        margin: auto 5px auto auto;
+      }
+      #button-group {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        grid-gap: 15px;
+        margin-top: 15px;
+        justify-items: end;
+      }
+      #bottom-container {
+        display: grid;
+        grid-template-columns: 30% 30% 30%;
+        margin-top: 10px;
+        grid-gap: 15px;
+        padding: 20px;
+        background-color: var(--things-white-opacity-background-color);
+        border-radius: var(--things-default-border-radius);
+        color: rgba(255,255,255,.8);
+      }
+    </style>
+
+    <!-- 상품 적치를 가이드할 추천 셀 정보 조회를 위한 Ajax -->
+    <sys-ajax
+      id="recommend-cell-ajax"
+      method="GET"
+      content-type="application/json"
+      on-sys-ajax-response="_renderCellCombo">
+    </sys-ajax>
+
+    <!-- 추천 로케이션 리스트에서 선택시에 해당 셀 재고 정보 조회를 위한 Ajax -->
+    <sys-ajax
+      id="order-stock-ajax"
+      method="GET"
+      content-type="application/json"
+      on-sys-ajax-response="_fillOrderStockInfo">
+    </sys-ajax>
+
+    <!-- 재고 적치 트랜잭션을 위한 Ajax -->
+    <sys-ajax
+      id="load-stock-ajax"
+      method="PUT"
+      content-type="application/json"
+      on-sys-ajax-error="_clearView"
+      on-sys-ajax-response="_stockSuccess">
+    </sys-ajax>
+
+    <!-- LED ON Ajax -->
+    <sys-ajax
+      id="led-on-ajax"
+      method="GET"
+      content-type="application/json">
+    </sys-ajax>
+
+    <!-- LED OFF Ajax -->
+    <sys-ajax
+      id="led-off-ajax"
+      method="GET"
+      content-type="application/json">
+    </sys-ajax>
+
+    <!-- 보충 랙 조회 Ajax -->
+    <sys-ajax
+      id="rack-list-ajax"
+      method="GET"
+      content-type="application/json"
+      on-sys-ajax-response="_rackSetting">
+    </sys-ajax>
+
+    <div id="container">
+      <div class="input-container">
+        <!-- 상품 바코드 -->
+        <span class="label">[[skuBarcdLabel]]</span>
+
+        <!-- SKU 정보 조회 시 복수개가 조회된 경우 실행되는 사용자가 고를 수 있는 팝업이 가미된 SKU Input -->
+        <auto-popup-input
+          hide-keyboard
+          id="sku-barcd"
+          resource-url="[[findSkuUrl]]"
+          popup-title="[[popupTitleLabel]]"
+          allowed-focus-out
+          button-txt-callback="[[_skuButtonTxtCallback]]"
+          on-item-selected="_onFoundStock">
+        </auto-popup-input>
+
+        <!-- 상품 명 입력 박스 -->
+        <span class="label">[[skuNameLabel]]</span>
+        <input id="sku-nm" readonly></input>
+
+        <!-- 주문 수량 입력 박스 -->
+        <span class="label">[[orderQtyLabel]]</span>
+        <input id="order-qty" readonly></input>
+
+        <!-- 재고 수량 입력 박스 -->
+        <span class="label">[[stockQtyLabel]]</span>
+        <input id="stock-qty" readonly></input>
+
+        <!-- 입력 수량 입력 박스 -->
+        <span class="label">[[inputQtyLabel]]</span>
+        <input id="input-qty" type="number" min="1" max = "[[inputMaxQty]]" on-keypress="_onInputQtyChanged">
+
+        <!-- 추천 셀 셀렉트 박스 -->
+        <span class="label">[[recommendCellLabel]]</span>
+        <select id="cell" on-change="_cellSelected">
+          <option></option>
+        </select>
+
+        <!-- 변경 셀 입력 박스 -->
+        <span class="label">[[changeCellLabel]]</span>
+        <input id="change-cell" on-focus="_hideKeyboard" on-keypress="_onCellChanged">
+
+        <!-- 셀 유형 -->
+        <span class="label">[[stockCellTypeLabel]]</span>
+        <input id="stock-cell-type" readonly></input>
+        
+        <!-- 보충 단위 입력 박스 -->
+        <span class="label">[[loadUnitLabel]]</span>
+        <select id="load-unit">
+          <option selected>[[loadUnitPcsLabel]]</option>
+          <option>[[loadUnitBoxLabel]]</option>
+        </select>
+      </div>
+
+      <!-- 버튼 - 초기화 / 적치 -->
+      <div id="button-group">
+        <button id="reset-btn" on-click="_clearView">[[resetBtnLabel]]</button>
+        <button id="load-btn" on-click="_load">[[loadBtnLabel]]</button>
+      </div>
+    </div>
+
+    <div id = "bottom-container">
+      <select id="rack-combo" on-change="_getStationList"></select>
+      <button id = "on-btn" class= 'btn' on-click="_ledOn">[[ledOnBtnLabel]]</button>
+      <button id = "off-btn" class= 'btn' on-click="_ledOff">[[ledOffBtnLabel]]</button>
+    </div>
+  </template>
+
+  <script>
+    class StockSupplement extends BarcodeScannerMixin(Polymer.Element) {
+      static get is() {
+        return 'stock-supplement'
+      }
+
+      static get properties() {
+        return {
+          /**
+           * @description 변경 셀 라벨
+           ***************
+           * @type {String}
+           */
+          changeCellLabel: {
+            type: String,
+            value: () => t('label.change_loc')
+          },
+
+          /**
+           * @description 상품 바코드 라벨
+           ***************
+           * @type {String}
+           */
+          skuBarcdLabel: {
+            type: String,
+            value: () => t('label.sku_barcd')
+          },
+
+          /**
+           * @description 상품명 라벨
+           ***************
+           * @type {String}
+           */
+          skuNameLabel: {
+            type: String,
+            value: () => t('label.sku_nm')
+          },
+
+          /**
+           * @description 추천 셀 라벨
+           ***************
+           * @type {String}
+           */
+          recommendCellLabel: {
+            type: String,
+            value: () => t('label.recommend_location')
+          },
+
+          /**
+           * @description 주문 수량 라벨
+           ***************
+           * @type {String}
+           */
+          orderQtyLabel: {
+            type: String,
+            value: () => t('label.order_qty')
+          },
+
+          /**
+           * @description 적치 수량 라벨
+           ***************
+           * @type {String}
+           */
+          stockQtyLabel: {
+            type: String,
+            value: () => t('label.stock_qty')
+          },
+
+          /**
+           * @description 할당 수량 라벨
+           ***************
+           * @type {String}
+           */
+          allocQtyLabel: {
+            type: String,
+            value: () => t('label.alloc_qty')
+          },
+
+          /**
+           * @description 입력 수량 라벨
+           ***************
+           * @type {String}
+           */
+          inputQtyLabel: {
+            type: String,
+            value: () => t('label.input_qty')
+          },
+
+          /**
+           * @description 초기화 버튼 라벨
+           ***************
+           * @type {String}
+           */
+          resetBtnLabel: {
+            type: String,
+            value: () => t('button.reset')
+          },
+
+          /**
+           * @description 적치 버튼 라벨
+           ***************
+           * @type {String}
+           */
+          loadBtnLabel: {
+            type: String,
+            value: () => t('button.load')
+          },
+
+          /**
+           * @description SKU 정보 조회 후 복수개가 조회된 경우 사용자가 고를 수 있는 팝업이 실행되는데 그 팝업에 표시할 타이틀
+           ****************
+           * @type {String}
+           */
+          popupTitleLabel: {
+            type: String,
+            value: () => t('label.sku')
+          },
+
+          /**
+           * @description 적치 처리 대상 셀 코드
+           ***************
+           * @type {String}
+           */
+          selectedCellCd: {
+            type: String,
+            value: ''
+          },
+
+          /**
+           * @description SKU 정보 조회를 위한 URL
+           ****************
+           * @type {String}
+           */
+          findSkuUrl: {
+            type: String,
+            value: `/sku/search/${LOGIS_UTIL.getEquipType()}/${LOGIS_UTIL.getEquipCd()}/:inputValue`
+          },
+
+          /**
+           * @description 점등 버튼 라벨
+           ****************
+           * @type {String}
+           */
+          ledOnBtnLabel: {
+            type: String,
+            value: () => t('button.led_on')
+          },
+
+          /**
+           * @description 소등 버튼 라벨
+           ****************
+           * @type {String}
+           */
+          ledOffBtnLabel: {
+            type: String,
+            value: () => t('button.led_off')
+          },
+
+          /**
+           * @description 재고 셀 유형 라벨
+           ****************
+           * @type {String}
+           */
+          stockCellTypeLabel: {
+            type: String,
+            value: () => t('label.cell_type')
+          },
+
+          /**
+           * @description 적치 단위 라벨
+           ****************
+           * @type {String}
+           */
+          loadUnitLabel: {
+            type: String,
+            value: () => t('label.stock_load_unit')
+          },
+
+          /**
+           * @description 적치 단위 개별 라벨
+           ****************
+           * @type {String}
+           */
+          loadUnitPcsLabel: {
+            type: String,
+            value: () => t('label.stock_load_unit_pcs')
+          },
+
+          /**
+           * @description 적치 단위 박스 라벨
+           ****************
+           * @type {String}
+           */
+          loadUnitBoxLabel: {
+            type: String,
+            value: () => t('label.stock_load_unit_box')
+          }
+        }
+      }
+
+      /**
+       * @description lifecycle
+       *******************
+       */
+      connectedCallback() {
+        super.connectedCallback();
+
+        document.addEventListener(`alert-closed-at-${location.hash.replace('#/', '')}`, event => {
+          if (!event.detail.hasCallback) {
+            this._initialSetup();
+          }
+        });
+
+        this._searchRackList();
+      }
+
+      /**
+       * @description 적치 대상 상품 선택 완료시 적치 위치 콤보박스를 구성하기 위해 대상 셀을 조회함
+       *******************
+       * @param {Object} event
+       */
+      _onFoundStock(event) {
+        if (!event || !event.detail) return;
+
+        this._clearView();
+        let skuInfo = event.detail;
+        this.comCd = skuInfo.com_cd;
+        this.skuCd = skuInfo.sku_cd;
+        this.$['sku-barcd'].value = skuInfo.sku_barcd;
+        this.$['sku-nm'].value = skuInfo.sku_nm;
+
+        // 보충 대상 셀 리스트를 조회
+        this._getCellList(skuInfo);
+      }
+
+      /**
+       * @description 보충 대상 상품 선택 완료시 보충 위치 대상 셀을 조회
+       *******************
+       * @param {Object} skuInfo
+       */
+      _getCellList(skuInfo) {
+        if (skuInfo && skuInfo.sku_cd && skuInfo.sku_cd.length >= 4) {
+          const recommendCellAjax = this.$['recommend-cell-ajax'];
+          recommendCellAjax.curl = `/stocks/recommend_cells/${LOGIS_UTIL.getEquipType()}/${this._getRackCd()}/${skuInfo.com_cd}/${skuInfo.sku_cd}`;
+          recommendCellAjax.generateRequest();
+        }
+      }
+
+      /**
+       * @description 추천 셀 조회 응답 후 
+       *******************
+       * @param {Object} response
+       */
+      _renderCellCombo(response) {
+        if (!response || !response.detail) return;
+
+        let cells = response.detail;
+
+        if (cells.length > 0) {
+          const cellCombo = this.$['cell'];
+          this._clearCombobox(cellCombo);
+
+          cells.forEach(cell => {
+            const option = document.createElement('option');
+            option.innerText = cell.cell_cd;
+            option.value = cell.cell_cd;
+            option.setAttribute('fixed_flag', cell.fixed_flag);
+            cellCombo.appendChild(option);
+          });
+
+          if (cellCombo.selectedOptions && cellCombo.selectedOptions.length >= 1) {
+            this._cellSelected();
+          }
+        } else {
+          this.findStockByOrder();
+        }
+      }
+
+      /**
+       * @description 선택한 셀의 재고 수량을 조회
+       *******************
+       */
+      _cellSelected() {
+        this.$['change-cell'].value = '';
+        const cellCombo = this.$['cell'];
+        let selectedOption = cellCombo.selectedOptions[0];
+        let fixedFlag = selectedOption.getAttribute('fixed_flag');
+        this.$['stock-cell-type'].value = fixedFlag ? '고정 셀' : '자유 셀';
+        this.calcStockByOrder(selectedOption.value, selectedOption.getAttribute('fixed_flag'));
+      }
+
+      /**
+       * @description 추천 셀 리스트에서 셀 선택시에 해당 셀의 재고 정보를 조회한다
+       *******************
+       * @param {String} selectedCellCd
+       * @param {Boolean} fixedFlag
+       */
+      calcStockByOrder(selectedCellCd, fixedFlag) {
+        if (!selectedCellCd) {
+          LOGIS_UTIL.showToastWarnMessage(t('error.loc_cd_invalid'));
+          return;
+        } else if (!this.skuCd) {
+          LOGIS_UTIL.showToastWarnMessage(t('error.invalid_sku_cd'));
+          return;
+        }
+
+        try {
+          const orderStockAjax = this.$['order-stock-ajax'];
+          orderStockAjax.curl = `/stocks/calc_order_stock/${LOGIS_UTIL.getEquipType()}/${this._getRackCd()}/${selectedCellCd}/${this.comCd}/${this.skuCd}`;
+          orderStockAjax.generateRequest();
+        } catch (error) {
+          LOGIS_UTIL.showToastErrorMessage(error.message);
+        }
+      }
+
+      /**
+       * @description 추천 셀 리스트에서 셀 선택시에 해당 셀의 재고 정보를 조회한다
+       *******************
+       * @param {Boolean} fixedFlag
+       */
+      findStockByOrder(fixedFlag) {
+        if (!this.skuCd) {
+          LOGIS_UTIL.showToastWarnMessage(t('error.invalid_sku_cd'));
+          return;
+        }
+
+        try {
+          const orderStockAjax = this.$['order-stock-ajax'];
+          orderStockAjax.curl = `/stocks/find_order_stock/${LOGIS_UTIL.getEquipType()}/${this._getRackCd()}/${this.comCd}/${this.skuCd}`;
+          orderStockAjax.generateRequest();
+        } catch (error) {
+          LOGIS_UTIL.showToastErrorMessage(error.message);
+        }
+      }
+
+      /**
+       * @description SKU 정보 조회 시 복수개가 조회된 경우 사용자가 고를 수 있는 버튼이 실행되는데 그 버튼에 표시할 내용
+       *******************
+       * @param {Object} item
+       */
+      _skuButtonTxtCallback(item) {
+        return `(${item.sku_cd})
+                ${item.sku_nm}`;
+      }
+
+      /**
+       * @description 주문 별 재고 계산 조회 결과 응답 후 
+       *******************
+       * @param {Object} response
+       */
+      _fillOrderStockInfo(response) {
+        if (!response || !response.detail) return;
+
+        let stock = response.detail;
+        this.orderQtyLabel = stock.fixed_flag ? t('label.max_load_qty') : t('label.order_qty');
+
+        // 조회를 통해 구한 값을 input에 출력
+        this.$['order-qty'].value = stock.order_qty;
+        this.$['stock-qty'].value = stock.stock_qty;
+        this.$['input-qty'].value = stock.input_qty;
+
+        if (stock.input_qty <= 0) {
+          LOGIS_UTIL.showToastInfoMessage(t('text.stock_load_done'));
+        }
+
+        stock.input_qty <= 1 ? this.$['change-cell'].select() : this.$['input-qty'].select();
+
+        // TODO 3 초후 this._clearView();
+      }
+
+      /**
+       * @description 변경 셀에 엔터 키 처리
+       *******************
+       * @param {Object} event
+       */
+      _onCellChanged(event) {
+        let changeCellCd = this.$['change-cell'].value;
+
+        if (event.keyCode === 13) {
+          if (LOGIS_UTIL.isCellCdValid(changeCellCd)) {
+            this.$['cell'].value = '';
+            this.$['change-cell'].select();
+            this._load();
+
+          } else {
+            LOGIS_UTIL.showToastWarnMessage(t('error.loc_cd_invalid'));
+            this.$['change-cell'].value = '';
+            this.$['change-cell'].select();
+          }
+        }
+      }
+
+      /**
+       * @description 입력 수량이 변경시 
+       ********************
+       * @param {Object} event
+       */
+      _onInputQtyChanged(event) {
+        if (event.charCode === 13) {
+          let orderQty = Number(this.$['order-qty'].value);
+          let stockQty = Number(this.$['stock-qty'].value);
+          let inputQty = Number(this.$['input-qty'].value);
+
+          if (orderQty - stockQty < inputQty) {
+            LOGIS_UTIL.showToastWarnMessage(t('error.out_of_valid_qty'));
+          } else {
+            this.$['change-cell'].select();
+          }
+        }
+      }
+
+      /**
+       * @description 재고 적치 트랜잭션 처리
+       *******************
+       */
+      _load() {
+        var changeCellInput = this.$['change-cell'];
+        var orderQtyInput = this.$['order-qty'];
+        var stockQtyInput = this.$['stock-qty'];
+        var inputQtyInput = this.$['input-qty'];
+
+        // 변경 로케이션 
+        var changeCellCd = changeCellInput.value;
+        // 주문 수량 
+        var orderQty = Number(orderQtyInput.value);
+        // 재고 수량 
+        var stockQty = Number(stockQtyInput.value);
+        // 입력 수량
+        var inputQty = Number(inputQtyInput.value);
+
+        if (!changeCellCd || changeCellCd == '' || changeCellCd.length < 1 || !LOGIS_UTIL.isCellCdValid(changeCellCd)) {
+          LOGIS_UTIL.showToastErrorMessage(t('error.loc_cd_invalid'));
+          changeCellInput.select();
+
+        } else if (inputQtyInput.value == undefined || inputQtyInput.value == '' || inputQty <= 0) {
+          LOGIS_UTIL.showToastWarnMessage(t('text.input_qty_none'));
+          inputQtyInput.select();
+
+        } else if (orderQty - stockQty < inputQty) {
+          LOGIS_UTIL.showToastWarnMessage(t('error.out_of_valid_qty'));
+          inputQtyInput.select();
+
+        } else if (!this.skuCd) {
+          LOGIS_UTIL.showToastWarnMessage(t('text.invalid_sku_cd'));
+
+        } else {
+          try {
+            let rackCd = LOGIS_UTIL.getEquipCd();
+            const loadStockAjax = this.$['load-stock-ajax'];
+            loadStockAjax.curl = `/stocks/load_stock/${rackCd}/${changeCellCd}/${this.comCd}/${this.skuCd}/P/${inputQty}`;
+            loadStockAjax.generateRequest();
+          } catch (error) {
+            LOGIS_UTIL.showToastErrorMessage(error.message);
+            changeCellInput.select();
+          }
+        }
+      }
+
+      /**
+       * @description combo box에 구성된 option을 제거
+       *******************
+       * @param {Object} combobox
+       */
+      _clearCombobox(combobox) {
+        while (combobox.children.length) {
+          combobox.removeChild(combobox.firstChild);
+        }
+      }
+
+      /**
+       * @description 재고 보충 성공시
+       *******************
+       */
+      _stockSuccess() {
+        LOGIS_UTIL.showToastInfoMessage(t('text.stock_load_success'));
+        this._clearView();
+      }
+
+      /**
+       * @description 폼 초기화 
+       ********************
+       */
+      _clearView() {
+        this._clearCombobox(this.$['cell']);
+        this.$['sku-barcd'].value = '';
+        this.$['sku-nm'].value = '';
+        this.$['change-cell'].value = '';
+        this.$['order-qty'].value = '';
+        this.$['stock-qty'].value = '';
+        this.$['input-qty'].value = '';
+        this.$['stock-cell-type'].value = '';
+
+        this.comCd = null;
+        this.skuCd = null;
+        this.selectedCellCd = '';
+
+        this._initialSetup();
+      }
+
+      /**
+       * @description 화면 초기화
+       *******************
+       */
+      _initialSetup() {
+        this.$['sku-barcd']._initialSetup();
+      }
+
+      /**
+       * @description LED 점등
+       *******************
+       */
+      _ledOn() {
+        const ledOnajax = this.$['led-on-ajax'];
+        let rackCd = this.$['rack-combo'].value;
+        ledOnajax.curl = `/pda_process/dps/led/on/${rackCd}`;
+        ledOnajax.generateRequest();
+      }
+
+      /**
+       * @description LED 소등
+       *******************
+       */
+      _ledOff() {
+        const ledOffajax = this.$['led-off-ajax'];
+        let rackCd = this.$['rack-combo'].value;
+        ledOffajax.curl = `/pda_process/dps/led/off/${rackCd}`;
+        ledOffajax.generateRequest();
+      }
+
+      /**
+       * @description 설비 리스트 조회
+       *******************
+       */
+      _searchRackList() {
+        const rackAjax = this.$['rack-list-ajax'];
+        rackAjax.baseUrl = JSON.parse(localStorage.getItem('setting.baseUrl'));
+        rackAjax.customParams = {
+          query: [{
+            name: 'stage_cd',
+            value: LOGIS_UTIL.getStageCd()
+          }, {
+            name: 'job_type',
+            value: 'DPS'
+          }, {
+            name: 'rack_type',
+            value: 'S'
+          }]
+        };
+
+        rackAjax.curl = '/racks';
+        rackAjax.generateRequest();
+      }
+
+      /**
+       * @description 설비 호기 구성
+       *******************
+       */
+      _rackSetting(e) {
+        if (!e || !e.detail || !e.detail.items || e.detail.items.length == 0) return;
+
+        let rackCombo = this.$['rack-combo'];
+        e.detail.items.forEach(rack => {
+          const option = new Option(rack.rack_nm, rack.rack_cd);
+          rackCombo.appendChild(option);
+        })
+      }
+
+      /**
+       * @description 선택 설비 호기 리턴
+       ********************
+       */
+      _getRackCd() {
+        return this.$['rack-combo'].value;
+      }
+    }
+
+    customElements.define(StockSupplement.is, StockSupplement);
+  </script>
+</dom-module>

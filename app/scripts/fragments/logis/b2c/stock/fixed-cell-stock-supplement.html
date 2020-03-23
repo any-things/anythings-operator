@@ -8,7 +8,7 @@ Copyright © HatioLab Inc. All rights reserved.
 <!--
   물류 > B2C > 고정 로케이션 재고적치 화면 (PDA)
 -->
-<dom-module id="fixed-cell-stock-supplement">
+<dom-module id="fixed-stock-supplement">
   <template>
     <style include="shared-styles">
       :host {
@@ -130,9 +130,9 @@ Copyright © HatioLab Inc. All rights reserved.
   </template>
 
   <script>
-    class FixedCellStockSupplement extends BarcodeScannerMixin(Polymer.Element) {
+    class FixedStockSupplement extends BarcodeScannerMixin(Polymer.Element) {
       static get is() {
-        return 'fixed-cell-stock-supplement'
+        return 'fixed-stock-supplement'
       }
 
       static get properties() {
@@ -529,6 +529,6 @@ Copyright © HatioLab Inc. All rights reserved.
       }
     }
 
-    customElements.define(FixedCellStockSupplement.is, FixedCellStockSupplement);
+    customElements.define(FixedStockSupplement.is, FixedStockSupplement);
   </script>
 </dom-module>

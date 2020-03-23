@@ -143,6 +143,10 @@ window.locales['ko-KR'] = {
   'label.incomplete': '미완료',
   'label.box_arrived': '박스 도착',
   'label.box_departure': '박스 출발',
+  'label.cell_type': '셀 유형',
+  'label.stock_load_unit': '재고 보충 단위',
+  'label.stock_load_unit_pcs': 'PCS',
+  'label.stock_load_unit_box': '박스',
 
   // menu list
   'menu.Settings': '설정',
@@ -163,7 +167,7 @@ window.locales['ko-KR'] = {
   'menu.TabletLabelList': '라벨발행이력',
   'menu.LabelList': '라벨 리스트',
   'menu.StockStatusByCell': '셀 재고조회',
-  'menu.CellStockSupplement': '재고 보충',
+  'menu.StockSupplement': '재고 보충',
   'menu.RegionSkuInfo': '랙 상품정보',
   'menu.TabletRegionInputList': '랙 상품정보',
   'menu.MiddleAssort': '중분류',

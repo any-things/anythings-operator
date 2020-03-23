@@ -334,7 +334,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} e
        */
       _onValueBlur(e) {
-        if (this.allowedFocusOut) {
+        if (!this.allowedFocusOut) {
           var id = e.currentTarget.id;
           var me = this;
 

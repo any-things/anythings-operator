@@ -141,7 +141,12 @@ window.locales['zh-CN'] = {
   'label.equipment_name': 'Equipment Code',
   'label.complete': '완료',
   'label.incomplete': '미완료',
-  'label.box_arrived': '박스도착',
+  'label.box_arrived': '박스 도착',
+  'label.box_departure': '박스 출발',
+  'label.cell_type': '셀 유형',
+  'label.stock_load_unit': '재고 보충 단위',
+  'label.stock_load_unit_pcs': 'PCS',
+  'label.stock_load_unit_box': '박스',
 
   // menu list
   'menu.Settings': '设置',
@@ -162,7 +167,7 @@ window.locales['zh-CN'] = {
   'menu.TabletLabelList': '라벨발행이력',
   'menu.LabelList': '标签重打',
   'menu.StockStatusByCell': '库位库存检索',
-  'menu.CellStockSupplement': '积置库存',
+  'menu.StockSupplement': '积置库存',
   'menu.RegionSkuInfo': '机组商品信息',
   'menu.TabletRegionInputList': '机组商品信息',
   'menu.MiddleAssort': '中分类',
