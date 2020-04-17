@@ -12,7 +12,7 @@ Copyright © HatioLab Inc. All rights reserved.
 <link rel="import" href="./out-assort-transaction.html">
 
 <!--
-  물류 > B2B > 소분류 처리 화면 (PDA)
+  물류 > B2B > 출고 소분류 처리 화면 (PDA)
 -->
 <dom-module id="b2b-assort-job">
   <template>
@@ -200,13 +200,18 @@ Copyright © HatioLab Inc. All rights reserved.
 
       static get properties() {
         return {
+          /**
+           * @description 작업 유형
+           ****************
+           * @type {String}
+           */
           jobType: {
             type: String,
             value: 'DAS'
           },
 
           /**
-           * SKU 정보 조회를 위한 URL
+           * @description SKU 정보 조회를 위한 URL
            ****************
            * @type {String}
            */
@@ -216,7 +221,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * SKU 정보 조회 시 복수개가 조회된 경우 사용자가 고를 수 있는 팝업이 실행되는데 그 팝업에 표시할 타이틀
+           * @description SKU 정보 조회 시 복수개가 조회된 경우 사용자가 고를 수 있는 팝업이 실행되는데 그 팝업에 표시할 타이틀
            ****************
            * @type {String}
            */
@@ -226,7 +231,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 버튼 리스트 팝업 표시를 위한 버튼 라벨
+           * @description 버튼 리스트 팝업 표시를 위한 버튼 라벨
            ****************
            * @type {String}
            */
@@ -236,7 +241,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 초기화 버튼 라벨
+           * @description 초기화 버튼 라벨
            ****************
            * @type {String}
            */
@@ -246,7 +251,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 상품 코드 라벨
+           * @description 상품 코드 라벨
            ****************
            * @type {String}
            */
@@ -256,7 +261,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 상품 코드 라벨
+           * @description 상품 코드 라벨
            ****************
            * @type {String}
            */
@@ -266,7 +271,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 상품 명 라벨
+           * @description 상품 명 라벨
            ****************
            * @type {String}
            */
@@ -276,7 +281,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 고객사 수 라벨
+           * @description 고객사 수 라벨
            ****************
            * @type {String}
            */
@@ -286,7 +291,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 투입 결과
+           * @description 투입 결과
            ****************
            * @type {Object}
            */
@@ -296,7 +301,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 그리드 데이터
+           * @description 그리드 데이터
            ****************
            * @type {Array}
            */
@@ -306,7 +311,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 그리드 데이터
+           * @description 그리드 데이터
            ****************
            * @type {Array}
            */
@@ -315,7 +320,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 그리드 헤더
+           * @description 그리드 헤더
            ****************
            * @type {Array}
            */
@@ -333,8 +338,8 @@ Copyright © HatioLab Inc. All rights reserved.
                   }
                 }
               }, {
-                display: t('label.location'),
-                fieldname: 'loc_cd',
+                display: t('label.cell'),
+                fieldname: 'sub_equip_cd',
                 style: {
                   textAlign: 'center'
                 },
@@ -380,9 +385,9 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 총 수량 라벨
+           * @description 총 수량 라벨
            ****************
-           * @type {Array}
+           * @type {String}
            */
           totalQtyLabel: {
             type: String,
@@ -390,7 +395,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 총 확정 수량 라벨
+           * @description 총 확정 수량 라벨
            ****************
            * @type {Array}
            */
@@ -400,7 +405,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 총 예정 수량 라벨
+           * @description 총 예정 수량 라벨
            ****************
            * @type {Array}
            */
@@ -410,7 +415,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 총 확정 박스 수량 라벨
+           * @description 총 확정 박스 수량 라벨
            ****************
            * @type {Array}
            */
@@ -419,7 +424,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 총 예정 박스 수량 라벨
+           * @description 총 예정 박스 수량 라벨
            ****************
            * @type {Array}
            */
@@ -428,7 +433,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 현재 모드 정보 - 현재 사용 안 함
+           * @description 현재 모드 정보 - 현재 사용 안 함
            ****************
            * @type {Array}
            */
@@ -438,7 +443,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },*/
 
           /**
-           * 현재 모드 라벨 - 현재 사용 안 함
+           * @description 현재 모드 라벨 - 현재 사용 안 함
            ****************
            * @type {Array}
            */
@@ -452,6 +457,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description Life Cycle - connected callback
+       *******************
        */
       connectedCallback() {
         super.connectedCallback();

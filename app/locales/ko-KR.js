@@ -111,7 +111,7 @@ window.locales['ko-KR'] = {
   'label.please_wait': '잠시만 기다려주세요...',
   'label.fixed': '고정',
   'label.nonfixed': '비고정',
-  'label.total_picked_qty': '총 정',
+  'label.total_picked_qty': '총 확정',
   'label.total_picking_qty': '총 예정',
   'label.unfinished_qty': '미완성',
   'label.non_classed': '미분류',

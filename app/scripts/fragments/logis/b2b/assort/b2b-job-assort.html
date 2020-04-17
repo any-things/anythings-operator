@@ -15,7 +15,7 @@ Copyright © HatioLab Inc. All rights reserved.
 <link rel="import" href="../../../../components/logis/job-transaction-popup.html">
 
 <!--
-  물류 > 출고 > 소분류 처리 화면 (Tablet)
+  물류 > B2B > 출고 소분류 처리 화면 (Tablet)
 -->
 
 <dom-module id="b2b-job-assort">
@@ -52,40 +52,59 @@ Copyright © HatioLab Inc. All rights reserved.
       }
     </style>
 
-    <!-- 상품 정보 스캔 투입 리스트 -->
-    <sys-ajax auto id="input-list-ajax" method="GET" content-type="application/json"
+    <!-- 삭제 - 상품 정보 스캔 투입 리스트 -->
+    <sys-ajax 
+      auto 
+      id="input-list-ajax" 
+      method="GET" 
+      content-type="application/json"
       on-sys-ajax-response="_inputListResponsed">
     </sys-ajax>
 
+    <!-- 삭제 - 투입 이벤트의 매장 작업 리스트 -->
+    <sys-ajax 
+      id="input-job-details-ajax" 
+      method="GET"
+      curl="/tablet_process/input_details/:rack_cd/:job_input_seq_id/:side_cd/:zone_cd"
+      content-type="application/json" 
+      last-response="{{inputDetails}}">
+    </sys-ajax>
+
     <!-- 상품 투입 -->
-    <sys-ajax id="input-sku-ajax" method="POST" content-type="application/json"
+    <sys-ajax 
+      id="input-sku-ajax" 
+      method="POST" 
+      content-type="application/json"
       on-sys-ajax-response="_inputSkuResponsed">
     </sys-ajax>
 
     <!-- 상품 정보 스캔 투입 리스트 페이지네이션 -->
-    <sys-ajax id="input-list-pages-ajax" method="GET" content-type="application/json"
+    <sys-ajax 
+      id="input-list-pages-ajax" 
+      method="GET" 
+      content-type="application/json"
       on-sys-ajax-response="_inputListPageResponsed">
     </sys-ajax>
 
-    <!-- 투입 이벤트의 거래처 작업 리스트 -->
-    <sys-ajax id="input-job-details-ajax" method="GET"
-      curl="/tablet_process/input_details/:rack_cd/:job_input_seq_id/:side_cd/:zone_cd"
-      content-type="application/json" last-response="{{inputDetails}}">
-    </sys-ajax>
-
     <!-- 태블릿 작업 존의 처리 안된 혹은 처리 완료된 작업을 조회하여 표시기에 점등 -->
-    <sys-ajax id="mpi-on-jobs-ajax" method="PUT"
+    <sys-ajax 
+      id="mpi-on-jobs-ajax" 
+      method="PUT"
       curl="/tablet_process/das/mpi_on/:job_input_seq_id/:rack_cd/:zone_cd/:side_cd/:done_or_todo"
       content-type="application/json">
     </sys-ajax>
 
     <!-- 부족한 상품을 채우기 위해 표시기에 불을 켜는 요청 -->
-    <sys-ajax id="mpi-off-my-zone-ajax" method="PUT" curl="/tablet_process/mpi_off/:rack_cd/:zone_cd/:side_cd"
+    <sys-ajax 
+      id="mpi-off-my-zone-ajax" 
+      method="PUT" 
+      curl="/tablet_process/mpi_off/:rack_cd/:zone_cd/:side_cd"
       content-type="application/json">
     </sys-ajax>
 
+    <!-- 진척율 차트 -->
     <div class="bar-chart">
-      <span class="label">진척률</span>
+      <span class="label">진척율</span>
       <div class="bar">
         <span id="progress-bar" class="chart-value"
           style="width:calc([[totalGaugeRate]]% - 10px)">[[totalGaugeRate]]%</span>
@@ -94,7 +113,6 @@ Copyright © HatioLab Inc. All rights reserved.
 
     <!-- 상품 및 작업 정보 표시를 위한 영역 -->
     <div id="info-section">
-
       <!-- 상품 이미지 표시를 위한 영역 -->
       <img class="prod-img" src="[[prodImgSrc]]" />
 
@@ -133,43 +151,58 @@ Copyright © HatioLab Inc. All rights reserved.
     <!-- 작업 내용 표시를 위한 영역 -->
     <div id="content">
 
-      <!-- 앞쪽 로케이션 작업 표시를 위한 영역 -->
-      <dom-if if="[[showFront]]">
-        <template>
-          <div id="left-section" class="list-container">
-            <button class="list-header-btn" disabled>[[frontBtnLabel]]</button>
-
-            <item-list id="front-list" hide-header header="[[header]]" data="[[frontDetailList]]"
-              on-data-list-click="showProcessPopup" on-configured="_addOrderStatusAttr">
-            </item-list>
-          </div>
-        </template>
+    <!-- 앞쪽 로케이션 작업 표시를 위한 영역 -->
+    <dom-if if="[[showFront]]">
+      <template>
+        <div id="left-section" class="list-container">
+          <!-- 앞 로케이션 라벨 -->
+          <button class="list-header-btn" disabled>[[frontBtnLabel]]</button>
+          <!-- 앞 로케이션의 작업 리스트 -->
+          <item-list 
+            id="front-list" 
+            hide-header header="[[header]]" 
+            data="[[frontDetailList]]"
+            on-data-list-click="showProcessPopup" 
+            on-configured="_addOrderStatusAttr">
+          </item-list>
+        </div>
+      </template>
   </dom-if>
 
   <!-- 뒤쪽 로케이션 작업 표시를 위한 영역 -->
   <dom-if if="[[showRear]]">
     <template>
-          <div id="right-section" class="list-container">
-            <button class="list-header-btn" disabled>[[rearBtnLabel]]</button>
-
-            <item-list id="rear-list" hide-header header="[[header]]" data="[[rearDetailList]]"
-              on-data-list-click="showProcessPopup" on-configured="_addOrderStatusAttr">
-            </item-list>
-          </div>
-        </template>
+        <div id="right-section" class="list-container">
+          <!-- 뒤 로케이션 라벨 -->
+          <button class="list-header-btn" disabled>[[rearBtnLabel]]</button>
+          <!-- 뒤 로케이션의 작업 리스트 -->
+          <item-list 
+            id="rear-list" 
+            hide-header header="[[header]]" 
+            data="[[rearDetailList]]"
+            on-data-list-click="showProcessPopup" 
+            on-configured="_addOrderStatusAttr">
+          </item-list>
+        </div>
+      </template>
   </dom-if>
 
   <!-- 앞/뒤 모든 로케이션 작업 표시를 위한 영역 -->
   <dom-if if="[[showTotal]]">
     <template>
-          <div id="total-section" class="list-container">
-            <button class="list-header-btn" disabled>[[totalBtnLabel]]</button>
+        <div id="total-section" class="list-container">
+          <button class="list-header-btn" disabled>[[totalBtnLabel]]</button>
 
-            <item-list id="total-list" hide-header header="[[header]]" data="[[totalDetailList]]"
-              on-data-list-click="showProcessPopup" on-configured="_addOrderStatusAttr">
-            </item-list>
-          </div>
-        </template>
+          <item-list 
+            id="total-list" 
+            hide-header 
+            header="[[header]]" 
+            data="[[totalDetailList]]"
+            on-data-list-click="showProcessPopup" 
+            on-configured="_addOrderStatusAttr">
+          </item-list>
+        </div>
+      </template>
   </dom-if>
   </div>
 
@@ -210,14 +243,15 @@ Copyright © HatioLab Inc. All rights reserved.
             type: Array,
             value: function() {
               return [{
-                fieldname: 'loc_cd',
+                fieldname: 'sub_equip_cd',
                 columnWidth: 'auto',
-                displayCallback: value => '(' + (value ? value.substring(4) : '') + ')'
+                displayCallback: value => '(' + (value ? value.substring(value.indexOf('-') + 1) : '') + ')'
               }, {
-                fieldname: 'cust_nm',
+                fieldname: 'shop_nm',
                 columnWidth: '3fr'
               }, {
                 fieldname: 'picking_sum',
+                columnWidth: '0.5fr',
                 displayCallback: (value, rowData) => {
                   return `${rowData['picked_qty']}/${rowData['pick_qty']}`;
                 },
@@ -292,6 +326,29 @@ Copyright © HatioLab Inc. All rights reserved.
             type: Object
           }
         }
+      }
+
+      /**
+       * @override 투입 상품 리스트 조회
+       */
+      refreshInputList(event) {
+        // 버튼 클릭으로 인한 refresh의 경우 event의 type을 click으로 받는다
+        // 버튼 클릭의 경우 현재 inputList가 response 되었을 때 현재 inputList와 조회 결과를 비교하지 않고 반드시
+        // this.inputList에 값을 초기화 하도록 forceRefresh flag를 true로 변환한다.
+        if (event && event.type === 'click') {
+          this.forceRefresh = true;
+        }
+
+        let inputListAjax = this.$['input-list-ajax'];
+        let equipType = LOGIS_UTIL.getEquipType();
+        let equipCd = LOGIS_UTIL.getEquipCd();
+        let stationCd = LOGIS_UTIL.getStationCd();
+
+        inputListAjax.curl = `/device_process/search/input_list/${equipType}/${equipCd}/${stationCd}`;
+        inputListAjax.params = {
+          selected_input_id: this.selectedInput ? this.selectedInput.id : ''
+        };
+        inputListAjax.generateRequest();
       }
 
       /**
@@ -450,6 +507,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description 태블릿 작업 존에 해당하는 표시기 리스트를 소등한다.
+       *********************
        */
       mpiOffByTabletZone() {
         const mpiOffAjax = this.$['mpi-off-my-zone-ajax'];
@@ -569,16 +627,14 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} event
        */
       inputSku(event) {
-        let skuInfo = event.detail;
+        let sku = event.detail;
         const rackCd = LOGIS_UTIL.getEquipCd();
-        const sideCd = LOGIS_UTIL.getWorkSideCd();
-        let zoneCd = LOGIS_UTIL.getStationCd();
-        let comCd = skuInfo.com_cd;
-        let skuCd = skuInfo.sku_cd;
+        let comCd = sku.com_cd;
+        let skuCd = sku.sku_cd;
 
         try {
           const inputAjax = this.$['input-sku-ajax'];
-          inputAjax.curl = `/tablet_process/input_sku/${rackCd}/${sideCd}/${zoneCd}/${comCd}/${skuCd}`;
+          inputAjax.curl = `/device_process/input/sku/Rack/${rackCd}/${comCd}/${skuCd}`;
           inputAjax.generateRequest();
         } catch (error) {
           LOGIS_UTIL.showMessage(t('error.VALIDATION_ERROR'), error);
