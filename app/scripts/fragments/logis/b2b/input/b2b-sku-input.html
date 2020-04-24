@@ -1125,7 +1125,7 @@ Copyright © HatioLab Inc. All rights reserved.
           }
 
           const inspectAjax = this.$['inspect-sku-ajax'];
-          inspectAjax.curl = `/device_process/inspect_by_indicator/${equipCd}/${stationCd}/${comCd}/${skuCd}`
+          inspectAjax.curl = `/device_process/dynamic/DAS/inspect_by_indicator/${equipCd}/${stationCd}/${comCd}/${skuCd}`
           inspectAjax.generateRequest();
         } catch (error) {
           LOGIS_UTIL.showMessage(t('error.VALIDATION_ERROR'), error, this._initialSetup.bind(this));

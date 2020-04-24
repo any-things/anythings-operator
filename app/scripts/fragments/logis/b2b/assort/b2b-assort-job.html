@@ -217,7 +217,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           getSkuAjaxUrl: {
             type: String,
-            value: `/pda_process/find_sku/${LOGIS_UTIL.getEquipCd()}/:inputValue`
+            value: `/device_process/find_sku/${LOGIS_UTIL.getEquipCd()}/:inputValue`
           },
 
           /**
@@ -687,6 +687,7 @@ Copyright © HatioLab Inc. All rights reserved.
           this.validateBeforeRequest();
           const inputAjax = this._getInputAjax();
           let zoneCd = LOGIS_UTIL.getStationCd();
+          // `/tablet_process/find_sku/${LOGIS_UTIL.getEquipCd()}/:inputValue`
           inputAjax.curl = `/pda_process/input_sku/${equipCd}/${sideCd}/${zoneCd}/${comCd}/${skuCd}`;
           inputAjax.generateRequest();
 
@@ -708,7 +709,7 @@ Copyright © HatioLab Inc. All rights reserved.
         try {
           this.validateBeforeRequest();
           const inspectAjax = this._getInspectAjax();
-          inspectAjax.curl = `/pda_process/inspection_by_mpi/${equipCd}/${sideCd}/${zoneCd}/${comCd}/${skuCd}`
+          inspectAjax.curl = `/device_process/dynamic/DAS/inspect_by_indicator/${equipCd}/${zoneCd}/${comCd}/${skuCd}`
           inspectAjax.generateRequest();
 
         } catch (error) {
@@ -767,7 +768,7 @@ Copyright © HatioLab Inc. All rights reserved.
       _onAjaxErrorHandler(event) {
         var detail = event.detail ? event.detail : event.detail.body;
 
-        if (detail && detail.msg == 'already-input-sku') {
+        if (detail && detail.msg == 'already-input-sku-want-to-inspection') {
           LOGIS_UTIL.showConfirm(t('text.checking_inspection'), t('text.check_inspection'), function() {
             this.clearView();
 
