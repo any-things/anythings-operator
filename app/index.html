@@ -114,7 +114,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             document.head.appendChild(linkTag);
           })
           .catch(() => {
-            localStorage.setItem('setting.srcUrl', JSON.stringify(prompt('Type Operato application source URL. (ex: http://127.0.0.1:8080)', "http://128.10.1.143:8080")));
+            localStorage.setItem('setting.srcUrl', JSON.stringify(prompt('Type Operato application source URL. (ex: http://127.0.0.1:8080)', CONST.SRC_URL)));
             location.reload(true);
           });
         }

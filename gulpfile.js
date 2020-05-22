@@ -98,10 +98,10 @@ gulp.task('build', ['optimizeImages'], () => {
     .pipe(plugins.if('*.js', plugins.uglify()))
     .pipe(plugins.if('*.css', plugins.minifyCss()))
     .pipe(plugins.if('*.html', htmlmin({
-          minifyJS: true,
-          minifyCSS: true,
-          removeComments: true
-        })))
+      minifyJS: true,
+      minifyCSS: true,
+      removeComments: true
+    })))
     .pipe(gulp.dest(to()))
     .pipe(plugins.size({ title: 'build-app' }))
 
@@ -178,3 +178,60 @@ gulp.task('license', function () {
     .pipe(license('<!--\n@license\nCopyright © HatioLab Inc. All rights reserved.\n-->\n'))
     .pipe(gulp.dest('./app/styles/'));
 });
+
+gulp.task('cordova-build', () => {
+  // run a command in a shell
+  var exec = require('child_process').exec;
+
+  function execPromise(cmd) {
+    return new Promise(function (resolve, reject) {
+      exec(cmd, function (err, stdout) {
+        if (err) return reject(err);
+        resolve(stdout);
+      });
+    });
+  }
+
+  const SRC_URL = "http://60.196.69.234:25002/";
+  const MY_DEVICE = "PDA";
+
+  let constjs = `(() => {
+	window.CONST = {
+		DEVICE_TYPE: {
+			TABLET: "TABLET",
+			PDA: "PDA",
+			KIOSK: "KIOSK"
+		},
+		SRC_URL: "${SRC_URL}",
+		IS_DEV_MODE: false,
+		MY_DEVICE: "${MY_DEVICE}",
+	}
+})();`;
+
+  const commands =
+    ['rm -rf ./release_apk',
+      'cordova create release_apk',
+      'rm -rf ./release_apk/www/',
+      'cp -r build/debug/app/ ./release_apk/www/',
+      'cp config.xml ./release_apk/',
+      'rm ./release_apk/www/static/const.js',
+      `echo '${constjs}' >./release_apk/www/static/const.js`,
+      `cd release_apk && cordova platform add android`,
+      `cd release_apk && cordova build`,
+      `mv ./release_apk/platforms/android/app/build/outputs/apk/debug/app-debug.apk ./release_apk/app-${MY_DEVICE}.apk`];
+
+  commands.reduce(function (p, cmd) {
+    return p.then(function (results) {
+      return execPromise(cmd).then(function (stdout) {
+        results.push(stdout);
+        return results;
+      });
+    });
+  }, Promise.resolve([])).then(function (results) {
+    // all done here, all results in the results array
+    console.log('cordova build completed');
+  }, function (err) {
+    // error here
+    console.log(err);
+  });
+})

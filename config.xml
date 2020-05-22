@@ -12,10 +12,10 @@
     <platform name="android">
         <allow-intent href="market:*" />
         <allow-intent href="market:*" />
-        <icon density="mdpi" src="./app/images/manifest/bg-brand.png" />
-        <icon density="xhdpi" src="./app/images/manifest/bg-brand.png" />
-        <icon density="xxhdpi" src="./app/images/manifest/bg-brand.png" />
-        <icon density="xxxhdpi" src="./app/images/manifest/bg-brand.png" />
+        <icon density="mdpi" src="../app/images/manifest/bg-brand.png" />
+        <icon density="xhdpi" src="../app/images/manifest/bg-brand.png" />
+        <icon density="xxhdpi" src="../app/images/manifest/bg-brand.png" />
+        <icon density="xxxhdpi" src="../app/images/manifest/bg-brand.png" />
     </platform>
     <platform name="ios">
     </platform>

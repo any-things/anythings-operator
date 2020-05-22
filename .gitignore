@@ -4,3 +4,4 @@ app/bower_components
 app/dist
 bower_components
 .DS_Store
+release_apk
