@@ -589,89 +589,101 @@ Copyright © HatioLab Inc. All rights reserved.
             type: Array,
             value: function() {
               return [{
-                display: t('label.input_seq'),
-                fieldname: 'input_seq',
-                columnWidth: '0.65fr',
-                style: {
-                  textAlign: 'right',
-                  color: '#fff'
-                }
-              }, {
-                display: t('label.rack'),
-                fieldname: 'equip_cd',
-                style: {
-                  textAlign: 'center'
-                }
-              }, {
-                display: t('label.box_type'),
-                fieldname: 'box_type',
-                style: {
-                  textAlign: 'center'
-                },
-                displayCallback: (data) => {
-                  return data ? data : '';
-                }
-              }, {
-                display: t('label.box_id'),
-                fieldname: 'box_id',
-                columnWidth: '1.25fr',
-                displayCallback: (data) => {
-                  return data ? data : '';
-                },
-                classCallback: (data) => {
-                  let boxColor = data['color_cd'];
-                  boxColor = boxColor ? boxColor.toLowerCase() : 'n';
-
-                  if (boxColor === 'r') {
-                    return 'red';
-                  } else if (boxColor === 'g') {
-                    return 'green';
-                  } else if (boxColor === 'b') {
-                    return 'blue';
-                  } else if (boxColor === 'y') {
-                    return 'yellow'
-                  } else {
-                    return 'gray';
+                  display: t('label.input_seq'),
+                  fieldname: 'input_seq',
+                  columnWidth: '0.6fr',
+                  style: {
+                    textAlign: 'right',
+                    color: '#fff'
                   }
-                }
-              }, {
-                display: t('label.order_no'),
-                fieldname: 'order_no',
-                columnWidth: '1.75fr',
-                style: {
-                  textAlign: 'center'
-                }
-              }, {
-                display: t('label.sku_qty'),
-                fieldname: 'sku_qty',
-                style: {
-                  textAlign: 'right'
-                }
-              }, {
-                display: t('label.pick_qty') + ' (PCS)',
-                fieldname: 'plan_qty',
-                style: {
-                  textAlign: 'right'
-                }
-              }, {
-                display: t('label.picked_qty') + ' (PCS)',
-                fieldname: 'result_qty',
-                style: {
-                  textAlign: 'right'
-                }
-              }, {
-                display: t('label.status'),
-                fieldname: 'status',
-                style: {
-                  textAlign: 'right'
+                }, {
+                  display: t('label.rack'),
+                  fieldname: 'equip_cd',
+                  columnWidth: '1fr',
+                  style: {
+                    textAlign: 'center'
+                  }
                 },
-                displayCallback: (data) => {
-                  return data == 0 ? t('label.incomplete') : t('label.complete')
-                },
-              }, {
-                fieldname: 'color_cd',
-                hidden: true
-              }]
+                /*{
+                  display: t('label.box_type'),
+                  fieldname: 'box_type',
+                  columnWidth: '0.7fr',
+                  style: {
+                    textAlign: 'center'
+                  },
+                  displayCallback: (data) => {
+                    return data ? data : '';
+                  }
+                },*/
+                {
+                  display: t('label.box_id'),
+                  fieldname: 'box_id',
+                  columnWidth: '1.5fr',
+                  style: {
+                    textAlign: 'center'
+                  },
+                  displayCallback: (data) => {
+                    return data ? data : '';
+                  },
+                  classCallback: (data) => {
+                    let boxColor = data['color_cd'];
+                    boxColor = boxColor ? boxColor.toLowerCase() : 'n';
+
+                    if (boxColor === 'r') {
+                      return 'red';
+                    } else if (boxColor === 'g') {
+                      return 'green';
+                    } else if (boxColor === 'b') {
+                      return 'blue';
+                    } else if (boxColor === 'y') {
+                      return 'yellow'
+                    } else {
+                      return 'gray';
+                    }
+                  }
+                }, {
+                  display: t('label.order_no'),
+                  fieldname: 'order_no',
+                  columnWidth: '2fr',
+                  style: {
+                    textAlign: 'center'
+                  }
+                }, {
+                  display: t('label.sku_qty'),
+                  fieldname: 'sku_qty',
+                  columnWidth: '0.7fr',
+                  style: {
+                    textAlign: 'right'
+                  }
+                }, {
+                  display: t('label.pick_qty'),
+                  fieldname: 'plan_qty',
+                  columnWidth: '0.55fr',
+                  style: {
+                    textAlign: 'right'
+                  }
+                }, {
+                  display: t('label.picked_qty'),
+                  fieldname: 'result_qty',
+                  columnWidth: '0.55fr',
+                  style: {
+                    textAlign: 'right'
+                  }
+                }, {
+                  display: t('label.status'),
+                  fieldname: 'status',
+                  columnWidth: '0.75fr',
+                  style: {
+                    textAlign: 'center'
+                  },
+                  displayCallback: (data) => {
+                    return data == 0 ? t('label.incomplete') : t('label.complete')
+                  },
+                }, {
+                  fieldname: 'color_cd',
+                  hidden: true
+                }
+              ]
             }
           },
 

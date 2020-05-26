@@ -134,10 +134,15 @@ LOGIS_UTIL.getDeviceSettings = function() {
  */
 LOGIS_UTIL.getDeviceSettingValue = function(key) {
   let settings = LOGIS_UTIL.getDeviceSettings();
-  let setting = settings.find(function(setting) {
-    return setting.name === key;
-  });
-  return setting ? setting.value : null;
+
+  if (settings) {
+    let setting = settings.find(function(setting) {
+      return setting.name === key;
+    });
+    return setting ? setting.value : null;
+  } else {
+    return null;
+  }
 };
 
 /**
