@@ -303,8 +303,8 @@ Copyright © HatioLab Inc. All rights reserved.
         this.comCd = skuInfo.com_cd;
         this.skuCd = skuInfo.sku_cd;
         this.$['sku-cd'].value = skuInfo.sku_cd;
-        this.$['sku-nm'].value = skuInfo.sku_nm;
-        this.$['sku-barcd'].value = skuInfo.sku_barcd;
+        this.$['sku-nm'].value = skuInfo.sku_nm ? skuInfo.sku_nm : '';
+        this.$['sku-barcd'].value = skuInfo.sku_barcd ? skuInfo.sku_barcd : '';
 
         // 1. 읽힌 정보가 셀 코드이면
         if (LOGIS_UTIL.isCellCdValid(barcd)) {

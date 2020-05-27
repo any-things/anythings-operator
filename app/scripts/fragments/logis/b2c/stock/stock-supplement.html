@@ -145,8 +145,8 @@ Copyright © HatioLab Inc. All rights reserved.
         <input id="stock-cell-type" readonly></input>
         
         <!-- 보충 단위 입력 박스 -->
-        <span class="label">[[loadUnitLabel]]</span>
-        <select id="load-unit">
+        <span class="label" hidden>[[loadUnitLabel]]</span>
+        <select id="load-unit" hidden>
           <option selected>[[loadUnitPcsLabel]]</option>
           <option>[[loadUnitBoxLabel]]</option>
         </select>
@@ -452,9 +452,9 @@ Copyright © HatioLab Inc. All rights reserved.
         this.$['change-cell'].value = '';
         const cellCombo = this.$['cell'];
         let selectedOption = cellCombo.selectedOptions[0];
-        let fixedFlag = selectedOption.getAttribute('fixed_flag');
+        let fixedFlag = selectedOption.getAttribute('fixed_flag') === 'true';
         this.$['stock-cell-type'].value = fixedFlag ? '고정 셀' : '자유 셀';
-        this.calcStockByOrder(selectedOption.value, selectedOption.getAttribute('fixed_flag'));
+        this.calcStockByOrder(selectedOption.value, fixedFlag);
       }
 
       /**
@@ -524,16 +524,15 @@ Copyright © HatioLab Inc. All rights reserved.
 
         // 조회를 통해 구한 값을 input에 출력
         this.$['order-qty'].value = stock.order_qty;
-        this.$['stock-qty'].value = stock.stock_qty;
+        this.$['stock-qty'].value = stock.stock_qty + stock.alloc_qty;
         this.$['input-qty'].value = stock.input_qty;
 
         if (stock.input_qty <= 0) {
           LOGIS_UTIL.showToastInfoMessage(t('text.stock_load_done'));
+          // TODO 3 초후 this._clearView();
         }
 
         stock.input_qty <= 1 ? this.$['change-cell'].select() : this.$['input-qty'].select();
-
-        // TODO 3 초후 this._clearView();
       }
 
       /**
