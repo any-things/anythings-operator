@@ -403,17 +403,26 @@ LOGIS_UTIL.getBoxIdValidationRule = function() {
 };
 
 /**
- * @description 박스 바코드 유효성 체크
- ********************
+ * @description 박스 ID 유효성 체크
+ ************************
  * @param {String} boxId
- * @return
+ * @param {Boolean} showInvalidMsg
+ * @param {Object} invalidCallback
+ * @return {Boolean}
  */
-LOGIS_UTIL.isBoxIdValid = function(boxId) {
+LOGIS_UTIL.isBoxIdValidate = function(boxId, showInvalidMsg, invalidCallback) {
   if (!LOGIS_UTIL.isBoxIdValidationEnabled()) {
     return true;
+
   } else {
     let rule = new RegExp(LOGIS_UTIL.getBoxIdValidationRule());
-    return rule.test(boxId);
+    let isValid = rule.test(boxId);
+
+    if (!isValid && showInvalidMsg && showInvalidMsg === true) {
+      LOGIS_UTIL.showMessageWithSound('error', t('error.VALIDATION_ERROR'), t('error.box_id_invalid'), invalidCallback);
+    }
+
+    return isValid;
   }
 };
 
@@ -437,16 +446,25 @@ LOGIS_UTIL.getCellCdValidationRule = function() {
 
 /**
  * @description 셀 코드 유효성 체크
- ********************
+ ************************
  * @param {String} cellCd
- * @return
+ * @param {Boolean} showInvalidMsg
+ * @param {Object} invalidCallback
+ * @return {Boolean}
  */
-LOGIS_UTIL.isCellCdValid = function(cellCd) {
+LOGIS_UTIL.isCellCdValid = function(cellCd, showInvalidMsg, invalidCallback) {
   if (!LOGIS_UTIL.isCellCdValidationEnabled()) {
     return true;
+
   } else {
     let rule = new RegExp(LOGIS_UTIL.getCellCdValidationRule());
-    return rule.test(cellCd);
+    let isValid = rule.test(cellCd);
+
+    if (!isValid && showInvalidMsg && showInvalidMsg === true) {
+      LOGIS_UTIL.showMessageWithSound('error', t('error.VALIDATION_ERROR'), t('error.loc_cd_invalid'), invalidCallback);
+    }
+
+    return isValid;
   }
 };
 
@@ -470,16 +488,25 @@ LOGIS_UTIL.getChuteCdValidationRule = function() {
 
 /**
  * @description 슈트 코드 유효성 체크
- ********************
+ ************************
  * @param {String} chuteCd
- * @return
+ * @param {Boolean} showInvalidMsg
+ * @param {Object} invalidCallback
+ * @return {Boolean}
  */
-LOGIS_UTIL.isChuteCdValid = function(chuteCd) {
+LOGIS_UTIL.isChuteCdValid = function(chuteCd, showInvalidMsg, invalidCallback) {
   if (!LOGIS_UTIL.isChuteCdValidationEnabled()) {
     return true;
+
   } else {
     let rule = new RegExp(LOGIS_UTIL.getChuteCdValidationRule());
-    return rule.test(chuteCd);
+    let isValid = rule.test(chuteCd);
+
+    if (!isValid && showInvalidMsg && showInvalidMsg === true) {
+      LOGIS_UTIL.showMessageWithSound('error', t('error.VALIDATION_ERROR'), t('error.chute_cd_invalid'), invalidCallback);
+    }
+
+    return isValid;
   }
 };
 
@@ -503,16 +530,25 @@ LOGIS_UTIL.getIndCdValidationRule = function() {
 
 /**
  * @description 표시기 코드 유효성 체크
- ********************
+ ************************
  * @param {String} indCd
- * @return
+ * @param {Boolean} showInvalidMsg
+ * @param {Object} invalidCallback
+ * @return {Boolean}
  */
-LOGIS_UTIL.isIndCdValid = function(indCd) {
+LOGIS_UTIL.isIndCdValid = function(indCd, showInvalidMsg, invalidCallback) {
   if (!LOGIS_UTIL.isIndCdValidationEnabled()) {
     return true;
+
   } else {
     let rule = new RegExp(LOGIS_UTIL.getIndCdValidationRule());
-    return rule.test(indCd);
+    let isValid = rule.test(indCd);
+
+    if (!isValid && showInvalidMsg && showInvalidMsg === true) {
+      LOGIS_UTIL.showMessageWithSound('error', t('error.VALIDATION_ERROR'), t('error.ind_cd_invalid'), invalidCallback);
+    }
+
+    return isValid;
   }
 };
 
@@ -536,16 +572,25 @@ LOGIS_UTIL.getRackCdValidationRule = function() {
 
 /**
  * @description 랙 코드 유효성 체크
- ********************
+ ************************
  * @param {String} rackCd
- * @return
+ * @param {Boolean} showInvalidMsg
+ * @param {Object} invalidCallback
+ * @return {Boolean}
  */
-LOGIS_UTIL.isRackCdValid = function(rackCd) {
+LOGIS_UTIL.isRackCdValid = function(rackCd, showInvalidMsg, invalidCallback) {
   if (!LOGIS_UTIL.isRackCdValidationEnabled()) {
     return true;
+
   } else {
     let rule = new RegExp(LOGIS_UTIL.getRackCdValidationRule());
-    return rule.test(rackCd);
+    let isValid = rule.test(rackCd);
+
+    if (!isValid && showInvalidMsg && showInvalidMsg === true) {
+      LOGIS_UTIL.showMessageWithSound('error', t('error.VALIDATION_ERROR'), t('error.rack_cd_invalid'), invalidCallback);
+    }
+
+    return isValid;
   }
 };
 
@@ -569,16 +614,25 @@ LOGIS_UTIL.getSkuBarcdValidationRule = function() {
 
 /**
  * @description 상품 바코드 유효성 체크
- ********************
+ ************************
  * @param {String} skuBarcd
- * @return
+ * @param {Boolean} showInvalidMsg
+ * @param {Object} invalidCallback
+ * @return {Boolean}
  */
-LOGIS_UTIL.isSkuBarcdValid = function(skuBarcd) {
+LOGIS_UTIL.isSkuBarcdValid = function(skuBarcd, showInvalidMsg, invalidCallback) {
   if (!LOGIS_UTIL.isSkuBarcdValidationEnabled()) {
     return true;
+
   } else {
     let rule = new RegExp(LOGIS_UTIL.getSkuBarcdValidationRule());
-    return rule.test(skuBarcd);
+    let isValid = rule.test(skuBarcd);
+
+    if (!isValid && showInvalidMsg && showInvalidMsg === true) {
+      LOGIS_UTIL.showMessageWithSound('error', t('error.VALIDATION_ERROR'), t('error.sku_barcd_invalid'), invalidCallback);
+    }
+
+    return isValid;
   }
 };
 
@@ -602,16 +656,25 @@ LOGIS_UTIL.getSkuCdValidationRule = function() {
 
 /**
  * @description 상품 코드 유효성 체크
- ********************
+ ************************
  * @param {String} skuCd
- * @return
+ * @param {Boolean} showInvalidMsg
+ * @param {Object} invalidCallback
+ * @return {Boolean}
  */
-LOGIS_UTIL.isSkuCdValid = function(skuCd) {
+LOGIS_UTIL.isSkuCdValid = function(skuCd, showInvalidMsg, invalidCallback) {
   if (!LOGIS_UTIL.isSkuCdValidationEnabled()) {
     return true;
+
   } else {
     let rule = new RegExp(LOGIS_UTIL.getSkuCdValidationRule());
-    return rule.test(skuCd);
+    let isValid = rule.test(skuCd);
+
+    if (!isValid && showInvalidMsg && showInvalidMsg === true) {
+      LOGIS_UTIL.showMessageWithSound('error', t('error.VALIDATION_ERROR'), t('error.sku_cd_invalid'), invalidCallback);
+    }
+
+    return isValid;
   }
 };
 
@@ -780,6 +843,24 @@ LOGIS_UTIL.showToastMessage = function(type, message) {
     }
   }));
 };
+
+/**
+ * @description 정보 / 경고 팝업 표시
+ ******************
+ * @param {String} type 메시지 타입 - info / error
+ * @param {String} title 메시지 타이틀 
+ * @param {String} message 팝업 메시지 
+ * @param {Function} callback 콜백 함수
+ */
+LOGIS_UTIL.showMessageWithSound = function(type, title, message, callback) {
+  if (type && type === 'error') {
+    SOUND.playErrorSound();
+  } else {
+    SOUND.playInfoSound();
+  }
+
+  LOGIS_UTIL.showMessage(title, message, callback);
+}
 
 /**
  * @description items의 내용 중에 left_qty가 0인 항목이 아래로 가도록 소팅

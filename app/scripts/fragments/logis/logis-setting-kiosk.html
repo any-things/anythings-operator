@@ -19,6 +19,10 @@ Copyright © HatioLab Inc. All rights reserved.
     <sys-ajax id="kiosk-menu-ajax" last-response="{{kioskMenuList}}">
     </sys-ajax>
 
+    <!-- KIOSK 프린터 리스트 조회 -->
+    <sys-ajax id="printer-ajax" on-sys-ajax-response="_onPrintersResponsed">
+    </sys-ajax>
+
     <!-- 업데이트 내역 조회 -->
     <sys-ajax id="update-ajax" method="GET" last-response="{{updatedItems}}">
     </sys-ajax>
@@ -37,6 +41,15 @@ Copyright © HatioLab Inc. All rights reserved.
       <div class="button-container">
         <button id="move-btn" on-click="_moveToScreen">[[moveBtnLabel]]</button>
       </div>
+    </div>
+
+    <!-- 프린터 설정 -->
+    <div id="printer" class="input-container">
+      <label style="text-align: left">[[printerLabel]]</label>
+    </div>
+    
+    <div class="input-container">
+      <select id="printer-combo"></select>
     </div>
 
     <!-- 업데이트 -->
@@ -72,6 +85,16 @@ Copyright © HatioLab Inc. All rights reserved.
           screenLabel: {
             type: String,
             value: () => t('label.screen')
+          },
+
+          /**
+           * @description 프린터 라벨
+           *********************
+           * @type {String}
+           */
+          printerLabel: {
+            type: String,
+            value: () => t('label.default_printer')
           },
 
           /**
@@ -162,6 +185,36 @@ Copyright © HatioLab Inc. All rights reserved.
           kioskMenuList: {
             type: Array,
             observer: '_renderScreenCombo'
+          },
+
+          /**
+           * @description 기본 프린터 설정 값
+           *********************
+           * @type {String}
+           */
+          printerId: {
+            type: String,
+            value: () => JSON.parse(localStorage.getItem('setting.printerId'))
+          },
+
+          /**
+           * @description 프린터 설정 값 저장을 위한 localStorage의 key
+           *********************
+           * @type {String}
+           */
+          printerIdLSKey: {
+            type: String,
+            value: 'setting.printerId'
+          },
+
+          /**
+           * @description 프린터 리스트
+           *********************
+           * @type {Array}
+           */
+          printerList: {
+            type: Array,
+            observer: '_renderPrinterCombo'
           }
         }
       }
@@ -173,6 +226,7 @@ Copyright © HatioLab Inc. All rights reserved.
       connectedCallback() {
         super.connectedCallback();
         this._getKioskMenus();
+        this._getPrinterList();
         this._setDefaultValues();
       }
 
@@ -200,6 +254,43 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _getKioskMenuAjax() {
         return this.$['kiosk-menu-ajax'];
+      }
+
+      /**
+       * @description 프린터 리스트 조회
+       *********************
+       */
+      _getPrinterList() {
+        const printAjax = this._getPrinterAjax();
+        printAjax.curl = '/printers';
+        printAjax.baseUrl = LOGIS_UTIL.getLocalStorage('setting.baseUrl');
+        printAjax.customParams = {
+          query: [{
+            name: 'printer_type',
+            value: 'BARCODE'
+          }]
+        };
+
+        printAjax.generateRequest();
+      }
+
+      /**
+       * @description 프린터 리스트 조회 시 ...
+       *********************
+       * @param {Object} event
+       */
+      _onPrintersResponsed(event) {
+        if (event && event.detail && event.detail.items) {
+          this.printerList = event.detail.items;
+        }
+      }
+
+      /**
+       * @description 프린터 조회 Ajax 리턴
+       *********************
+       */
+      _getPrinterAjax() {
+        return this.$['printer-ajax'];
       }
 
       /**
@@ -236,6 +327,24 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
+       * @description 프린터 change event handler
+       **********************
+       * @param {Array} printerList
+       */
+      _renderPrinterCombo(printerList) {
+        const printerCombo = this._getPrinterCombo();
+        this._clearCombo(printerCombo);
+
+        if (printerList && printerList.length > 0) {
+          printerList.forEach(printer => {
+            const option = new Option(printer.printer_nm, printer.id);
+            option.selected = (this.printerId === printer.id);
+            printerCombo.appendChild(option);
+          });
+        }
+      }
+
+      /**
        * @description 메뉴 이동
        **********************
        * @param {Object} event
@@ -257,6 +366,7 @@ Copyright © HatioLab Inc. All rights reserved.
         return new Promise((resolve, reject) => {
           this.updateSetting().then(() => {
             LOGIS_UTIL.setLocalStorage(this.kioskScreenLSKey, LOGIS_UTIL.getComboSelectValue(this._getScreenCombo(), 'logis_setting'));
+            LOGIS_UTIL.setLocalStorage(this.printerIdLSKey, LOGIS_UTIL.getComboSelectValue(this._getPrinterCombo(), 'logis_setting'));
             resolve();
           }).catch(error => {
             reject(error);
@@ -315,6 +425,15 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _getScreenCombo() {
         return this.$['screen-combo']
+      }
+
+      /**
+       * @description return 프린터 설정 콤보
+       ***********************
+       * @return {Object} combo box
+       */
+      _getPrinterCombo() {
+        return this.$['printer-combo']
       }
     }
 

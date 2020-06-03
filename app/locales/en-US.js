@@ -33,14 +33,13 @@ window.locales['en-US'] = {
   'label.bucket_cd': 'Bucket Code',
   'label.size': 'Size',
   'label.sku_qty': 'SKU Quantity',
-  'label.label_cd': 'Label Code',
+  'label.invoice_id': 'Invoice No.',
   'label.sku_nm': 'Sku Name',
   'label.confirm_qty': 'Confirm Qty',
   'label.diff_qty': 'Diff. Qty',
   'label.sku_cnt': 'SKU Count',
   'label.default_weight': 'Default Weight',
   'label.current_weight': 'Current Weight',
-  'label.label_cd': 'Label Code',
   'label.expect_weight': 'Expect Weight',
   'label.diff_weight': 'Diff. Weight',
   'label.box_weight': 'Box Weight',
@@ -147,6 +146,7 @@ window.locales['en-US'] = {
   'label.stock_load_unit': 'Stock Unit',
   'label.stock_load_unit_pcs': 'PCS',
   'label.stock_load_unit_box': 'BOX',
+  'label.tray_cd': 'Tray Box',
 
   // menu list
   'menu.Settings': 'Setting',

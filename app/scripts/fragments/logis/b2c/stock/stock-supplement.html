@@ -100,6 +100,10 @@ Copyright © HatioLab Inc. All rights reserved.
 
     <div id="container">
       <div class="input-container">
+        <!-- 랙 선택 -->
+        <span class="label">[[rackLabel]]</span>
+        <select id="rack-combo" on-change="_getStationList"></select>
+
         <!-- 상품 바코드 -->
         <span class="label">[[skuBarcdLabel]]</span>
 
@@ -121,6 +125,10 @@ Copyright © HatioLab Inc. All rights reserved.
         <!-- 주문 수량 입력 박스 -->
         <span class="label">[[orderQtyLabel]]</span>
         <input id="order-qty" readonly></input>
+
+        <!-- 할당 수량 입력 박스 -->
+        <span class="label">[[allocQtyLabel]]</span>
+        <input id="alloc-qty" readonly></input>
 
         <!-- 재고 수량 입력 박스 -->
         <span class="label">[[stockQtyLabel]]</span>
@@ -159,11 +167,10 @@ Copyright © HatioLab Inc. All rights reserved.
       </div>
     </div>
 
-    <div id = "bottom-container">
-      <select id="rack-combo" on-change="_getStationList"></select>
-      <button id = "on-btn" class= 'btn' on-click="_ledOn">[[ledOnBtnLabel]]</button>
-      <button id = "off-btn" class= 'btn' on-click="_ledOff">[[ledOffBtnLabel]]</button>
-    </div>
+    <!--div id = "bottom-container">
+      <button id = "on-btn" class= 'btn' on-click="_ledOn" hidden>[[ledOnBtnLabel]]</button>
+      <button id = "off-btn" class= 'btn' on-click="_ledOff" hidden>[[ledOffBtnLabel]]</button>
+    </div-->
   </template>
 
   <script>
@@ -174,6 +181,16 @@ Copyright © HatioLab Inc. All rights reserved.
 
       static get properties() {
         return {
+          /**
+           * @description 랙 라벨
+           ***************
+           * @type {String}
+           */
+          rackLabel: {
+            type: String,
+            value: () => t('label.rack')
+          },
+
           /**
            * @description 변경 셀 라벨
            ***************
@@ -524,7 +541,8 @@ Copyright © HatioLab Inc. All rights reserved.
 
         // 조회를 통해 구한 값을 input에 출력
         this.$['order-qty'].value = stock.order_qty;
-        this.$['stock-qty'].value = stock.stock_qty + stock.alloc_qty;
+        this.$['stock-qty'].value = stock.stock_qty;
+        this.$['alloc-qty'].value = stock.alloc_qty;
         this.$['input-qty'].value = stock.input_qty;
 
         if (stock.input_qty <= 0) {

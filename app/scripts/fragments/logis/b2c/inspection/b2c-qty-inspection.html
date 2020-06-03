@@ -14,33 +14,25 @@ Copyright © HatioLab Inc. All rights reserved.
   <template>
     <style>
       .container {
-        /* height: calc(100% - 40px); */
-        height: calc(100% - 20px);
-        padding: 10px;
+        height: calc(100% - 10px);
+        padding: 10px 15px 0px 15px;
         display: flex;
         flex-direction: column;
       }
       .input-section {
         display:grid;
-        grid-template:1.1fr / 1.4fr 1fr 1fr 1fr;
+        grid-template: 1.5fr / 1.5fr 1.5fr 1fr 1fr;
         background-color: var(--things-white-opacity-background-color);
         border-radius:var(--things-default-border-radius);
         overflow: hidden;
         margin-bottom: 10px;
-        /* padding:10px; */
         padding: 7px;
       }
       #bottom-container {
         flex: 1;
-        display: grid;
-        grid-template-columns: 4fr 1fr;
-        grid-gap: 20px;
-        /* padding: 9px 7px 7px 0; */
-        /* padding: 0; */
         border-radius:var(--things-default-border-radius);
-        /* margin-bottom: 20px; */
+        margin-bottom: 10px;
       }
-
       .input-section div{
         text-align:center;
         color:#fff;
@@ -115,11 +107,12 @@ Copyright © HatioLab Inc. All rights reserved.
       }
       .btn-section {
         display: flex;
-        flex-direction: column;
+        flex-direction: row;
       }
       button {
         @apply --operator-default-btn;
-        margin-top: 15px;
+        margin-right: 10px;
+        margin-bottom: 10px;
         flex: 1;
       }
       button:active {
@@ -143,21 +136,21 @@ Copyright © HatioLab Inc. All rights reserved.
       }
     </style>
 
-    <!-- 송장 번호로 검수 정보 조회를 위한 Ajax -->
+    <!-- 검수 정보 조회를 위한 Ajax -->
     <sys-ajax
-      id="inspection-items-ajax"
-      curl="/kiosk_process/dps/inspection/by_qty/ready/by_order/:order_id"
+      id="find-inspection-ajax"
+      curl="/device_process/dynamic/dps/inspection/find_by_order/:order_id"
       method="GET"
       content-type="application/json"
-      last-response="{{inspection}}"
       custom-error-handler
-      on-sys-ajax-error="onInspectionError">
+      on-sys-ajax-response="_onInpspectionResponsed"
+      on-sys-ajax-error="_onFindInspectionError">
     </sys-ajax>
 
     <!-- 검수 완료를 위한 Ajax -->
     <sys-ajax
       id="inspection-complete-ajax"
-      curl="/kiosk_process/dps/inspection/by_qty/finish/:order_id"
+      curl="/device_process/dynamic/dps/inspection/finish/:order_id"
       method="PUT"
       content-type="application/json"
       last-response="{{inspectionResult}}">
@@ -166,7 +159,7 @@ Copyright © HatioLab Inc. All rights reserved.
     <!-- 송장 재발행을 위한 Ajax -->
     <sys-ajax
       id="reprint-invoice-ajax"
-      curl="/kiosk_process/dps/inspection/print/:order_id"
+      curl="/device_process/dynamic/dps/inspection/print/:order_id"
       method="PUT"
       content-type="application/json"
       on-sys-ajax-response="_reprintSucceed">
@@ -175,7 +168,7 @@ Copyright © HatioLab Inc. All rights reserved.
     <!-- 박스 분할을 위한 Ajax -->
     <sys-ajax
       id="split-box-ajax"
-      curl="/kiosk_process/dps/inspection/split_box/:order_id"
+      curl="/device_process/dynamic/dps/inspection/split_box/:order_id"
       method="PUT"
       content-type="application/json"
       on-sys-ajax-response="_splitBoxResponsed">
@@ -190,84 +183,73 @@ Copyright © HatioLab Inc. All rights reserved.
       on-sys-ajax-response="_addSkuResponsed">
     </sys-ajax>
 
+    <!-- 재검수를 위한 Ajax -->
     <sys-ajax
       id="change-status-ajax"
-      curl="/kiosk_process/dps/inspection/by_qty/again/:box_type/:box_id"
+      curl="/device_process/dynamic/dps/inspection/finish_again/:box_type/:box_id"
       method="PUT"
       content-type="application/json">
     </sys-ajax>
 
+    <!-- 레이아웃 -->
     <div class="container">
       <div class="input-section" id="input-section">
         <div class="input1">
-          <span class="label">[[bucketCdLabel]]</span>
-          <input id="bucket-cd" on-keypress="_onBarcodeScan">
-          <span class="label">[[orderIdLabel]]</span>
-          <input id="order-cd" on-keypress="_onOrderIdScan">
+          <!-- 박스, 주문 번호, 상품 코드 입력 박스 -->
+          <span class="label">[[trayCdLabel]]</span>
+          <input id="tray-cd" on-keypress="_onTrayCdScan">
           <span class="label">[[skuBarcdLabel]]</span>
-          <input id="sku-barcode" on-keypress="_onBarcodeScan">
-
-          <!-- SKU 정보 조회 시 복수개가 조회된 경우 실행되는 사용자가 고를 수 있는 팝업이 가미된 SKU Input -->
-          <auto-popup-input
-            id="sku-bcd"
-            resource-url="[[getSkuAjaxUrl]]"
-            popup-title="[[popupTitleLabel]]"
-            button-txt-callback="[[_skuButtonTxtCallback]]"
-            allowed-focus-out
-            on-item-selected="_onSkuBarcodeScan">
-          </auto-popup-input>
+          <input id="sku-barcode" on-keypress="_onSkuBarcodeScan">
         </div>
 
+        <div class="input1">
+          <!-- 박스, 주문 번호, 상품 코드 입력 박스 -->
+          <span class="label">[[boxIdLabel]]</span>
+          <input id="box-id" on-keypress="_onBoxIdScan">
+          <span class="label">[[orderNoLabel]]</span>
+          <input id="order-no" on-keypress="_onOrderNoScan">
+          <span class="label">[[invoiceIdLabel]]</span>
+          <input id="invoice-id" on-keypress="_onInvoiceIdScan">
+        </div>
+
+        <!-- 상품 건수 -->
         <div class="sku-info">
           <span class="smalltitle">[[skuCntLabel]]</span>
           <span class="proc"><b>[[pickedSkuCnt]]</b> / [[confirmSkuCnt]]</span>
         </div>
 
+        <!-- 상품 수량 -->
         <div class="sku-info">
           <span class="smalltitle">[[skuQtyLabel]]</span>
           <span class="proc"><b>[[pickedSkuPcsQty]]</b> / [[confirmSkuPcsQty]]</span>
         </div>
-
-        <div class="sku-info">
-          <span class="smalltitle">[[bucketCdLabel]]</span>
-          <span class="proc"><b>[[currentBucketCd]]</b></span>
-        </div>
-
-        <template is="dom-if" if="[[jobType]]">
-          <div class="sku-info">
-            <span class="smalltitle">[[skuWeightLabel]]</span>
-              <template is="dom-if" if="[[!rejectStatus]]">
-                <span class="proc"><b>[[skuWeight]]</b> ([[skuMinimumWeight]] ~ [[skuMaximumWeight]])</span>
-              </template>
-
-  <template is="dom-if" if="[[rejectStatus]]">
-                <span class="proc-reject"><b>[[skuWeight]]</b> ([[skuMinimumWeight]] ~ [[skuMaximumWeight]])</span>
-              </template>
-  </div>
-  </template>
-  </div>
-
-  <div id="bottom-container">
-    <item-list header="[[header]]" data="[[items]]" on-configured="_addCompleteClass">
-    </item-list>
-
-    <div class="right-section">
-      <div class="radio-section">
-        <input type="radio" on-click="_handleInspectionMethodClick" name="chk_info" value="each" checked="checked" id="each">
-        <label for="each">[[indivisualLabel]]</label><br/>
-        <!--input type="radio" on-click="_handleInspectionMethodClick" name="chk_info" value="total" id="total">
-                <label for="total">[[batchLabel]]</label><br/>
-                <input type="radio" on-click="_handleInspectionMethodClick" name="chk_info" value="inputCount" id="inputCount">
-                <label for="inputCount">[[qtyInputLabel]]</label><br/>
-                <input type="radio" on-click="_handleInspectionMethodClick" name="chk_info" value="addSku" id="addSku">
-                <label for="addSku">[[addSkuLabel]]</label-->
       </div>
 
-      <div class="btn-section">
-        <template is="dom-if" if="[[jobType]]">
-                <button id="inspection-btn" on-click="searchSBS">[[sbsLabel]]</button>
-            </template>
+      <div id="bottom-container">
+        <!-- 주문 내품 내역 리스트 -->
+        <item-list 
+          header="[[header]]" 
+          data="[[items]]" 
+          on-configured="_addCompleteClass">
+        </item-list>
 
+        <!-- 검수 방법 -->
+        <div class="right-section" hidden>
+          <div class="radio-section" hidden>
+            <input type="radio" on-click="_handleInspectionMethodClick" name="chk_info" value="each" checked="checked" id="each">
+            <label for="each">[[indivisualLabel]]</label><br/>
+            <input type="radio" on-click="_handleInspectionMethodClick" name="chk_info" value="total" id="total">
+            <label for="total">[[batchLabel]]</label><br/>
+            <input type="radio" on-click="_handleInspectionMethodClick" name="chk_info" value="inputCount" id="inputCount">
+            <label for="inputCount">[[qtyInputLabel]]</label><br/>
+            <input type="radio" on-click="_handleInspectionMethodClick" name="chk_info" value="addSku" id="addSku">
+            <label for="addSku">[[addSkuLabel]]</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- 검수 관련 버튼 -->
+      <div class="btn-section">
         <button id="inspection-btn" on-click="completeInspection">[[completeLabel]]</button>
         <button id="retry-inspection-btn" on-click="changeInspectionStatus">[[retryInspectionLabel]]</button>
         <button id="reset-btn" on-click="reset">[[resetLabel]]</button>
@@ -275,8 +257,6 @@ Copyright © HatioLab Inc. All rights reserved.
         <button id="reprint-btn" on-click="reprint">[[reprintLabel]]</button>
       </div>
     </div>
-  </div>
-  </div>
   </template>
 
   <script>
@@ -288,37 +268,47 @@ Copyright © HatioLab Inc. All rights reserved.
       static get properties() {
         return {
           /**
-           * 버킷 번호 라벨
+           * @description 트레이 코드 라벨
            ****************
            * @type {String}
            */
-          bucketCdLabel: {
+          trayCdLabel: {
             type: String,
-            value: t('label.bucket_cd')
+            value: t('label.tray_cd')
           },
 
           /**
-           * 상품 중량 라벨
+           * @description 박스 ID 라벨
            ****************
            * @type {String}
            */
-          skuWeightLabel: {
+          boxIdLabel: {
             type: String,
-            value: t('label.sku_weight')
+            value: t('label.box_id')
           },
 
           /**
-           * 주문 번호 라벨
+           * @description 주문 번호 라벨
            ****************
            * @type {String}
            */
-          orderIdLabel: {
+          orderNoLabel: {
             type: String,
             value: t('label.order_id')
           },
 
           /**
-           * 상품 바코드 라벨
+           * @description 송장 번호 라벨
+           ****************
+           * @type {String}
+           */
+          invoiceIdLabel: {
+            type: String,
+            value: t('label.invoice_id')
+          },
+
+          /**
+           * @description 상품 바코드 라벨
            ****************
            * @type {String}
            */
@@ -328,7 +318,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 상품 개수 라벨
+           * @description 상품 개수 라벨
            ****************
            * @type {String}
            */
@@ -338,7 +328,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 상품 수량 라벨
+           * @description 상품 수량 라벨
            ****************
            * @type {String}
            */
@@ -348,7 +338,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 검수 완료 라벨
+           * @description 검수 완료 라벨
            ****************
            * @type {String}
            */
@@ -358,17 +348,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * SBS 박스 조회 라벨
-           ****************
-           * @type {String}
-           */
-          sbsLabel: {
-            type: String,
-            value: t('button.search_sbs')
-          },
-
-          /**
-           * 초기화 라벨
+           * @description 초기화 라벨
            ****************
            * @type {String}
            */
@@ -378,7 +358,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 전체 초기화 라벨
+           * @description 전체 초기화 라벨
            ****************
            * @type {String}
            */
@@ -388,7 +368,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 재발행 라벨
+           * @description 재발행 라벨
            ****************
            * @type {String}
            */
@@ -398,7 +378,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 개별처리 라벨
+           * @description 개별처리 라벨
            ****************
            * @type {String}
            */
@@ -408,7 +388,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 일괄처리 라벨
+           * @description 일괄처리 라벨
            ****************
            * @type {String}
            */
@@ -418,7 +398,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 수량 입력처리 라벨
+           * @description 수량 입력처리 라벨
            ****************
            * @type {String}
            */
@@ -428,7 +408,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           *  상품 추가처리 라벨
+           * @description 상품 추가 처리 라벨
            ****************
            * @type {String}
            */
@@ -438,7 +418,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           *  검수 상태 변경 버튼 라벨
+           * @description 검수 상태 변경 버튼 라벨
            ****************
            * @type {String}
            */
@@ -448,57 +428,47 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 스캔한 주문 번호
+           * @description 스캔한 트레이 코드
            ****************
            * @type {String}
            */
-          currentOrderId: {
+          currentTrayCd: {
             type: String,
             value: ''
           },
 
           /**
-           * 주문 번호와 매핑된 버킷 코드
+           * @description 스캔한 주문 번호
            ****************
            * @type {String}
            */
-          currentBucketCd: {
+          currentOrderNo: {
             type: String,
             value: ''
           },
 
           /**
-           * 상품 중량
+           * @description 스캔한 송장 번호
            ****************
-           * @type {Number}
+           * @type {String}
            */
-          skuWeight: {
-            type: Number,
-            value: 0
+          currentInvoiceId: {
+            type: String,
+            value: ''
           },
 
           /**
-           * 상품 최대 중량
+           * @description 주문 번호와 매핑된 박스 ID
            ****************
-           * @type {Number}
+           * @type {String}
            */
-          skuMaximumWeight: {
-            type: Number,
-            value: 0
+          currentBoxId: {
+            type: String,
+            value: ''
           },
 
           /**
-           * 상품 최소 중량
-           ****************
-           * @type {Number}
-           */
-          skuMinimumWeight: {
-            type: Number,
-            value: 0
-          },
-
-          /**
-           * 이전 스캔한 상품 코드
+           * @description 이전 스캔한 상품 코드
            ****************
            * @type {String}
            */
@@ -507,7 +477,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 피킹한 상품 수
+           * @description 피킹한 상품 수
            ****************
            * @type {Number}
            */
@@ -517,7 +487,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 피킹한 상품 낱개 수
+           * @description 피킹한 상품 낱개 수
            ****************
            * @type {Number}
            */
@@ -527,7 +497,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 확인 상품 수
+           * @description 확인 상품 수
            ****************
            * @type {Number}
            */
@@ -537,7 +507,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 확인 상품의 낱개 수
+           * @description 확인 상품의 낱개 수
            ****************
            * @type {String}
            */
@@ -547,7 +517,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 검수 방법
+           * @description 검수 방법
            ****************
            * @type {String}
            */
@@ -557,7 +527,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 검수 결과
+           * @description 검수 결과
            ****************
            * @type {Object}
            */
@@ -567,7 +537,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 그리드 헤더 정의
+           * @description 그리드 헤더 정의
            ****************
            * @type {Array}
            */
@@ -581,48 +551,49 @@ Copyright © HatioLab Inc. All rights reserved.
                   color: '#fff',
                   textAlign: 'left'
                 },
-                columnWidth: '180px'
+                columnWidth: '1.2fr'
               }, {
                 display: t('label.sku_nm'),
                 fieldname: 'sku_nm',
                 style: {
                   color: '#ADCBEB',
                   textAlign: 'left'
-                }
+                },
+                columnWidth: '1.75fr'
               }, {
                 display: t('label.sku_barcd'),
                 fieldname: 'sku_barcd',
                 style: {
                   textAlign: 'center'
                 },
-                columnWidth: '300px'
+                columnWidth: '1.7fr'
               }, {
                 display: t('label.order_qty'),
-                fieldname: 'item_qty',
+                fieldname: 'picked_qty',
                 style: {
                   textAlign: 'right'
                 },
-                columnWidth: '110px'
+                columnWidth: '0.4fr'
               }, {
                 display: t('label.confirm_qty'),
                 fieldname: 'confirm_qty',
                 style: {
                   textAlign: 'right'
                 },
-                columnWidth: '100px'
+                columnWidth: '0.4fr'
               }, {
                 display: t('label.diff_qty'),
                 fieldname: 'diff_qty',
                 style: {
                   textAlign: 'right'
                 },
-                columnWidth: '80px'
+                columnWidth: '0.3fr'
               }]
             }
           },
 
           /**
-           * 그리드 데이터
+           * @description 그리드 데이터
            ****************
            * @type {Array}
            */
@@ -631,331 +602,161 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 그리드 데이터를 위한 소스 데이터
+           * @description 그리드 데이터를 위한 소스 데이터
            ****************
            * @type {Array}
            */
           inspection: {
             type: Object,
             observer: '_inspectionChanged'
-          },
-          /**
-           * SKU 정보 조회를 위한 URL
-           ****************
-           * @type {String}
-           */
-          getSkuAjaxUrl: {
-            type: String,
-            value: `/pda_process/find_sku/${LOGIS_UTIL.getEquipCd()}/:inputValue`
-          },
-          /**
-           * SKU 정보 조회 후 복수개가 조회된 경우 사용자가 고를 수 있는 팝업이 실행되는데 그 팝업에 표시할 타이틀
-           ****************
-           * @type {String}
-           */
-          popupTitleLabel: {
-            type: String,
-            value: () => t('label.sku')
-          },
-        }
-      }
-      _onBarcodeScan(e) {
-          if (e.key != 'Enter') return;
-
-          if (/^[bcdfghiBCDFGHI][0-9]{7}$/.exec(e.currentTarget.value)) {
-            this.$['bucket-cd'].value = e.currentTarget.value;
-            if (this.$['sku-barcode'] === e.currentTarget) {
-              this.$['sku-barcode'].value = '';
-            }
-            this._onBucketCdScan(e)
-          } else {
-            this.$['sku-barcode'].value = e.currentTarget.value;
-            this.$['sku-bcd'].value = e.currentTarget.value;
-            this.$['sku-bcd']._triggerAjax();
           }
         }
-        /**
-         * 최초 코드
-         */
+      }
+
+      /**
+       * @description life cycle - connectedCallback
+       ****************************
+       */
       connectedCallback() {
         super.connectedCallback();
+
         document.addEventListener('page-changed', event => {
           if (event.detail.currentPage === location.hash.replace('#/', '')) {
-            this.focusBucketInput();
+            this.focusDefaultInput();
           }
         });
 
         document.addEventListener(`alert-closed-at-${location.hash.replace('#/', '')}`, event => {
           if (!event.detail.hasCallback) {
-            this.focusBucketInput();
+            this.focusDefaultInput();
           }
         });
 
-        this.focusBucketInput();
+        this.focusDefaultInput();
       }
 
       /**
-       * 버킷 코드 스캔시
+       * @description 트레이 코드 스캔 시
+       ****************************
+       * @param {Object} e
+       */
+      _onTrayCdScan(e) {
+        if (e.key == 'Enter' && e.currentTarget.value) {
+          let barcode = e.currentTarget.value;
+          this.refreshInspection('box', barcode, 'tray');
+        }
+      }
+
+      /**
+       * @description 박스 바코드 스캔 시
+       ****************************
+       * @param {Object} e
+       */
+      _onBoxIdScan(e) {
+        if (e.key == 'Enter' && e.currentTarget.value) {
+          let barcode = e.currentTarget.value;
+          this.refreshInspection('box', barcode, 'box');
+        }
+      }
+
+      /**
+       * @description 주문 번호 스캔시
        *****************
        * @param {Object} e
        */
-      _onBucketCdScan(e) {
-        // if (e.key != 'Enter') return;
-        this.refreshInspection(this.$['bucket-cd'].value);
-      }
-
-      /**
-       * 검수 화면 데이터 조회
-       ************
-       * @param {String} bucketCd
-       */
-      refreshInspection(bucketCd) {
-        try {
-          this.bucketCd = bucketCd;
-          this.validateBeforeBucketScan();
-          var ajaxLabel = this.$['inspection-items-ajax'];
-          var inputType = LOGIS_UTIL.getInputBoxType();
-          ajaxLabel.curl = '/kiosk_process/dps/inspection/by_qty/ready/by_box/' + inputType + '/' + this.bucketCd;
-          ajaxLabel.generateRequest();
-        } catch (error) {
-          LOGIS_UTIL.showMessage(error.title, error.message, error.confirmCallback);
+      _onOrderNoScan(e) {
+        if (e.key == 'Enter' && e.currentTarget.value) {
+          let orderNo = e.currentTarget.value;
+          this.refreshInspection('order', orderNo);
         }
       }
 
       /**
-       * 박스 ID 스캔 전 Validation Check
-       */
-      validateBeforeBucketScan() {
-        if (!this.bucketCd || this.bucketCd.length < 4) {
-          throw {
-            title: t('error.VALIDATION_ERROR'),
-            message: t('error.bucket_cd_invalid'),
-            confirmCallback: this.focusBucketInput.bind(this)
-          }
-        }
-      }
-
-      /**
-       * 버킷 코드 스캔 에러시
-       **************
-       * @param {Object} event
-       */
-      onInspectionError(event) {
-        this.clearView();
-        LOGIS_UTIL.showMessage(event.detail.code, event.detail.msg, this.focusBucketInput.bind(this));
-      }
-
-      /**
-       * 주문 번호 스캔시
+       * @description 송장 번호 스캔시
        *****************
        * @param {Object} e
        */
-      _onOrderIdScan(e) {
-        if (e.key != 'Enter') return;
-        try {
-          this.orderId = e.currentTarget.value;
-          this.validateBeforeOrderScan();
-          var ajaxLabel = this.$['inspection-items-ajax'];
-          ajaxLabel.curl = '/kiosk_process/dps/inspection/by_qty/ready/by_order/' + this.orderId;
-          ajaxLabel.generateRequest();
-        } catch (error) {
-          LOGIS_UTIL.showMessage(error.title, error.message, error.confirmCallback);
+      _onInvoiceIdScan(e) {
+        if (e.key == 'Enter' && e.currentTarget.value) {
+          let invoiceId = e.currentTarget.value;
+          this.refreshInspection('invoice', invoiceId);
         }
       }
 
       /**
-       * 주문 번호 스캔 전 Validation Check
-       */
-      validateBeforeOrderScan() {
-        if (!this.orderId || this.orderId < 5) {
-          throw {
-            title: t('error.VALIDATION_ERROR'),
-            message: t('error.order_id_invalid'),
-            confirmCallback: this.focusOrderInput.bind(this)
-          }
-        }
-      }
-
-      /**
-       * 상품 바코드 스캔시
+       * @description 상품 바코드 스캔시
        *****************
        * @param {Object} e
        */
       _onSkuBarcodeScan(e) {
-        // if (e.key != 'Enter') return;
+        if (e.key == 'Enter' && e.currentTarget.value) {
 
-        // this.items (검수 대상 리스트)가 존재 하지 않는다면 alert
-        if (!this.items || this.items.length == 0) {
-          e.currentTarget.value = '';
-          LOGIS_UTIL.showMessage(t('error.VALIDATION_ERROR'), t('text.target_not_exist'), this.focusBucketInput.bind(this));
-          return;
-        }
+          // 박스 ID가 스캔 되기 전이라면 alert
+          if (!this.$['invoice-id'].value) {
+            this.$['sku-barcode'].value = '';
+            LOGIS_UTIL.showMessageWithSound('error', t('error.VALIDATION_ERROR'), t('text.box_id_empty'), this.focusDefaultInput.bind(this));
 
-        let skuBarcode = e.currentTarget.value;
-        let found = this.items.find((item) => {
-          return (item.sku_cd === skuBarcode || item.sku_barcd === skuBarcode);
-        });
-
-        // found (검수 대상 리스트 중 입력한 상품 코드와 일치하는 것)가 없다면 alert
-        if (!found || found.length == 0) {
-          LOGIS_UTIL.showMessage(t('error.invalid_sku_cd'), t('text.scanned_sku_code_not_exist'), this.focusSkuBarcdInput.bind(this));
-          return;
-        }
-
-        this.prevSkuBarcode = skuBarcode;
-        let errorFlag = false;
-        let finishedItem = null;
-        var flag = 0;
-
-        let newItems = this.items.map((item, index) => {
-          if (skuBarcode == item.sku_cd || skuBarcode == item.sku_barcd) {
-            if (flag >= 1) {
-              return item;
-            }
-
-            if (item.diff_qty == 0) {
-              LOGIS_UTIL.showMessage(t('error.out_of_valid_qty'), t('text.confirm_qty_out_of_item_qty'), this.focusSkuBarcdInput.bind(this));
-              errorFlag = true;
-              return null;
-            }
-
-            if (this.inspectionMethodValue == 'each') {
-              item.confirm_qty = ++item.confirm_qty;
-              this.confirmSkuPcsQty = this.confirmSkuPcsQty + 1;
-              flag++;
-
-            } else if (this.inspectionMethodValue == 'total') {
-              var calcQty = item.item_qty - item.confirm_qty;
-              item.confirm_qty = item.item_qty;
-              this.confirmSkuPcsQty = this.confirmSkuPcsQty + calcQty;
-
-            } else if (this.inspectionMethodValue == 'inputCount') {
-              const inputCountPopup = document.createElement('inspection-enter-qty-popup');
-              inputCountPopup.item = item;
-
-              if (item.sku_cd == skuBarcode || skuBarcode == item.sku_barcd) {
-                LOGIS_UTIL.showPopup(this.qtyInputLabel, inputCountPopup, 'fit', 'fit', function() {
-                  inputCountPopup._initialSetup();
-
-                }.bind(this), function() {
-                  let inputQty = inputCountPopup.inputQty;
-                  if (!inputQty) {
-                    this.focusSkuBarcdInput();
-                    return;
-                  }
-                  this.confirmSkuPcsQty = this.confirmSkuPcsQty + inputQty;
-                  if (this.items[index].diff_qty > 0) {
-                    this.items[index].diff_qty = this.items[index].item_qty - this.items[index].confirm_qty;
-                    if (this.items[index].diff_qty == 0) {
-                      this.confirmSkuCnt = this.confirmSkuCnt + 1;
-                      finishedItem = this.items[index];
-                    }
-                  }
-
-                  let countItems = this.items;
-
-                  if (!errorFlag) {
-                    if (finishedItem) {
-                      countItems.splice(countItems.indexOf(finishedItem), 1);
-                      countItems.push(finishedItem);
-                    }
-                  }
-
-                  this.set('items', []);
-                  this.set('items', countItems);
-
-                  this.focusSkuBarcdInput();
-                  // 모든 검수가 완료 되었는지 확인하고 완료 되었다면 자동으로 검수 완료 처리
-                  if (this.checkFinished(this.items)) {
-                    this.completeInspection();
-                  }
-                }.bind(this));
-
-                /*document.dispatchEvent(new CustomEvent('open-dialog', {
-                  detail: {
-                    content: inputCountPopup,
-                    width: 'fit',
-                    height: 'fit',
-                    title: this.qtyInputLabel,
-                    openCallback: () => {
-                      inputCountPopup._initialSetup();
-                    },
-                    closeCallback: () => {
-                      let inputQty = inputCountPopup.inputQty;
-                      if (!inputQty) {
-                        this.focusSkuBarcdInput();
-                        return;
-                      }
-                      this.confirmSkuPcsQty = this.confirmSkuPcsQty + inputQty;
-                      if (this.items[index].diff_qty > 0) {
-                        this.items[index].diff_qty = this.items[index].item_qty - this.items[index].confirm_qty;
-                        if (this.items[index].diff_qty == 0) {
-                          this.confirmSkuCnt = this.confirmSkuCnt + 1;
-                          finishedItem = this.items[index];
-                        }
-                      }
-
-                      let countItems = this.items;
-
-                      if (!errorFlag) {
-                        if (finishedItem) {
-                          countItems.splice(countItems.indexOf(finishedItem), 1);
-                          countItems.push(finishedItem);
-                        }
-                      }
-
-                      this.set('items', []);
-                      this.set('items', countItems);
-
-                      this.focusSkuBarcdInput();
-                      // 모든 검수가 완료 되었는지 확인하고 완료 되었다면 자동으로 검수 완료 처리
-                      if (this.checkFinished(this.items)) {
-                        this.completeInspection();
-                      }
-                    }
-                  }
-                }));*/
-              }
-
-            } else if (this.inspectionMethodValue == 'addSku') {
-              //바코드를 스캔할 때마다 상품 추가작업
-              let pickAjax = this.$['add-sku-ajax'];
-              pickAjax.curl = '';
-
-            }
-            if (this.inspectionMethodValue != 'inputCount') {
-              if (item.diff_qty > 0) {
-                item.diff_qty = item.item_qty - item.confirm_qty;
-                if (item.diff_qty == 0) {
-                  this.confirmSkuCnt = this.confirmSkuCnt + 1;
-                  finishedItem = item;
-                  flag++;
-                }
-              }
-            }
+            // 박스 ID로 스캔한 후 라면 내품 검수 처리
+          } else {
+            let skuCd = e.currentTarget.value;
+            // 내품 검수 실행 
+            this._doItemInspection(skuCd);
           }
-          return item;
-        });
-
-        // 오류가 없고 항목이 완료되었다면 완료된 항목은 아래로 이동 - 소팅
-        if (!errorFlag) {
-          if (finishedItem) {
-            newItems.splice(newItems.indexOf(finishedItem), 1);
-            newItems.push(finishedItem);
-          }
-          this.items = newItems;
-        }
-        this.$['sku-barcode'].value = '';
-        // 모든 검수가 완료 되었는지 확인하고 완료 되었다면 자동으로 검수 완료 처리
-        if (this.checkFinished(this.items)) {
-          this.completeInspection();
         }
       }
 
       /**
-       * 검수 완료 체크
-       * @param {Array} items
+       * @description 검수 화면 데이터 조회
+       *******************
+       * @param {String} inputType
+       * @param {String} inputId
+       * @param {String} boxType
+       */
+      refreshInspection(inputType, inputId, boxType) {
+        try {
+          var findAjax = this.$['find-inspection-ajax'];
+          findAjax.curl = `/device_process/dynamic/dps/inspection/find_by_${inputType}`;
+
+          findAjax.customParams = {
+            equipType: LOGIS_UTIL.getEquipType(),
+            equipCd: LOGIS_UTIL.getEquipCd(),
+            boxType: boxType ? boxType : null,
+            boxId: inputId,
+            orderNo: inputId,
+            invoiceId: inputId
+          };
+          findAjax.generateRequest();
+
+        } catch (error) {
+          LOGIS_UTIL.showMessage(error.title, error.message, error.confirmCallback);
+        }
+      }
+
+      /**
+       * @description 검수 조회 성공시
+       **************
+       * @param {Object} event
+       */
+      _onInpspectionResponsed(event) {
+        if (event && event.detail && event.detail.success == true) {
+          this.inspection = event.detail.result;
+        }
+      }
+
+      /**
+       * @description 검수 조회 에러시
+       **************
+       * @param {Object} event
+       */
+      _onFindInspectionError(event) {
+        this.clearView();
+        LOGIS_UTIL.showMessage(event.detail.code, event.detail.msg, this.focusDefaultInput.bind(this));
+      }
+
+      /**
+       * @description 검수 완료 체크
        ***************
+       * @param {Array} items
        */
       checkFinished(items) {
         let finished = true;
@@ -970,9 +771,9 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 상품 추가 완료 체크
-       * @param {Array} items
+       * @description 상품 추가 완료 체크
        ***************
+       * @param {Array} items
        */
       _addSkuResponsed(items) {
         //피킹이 완료되면 검수완료 작업.
@@ -982,39 +783,41 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 검사항목 정보 및 내품 내역 정보 변경 핸들러
+       * @description 검사항목 정보 및 내품 내역 정보 변경 핸들러
        *****************
        * @param {Object} inspection
        */
       _inspectionChanged(inspection) {
         if (inspection == null) return;
 
-        if (!(/([BRES])/.test(inspection.status))) {
+        if ('B' == inspection.status) {
+          LOGIS_UTIL.showToastWarnMessage('박스 처리는 되었으나 실적 전송이 안 되었습니다.');
+          this.clearView();
+          this.focusDefaultInput();
+          return;
+
+        } else if (!(/([ES])/.test(inspection.status))) {
           LOGIS_UTIL.showToastWarnMessage(t('text.cannot_inspection_now'));
           this.clearView();
-          this.focusBucketInput();
+          this.focusDefaultInput();
           return;
         }
 
-        this.currentOrderId = inspection.order_id;
-        this.custOrderId = inspection.cust_order_id;
-        this.currentBucketCd = inspection.box_id;
-        this.$['order-cd'].value = this.currentOrderId;
-        this.$['bucket-cd'].value = this.currentBucketCd;
+        this.currentTrayCd = inspection.tray_cd;
+        this.currentBoxId = inspection.box_id;
+        this.currentOrderNo = inspection.order_no;
+        this.currentInvoiceId = inspection.invoice_id;
 
-        if (inspection.job_type === 'QPS') {
-          this.jobType = true;
-          if (inspection.status === 'R') this.rejectStatus = true;
-          else this.rejectStatus = false;
-        } else {
-          this.jobType = false;
-        }
+        this.$['tray-cd'].value = this.currentTrayCd;
+        this.$['box-id'].value = this.currentBoxId;
+        this.$['order-no'].value = this.currentOrderNo;
+        this.$['invoice-id'].value = this.currentInvoiceId;
 
         let inspItems = inspection.items ? inspection.items : [];
+        this.inspectionStatus = inspection.status;
         let skuPcs = 0;
 
-        this.inspectionStatus = inspection.status;
-        if (this.inspectionStatus === 'B' || this.inspectionStatus === 'R') {
+        if (this.inspectionStatus == 'S') {
           this.$['inspection-btn'].hidden = false;
           this.$['reset-btn'].hidden = false;
           this.$['reset-all-btn'].hidden = false;
@@ -1023,64 +826,61 @@ Copyright © HatioLab Inc. All rights reserved.
           this.$['inspection-btn'].hidden = true;
           this.$['reset-btn'].hidden = true;
           this.$['reset-all-btn'].hidden = true;
-          //화면에서 완료된건은 빨강색으로 표현이 되기에 아래 메시지 필요 없음, 송장프린트는 별도 기능으로 처리
-          // LOGIS_UTIL.showMessage(t('error.already_processed'), t('text.can_re_issue_invoice'), this.focusBucketInput.bind());
         }
 
         this.items = inspItems.map((item) => {
-          this.inspectionStatus === 'E' || this.inspectionStatus === 'S' ? item.confirm_qty = item.item_qty : item.confirm_qty = 0;
-          this.inspectionStatus === 'E' || this.inspectionStatus === 'S' ? item.diff_qty = 0 : item.diff_qty = item.item_qty;
+          this.inspectionStatus === 'E' ? item.confirm_qty = item.picked_qty : item.confirm_qty = 0;
+          this.inspectionStatus === 'E' ? item.diff_qty = 0 : item.diff_qty = item.picked_qty;
           item.sku_barcd = item.sku_barcd ? item.sku_barcd : '';
-          skuPcs += item.item_qty;
+          skuPcs += item.picked_qty;
           return item;
         });
 
         this.pickedSkuCnt = this.items.length;
         this.pickedSkuPcsQty = skuPcs;
-        this.inspectionStatus === 'B' || this.inspectionStatus === 'R' ? this.confirmSkuCnt = 0 : this.confirmSkuCnt = this.pickedSkuCnt;
-        this.inspectionStatus === 'B' || this.inspectionStatus === 'R' ? this.confirmSkuPcsQty = 0 : this.confirmSkuPcsQty = this.pickedSkuPcsQty;
+        this.inspectionStatus != 'E' ? this.confirmSkuCnt = 0 : this.confirmSkuCnt = this.pickedSkuCnt;
+        this.inspectionStatus != 'E' ? this.confirmSkuPcsQty = 0 : this.confirmSkuPcsQty = this.pickedSkuPcsQty;
         this.focusSkuBarcdInput();
-
-        if (this.jobType) {
-          this.$['input-section'].style['grid-template'] = '1.1fr / 1.4fr 1fr 1fr 1fr 1.4fr';
-          this.skuMinimumWeight = (inspection.box_weight_list[0]).toFixed(0);
-          this.skuWeight = (inspection.box_weight_list[1]).toFixed(0);
-          this.skuMaximumWeight = (inspection.box_weight_list[2]).toFixed(0);
-        } else {
-          this.$['input-section'].style['grid-template'] = '1.1fr / 1.4fr 1fr 1fr 1fr';
-        }
       }
 
       /**
-       * 검수 완료 결과 변경 핸들러
+       * @description 검수 완료 결과 변경 핸들러
        *****************
        * @param {Object} inspectionResult
        */
       _inspectionResultChanged(inspectionResult) {
         this.set('items', []);
-        this.currentOrderId = '';
-        this.currentBucketCd = '';
+
+        this.prevSkuBarcode = '';
+        this.currentTrayCd = '';
+        this.currentBoxId = '';
+        this.currentInvoiceId = '';
+        this.currentOrderNo = '';
+
         this.pickedSkuCnt = 0;
         this.pickedSkuPcsQty = 0;
         this.confirmSkuCnt = 0;
         this.confirmSkuPcsQty = 0;
-        this.$['sku-barcode'].value = '';
-        this.$['order-cd'].value = '';
-        this.$['bucket-cd'].value = '';
-        this.skuMinimumWeight = 0;
-        this.skuWeight = 0;
-        this.skuMaximumWeight = 0;
 
-        this.focusBucketInput();
+        this.$['sku-barcode'].value = '';
+        this.$['invoice-id'].value = '';
+        this.$['order-no'].value = '';
+        this.$['box-id'].value = '';
+        this.$['tray-cd'].value = '';
+
+        this.focusDefaultInput();
       }
 
       /**
-       * 검수 리스트가 configured 될 때 호출 되며
+       * @description 검수 리스트가 configured 될 때 호출 되며
        * diff_qty가 0이면 complete 클래스를 로우에 추가함
        * item-list의 header 설정에 의해 결정된 color를 제거함
+       *********************
+       * @param {Object} event
        */
       _addCompleteClass(event) {
         let list = event.detail.contentElements;
+
         list.forEach(row => {
           let data = row.getData();
           if (data.diff_qty <= 0) {
@@ -1094,59 +894,41 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 검수 완료
+       * @description 검수 완료
+       *********************
        */
       completeInspection() {
         // 1. 모두 확인하였다면 검수 완료
-        if (this.pickedSkuCnt > 0 && this.confirmSkuCnt > 0 && this.pickedSkuCnt > 0 && this.confirmSkuCnt > 0 &&
-          this.pickedSkuCnt == this.confirmSkuCnt && this.pickedSkuPcsQty == this.confirmSkuPcsQty) {
+        if (this.pickedSkuCnt > 0 &&
+          this.confirmSkuCnt > 0 &&
+          this.pickedSkuCnt > 0 &&
+          this.confirmSkuCnt > 0 &&
+          this.pickedSkuCnt == this.confirmSkuCnt &&
+          this.pickedSkuPcsQty == this.confirmSkuPcsQty) {
+
           var completeAjax = this.$['inspection-complete-ajax'];
-          completeAjax.curl = '/kiosk_process/dps/inspection/by_qty/finish/' + this.currentOrderId;
+          completeAjax.curl = '/device_process/dynamic/dps/inspection/finish';
           completeAjax.customParams = {
-            printer_id: LOGIS_UTIL.getPrinterId()
+            equipType: LOGIS_UTIL.getEquipType(),
+            equipCd: LOGIS_UTIL.getEquipCd(),
+            invoiceId: this.currentInvoiceId,
+            printerId: LOGIS_UTIL.getPrinterId()
           };
           completeAjax.generateRequest();
+
+          // 2. 하나라도 검수한 다음 검수 완료 버튼을 누르면 송장 분할
+        } else if (this.confirmSkuPcsQty > 0 && this.pickedSkuPcsQty > this.confirmSkuPcsQty) {
+          LOGIS_UTIL.showMessage(t('button.confirm'), '송장 분할하시겠습니까?', this.splitBox.bind(this));
+
+          // 3. 검수 완료되지 않았다면 에러 메시지 표시
+        } else {
+          LOGIS_UTIL.showMessage(t('button.confirm'), t('text.inspection_not_finished_yet'), this.focusDefaultInput.bind(this));
         }
-        // 2. 하나라도 검수한 다음 검수 완료 버튼을 누르면 송장 분할--> 박스는 제투입하지 않을 것이기에 박스가 전체 완료되어야 함.
-        // else if(this.confirmSkuPcsQty > 0 && this.pickedSkuPcsQty > this.confirmSkuPcsQty) {
-        //   LOGIS_UTIL.showMessage(t('button.confirm'), '송장 분할하시겠습니까?', this.splitBox.bind(this));
-        //
-        // }
-        // 3. 검수 완료되지 않았다면 에러 메시지 표시
-        else {
-          LOGIS_UTIL.showMessage(t('button.confirm'), t('text.inspection_not_finished_yet'), this.focusBucketInput.bind(this));
-        }
-        // try {
-        //   this.validateBeforeComplete();
-        //   var completeAjax = this.$['inspection-complete-ajax'];
-        //   completeAjax.curl = '/kiosk_process/dps/inspection/by_qty/finish/' + this.currentOrderId;
-        //   completeAjax.generateRequest();
-        // } catch (error) {
-        //   LOGIS_UTIL.showMessage(error.title, error.message, error.confirmCallback);
-        // }
       }
 
       /**
-       * 검수 완료 전 Validation Check
-       */
-      /*validateBeforeComplete() {
-        if(this.pickedSkuCnt > 0 &&
-           this.confirmSkuCnt > 0 &&
-           this.pickedSkuCnt > 0 &&
-           this.confirmSkuCnt > 0 &&
-           this.pickedSkuCnt == this.confirmSkuCnt &&
-           this.pickedSkuPcsQty == this.confirmSkuPcsQty) {
-        } else {
-          throw {
-            title: t('button.confirm'),
-            message: t('text.inspection_not_finished_yet'),
-            confirmCallback: this.focusBucketInput.bind(this)
-          }
-        }
-      }*/
-
-      /**
-       * 초기화
+       * @description 초기화
+       ********************
        */
       reset() {
         if (this.items && this.items.length) {
@@ -1158,7 +940,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
               this.confirmSkuPcsQty = this.confirmSkuPcsQty - item.confirm_qty;
               item.confirm_qty = 0;
-              item.diff_qty = item.item_qty - item.confirm_qty;
+              item.diff_qty = item.picked_qty - item.confirm_qty;
             }
 
             return item;
@@ -1166,89 +948,108 @@ Copyright © HatioLab Inc. All rights reserved.
         }
 
         this.$['sku-barcode'].value = '';
-        if (this.$['bucket-cd'].value) {
+        if (this.$['tray-cd'].value) {
           this.focusSkuBarcdInput();
         } else {
-          this.focusBucketInput();
+          this.focusDefaultInput();
         }
       }
 
       /**
-       * 전체 초기화
+       * @description 전체 초기화
+       ***********************
        */
       resetAll() {
         if (this.items && this.items.length) {
           this.items = this.items.map((item) => {
             item.confirm_qty = 0;
-            item.diff_qty = item.item_qty - item.confirm_qty;
+            item.diff_qty = item.picked_qty - item.confirm_qty;
             return item;
           });
         }
 
-        this.$['sku-barcode'].value = '';
         this.confirmSkuCnt = 0;
         this.confirmSkuPcsQty = 0;
+        this.$['sku-barcode'].value = '';
 
-        if (this.$['bucket-cd'].value) {
+        if (this.$['tray-cd'].value) {
           this.focusSkuBarcdInput();
         } else {
-          this.focusBucketInput();
+          this.focusDefaultInput();
         }
       }
 
       /**
-       * 재발행
+       * @description 재발행
+       **********************
        */
       reprint() {
         // 검수가 완료되었다면 재발행을 호출할 수 있다.
-        if (this.inspectionStatus === 'E' || this.inspectionStatus === 'S') {
+        if (this.inspectionStatus === 'E') {
           var reprintAjax = this.$['reprint-invoice-ajax'];
-          reprintAjax.curl = '/kiosk_process/dps/inspection/print/' + this.currentOrderId;
+          reprintAjax.curl = '/device_process/dynamic/dps/print_invoice';
           reprintAjax.customParams = {
-            printer_id: LOGIS_UTIL.getPrinterId()
+            equipType: LOGIS_UTIL.getEquipType(),
+            equipCd: LOGIS_UTIL.getEquipCd(),
+            invoiceId: this.currentInvoiceId,
+            printerId: LOGIS_UTIL.getPrinterId()
           };
           reprintAjax.generateRequest();
+
+          // 유효성 에러 
         } else {
-          LOGIS_UTIL.showMessage(t('button.confirm'), t('text.reprint_error_msg_1'), this.focusBucketInput.bind(this));
+          LOGIS_UTIL.showMessage(t('button.confirm'), t('text.reprint_error_msg_1'), this.focusDefaultInput.bind(this));
         }
       }
 
       /**
-       * 재발행 후 호출되는 리스너
+       * @description 재발행 후 호출되는 리스너
+       *********************
+       * @param {Object} e
        */
       _reprintSucceed(e) {
-        if (e.detail.result.toLowerCase() === 'ok') {
+        if (e.detail.message.toLowerCase() === 'ok') {
           this.inspectionStatus = '';
           this._inspectionResultChanged();
         } else {
           // 재발행 실패했을 경우
-          LOGIS_UTIL.showMessage(t('button.confirm'), t('text.reprint_event_listener_error'), this.focusBucketInput.bind(this));
+          LOGIS_UTIL.showMessage(t('button.confirm'), t('text.reprint_event_listener_error'), this.focusDefaultInput.bind(this));
         }
       }
 
       /**
-       * 송장 분할
+       * @description 송장 분할
+       **********************
        */
       splitBox() {
         var splitBoxAjax = this.$['split-box-ajax'];
-        splitBoxAjax.curl = '/kiosk_process/dps/inspection/split_box/' + this.currentOrderId;
+        splitBoxAjax.curl = '/device_process/dynamic/dps/inspection/split_box';
+        reprintAjax.customParams = {
+          equipType: LOGIS_UTIL.getEquipType(),
+          equipCd: LOGIS_UTIL.getEquipCd(),
+          invoiceId: this.currentInvoiceId,
+          printerId: LOGIS_UTIL.getPrinterId()
+        };
         splitBoxAjax.body = this.items;
         splitBoxAjax.generateRequest();
       }
 
       /**
-       * 송장 분할 완료 후
+       * @description 송장 분할 완료 후
+       **********************
+       * @param {Object} event
        */
       _splitBoxResponsed(event) {
         var newBox = event.detail;
         this.resetAll();
+
         LOGIS_UTIL.showMessage(t('button.confirm'), t('text.split_invoice_complete'), function() {
-          this.refreshInspection(newBox.box_id);
+          this.refreshInspection('invoice', newBox.invoice_id);
         }.bind(this));
       }
 
       /**
-       * 라디오 버튼 클릭시
+       * @description 라디오 버튼 클릭시
        ****************
        * @param {Object} e
        */
@@ -1257,63 +1058,143 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 화면 정보 클리어
+       * @description 화면 정보 클리어
+       **********************
        */
       clearView() {
         this.set('items', []);
+
         this.$['sku-barcode'].value = '';
-        this.$['bucket-cd'].value = '';
-        this.$['order-cd'].value = '';
+        this.$['order-no'].value = '';
+        this.$['invoice-id'].value = '';
+        this.$['box-id'].value = '';
+        this.$['tray-cd'].value = '';
+
         this.confirmSkuCnt = 0;
         this.confirmSkuPcsQty = 0;
         this.pickedSkuCnt = 0;
         this.pickedSkuPcsQty = 0;
-        this.currentBucketCd = '';
+
+        this.currentTrayCd = '';
+        this.currentBoxId = '';
+        this.currentInvoiceId = '';
+        this.currentOrderNo = '';
+
+        this.prevSkuBarcode = '';
       }
 
       /**
-       * bucket-cd input field select
+       * @description box-id input field select
+       **********************
        */
-      focusBucketInput() {
-        this.$['bucket-cd'].select();
+      focusDefaultInput() {
+        this.$['tray-cd'].select();
       }
 
       /**
-       * order-cd input field select
+       * @description order-no input field select
+       **********************
        */
       focusOrderInput() {
-        this.$['order-cd'].select();
+        this.$['order-no'].select();
       }
 
       /**
-       * sku-barcode input field select
+       * @description sku-barcode input field select
+       **********************
        */
       focusSkuBarcdInput() {
-          this.$['sku-barcode'].select();
-        }
-        /**
-         * SKU 정보 조회 시 복수개가 조회된 경우 사용자가 고를 수 있는 버튼이 실행되는데 그 버튼에 표시할 내용
-         *******************
-         * @param {Object} item
-         */
-      _skuButtonTxtCallback(item) {
-        return `(${item.sku_cd})
-                ${item.sku_nm}`;
+        this.$['sku-barcode'].select();
       }
 
       /**
-       * when sbs button clicked
+       * @description 검수 상태 변경 시 
+       *******************
        */
-      searchSBS(e) {
-        var sbsUrl = 'http://128.10.1.128/source/report/open_gdc_o.asp?orderid=' + this.custOrderId;
-        window.open(sbsUrl, 'SBS');
-      }
       changeInspectionStatus() {
-        var boxId = this.$['bucket-cd'].value;
+        var trayCd = this.$['tray-cd'].value;
         var inputType = LOGIS_UTIL.getInputBoxType();
         var changeStatusAjax = this.$['change-status-ajax'];
-        changeStatusAjax.curl = '/kiosk_process/dps/inspection/by_qty/again/' + inputType + '/' + boxId;
+        changeStatusAjax.curl = '/device_process/dynamic/dps/inspection/finish_again/' + inputType + '/' + trayCd;
         changeStatusAjax.generateRequest();
+      }
+
+      /**
+       * @description 내품 항목 검수 전 유효성 체크
+       ***************************
+       * @param {String} skuBarcode
+       */
+      _validateForInspectionItem(skuBarcode) {
+        // 1. 검수 대상 리스트가 존재 하지 않는다면 alert
+        if (!this.items || this.items.length == 0) {
+          LOGIS_UTIL.showMessageWithSound('error', t('error.VALIDATION_ERROR'), t('text.target_not_exist'), this.focusDefaultInput.bind(this));
+          this.$['sku-barcode'].value = '';
+          return false;
+        }
+
+        // 2. 검수 대상 리스트 중 입력한 상품 코드와 일치하는 상품이 있는지 체크 
+        let found = this.items.find((item) => {
+          return (item.sku_cd === skuBarcode || item.sku_barcd === skuBarcode);
+        });
+
+        // 3. 검수 대상 리스트 중 입력한 상품 코드와 일치하는 것이 없다면 alert
+        if (!found || found.length == 0) {
+          LOGIS_UTIL.showMessage(t('error.invalid_sku_cd'), t('text.scanned_sku_code_not_exist'), this.focusSkuBarcdInput.bind(this));
+          this.$['sku-barcode'].value = '';
+          return false;
+        }
+
+        // 4. 찾은 박스 내품 리턴
+        return found;
+      }
+
+      /**
+       * @description 상품 내품 검수 
+       *****************
+       * @param {String} skuBarcode
+       */
+      _doItemInspection(skuBarcode) {
+        // 1. 박스 내품 내역 중에 스캔한 상품 바코드에 해당하는 항목을 추출
+        let item = this._validateForInspectionItem(skuBarcode);
+        if (item === false) {
+          return null;
+        }
+
+        // 2. 상품별 검수 수량을 모두 처리 했는지 체크 
+        if (item.diff_qty == 0) {
+          LOGIS_UTIL.showMessage(t('error.out_of_valid_qty'), t('text.confirm_qty_out_of_item_qty'), this.focusSkuBarcdInput.bind(this));
+          return null;
+        }
+
+        // 3. 검수 수량 처리 
+        item.confirm_qty = ++item.confirm_qty;
+        item.diff_qty = item.picked_qty - item.confirm_qty;
+        this.confirmSkuPcsQty = this.confirmSkuPcsQty + 1;
+        let isItemFinished = item.diff_qty == 0;
+
+        // 4. 상품 하나에 대한 검수가 완료되었다면 상품 검수 수량을 올리고 해당 항목은 아래로 이동
+        if (isItemFinished) {
+          this.confirmSkuCnt = this.confirmSkuCnt + 1;
+          this.items.splice(this.items.indexOf(item), 1);
+          this.items.push(item);
+        }
+
+        // 5. 기존 박스 내품 내역 복사 
+        let newItems = JSON.parse(JSON.stringify(this.items));
+
+        // 6. 박스 내품 리스트를 복사한 리스트로 변경 
+        this.items = newItems;
+
+        // 7. 이전 스캔 상품 바코드를 갱신
+        this.prevSkuBarcode = skuBarcode;
+
+        // 8. 상품 바코드 입력 박스 리셋 
+        this.$['sku-barcode'].value = '';
+
+        // 9. 모든 검수가 완료 되었는지 확인하고 완료 되었다면 자동으로 검수 완료 처리
+        if (this.checkFinished(this.items)) {
+          this.completeInspection();
+        }
       }
     }
 

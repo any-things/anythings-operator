@@ -33,7 +33,7 @@ window.locales['zh-CN'] = {
   'label.bucket_cd': '桶编码',
   'label.size': '大小',
   'label.sku_qty': '商品数量',
-  'label.label_cd': '发票号',
+  'label.invoice_id': '发票号',
   'label.sku_nm': '商品名称',
   'label.confirm_qty': '确认数量',
   'label.diff_qty': '差异数量',
@@ -147,6 +147,7 @@ window.locales['zh-CN'] = {
   'label.stock_load_unit': '재고 보충 단위',
   'label.stock_load_unit_pcs': 'PCS',
   'label.stock_load_unit_box': '박스',
+  'label.tray_cd': 'Tray Box',
 
   // menu list
   'menu.Settings': '设置',
