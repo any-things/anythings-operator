@@ -827,9 +827,9 @@ Copyright © HatioLab Inc. All rights reserved.
           this.totalPcsPicking = progressRate.plan_pcs;
           this.totalPcsPicked = progressRate.actual_pcs;
 
-          this.totalProgressRateByPcs = progressRate.rate_pcs;
-          this.totalProgressRateBySku = progressRate.rate_sku;
-          this.totalProgressRateByOrder = progressRate.rate_order;
+          this.totalProgressRateByPcs = progressRate.rate_pcs.toFixed(1);
+          this.totalProgressRateBySku = progressRate.rate_sku.toFixed(1);
+          this.totalProgressRateByOrder = progressRate.rate_order.toFixed(1);
 
           this.inputableBoxes = orderDataSet.result.inputable_buckets;
 
@@ -852,7 +852,7 @@ Copyright © HatioLab Inc. All rights reserved.
         if (event.key === 'Enter') {
           var boxCd = event.currentTarget.value;
 
-          if (LOGIS_UTIL.isBoxIdValid(boxCd)) {
+          if (LOGIS_UTIL.isBoxIdValidate(boxCd)) {
             event.currentTarget.value = '';
             this.inputBox(boxCd);
             SOUND.playInfoSound();
