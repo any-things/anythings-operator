@@ -143,15 +143,25 @@ Copyright © HatioLab Inc. All rights reserved.
       method="GET"
       content-type="application/json"
       custom-error-handler
-      on-sys-ajax-response="_onInpspectionResponsed"
+      on-sys-ajax-response="_onFindInpspectionSuccess"
       on-sys-ajax-error="_onFindInspectionError">
+    </sys-ajax>
+
+    <!-- 박스 내품 검수를 위한 Ajax -->
+    <sys-ajax
+      id="inspection-item-ajax"
+      curl="/device_process/dynamic/dps/inspection/by_item/:order_no/:rfid_id"
+      method="PUT"
+      content-type="application/json"
+      on-sys-ajax-response="_onItemInpspectionSuccess"
+      on-sys-ajax-error="_onItemInspectionError">
     </sys-ajax>
 
     <!-- 검수 완료를 위한 Ajax -->
     <sys-ajax
       id="inspection-complete-ajax"
       curl="/device_process/dynamic/dps/inspection/finish/:order_id"
-      method="PUT"
+      method="POST"
       content-type="application/json"
       last-response="{{inspectionResult}}">
     </sys-ajax>
@@ -162,7 +172,7 @@ Copyright © HatioLab Inc. All rights reserved.
       curl="/device_process/dynamic/dps/inspection/print/:order_id"
       method="PUT"
       content-type="application/json"
-      on-sys-ajax-response="_reprintSucceed">
+      on-sys-ajax-response="_reprintSuccess">
     </sys-ajax>
 
     <!-- 박스 분할을 위한 Ajax -->
@@ -171,16 +181,15 @@ Copyright © HatioLab Inc. All rights reserved.
       curl="/device_process/dynamic/dps/inspection/split_box/:order_id"
       method="PUT"
       content-type="application/json"
-      on-sys-ajax-response="_splitBoxResponsed">
+      on-sys-ajax-response="_splitBoxSuccess">
     </sys-ajax>
 
-    <!-- 상품 추가작업을 위한 Ajax -->
+    <!-- 상품 추가 작업을 위한 Ajax -->
     <sys-ajax
-      id="add-sku-ajax"
-      curl=""
-      method="GET"
+      id="add-item-ajax"
+      method="PUT"
       content-type="application/json"
-      on-sys-ajax-response="_addSkuResponsed">
+      on-sys-ajax-response="_addItemSuccess">
     </sys-ajax>
 
     <!-- 재검수를 위한 Ajax -->
@@ -195,7 +204,7 @@ Copyright © HatioLab Inc. All rights reserved.
     <div class="container">
       <div class="input-section" id="input-section">
         <div class="input1">
-          <!-- 박스, 주문 번호, 상품 코드 입력 박스 -->
+          <!-- 트레이 박스, 상품 코드 입력 박스 -->
           <span class="label">[[trayCdLabel]]</span>
           <input id="tray-cd" on-keypress="_onTrayCdScan">
           <span class="label">[[skuBarcdLabel]]</span>
@@ -203,7 +212,7 @@ Copyright © HatioLab Inc. All rights reserved.
         </div>
 
         <div class="input1">
-          <!-- 박스, 주문 번호, 상품 코드 입력 박스 -->
+          <!-- 주문 번호, 박스 ID, 송장 번호 입력 박스 -->
           <span class="label">[[orderNoLabel]]</span>
           <input id="order-no" on-keypress="_onOrderNoScan">
           <span class="label">[[boxIdLabel]]</span>
@@ -253,7 +262,7 @@ Copyright © HatioLab Inc. All rights reserved.
         <button id="inspection-btn" on-click="completeInspection">[[completeLabel]]</button>
         <button id="retry-inspection-btn" on-click="changeInspectionStatus" hidden>[[retryInspectionLabel]]</button>
         <button id="reset-btn" on-click="reset">[[resetLabel]]</button>
-        <button id="reset-all-btn" on-click="resetAll">[[resetAllLabel]]</button>
+        <button id="reset-all-btn" on-click="clearView">[[resetAllLabel]]</button>
         <button id="reprint-btn" on-click="reprint">[[reprintLabel]]</button>
       </div>
     </div>
@@ -468,6 +477,16 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
+           * @description 현재까지 검수 완료한 RFID ID 리스트
+           ****************
+           * @type {Array}
+           */
+          currentRfidList: {
+            type: Array,
+            value: []
+          },
+
+          /**
            * @description 이전 스캔한 상품 코드
            ****************
            * @type {String}
@@ -537,6 +556,25 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
+           * @description 그리드 데이터를 위한 소스 데이터
+           ****************
+           * @type {Array}
+           */
+          inspection: {
+            type: Object,
+            observer: '_inspectionChanged'
+          },
+
+          /**
+           * @description 그리드 데이터
+           ****************
+           * @type {Array}
+           */
+          items: {
+            type: Array
+          },
+
+          /**
            * @description 그리드 헤더 정의
            ****************
            * @type {Array}
@@ -588,27 +626,10 @@ Copyright © HatioLab Inc. All rights reserved.
                   textAlign: 'right'
                 },
                 columnWidth: '0.3fr'
+              }, {
+                fieldname: 'shop_cd'
               }]
             }
-          },
-
-          /**
-           * @description 그리드 데이터
-           ****************
-           * @type {Array}
-           */
-          items: {
-            type: Array
-          },
-
-          /**
-           * @description 그리드 데이터를 위한 소스 데이터
-           ****************
-           * @type {Array}
-           */
-          inspection: {
-            type: Object,
-            observer: '_inspectionChanged'
           }
         }
       }
@@ -641,7 +662,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} e
        */
       _onTrayCdScan(e) {
-        if (e.key == 'Enter' && e.currentTarget.value) {
+        if (e && e.key == 'Enter' && e.currentTarget && e.currentTarget.value) {
           let barcode = e.currentTarget.value;
           this.refreshInspection('box', barcode, 'tray');
         }
@@ -653,7 +674,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} e
        */
       _onBoxIdScan(e) {
-        if (e.key == 'Enter' && e.currentTarget.value) {
+        if (e && e.key == 'Enter' && e.currentTarget && e.currentTarget.value) {
           let barcode = e.currentTarget.value;
           this.refreshInspection('box', barcode, 'box');
         }
@@ -665,7 +686,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} e
        */
       _onOrderNoScan(e) {
-        if (e.key == 'Enter' && e.currentTarget.value) {
+        if (e && e.key == 'Enter' && e.currentTarget && e.currentTarget.value) {
           let orderNo = e.currentTarget.value;
           this.refreshInspection('order', orderNo);
         }
@@ -677,7 +698,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} e
        */
       _onInvoiceIdScan(e) {
-        if (e.key == 'Enter' && e.currentTarget.value) {
+        if (e && e.key == 'Enter' && e.currentTarget && e.currentTarget.value) {
           let invoiceId = e.currentTarget.value;
           this.refreshInspection('invoice', invoiceId);
         }
@@ -689,10 +710,16 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} e
        */
       _onSkuBarcodeScan(e) {
-        if (e.key == 'Enter' && e.currentTarget.value) {
-          let skuCd = e.currentTarget.value;
-          // 내품 검수 실행 
-          this._doItemInspection(skuCd);
+        if (e && e.key == 'Enter' && e.currentTarget && e.currentTarget.value) {
+          let barcode = e.currentTarget.value;
+
+          // 상품 코드 스캔으로 내품 검수 실행 
+          if (barcode.length < 30) {
+            this._doItemInspectionByScan(barcode);
+            // RFID 스캔으로 내품 검수 실행 
+          } else {
+            this._doItemInspectionByRfid(barcode);
+          }
         }
       }
 
@@ -704,23 +731,19 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {String} boxType
        */
       refreshInspection(inputType, inputId, boxType) {
-        try {
-          var findAjax = this.$['find-inspection-ajax'];
-          findAjax.curl = `/device_process/dynamic/dps/inspection/find_by_${inputType}`;
+        var findAjax = this.$['find-inspection-ajax'];
+        findAjax.curl = `/device_process/dynamic/dps/inspection/find_by_${inputType}`;
 
-          findAjax.customParams = {
-            equipType: LOGIS_UTIL.getEquipType(),
-            equipCd: LOGIS_UTIL.getEquipCd(),
-            boxType: boxType ? boxType : null,
-            boxId: inputId,
-            orderNo: inputId,
-            invoiceId: inputId
-          };
-          findAjax.generateRequest();
+        findAjax.customParams = {
+          equipType: LOGIS_UTIL.getEquipType(),
+          equipCd: LOGIS_UTIL.getEquipCd(),
+          boxType: boxType ? boxType : null,
+          boxId: inputId,
+          orderNo: inputId,
+          invoiceId: inputId
+        };
 
-        } catch (error) {
-          LOGIS_UTIL.showMessage(error.title, error.message, error.confirmCallback);
-        }
+        findAjax.generateRequest();
       }
 
       /**
@@ -728,7 +751,7 @@ Copyright © HatioLab Inc. All rights reserved.
        **************
        * @param {Object} event
        */
-      _onInpspectionResponsed(event) {
+      _onFindInpspectionSuccess(event) {
         if (event && event.detail && event.detail.success == true) {
           this.inspection = event.detail.result;
         }
@@ -742,6 +765,33 @@ Copyright © HatioLab Inc. All rights reserved.
       _onFindInspectionError(event) {
         this.clearView();
         LOGIS_UTIL.showMessage(event.detail.code, event.detail.msg, this.focusDefaultInput.bind(this));
+      }
+
+      /**
+       * @description 박스 내품 검수 성공 시
+       **************
+       * @param {Object} event
+       */
+      _onItemInpspectionSuccess(event) {
+        if (event && event.detail) {
+          if (event.detail.success) {
+            // 내품 검수 서버 처리 결과로 넘어온 skuBarcd로 내품 검수 처리 
+            var rfidInfo = event.detail.result;
+            this._doItemInspectionByScan(rfidInfo.sku_barcd, rfidInfo);
+          } else {
+            LOGIS_UTIL.showToastErrorMessage(event.detail.message);
+            this.focusSkuBarcdInput();
+          }
+        }
+      }
+
+      /**
+       * @description 박스 내품 검수 에러 시
+       **************
+       * @param {Object} event
+       */
+      _onItemInspectionError(event) {
+        LOGIS_UTIL.showMessage(event.detail.code, event.detail.msg, this.focusSkuBarcdInput.bind(this));
       }
 
       /**
@@ -766,8 +816,8 @@ Copyright © HatioLab Inc. All rights reserved.
        ***************
        * @param {Array} items
        */
-      _addSkuResponsed(items) {
-        //피킹이 완료되면 검수완료 작업.
+      _addItemSuccess(items) {
+        // 피킹이 완료되면 검수완료 작업.
         if (items.length <= 0) {
           this.completeInspection();
         }
@@ -821,6 +871,7 @@ Copyright © HatioLab Inc. All rights reserved.
         this.pickedSkuPcsQty = skuPcs;
         !inspectionFinished ? this.confirmSkuCnt = 0 : this.confirmSkuCnt = this.pickedSkuCnt;
         !inspectionFinished ? this.confirmSkuPcsQty = 0 : this.confirmSkuPcsQty = this.pickedSkuPcsQty;
+
         this.focusSkuBarcdInput();
       }
 
@@ -830,26 +881,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} inspectionResult
        */
       _inspectionResultChanged(inspectionResult) {
-        this.set('items', []);
-
-        this.prevSkuBarcode = '';
-        this.currentTrayCd = '';
-        this.currentOrderNo = '';
-        this.currentBoxId = '';
-        this.currentInvoiceId = '';
-
-        this.pickedSkuCnt = 0;
-        this.pickedSkuPcsQty = 0;
-        this.confirmSkuCnt = 0;
-        this.confirmSkuPcsQty = 0;
-
-        this.$['sku-barcode'].value = '';
-        this.$['invoice-id'].value = '';
-        this.$['order-no'].value = '';
-        this.$['box-id'].value = '';
-        this.$['tray-cd'].value = '';
-
-        this.focusDefaultInput();
+        this.clearView();
       }
 
       /**
@@ -895,6 +927,13 @@ Copyright © HatioLab Inc. All rights reserved.
             orderNo: this.currentOrderNo,
             printerId: LOGIS_UTIL.getPrinterId()
           };
+
+          // RFID 정보가 있다면 ...
+          if (this.currentRfidList.length > 0) {
+            completeAjax.curl += '_by_rfid';
+            completeAjax.body = this.currentRfidList;
+          }
+
           completeAjax.generateRequest();
 
           // 2. 하나라도 검수한 다음 검수 완료 버튼을 누르면 송장 분할
@@ -928,6 +967,10 @@ Copyright © HatioLab Inc. All rights reserved.
           });
         }
 
+        if (currentRfidList && currentRfidList.length > 0) {
+          currentRfidList.pop();
+        }
+
         this.$['sku-barcode'].value = '';
         if (this.$['tray-cd'].value) {
           this.focusSkuBarcdInput();
@@ -937,20 +980,12 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * @description 전체 초기화
-       ***********************
-       */
-      resetAll() {
-        this.clearView();
-      }
-
-      /**
        * @description 재발행
        **********************
        */
       reprint() {
         // 검수가 완료되었다면 재발행을 호출할 수 있다.
-        if (this.inspectionStatus === 'S') {
+        if (this.inspectionStatus === 'S' || this.inspectionStatus == 'E') {
           var reprintAjax = this.$['reprint-invoice-ajax'];
           reprintAjax.curl = '/device_process/dynamic/dps/print_invoice';
           reprintAjax.customParams = {
@@ -972,10 +1007,10 @@ Copyright © HatioLab Inc. All rights reserved.
        *********************
        * @param {Object} e
        */
-      _reprintSucceed(e) {
-        if (e.detail.message.toLowerCase() === 'ok') {
+      _reprintSuccess(e) {
+        if (e && e.detail && e.detail.message && e.detail.message.toLowerCase() === 'ok') {
           this.inspectionStatus = '';
-          this._inspectionResultChanged();
+          this.clearView();
         } else {
           // 재발행 실패했을 경우
           LOGIS_UTIL.showMessage(t('button.confirm'), t('text.reprint_event_listener_error'), this.focusDefaultInput.bind(this));
@@ -989,7 +1024,7 @@ Copyright © HatioLab Inc. All rights reserved.
       splitBox() {
         var splitBoxAjax = this.$['split-box-ajax'];
         splitBoxAjax.curl = '/device_process/dynamic/dps/inspection/split_box';
-        reprintAjax.customParams = {
+        splitBoxAjax.customParams = {
           equipType: LOGIS_UTIL.getEquipType(),
           equipCd: LOGIS_UTIL.getEquipCd(),
           orderNo: this.currentOrderNo,
@@ -1004,9 +1039,9 @@ Copyright © HatioLab Inc. All rights reserved.
        **********************
        * @param {Object} event
        */
-      _splitBoxResponsed(event) {
+      _splitBoxSuccess(event) {
         var newBox = event.detail;
-        this.resetAll();
+        this.clearView();
 
         LOGIS_UTIL.showMessage(t('button.confirm'), t('text.split_invoice_complete'), function() {
           this.refreshInspection('invoice', newBox.invoice_id);
@@ -1028,6 +1063,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       clearView() {
         this.set('items', []);
+        this.currentRfidList = [];
 
         this.$['sku-barcode'].value = '';
         this.$['order-no'].value = '';
@@ -1044,8 +1080,9 @@ Copyright © HatioLab Inc. All rights reserved.
         this.currentBoxId = '';
         this.currentInvoiceId = '';
         this.currentOrderNo = '';
-
         this.prevSkuBarcode = '';
+
+        this.focusDefaultInput();
       }
 
       /**
@@ -1114,21 +1151,40 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * @description 상품 내품 검수 
+       * @description RFID로 상품 내품 검수 
+       *****************
+       * @param {String} rfidId
+       */
+      _doItemInspectionByRfid(rfidId) {
+        var itemInspAjax = this.$['inspection-item-ajax'];
+        itemInspAjax.curl = '/device_process/dynamic/dps/inspection/by_item';
+        itemInspAjax.customParams = {
+          equipType: LOGIS_UTIL.getEquipType(),
+          equipCd: LOGIS_UTIL.getEquipCd(),
+          orderNo: this.currentOrderNo,
+          rfidId: rfidId
+        };
+
+        itemInspAjax.generateRequest();
+      }
+
+      /**
+       * @description 상품 바코드 스캔으로 상품 내품 검수 
        *****************
        * @param {String} skuBarcode
+       * @param {Object} rfidInfo
        */
-      _doItemInspection(skuBarcode) {
+      _doItemInspectionByScan(skuBarcode, rfidInfo) {
         // 1. 박스 내품 내역 중에 스캔한 상품 바코드에 해당하는 항목을 추출
         let item = this._validateForInspectionItem(skuBarcode);
         if (item === false) {
-          return null;
+          return false;
         }
 
         // 2. 상품별 검수 수량을 모두 처리 했는지 체크 
         if (item.diff_qty == 0) {
           LOGIS_UTIL.showMessage(t('error.out_of_valid_qty'), t('text.confirm_qty_out_of_item_qty'), this.focusSkuBarcdInput.bind(this));
-          return null;
+          return false;
         }
 
         // 3. 검수 수량 처리 
@@ -1156,10 +1212,20 @@ Copyright © HatioLab Inc. All rights reserved.
         // 8. 상품 바코드 입력 박스 리셋 
         this.$['sku-barcode'].value = '';
 
-        // 9. 모든 검수가 완료 되었는지 확인하고 완료 되었다면 자동으로 검수 완료 처리
+        // 9. rfidId가 존재한다면 
+        if (rfidId && rfidId.length > 30) {
+          rfidInfo.order_qty = item.picked_qty;
+          rfidInfo.shop_cd = item.shop_cd;
+          this.currentRfidList.push(rfidInfo);
+        }
+
+        // 10. 모든 검수가 완료 되었는지 확인하고 완료 되었다면 자동으로 검수 완료 처리
         if (this.checkFinished(this.items)) {
           this.completeInspection();
         }
+
+        // 11. 정상 처리 결과 리턴
+        return true;
       }
     }
 
