@@ -1213,7 +1213,7 @@ Copyright © HatioLab Inc. All rights reserved.
         this.$['sku-barcode'].value = '';
 
         // 9. rfidId가 존재한다면 
-        if (rfidId && rfidId.length > 30) {
+        if (rfidInfo) {
           rfidInfo.order_qty = item.picked_qty;
           rfidInfo.shop_cd = item.shop_cd;
           this.currentRfidList.push(rfidInfo);
