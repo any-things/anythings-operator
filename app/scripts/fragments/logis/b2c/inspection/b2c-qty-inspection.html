@@ -179,7 +179,7 @@ Copyright © HatioLab Inc. All rights reserved.
     <sys-ajax
       id="split-box-ajax"
       curl="/device_process/dynamic/dps/inspection/split_box/:order_id"
-      method="PUT"
+      method="POST"
       content-type="application/json"
       on-sys-ajax-response="_splitBoxSuccess">
     </sys-ajax>
@@ -209,6 +209,8 @@ Copyright © HatioLab Inc. All rights reserved.
           <input id="tray-cd" on-keypress="_onTrayCdScan">
           <span class="label">[[skuBarcdLabel]]</span>
           <input id="sku-barcode" on-keypress="_onSkuBarcodeScan">
+          <span class="label">[[reprintLabel]]</span>
+          <input type="checkbox" id="reprint-invoice">
         </div>
 
         <div class="input1">
@@ -627,7 +629,8 @@ Copyright © HatioLab Inc. All rights reserved.
                 },
                 columnWidth: '0.3fr'
               }, {
-                fieldname: 'shop_cd'
+                fieldname: 'shop_cd',
+                columnWidth: '0px'
               }]
             }
           }
@@ -734,13 +737,17 @@ Copyright © HatioLab Inc. All rights reserved.
         var findAjax = this.$['find-inspection-ajax'];
         findAjax.curl = `/device_process/dynamic/dps/inspection/find_by_${inputType}`;
 
+        // reprintMode는 재 인쇄 모드 체크 박스 선택시 true로 ...
+        let reprintMode = this.$['reprint-invoice'].checked;
+
         findAjax.customParams = {
           equipType: LOGIS_UTIL.getEquipType(),
           equipCd: LOGIS_UTIL.getEquipCd(),
           boxType: boxType ? boxType : null,
           boxId: inputId,
           orderNo: inputId,
-          invoiceId: inputId
+          invoiceId: inputId,
+          reprintMode: reprintMode
         };
 
         findAjax.generateRequest();
@@ -925,6 +932,8 @@ Copyright © HatioLab Inc. All rights reserved.
             equipType: LOGIS_UTIL.getEquipType(),
             equipCd: LOGIS_UTIL.getEquipCd(),
             orderNo: this.currentOrderNo,
+            trayCd: this.currentTrayCd,
+            boxId: this.currentBoxId,
             printerId: LOGIS_UTIL.getPrinterId()
           };
 
@@ -938,7 +947,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
           // 2. 하나라도 검수한 다음 검수 완료 버튼을 누르면 송장 분할
         } else if (this.confirmSkuPcsQty > 0 && this.pickedSkuPcsQty > this.confirmSkuPcsQty) {
-          LOGIS_UTIL.showMessage(t('button.confirm'), '송장 분할하시겠습니까?', this.splitBox.bind(this));
+          LOGIS_UTIL.showMessage(t('button.confirm'), t('text.split_invoice'), this.splitBox.bind(this));
 
           // 3. 검수 완료되지 않았다면 에러 메시지 표시
         } else {
@@ -991,7 +1000,7 @@ Copyright © HatioLab Inc. All rights reserved.
           reprintAjax.customParams = {
             equipType: LOGIS_UTIL.getEquipType(),
             equipCd: LOGIS_UTIL.getEquipCd(),
-            invoiceId: this.currentInvoiceId,
+            orderNo: this.currentOrderNo,
             printerId: LOGIS_UTIL.getPrinterId()
           };
           reprintAjax.generateRequest();
@@ -1008,7 +1017,11 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} e
        */
       _reprintSuccess(e) {
-        if (e && e.detail && e.detail.message && e.detail.message.toLowerCase() === 'ok') {
+        if (e && e.detail && e.detail.success) {
+          if (e.detail.message && e.detail.message != 'ok') {
+            LOGIS_UTIL.showToastInfoMessage(e.detail.message);
+          }
+
           this.inspectionStatus = '';
           this.clearView();
         } else {
@@ -1022,16 +1035,31 @@ Copyright © HatioLab Inc. All rights reserved.
        **********************
        */
       splitBox() {
-        var splitBoxAjax = this.$['split-box-ajax'];
-        splitBoxAjax.curl = '/device_process/dynamic/dps/inspection/split_box';
-        splitBoxAjax.customParams = {
-          equipType: LOGIS_UTIL.getEquipType(),
-          equipCd: LOGIS_UTIL.getEquipCd(),
-          orderNo: this.currentOrderNo,
-          printerId: LOGIS_UTIL.getPrinterId()
-        };
-        splitBoxAjax.body = this.items;
-        splitBoxAjax.generateRequest();
+        // 분할할 검수 완료 아이템을 추출 ...
+        if (this.items) {
+          let splitItems = [];
+          this.items.forEach(function(item) {
+            if (item.confirm_qty && item.confirm_qty > 0) {
+              splitItems.push(JSON.parse(JSON.stringify(item)));
+            }
+          });
+
+          if (splitItems.length > 0) {
+            var splitBoxAjax = this.$['split-box-ajax'];
+            splitBoxAjax.curl = '/device_process/dynamic/dps/inspection/split_box';
+            splitBoxAjax.customParams = {
+              equipType: LOGIS_UTIL.getEquipType(),
+              equipCd: LOGIS_UTIL.getEquipCd(),
+              trayCd: this.currentTrayCd,
+              orderNo: this.currentOrderNo,
+              boxId: this.currentBoxId,
+              printerId: LOGIS_UTIL.getPrinterId()
+            };
+
+            splitBoxAjax.body = splitItems;
+            splitBoxAjax.generateRequest();
+          }
+        }
       }
 
       /**
@@ -1041,10 +1069,11 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _splitBoxSuccess(event) {
         var newBox = event.detail;
+        let trayCd = this.currentTrayCd;
         this.clearView();
 
         LOGIS_UTIL.showMessage(t('button.confirm'), t('text.split_invoice_complete'), function() {
-          this.refreshInspection('invoice', newBox.invoice_id);
+          this.refreshInspection('box', trayCd, 'tray');
         }.bind(this));
       }
 
