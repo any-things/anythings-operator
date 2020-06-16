@@ -888,7 +888,12 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} inspectionResult
        */
       _inspectionResultChanged(inspectionResult) {
-        this.clearView();
+        if (inspectionResult && inspectionResult.result && inspectionResult.result.status && inspectionResult.result.status == 'C') {
+          LOGIS_UTIL.showMessage(t('button.confirm'), '본 주문은 취소되었습니다.', this.clearView.bind(this));
+        } else {
+          LOGIS_UTIL.showToastInfoMessage('처리되었습니다.');
+          this.clearView();
+        }
       }
 
       /**
