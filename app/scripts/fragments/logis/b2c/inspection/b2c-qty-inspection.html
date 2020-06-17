@@ -784,7 +784,7 @@ Copyright © HatioLab Inc. All rights reserved.
           if (event.detail.success) {
             // 내품 검수 서버 처리 결과로 넘어온 skuBarcd로 내품 검수 처리 
             var rfidInfo = event.detail.result;
-            this._doItemInspectionByScan(rfidInfo.sku_barcd, rfidInfo);
+            this._doItemInspectionByScan(rfidInfo.sku_cd, rfidInfo);
           } else {
             LOGIS_UTIL.showToastErrorMessage(event.detail.message);
             this.focusSkuBarcdInput();
