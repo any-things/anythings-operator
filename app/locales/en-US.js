@@ -367,6 +367,7 @@ window.locales['en-US'] = {
   'text.single_box_done': '이미 처리 완료된 박스 입니다.',
   'text.single_box_complete': '처리 완료 되었습니다.',
   'text.printer_is_not_set': '프린터가 설정되지 않았습니다. 설정화면에서 설정하세요.',
+  'text.this_order_has_been_canceled': 'This order has been canceled.',
 
   // title list
   'title.confirm_inspect': 'Confirm Inspection',
