@@ -202,7 +202,7 @@ Copyright © HatioLab Inc. All rights reserved.
           <span class="label">[[skuBarcdLabel]]</span>
           <input id="sku-barcode" on-keypress="_onSkuBarcodeScan">
           <span class="label">[[reprintLabel]]</span>
-          <input type="checkbox" id="reprint-invoice">
+          <input type="checkbox" id="reprint-invoice" on-click="focusDefaultInput">
         </div>
 
         <div class="input1">
@@ -705,6 +705,7 @@ Copyright © HatioLab Inc. All rights reserved.
       _onSkuBarcodeScan(e) {
         if (e && e.key == 'Enter' && e.currentTarget && e.currentTarget.value) {
           let barcode = e.currentTarget.value;
+          barcode = barcode.toUpperCase();
 
           // 상품 코드 스캔으로 내품 검수 실행 
           if (barcode.length < 30) {
@@ -729,6 +730,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
         // reprintMode는 재 인쇄 모드 체크 박스 선택시 true로 ...
         let reprintMode = this.$['reprint-invoice'].checked;
+        inputId = inputId.toUpperCase();
 
         findAjax.customParams = {
           equipType: LOGIS_UTIL.getEquipType(),
@@ -761,8 +763,12 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _onFindInspectionError(event) {
         this.clearView();
-        LOGIS_UTIL.showMessage(event.detail.code, event.detail.msg, this.focusDefaultInput.bind(this));
         SOUND.playErrorSound();
+        this.focusDefaultInput();
+
+        if (event && event.detail && event.detail.msg) {
+          LOGIS.showToastErrorMessage(event.detail.msg);
+        }
       }
 
       /**
@@ -1011,7 +1017,6 @@ Copyright © HatioLab Inc. All rights reserved.
           let msg = e.detail.message;
 
           if (e.detail.success) {
-            LOGIS_UTIL.showToastInfoMessage(msg);
             SOUND.playInfoSound();
 
           } else {

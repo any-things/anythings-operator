@@ -356,9 +356,7 @@ Copyright © HatioLab Inc. All rights reserved.
           var skuCd = event.currentTarget.value;
 
           if (skuCd && skuCd.length >= 8) {
-            this.processSinglePack(skuCd);
-          } else {
-            LOGIS_UTIL.showToastWarnMessage(t('text.invalid_barcode'));
+            this.processSinglePack(skuCd.toUpperCase());
           }
         }
       }
@@ -494,7 +492,6 @@ Copyright © HatioLab Inc. All rights reserved.
         if (event && event.detail) {
           let msg = event.detail.message;
           if (event.detail.success) {
-            LOGIS_UTIL.showToastInfoMessage(msg);
             SOUND.playInfoSound();
           } else {
             LOGIS_UTIL.showToastWarnMessage(msg);

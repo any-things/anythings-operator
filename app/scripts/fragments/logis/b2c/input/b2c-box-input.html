@@ -854,13 +854,18 @@ Copyright © HatioLab Inc. All rights reserved.
         if (event.key === 'Enter') {
           var boxCd = event.currentTarget.value;
 
-          if (LOGIS_UTIL.isBoxIdValidate(boxCd)) {
-            event.currentTarget.value = '';
-            this.inputBox(boxCd);
-            this._scannedFlag = true;
+          if (boxCd) {
+            boxCd = boxCd.toUpperCase();
 
-          } else {
-            LOGIS_UTIL.showToastWarnMessage(t('text.box_form_check'));
+            if (LOGIS_UTIL.isBoxIdValidate(boxCd)) {
+              event.currentTarget.value = '';
+              this.inputBox(boxCd);
+              this._scannedFlag = true;
+
+            } else {
+              SOUND.playErrorSound();
+              LOGIS_UTIL.showToastWarnMessage(t('text.box_form_check'));
+            }
           }
         }
       }
