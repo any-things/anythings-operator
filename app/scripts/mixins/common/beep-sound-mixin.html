@@ -29,7 +29,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           failSoundSrc: {
             type: String,
-            value: './static/audio/beep-02.wav'
+            value: './static/audio/beep-03.wav'
           },
 
           /**
@@ -61,7 +61,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {String} type
        */
       playSound(type) {
-        if(type && (type === 'error' || type === 'fail')) {
+        if (type && (type === 'error' || type === 'fail')) {
           this.audioElement.src = this.failSoundSrc;
         } else {
           this.audioElement.src = this.playSoundSrc;

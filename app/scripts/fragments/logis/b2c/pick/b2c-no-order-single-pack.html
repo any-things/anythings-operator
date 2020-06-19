@@ -350,7 +350,8 @@ Copyright © HatioLab Inc. All rights reserved.
        *******************
        */
       _initialSetup() {
-        this.$['sku-input'].select();
+        this.$['sku-input'].value = '';
+        this.$['sku-input'].focus();
         this.currentJobItem = null;
       }
 
@@ -364,7 +365,6 @@ Copyright © HatioLab Inc. All rights reserved.
           var skuCd = event.currentTarget.value;
 
           if (skuCd && skuCd.length >= 8) {
-            SOUND.playInfoSound();
             this.processSinglePack(skuCd);
           } else {
             LOGIS_UTIL.showToastWarnMessage(t('text.invalid_barcode'));
@@ -380,8 +380,8 @@ Copyright © HatioLab Inc. All rights reserved.
       processSinglePack(skuCd) {
         var processAjax = this.$['single-pack-process-ajax'];
         processAjax.customParams = {
-          job_date: this.jobDate,
-          sku_cd: skuCd
+          jobDate: this.jobDate,
+          skuCd: skuCd
         };
         processAjax.generateRequest();
       }
@@ -401,8 +401,10 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} event
        */
       _pageChanged(event) {
-        this.page = event.detail.page;
-        this.limit = event.detail.limit;
+        if (event.detail) {
+          this.page = event.detail.page;
+          this.limit = event.detail.limit;
+        }
       }
 
       /**
@@ -433,9 +435,14 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} event
        */
       _onJobListResponsed(event) {
-        if (event && event.detail && event.detail.total) {
-          this.items = event.detail.items;
-          this.total = event.detail.total;
+        if (event && event.detail) {
+          if (event.detail.total) {
+            this.items = event.detail.items;
+            this.total = event.detail.total;
+          } else {
+            this.items = [];
+            this.total = 0;
+          }
         }
       }
 
@@ -446,6 +453,8 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       refresh(event) {
         var jobListAjax = this.$['job-list-ajax'];
+
+        let workDate = this.jobDate.replace('-', '').replace('-', '');
         jobListAjax.customParams = {
           page: this.page,
           limit: this.limit,
@@ -456,14 +465,10 @@ Copyright © HatioLab Inc. All rights reserved.
           }],
           query: [{
             name: 'work_date',
-            value: this.jobDate
+            value: workDate
           }, {
             name: 'pack_tcd',
             value: 'D'
-          }, {
-            name: 'waybill_no',
-            operator: 'is_not_null',
-            value: ''
           }]
         };
         jobListAjax.generateRequest();
@@ -524,7 +529,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} event
        */
       _singlePackProcessSuccess(event) {
-        LOGIS_UTIL.showToastInfoMessage(t('text.processed'));
+        SOUND.playInfoSound();
         this.refresh();
       }
     }
