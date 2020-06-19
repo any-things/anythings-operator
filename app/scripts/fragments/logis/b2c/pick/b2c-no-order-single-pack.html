@@ -214,15 +214,6 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * @description 상품 명
-           ****************
-           * @type {String}
-           */
-          skuNm: {
-            type: String
-          },
-
-          /**
            * @description 페이지 정보
            ****************
            * @type {Number}
@@ -504,8 +495,10 @@ Copyright © HatioLab Inc. All rights reserved.
           let msg = event.detail.message;
           if (event.detail.success) {
             LOGIS_UTIL.showToastInfoMessage(msg);
+            SOUND.playInfoSound();
           } else {
             LOGIS_UTIL.showToastWarnMessage(msg);
+            SOUND.playErrorSound();
           }
         }
 

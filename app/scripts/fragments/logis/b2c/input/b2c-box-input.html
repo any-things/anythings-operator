@@ -254,7 +254,9 @@ Copyright © HatioLab Inc. All rights reserved.
       method="PUT" 
       content-type="application/json" 
       last-response="{{orderDataSet}}"
-      on-sys-ajax-error="_onBoxIdScanError">
+      custom-error-handler
+      on-sys-ajax-response="_onBoxInputSuccess"
+      on-sys-ajax-error="_onBoxInputError">
     </sys-ajax>
       
     <div id="container">
@@ -855,7 +857,6 @@ Copyright © HatioLab Inc. All rights reserved.
           if (LOGIS_UTIL.isBoxIdValidate(boxCd)) {
             event.currentTarget.value = '';
             this.inputBox(boxCd);
-            SOUND.playInfoSound();
             this._scannedFlag = true;
 
           } else {
@@ -935,14 +936,23 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
+       * @description 박스 ID 투입 성공 시 
+       *******************
+       * @param {Object} event
+       */
+      _onBoxInputSuccess(event) {
+        SOUND.playInfoSound();
+      }
+
+      /**
        * @description 박스 ID 스캔 에러시
        *******************
-       * @param {Object} e
+       * @param {Object} event
        */
-      _onBoxIdScanError(e) {
-        /*LOGIS_UTIL.showMessage(e.detail.code, e.detail.msg, () => {
-           this._initialSetup();
-        });*/
+      _onBoxInputError(event) {
+        if (event.detail && event.detail.msg) {
+          LOGIS_UTIL.showToastErrorMessage(event.detail.msg);
+        }
       }
 
       /**

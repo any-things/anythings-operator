@@ -762,6 +762,7 @@ Copyright © HatioLab Inc. All rights reserved.
       _onFindInspectionError(event) {
         this.clearView();
         LOGIS_UTIL.showMessage(event.detail.code, event.detail.msg, this.focusDefaultInput.bind(this));
+        SOUND.playErrorSound();
       }
 
       /**
@@ -778,6 +779,7 @@ Copyright © HatioLab Inc. All rights reserved.
           } else {
             LOGIS_UTIL.showToastErrorMessage(event.detail.message);
             this.focusSkuBarcdInput();
+            SOUND.playErrorSound();
           }
         }
       }
@@ -789,6 +791,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _onItemInspectionError(event) {
         LOGIS_UTIL.showMessage(event.detail.code, event.detail.msg, this.focusSkuBarcdInput.bind(this));
+        SOUND.playErrorSound();
       }
 
       /**
@@ -873,6 +876,7 @@ Copyright © HatioLab Inc. All rights reserved.
         !inspectionFinished ? this.confirmSkuPcsQty = 0 : this.confirmSkuPcsQty = this.pickedSkuPcsQty;
 
         this.focusSkuBarcdInput();
+        SOUND.playInfoSound();
       }
 
       /**
@@ -885,12 +889,13 @@ Copyright © HatioLab Inc. All rights reserved.
           if (inspectionResult.result.status == 'C') {
             LOGIS_UTIL.showMessage(t('button.confirm'), t('text.this_order_has_been_canceled'), this.clearView.bind(this));
           } else {
-            LOGIS_UTIL.showToastInfoMessage(t('text.processed'));
             this.clearView();
+            SOUND.playInfoSound();
           }
 
         } else {
           LOGIS_UTIL.showToastInfoMessage('처리 결과를 알 수 없습니다.');
+          SOUND.playErrorSound();
         }
       }
 
@@ -1002,18 +1007,20 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} e
        */
       _reprintSuccess(e) {
-        // 1. 재발행 성공시 
-        if (e && e.detail && e.detail.success) {
-          if (e.detail.message) {
-            LOGIS_UTIL.showToastInfoMessage(e.detail.message);
+        if (e && e.detail) {
+          let msg = e.detail.message;
+
+          if (e.detail.success) {
+            LOGIS_UTIL.showToastInfoMessage(msg);
+            SOUND.playInfoSound();
+
+          } else {
+            LOGIS_UTIL.showToastErrorMessage(msg);
+            SOUND.playErrorSound();
           }
 
           this.inspectionStatus = '';
           this.clearView();
-
-          // 2. 재발행 실패 시 
-        } else {
-          LOGIS_UTIL.showMessage(t('button.confirm'), t('text.reprint_event_listener_error'), this.focusDefaultInput.bind(this));
         }
       }
 
@@ -1102,6 +1109,7 @@ Copyright © HatioLab Inc. All rights reserved.
         var newBox = event.detail;
         let trayCd = this.currentTrayCd;
         this.clearView();
+        SOUND.playInfoSound();
 
         LOGIS_UTIL.showMessage(t('button.confirm'), t('text.split_invoice_complete'), function() {
           this.refreshInspection('box', trayCd, 'tray');
@@ -1237,6 +1245,8 @@ Copyright © HatioLab Inc. All rights reserved.
         // 10. 모든 검수가 완료 되었는지 확인하고 완료 되었다면 자동으로 검수 완료 처리
         if (this.checkFinished(this.items)) {
           this.completeInspection();
+        } else {
+          SOUND.playInfoSound();
         }
 
         // 11. 정상 처리 결과 리턴
