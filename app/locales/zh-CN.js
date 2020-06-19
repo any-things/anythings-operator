@@ -148,6 +148,9 @@ window.locales['zh-CN'] = {
   'label.stock_load_unit_pcs': 'PCS',
   'label.stock_load_unit_box': '박스',
   'label.tray_cd': 'Tray Box',
+  'label.brand_cd': 'Brand Code',
+  'label.batch_title': 'Batch Title',
+  'label.created_at': 'Crated At',
 
   // menu list
   'menu.Settings': '设置',

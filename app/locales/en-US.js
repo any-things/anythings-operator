@@ -147,6 +147,9 @@ window.locales['en-US'] = {
   'label.stock_load_unit_pcs': 'PCS',
   'label.stock_load_unit_box': 'BOX',
   'label.tray_cd': 'Tray Box',
+  'label.brand_cd': 'Brand Code',
+  'label.batch_title': 'Batch Title',
+  'label.created_at': 'Crated At',
 
   // menu list
   'menu.Settings': 'Setting',

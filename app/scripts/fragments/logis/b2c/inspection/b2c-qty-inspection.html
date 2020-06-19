@@ -1004,7 +1004,7 @@ Copyright © HatioLab Inc. All rights reserved.
       _reprintSuccess(e) {
         // 1. 재발행 성공시 
         if (e && e.detail && e.detail.success) {
-          if (e.detail.message && e.detail.message != 'ok') {
+          if (e.detail.message) {
             LOGIS_UTIL.showToastInfoMessage(e.detail.message);
           }
 

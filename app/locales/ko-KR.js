@@ -92,7 +92,7 @@ window.locales['ko-KR'] = {
   'label.change_loc': '변경 셀',
   'label.batch_group': '배치 그룹',
   'label.batch_group_id': '배치 그룹 ID',
-  'label.job_batch_seq': '작업 차수',
+  'label.job_batch_seq': '차수',
   'label.dc_cd': '센터 코드',
   'label.com_cd': '화주사 코드',
   'label.job_date': '작업 일자',
@@ -148,6 +148,9 @@ window.locales['ko-KR'] = {
   'label.stock_load_unit_pcs': 'PCS',
   'label.stock_load_unit_box': '박스',
   'label.tray_cd': '트레이 박스',
+  'label.brand_cd': '브랜드',
+  'label.batch_title': '배치 타이틀',
+  'label.created_at': '생성시간',
 
   // menu list
   'menu.Settings': '설정',

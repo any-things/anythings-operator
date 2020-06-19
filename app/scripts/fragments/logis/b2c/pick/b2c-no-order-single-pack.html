@@ -1,0 +1,673 @@
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+
+<link rel="import" href="../../../../../bower_components/polymer/polymer-element.html">
+
+<!--
+  물류 > B2C > 단포 처리 화면 (KIOSK)
+-->
+<dom-module id="b2c-no-order-single-pack">
+  <template>
+    <style>
+      #container {
+        display: flex;
+        flex-direction: column;
+        height: calc(100% - 20px);
+        padding: 10px 10px;
+      }
+
+      #input-container {
+        display: grid;
+        background-color: var(--things-white-opacity-background-color);
+        grid-template-columns: auto auto auto auto auto auto;
+        grid-gap: 10px;
+        padding: 10px 10px;
+        border-radius:var(--things-default-border-radius);
+        margin-bottom:10px;
+      }
+
+      #date-picker {
+        display: flex;
+        margin: auto 0;
+      }
+
+      #date-picker span {
+        margin: auto 10px auto auto;
+        color: #D5D7DB;
+        font-size: .8rem;
+        height: 50px;
+      }
+
+      #date-picker input {
+        font-size: .8rem;
+        height: 1rem;
+      }
+
+      .label {
+        text-align: right;
+        color: #D5D7DB;
+        font-size: 20pt;
+        margin: auto 15px auto 0;
+      }
+
+      button {
+        @apply --operator-default-btn;
+      }
+
+      button:active {
+        @apply --operator-default-btn-active;
+      }
+
+      button:focus {
+        outline: none
+      }
+
+      input {
+        background-color: rgba(0, 0, 0, .25);
+        border: 2px solid rgba(255, 255, 255, .2);
+        height: 50px;
+        color: #fff;
+        font-size: 1.1rem;
+        text-align: center;
+        margin: auto;
+      }
+    </style>
+
+    <!-- 작업 현황 조회를 위한 Ajax -->
+    <sys-ajax 
+      id="job-list-ajax"
+      curl="/dps_job_instances"
+      method="GET" 
+      content-type="application/json" 
+      on-sys-ajax-response="_onJobListResponsed">
+    </sys-ajax>
+
+    <!-- 단포 처리를 위한 Ajax -->
+    <sys-ajax 
+      id="single-pack-process-ajax" 
+      curl="/device_process/dynamic/dps/single_pack/pick" 
+      method="PUT" 
+      content-type="application/json" 
+      on-sys-ajax-response="_singlePackProcessSuccess">
+    </sys-ajax>
+
+    <!-- 송장 발행을 위한 Ajax -->
+    <sys-ajax 
+      id="reprint-ajax" 
+      curl="/device_process/dynamic/dps/print_invoice" 
+      method="PUT"
+      content-type="application/json" 
+      on-sys-ajax-response="_reprintSuccess">
+    </sys-ajax>
+      
+    <div id="container">
+      <!-- 상단 행 : 상품 코드 스캔 -->
+      <div id="input-container">
+        <div id="date-picker">
+          <span>[[jobDateLabel]]</span>
+          <input type="date" required value="[[_jobDateDefaultValue]]" on-change="_jobDateChanged">
+        </div>
+
+        <span class="label">[[barcodeLabel]]</span>
+
+        <input id="sku-input" on-keypress="_onSkuCdScan" max-length=32>
+
+        <button id="refresh-btn" on-click="refresh">
+          <img src="./images/icon-refresh.png" />
+          <span>[[refreshLabel]]</span>
+        </button>
+
+        <button id="reprint-btn" on-click="reprint" hidden>
+          <span>[[reprintLabel]]</span>
+        </button>
+      </div>
+
+      <!-- 하단 행 : 처리 작업 리스트 -->
+      <item-list 
+        id="item-list" 
+        header="[[header]]" 
+        page="[[page]]" 
+        total="[[total]]" 
+        limit="[[limit]]" 
+        data="[[items]]"
+        show-paginator 
+        on-data-list-click="_selectJobItem" 
+        on-paginator-changed="_pageChanged">
+      </item-list>
+    </div>
+  </template>
+
+  <script>
+    class B2CNoOrderSinglePack extends Polymer.Element {
+      static get is() {
+        return 'b2c-no-order-single-pack'
+      }
+
+      static get properties() {
+        return {
+          /**
+           * @description 작업일자 라벨
+           ****************
+           * @type {String}
+           */
+          jobDateLabel: {
+            type: String,
+            value: () => {
+              return t('label.job_date')
+            }
+          },
+
+          /**
+           * @description 작업일자 기본 값
+           ****************
+           * @type {String}
+           */
+          _jobDateDefaultValue: {
+            type: String,
+            value: () => {
+              let today = new Date();
+              return today.toISOString().slice(0, 10);
+            }
+          },
+
+          /**
+           * @description 상품 바코드 라벨
+           ****************
+           * @type {String}
+           */
+          barcodeLabel: {
+            type: String,
+            value: t('label.barcode')
+          },
+
+          /**
+           * @description 재발행 라벨
+           ****************
+           * @type {String}
+           */
+          reprintLabel: {
+            type: String,
+            value: t('button.reprint')
+          },
+
+          /**
+           * @description 상품 명
+           ****************
+           * @type {String}
+           */
+          skuNm: {
+            type: String
+          },
+
+          /**
+           * @description 작업 배치 값 선택시 Keep할 값 필드 리스트
+           ****************
+           * @type {Array}
+           */
+          selectorValueFields: {
+            type: Array,
+            value: () => {
+              return ['id']
+            }
+          },
+
+          /**
+           * @description 작업 배치 선택 화면에 표시할 필드
+           ****************
+           * @type {Array}
+           */
+          selectorInfoFields: {
+            type: Array,
+            value: () => {
+              return [{
+                display: t('label.job_date'),
+                fieldname: 'job_date',
+                columnWidth: '1fr'
+              }, {
+                display: t('label.job_batch_seq'),
+                fieldname: 'job_seq',
+                columnWidth: '0.7fr',
+                style: {
+                  textAlign: 'center'
+                }
+              }, {
+                display: t('label.job_batch'),
+                fieldname: 'id',
+                columnWidth: '1fr'
+              }, {
+                display: t('label.batch_title'),
+                fieldname: 'title',
+                columnWidth: '3fr'
+              }];
+            }
+          },
+
+          /**
+           * @description 작업 배치 선택 화면의 컬럼 정보
+           ****************
+           * @type {Array}
+           */
+          selectorColumns: {
+            type: Array,
+            value: () => {
+              return [{
+                display: t('label.job_date'),
+                fieldname: 'job_date',
+                columnWidth: '1fr'
+              }, {
+                display: t('label.job_batch_seq'),
+                fieldname: 'job_seq',
+                columnWidth: '0.7fr',
+                style: {
+                  textAlign: 'center'
+                }
+              }, {
+                display: t('label.job_batch'),
+                fieldname: 'id',
+                columnWidth: '1fr'
+              }, {
+                display: t('label.batch_title'),
+                fieldname: 'title',
+                columnWidth: '3fr'
+              }]
+            }
+          },
+
+          /**
+           * @description 작업 배치 선택 화면이 호출할 URL
+           ****************
+           * @type {String}
+           */
+          selectorResourceUrl: {
+            type: String,
+            value: '/job_batches'
+          },
+
+          /**
+           * @description 작업 배치 선택 화면이 호출할 파라미터
+           ****************
+           * @type {Object}
+           */
+          selectorParams: {
+            type: Object,
+            value: () => {
+              return {
+                sort: [{
+                  field: 'job_date',
+                  ascending: false
+                }],
+                query: [{
+                  name: 'status',
+                  value: 'RUN'
+                }, {
+                  name: 'job_type',
+                  value: 'DPS'
+                }]
+              }
+            }
+          },
+
+          /**
+           * @description 상품 선택 팝업 타이틀
+           ****************
+           * @type {String}
+           */
+          popupTitleLabel: {
+            type: String,
+            value: () => t('label.sku')
+          },
+
+          /**
+           * @description 새로고침 라벨
+           ****************
+           * @type {String}
+           */
+          refreshLabel: {
+            type: String,
+            value: function() {
+              return t('button.refresh');
+            }
+          },
+
+          /**
+           * @description 자동 리프레쉬 활성화
+           ****************
+           * @type {Boolean}
+           */
+          enableAutoRefresh: {
+            type: Boolean
+          },
+
+          /**
+           * @description 페이지 정보
+           ****************
+           * @type {Number}
+           */
+          page: {
+            type: Number,
+            value: 1
+          },
+
+          /**
+           * @description Limit 정보
+           ****************
+           * @type {Number}
+           */
+          limit: {
+            type: Number,
+            value: 100
+          },
+
+          /**
+           * @description 총 아이템 개수
+           ****************
+           * @type {Number}
+           */
+          total: {
+            type: Number
+          },
+
+          /**
+           * @description 그리드 데이터
+           ****************
+           * @type {Object}
+           */
+          items: {
+            type: Array,
+            observer: '_itemsChanged'
+          },
+
+          /**
+           * @description 그리드 헤더 정보
+           ****************
+           * @type {Array}
+           */
+          header: {
+            type: Array,
+            value: function() {
+              return [{
+                fieldname: 'id',
+                columnWidth: '0px'
+              }, {
+                display: t('label.brand_cd'),
+                fieldname: 'strr_id',
+                columnWidth: '0.3fr',
+                style: {
+                  textAlign: 'center',
+                  color: '#fff'
+                }
+              }, {
+                display: t('label.order_no'),
+                fieldname: 'ref_no',
+                columnWidth: '1.25fr',
+                style: {
+                  textAlign: 'center'
+                }
+              }, {
+                display: t('label.sku_cd'),
+                fieldname: 'item_cd',
+                columnWidth: '1.25fr',
+                style: {
+                  textAlign: 'center'
+                }
+              }, {
+                display: t('label.sku_barcd'),
+                fieldname: 'barcode2',
+                columnWidth: '1fr',
+                style: {
+                  textAlign: 'center'
+                }
+              }, {
+                display: t('label.invoice_id'),
+                fieldname: 'waybill_no',
+                columnWidth: '1fr',
+                style: {
+                  textAlign: 'center'
+                }
+              }, {
+                display: t('label.created_at'),
+                fieldname: 'box_input_at',
+                columnWidth: '1.25fr',
+                style: {
+                  textAlign: 'center'
+                }
+              }]
+            }
+          }
+        }
+      }
+
+      /**
+       * @description ready
+       *******************
+       */
+      connectedCallback() {
+        super.connectedCallback();
+
+        // 1. 페이지 변경 이벤트 핸들러
+        document.addEventListener('page-changed', (e) => {
+          this._routingChanged(e);
+        });
+
+        // 2. 페이지 리프레쉬
+        this.enableAutoRefresh = true;
+        this.startAutoRefresh();
+      }
+
+      /**
+       * @description 페이지 변경 시
+       *******************
+       * @param {Object} e
+       */
+      _routingChanged(e) {
+        if (e.detail.currentPage == 'b2c_no_order_single_pack') {
+          this._initialSetup();
+          this.enableAutoRefresh = true;
+        } else {
+          this.enableAutoRefresh = false;
+        }
+      }
+
+      /**
+       * @description 초기 셋업
+       *******************
+       */
+      _initialSetup() {
+        this.$['sku-input'].select();
+        this.$['reprint-btn'].hidden = true;
+      }
+
+      /**
+       * @description 자동 리프레쉬 시작
+       *******************
+       */
+      startAutoRefresh() {
+        if (this.enableAutoRefresh) {
+          try {
+            this.refresh();
+          } catch (e) {}
+        }
+
+        let interval = 0;
+        try {
+          interval = LOGIS_UTIL.getRefreshInterval();
+        } catch (e) {
+          interval = 20 * 10000;
+        }
+
+        setTimeout(function() {
+          this.startAutoRefresh();
+        }.bind(this), interval);
+      }
+
+      /**
+       * @description 작업일자 변경 시 
+       ***********************
+       * @param {Object} event
+       */
+      _jobDateChanged(event) {
+        this.jobDate = event.currentTarget.value;
+        /*this.selectorParams = {
+          sort: [{
+            field: 'job_id',
+            ascending: false
+          }],
+          query: [{
+            name: 'job_date',
+            value: this.jobDate
+          }]
+        };*/
+      }
+
+      /**
+       * @description 상품 코드 스캔 값 변경 핸들러
+       *********************
+       * @param {Object} event
+       */
+      _onSkuCdScan(event) {
+        if (event.key === 'Enter') {
+          var skuCd = event.currentTarget.value;
+
+          if (skuCd && skuCd.length >= 8) {
+            SOUND.playInfoSound();
+            this.inputSku(skuCd);
+          } else {
+            LOGIS_UTIL.showToastWarnMessage(t('text.invalid_barcode'));
+          }
+        }
+      }
+
+      /**
+       * @description 단포 상품 투입 
+       *******************
+       * @param {String} skuCd
+       */
+      inputSku(skuCd) {
+        var processAjax = this.$['single-pack-process-ajax'];
+        processAjax.customParams = {
+          job_date: this.jobDate,
+          sku_cd: skuCd
+        };
+        processAjax.generateRequest();
+      }
+
+      /**
+       * @description 데이터 변경 시
+       *******************
+       * @param {Array} items
+       */
+      _itemsChanged(items) {
+        this._initialSetup();
+      }
+
+      /**
+       * @description 작업 리스트 조회 시
+       *********************
+       * @param {Object} event
+       */
+      _onJobListResponsed(event) {
+        if (event && event.detail && event.detail.total) {
+          this.items = event.detail.items;
+          this.total = event.detail.total;
+        }
+      }
+
+      /**
+       * @description 새로고침 - 작업 리스트 조회
+       *******************
+       * @param {Object} event
+       */
+      refresh(event) {
+        var jobListAjax = this.$['job-list-ajax'];
+        jobListAjax.customParams = {
+          page: this.page,
+          limit: this.limit,
+          select: 'id,strr_id,ref_no,item_cd,barcode2,waybill_no,box_input_at',
+          sort: [{
+            field: 'box_input_at',
+            ascending: false
+          }],
+          query: [{
+            name: 'waybill_no',
+            operator: 'is_not_null',
+            value: ''
+          }]
+        };
+        jobListAjax.generateRequest();
+      }
+
+      /**
+       * @description item-list paginator-changed event handler
+       ***********************
+       * @param {Object} event
+       */
+      _pageChanged(event) {
+        this.page = event.detail.page;
+        this.limit = event.detail.limit;
+      }
+
+      /**
+       * @description 재발행
+       **********************
+       * @param {Object} event
+       */
+      reprint(event) {
+        if (this.currentJobItem && this.currentJobItem.invoice_id) {
+          var reprintAjax = this.$['reprint-ajax'];
+          reprintAjax.curl = '/device_process/dynamic/dps/print_invoice';
+          reprintAjax.customParams = {
+            equipType: LOGIS_UTIL.getEquipType(),
+            equipCd: LOGIS_UTIL.getEquipCd(),
+            orderNo: this.currentJobItem.ref_no,
+            invoiceId: this.currentJobItem.invoice_id,
+            printerId: LOGIS_UTIL.getPrinterId()
+          };
+          reprintAjax.generateRequest();
+        }
+      }
+
+      /**
+       * @description 재발행 후 호출되는 리스너
+       *********************
+       * @param {Object} e
+       */
+      _reprintSuccess(e) {
+        // 1. 재발행 성공시 
+        if (e && e.detail && e.detail.success) {
+          if (e.detail.message) {
+            LOGIS_UTIL.showToastInfoMessage(e.detail.message);
+            this._initialSetup();
+          }
+          // 2. 재발행 실패 시 
+        } else {
+          LOGIS_UTIL.showMessage(t('button.confirm'), t('text.reprint_event_listener_error'), this._initialSetup.bind(this));
+        }
+      }
+
+      /**
+       * @description 작업 항목 선택시 
+       ******************
+       * @param {Object} event
+       */
+      _selectJobItem(event) {
+        const data = event.detail.data;
+        this.currentJobItem = data;
+        this.$['reprint-btn'].hidden = false;
+      }
+
+      /**
+       * @description 단포 처리 성공 시  
+       ******************
+       * @param {Object} event
+       */
+      _singlePackProcessSuccess(event) {
+        LOGIS_UTIL.showToastInfoMessage(t('text.processed'));
+        this.refresh();
+      }
+    }
+
+    customElements.define(B2CNoOrderSinglePack.is, B2CNoOrderSinglePack);
+  </script>
+</dom-module>
