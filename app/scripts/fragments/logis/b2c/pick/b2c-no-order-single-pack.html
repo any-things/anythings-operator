@@ -36,13 +36,12 @@ Copyright © HatioLab Inc. All rights reserved.
       #date-picker span {
         margin: auto 10px auto auto;
         color: #D5D7DB;
-        font-size: .8rem;
-        height: 50px;
+        font-size: .9rem;
       }
 
       #date-picker input {
-        font-size: .8rem;
-        height: 1rem;
+        font-size: .9rem;
+        height: 50px;
       }
 
       .label {
@@ -87,7 +86,7 @@ Copyright © HatioLab Inc. All rights reserved.
     <!-- 단포 처리를 위한 Ajax -->
     <sys-ajax 
       id="single-pack-process-ajax" 
-      curl="/device_process/dynamic/dps/single_pack/pick" 
+      curl="/device_process/dynamic/dps/no_order_single_pack/pick" 
       method="PUT" 
       content-type="application/json" 
       on-sys-ajax-response="_singlePackProcessSuccess">
@@ -107,7 +106,7 @@ Copyright © HatioLab Inc. All rights reserved.
       <div id="input-container">
         <div id="date-picker">
           <span>[[jobDateLabel]]</span>
-          <input type="date" required value="[[_jobDateDefaultValue]]" on-change="_jobDateChanged">
+          <input type="date" required value="[[jobDate]]" on-change="_jobDateChanged">
         </div>
 
         <span class="label">[[barcodeLabel]]</span>
@@ -160,20 +159,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * @description 작업일자 기본 값
-           ****************
-           * @type {String}
-           */
-          _jobDateDefaultValue: {
-            type: String,
-            value: () => {
-              let today = new Date();
-              return today.toISOString().slice(0, 10);
-            }
-          },
-
-          /**
-           * @description 상품 바코드 라벨
+           * @description 바코드 라벨
            ****************
            * @type {String}
            */
@@ -193,133 +179,6 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * @description 상품 명
-           ****************
-           * @type {String}
-           */
-          skuNm: {
-            type: String
-          },
-
-          /**
-           * @description 작업 배치 값 선택시 Keep할 값 필드 리스트
-           ****************
-           * @type {Array}
-           */
-          selectorValueFields: {
-            type: Array,
-            value: () => {
-              return ['id']
-            }
-          },
-
-          /**
-           * @description 작업 배치 선택 화면에 표시할 필드
-           ****************
-           * @type {Array}
-           */
-          selectorInfoFields: {
-            type: Array,
-            value: () => {
-              return [{
-                display: t('label.job_date'),
-                fieldname: 'job_date',
-                columnWidth: '1fr'
-              }, {
-                display: t('label.job_batch_seq'),
-                fieldname: 'job_seq',
-                columnWidth: '0.7fr',
-                style: {
-                  textAlign: 'center'
-                }
-              }, {
-                display: t('label.job_batch'),
-                fieldname: 'id',
-                columnWidth: '1fr'
-              }, {
-                display: t('label.batch_title'),
-                fieldname: 'title',
-                columnWidth: '3fr'
-              }];
-            }
-          },
-
-          /**
-           * @description 작업 배치 선택 화면의 컬럼 정보
-           ****************
-           * @type {Array}
-           */
-          selectorColumns: {
-            type: Array,
-            value: () => {
-              return [{
-                display: t('label.job_date'),
-                fieldname: 'job_date',
-                columnWidth: '1fr'
-              }, {
-                display: t('label.job_batch_seq'),
-                fieldname: 'job_seq',
-                columnWidth: '0.7fr',
-                style: {
-                  textAlign: 'center'
-                }
-              }, {
-                display: t('label.job_batch'),
-                fieldname: 'id',
-                columnWidth: '1fr'
-              }, {
-                display: t('label.batch_title'),
-                fieldname: 'title',
-                columnWidth: '3fr'
-              }]
-            }
-          },
-
-          /**
-           * @description 작업 배치 선택 화면이 호출할 URL
-           ****************
-           * @type {String}
-           */
-          selectorResourceUrl: {
-            type: String,
-            value: '/job_batches'
-          },
-
-          /**
-           * @description 작업 배치 선택 화면이 호출할 파라미터
-           ****************
-           * @type {Object}
-           */
-          selectorParams: {
-            type: Object,
-            value: () => {
-              return {
-                sort: [{
-                  field: 'job_date',
-                  ascending: false
-                }],
-                query: [{
-                  name: 'status',
-                  value: 'RUN'
-                }, {
-                  name: 'job_type',
-                  value: 'DPS'
-                }]
-              }
-            }
-          },
-
-          /**
-           * @description 상품 선택 팝업 타이틀
-           ****************
-           * @type {String}
-           */
-          popupTitleLabel: {
-            type: String,
-            value: () => t('label.sku')
-          },
-
-          /**
            * @description 새로고침 라벨
            ****************
            * @type {String}
@@ -332,12 +191,35 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * @description 자동 리프레쉬 활성화
+           * @description 작업일자
            ****************
-           * @type {Boolean}
+           * @type {String}
            */
-          enableAutoRefresh: {
-            type: Boolean
+          jobDate: {
+            type: String,
+            value: () => {
+              let today = new Date();
+              return today.toISOString().slice(0, 10);
+            }
+          },
+
+          /**
+           * @description 현재 선택된 작업 항목
+           ****************
+           * @type {Object}
+           */
+          currentJobItem: {
+            type: Object,
+            observer: '_jobItemChanged'
+          },
+
+          /**
+           * @description 상품 명
+           ****************
+           * @type {String}
+           */
+          skuNm: {
+            type: String
           },
 
           /**
@@ -450,10 +332,6 @@ Copyright © HatioLab Inc. All rights reserved.
         document.addEventListener('page-changed', (e) => {
           this._routingChanged(e);
         });
-
-        // 2. 페이지 리프레쉬
-        this.enableAutoRefresh = true;
-        this.startAutoRefresh();
       }
 
       /**
@@ -464,9 +342,6 @@ Copyright © HatioLab Inc. All rights reserved.
       _routingChanged(e) {
         if (e.detail.currentPage == 'b2c_no_order_single_pack') {
           this._initialSetup();
-          this.enableAutoRefresh = true;
-        } else {
-          this.enableAutoRefresh = false;
         }
       }
 
@@ -476,49 +351,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _initialSetup() {
         this.$['sku-input'].select();
-        this.$['reprint-btn'].hidden = true;
-      }
-
-      /**
-       * @description 자동 리프레쉬 시작
-       *******************
-       */
-      startAutoRefresh() {
-        if (this.enableAutoRefresh) {
-          try {
-            this.refresh();
-          } catch (e) {}
-        }
-
-        let interval = 0;
-        try {
-          interval = LOGIS_UTIL.getRefreshInterval();
-        } catch (e) {
-          interval = 20 * 10000;
-        }
-
-        setTimeout(function() {
-          this.startAutoRefresh();
-        }.bind(this), interval);
-      }
-
-      /**
-       * @description 작업일자 변경 시 
-       ***********************
-       * @param {Object} event
-       */
-      _jobDateChanged(event) {
-        this.jobDate = event.currentTarget.value;
-        /*this.selectorParams = {
-          sort: [{
-            field: 'job_id',
-            ascending: false
-          }],
-          query: [{
-            name: 'job_date',
-            value: this.jobDate
-          }]
-        };*/
+        this.currentJobItem = null;
       }
 
       /**
@@ -532,7 +365,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
           if (skuCd && skuCd.length >= 8) {
             SOUND.playInfoSound();
-            this.inputSku(skuCd);
+            this.processSinglePack(skuCd);
           } else {
             LOGIS_UTIL.showToastWarnMessage(t('text.invalid_barcode'));
           }
@@ -540,17 +373,49 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * @description 단포 상품 투입 
+       * @description 단포 작업 처리  
        *******************
        * @param {String} skuCd
        */
-      inputSku(skuCd) {
+      processSinglePack(skuCd) {
         var processAjax = this.$['single-pack-process-ajax'];
         processAjax.customParams = {
           job_date: this.jobDate,
           sku_cd: skuCd
         };
         processAjax.generateRequest();
+      }
+
+      /**
+       * @description 작업 일자 변경 시 
+       ***********************
+       * @param {Object} event
+       */
+      _jobDateChanged(event) {
+        this.jobDate = event.currentTarget.value;
+      }
+
+      /**
+       * @description 그리드 페이지 정보 변경 시 
+       ***********************
+       * @param {Object} event
+       */
+      _pageChanged(event) {
+        this.page = event.detail.page;
+        this.limit = event.detail.limit;
+      }
+
+      /**
+       * @description 선택 변경시  
+       ***********************
+       * @param {Object} currentJobItem
+       */
+      _jobItemChanged(currentJobItem) {
+        if (currentJobItem) {
+          this.$['reprint-btn'].hidden = false;
+        } else {
+          this.$['reprint-btn'].hidden = true;
+        }
       }
 
       /**
@@ -590,22 +455,18 @@ Copyright © HatioLab Inc. All rights reserved.
             ascending: false
           }],
           query: [{
+            name: 'work_date',
+            value: this.jobDate
+          }, {
+            name: 'pack_tcd',
+            value: 'D'
+          }, {
             name: 'waybill_no',
             operator: 'is_not_null',
             value: ''
           }]
         };
         jobListAjax.generateRequest();
-      }
-
-      /**
-       * @description item-list paginator-changed event handler
-       ***********************
-       * @param {Object} event
-       */
-      _pageChanged(event) {
-        this.page = event.detail.page;
-        this.limit = event.detail.limit;
       }
 
       /**
@@ -631,19 +492,19 @@ Copyright © HatioLab Inc. All rights reserved.
       /**
        * @description 재발행 후 호출되는 리스너
        *********************
-       * @param {Object} e
+       * @param {Object} event
        */
-      _reprintSuccess(e) {
-        // 1. 재발행 성공시 
-        if (e && e.detail && e.detail.success) {
-          if (e.detail.message) {
-            LOGIS_UTIL.showToastInfoMessage(e.detail.message);
-            this._initialSetup();
+      _reprintSuccess(event) {
+        if (event && event.detail) {
+          let msg = event.detail.message;
+          if (event.detail.success) {
+            LOGIS_UTIL.showToastInfoMessage(msg);
+          } else {
+            LOGIS_UTIL.showToastWarnMessage(msg);
           }
-          // 2. 재발행 실패 시 
-        } else {
-          LOGIS_UTIL.showMessage(t('button.confirm'), t('text.reprint_event_listener_error'), this._initialSetup.bind(this));
         }
+
+        this._initialSetup();
       }
 
       /**
