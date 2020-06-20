@@ -610,6 +610,13 @@ Copyright © HatioLab Inc. All rights reserved.
                 },
                 columnWidth: '0.3fr'
               }, {
+                display: 'RFID 검수',
+                fieldname: 'rfid_item_yn',
+                style: {
+                  textAlign: 'center'
+                },
+                columnWidth: '0.7fr'
+              }, {
                 fieldname: 'shop_cd',
                 columnWidth: '0px'
               }, {
@@ -1167,14 +1174,19 @@ Copyright © HatioLab Inc. All rights reserved.
           return (item.sku_cd === skuBarcode || item.sku_barcd === skuBarcode);
         });
 
-        // 3. 검수 대상 리스트 중 입력한 상품 코드와 일치하는 것이 없다면 alert
+        // 3. 검수 대상 리스트 중 입력한 상품 코드와 일치하는 것이 없다면 에러 
         if (!found || found.length == 0) {
           LOGIS_UTIL.showMessage(t('error.invalid_sku_cd'), t('text.scanned_sku_code_not_exist'), this.focusSkuBarcdInput.bind(this));
           this.$['sku-barcode'].value = '';
           return false;
         }
 
-        // 4. 찾은 박스 내품 리턴
+        // 4. 검수 항목을 찾았는데 해당 항목이 RFID 검수 항목이면 에러
+        if (found.rfid_item_yn && found.rfid_item_yn == 'Y') {
+          LOGIS_UTIL.showMessage(t('error.invalid_sku_cd'), 'RFID 검수 항목입니다. RFID 검수를 해주세요.', this.focusSkuBarcdInput.bind(this));
+        }
+
+        // 5. 찾은 박스 내품 리턴
         return found;
       }
 
