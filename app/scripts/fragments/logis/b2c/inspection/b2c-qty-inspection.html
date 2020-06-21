@@ -572,7 +572,14 @@ Copyright © HatioLab Inc. All rights reserved.
                   color: '#fff',
                   textAlign: 'left'
                 },
-                columnWidth: '1.2fr'
+                columnWidth: '1.3fr'
+              }, {
+                display: t('label.sku_barcd'),
+                fieldname: 'sku_barcd',
+                style: {
+                  textAlign: 'center'
+                },
+                columnWidth: '1fr'
               }, {
                 display: t('label.sku_nm'),
                 fieldname: 'sku_nm',
@@ -580,28 +587,21 @@ Copyright © HatioLab Inc. All rights reserved.
                   color: '#ADCBEB',
                   textAlign: 'left'
                 },
-                columnWidth: '1.75fr'
-              }, {
-                display: t('label.sku_barcd'),
-                fieldname: 'sku_barcd',
-                style: {
-                  textAlign: 'center'
-                },
-                columnWidth: '1.7fr'
+                columnWidth: '2fr'
               }, {
                 display: t('label.order_qty'),
                 fieldname: 'picked_qty',
                 style: {
                   textAlign: 'right'
                 },
-                columnWidth: '0.4fr'
+                columnWidth: '0.45fr'
               }, {
                 display: t('label.confirm_qty'),
                 fieldname: 'confirm_qty',
                 style: {
                   textAlign: 'right'
                 },
-                columnWidth: '0.4fr'
+                columnWidth: '0.45fr'
               }, {
                 display: t('label.diff_qty'),
                 fieldname: 'diff_qty',
@@ -610,12 +610,12 @@ Copyright © HatioLab Inc. All rights reserved.
                 },
                 columnWidth: '0.3fr'
               }, {
-                display: 'RFID 검수',
+                display: 'RFID',
                 fieldname: 'rfid_item_yn',
                 style: {
                   textAlign: 'center'
                 },
-                columnWidth: '0.7fr'
+                columnWidth: '0.3fr'
               }, {
                 fieldname: 'shop_cd',
                 columnWidth: '0px'
@@ -774,7 +774,7 @@ Copyright © HatioLab Inc. All rights reserved.
         this.focusDefaultInput();
 
         if (event && event.detail && event.detail.msg) {
-          LOGIS.showToastErrorMessage(event.detail.msg);
+          LOGIS_UTIL.showToastErrorMessage(event.detail.msg);
         }
       }
 
