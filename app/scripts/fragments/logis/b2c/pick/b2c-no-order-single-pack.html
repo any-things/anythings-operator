@@ -21,7 +21,7 @@ Copyright © HatioLab Inc. All rights reserved.
       #input-container {
         display: grid;
         background-color: var(--things-white-opacity-background-color);
-        grid-template-columns: auto auto auto auto auto auto;
+        grid-template-columns: 400px auto auto auto auto auto auto;
         grid-gap: 10px;
         padding: 10px 10px;
         border-radius:var(--things-default-border-radius);
@@ -31,17 +31,8 @@ Copyright © HatioLab Inc. All rights reserved.
       #date-picker {
         display: flex;
         margin: auto 0;
-      }
-
-      #date-picker span {
-        margin: auto 10px auto auto;
-        color: #D5D7DB;
-        font-size: .9rem;
-      }
-
-      #date-picker input {
-        font-size: .9rem;
         height: 50px;
+        width: 370px;
       }
 
       .label {
@@ -67,6 +58,7 @@ Copyright © HatioLab Inc. All rights reserved.
         background-color: rgba(0, 0, 0, .25);
         border: 2px solid rgba(255, 255, 255, .2);
         height: 50px;
+        width: 200px;
         color: #fff;
         font-size: 1.1rem;
         text-align: center;
@@ -88,8 +80,10 @@ Copyright © HatioLab Inc. All rights reserved.
       id="single-pack-process-ajax" 
       curl="/device_process/dynamic/dps/no_order_single_pack/pick" 
       method="PUT" 
-      content-type="application/json" 
-      on-sys-ajax-response="_singlePackProcessSuccess">
+      content-type="application/json"
+      custom-error-handler
+      on-sys-ajax-response="_singlePackProcessSuccess"
+      on-sys-ajax-error="_singlePackProcessError">
     </sys-ajax>
 
     <!-- 송장 발행을 위한 Ajax -->
@@ -104,14 +98,13 @@ Copyright © HatioLab Inc. All rights reserved.
     <div id="container">
       <!-- 상단 행 : 상품 코드 스캔 -->
       <div id="input-container">
-        <div id="date-picker">
-          <span>[[jobDateLabel]]</span>
-          <input type="date" required value="[[jobDate]]" on-change="_jobDateChanged">
-        </div>
+        <input id="date-picker" type="date" required value="[[jobDate]]" on-change="_jobDateChanged">
 
         <span class="label">[[barcodeLabel]]</span>
-
         <input id="sku-input" on-keypress="_onSkuCdScan" max-length=32>
+
+        <span class="label">주문자</span>
+        <input id="cust-input" on-keypress="_onCustScan">
 
         <button id="refresh-btn" on-click="refresh">
           <img src="./images/icon-refresh.png" />
@@ -133,6 +126,7 @@ Copyright © HatioLab Inc. All rights reserved.
         data="[[items]]"
         show-paginator 
         on-data-list-click="_selectJobItem" 
+        on-configured="_addItemStatusAttr"
         on-paginator-changed="_pageChanged">
       </item-list>
     </div>
@@ -154,7 +148,7 @@ Copyright © HatioLab Inc. All rights reserved.
           jobDateLabel: {
             type: String,
             value: () => {
-              return t('label.job_date')
+              return t('label.date')
             }
           },
 
@@ -186,7 +180,7 @@ Copyright © HatioLab Inc. All rights reserved.
           refreshLabel: {
             type: String,
             value: function() {
-              return t('button.refresh');
+              return t('button.search');
             }
           },
 
@@ -264,6 +258,14 @@ Copyright © HatioLab Inc. All rights reserved.
                 fieldname: 'id',
                 columnWidth: '0px'
               }, {
+                display: '',
+                fieldname: 'box_input_seq',
+                columnWidth: '0.4fr',
+                style: {
+                  textAlign: 'center',
+                  color: '#fff'
+                }
+              }, {
                 display: t('label.brand_cd'),
                 fieldname: 'strr_id',
                 columnWidth: '0.3fr',
@@ -279,6 +281,13 @@ Copyright © HatioLab Inc. All rights reserved.
                   textAlign: 'center'
                 }
               }, {
+                display: '주문자',
+                fieldname: 'shipto_nm',
+                columnWidth: '0.6fr',
+                style: {
+                  textAlign: 'center'
+                }
+              }, {
                 display: t('label.sku_cd'),
                 fieldname: 'item_cd',
                 columnWidth: '1.25fr',
@@ -288,21 +297,21 @@ Copyright © HatioLab Inc. All rights reserved.
               }, {
                 display: t('label.sku_barcd'),
                 fieldname: 'barcode2',
-                columnWidth: '1fr',
+                columnWidth: '0.9fr',
                 style: {
                   textAlign: 'center'
                 }
               }, {
                 display: t('label.invoice_id'),
                 fieldname: 'waybill_no',
-                columnWidth: '1fr',
+                columnWidth: '0.9fr',
                 style: {
                   textAlign: 'center'
                 }
               }, {
                 display: t('label.created_at'),
                 fieldname: 'box_input_at',
-                columnWidth: '1.25fr',
+                columnWidth: '1.15fr',
                 style: {
                   textAlign: 'center'
                 }
@@ -337,13 +346,32 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
+       * @description 완료된 행의 스타일 변경
+       *******************
+       * @param {Object} event
+       */
+      _addItemStatusAttr(event) {
+        let list = event.detail.contentElements;
+
+        list.forEach(row => {
+          let data = row.getData();
+          if (data.left_qty == 0) {
+            row.classList.add('selected');
+          } else {
+            row.classList.remove('selected');
+          }
+        })
+      }
+
+      /**
        * @description 초기 셋업
        *******************
        */
       _initialSetup() {
+        this.currentJobItem = null;
+        this.$['cust-input'].value = '';
         this.$['sku-input'].value = '';
         this.$['sku-input'].focus();
-        this.currentJobItem = null;
       }
 
       /**
@@ -355,9 +383,20 @@ Copyright © HatioLab Inc. All rights reserved.
         if (event.key === 'Enter') {
           var skuCd = event.currentTarget.value;
 
-          if (skuCd && skuCd.length >= 8) {
+          if (skuCd && skuCd.length >= 4) {
             this.processSinglePack(skuCd.toUpperCase());
           }
+        }
+      }
+
+      /**
+       * @description 주문자 값 변경 핸들러
+       *********************
+       * @param {Object} event
+       */
+      _onCustScan(event) {
+        if (event.key === 'Enter') {
+          this.refresh();
         }
       }
 
@@ -370,7 +409,8 @@ Copyright © HatioLab Inc. All rights reserved.
         var processAjax = this.$['single-pack-process-ajax'];
         processAjax.customParams = {
           jobDate: this.jobDate,
-          skuCd: skuCd
+          skuCd: skuCd,
+          printerId: LOGIS_UTIL.getPrinterId()
         };
         processAjax.generateRequest();
       }
@@ -393,6 +433,7 @@ Copyright © HatioLab Inc. All rights reserved.
         if (event.detail) {
           this.page = event.detail.page;
           this.limit = event.detail.limit;
+          this.refresh();
         }
       }
 
@@ -428,10 +469,13 @@ Copyright © HatioLab Inc. All rights reserved.
           if (event.detail.total) {
             this.items = event.detail.items;
             this.total = event.detail.total;
+
           } else {
             this.items = [];
             this.total = 0;
           }
+
+          this._initialSetup();
         }
       }
 
@@ -442,22 +486,32 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       refresh(event) {
         var jobListAjax = this.$['job-list-ajax'];
-
+        let custNm = this.$['cust-input'].value;
         let workDate = this.jobDate.replace('-', '').replace('-', '');
+
+        let queryList = [{
+          name: 'work_date',
+          value: workDate
+        }, {
+          name: 'pack_tcd',
+          value: 'D'
+        }];
+
+        if (custNm && custNm.length >= 1) {
+          queryList.push({
+            name: 'shipto_nm',
+            value: custNm
+          });
+        }
+
         jobListAjax.customParams = {
           page: this.page,
           limit: this.limit,
           select: 'id,strr_id,ref_no,item_cd,barcode2,waybill_no,box_input_at',
+          query: queryList,
           sort: [{
             field: 'box_input_at',
             ascending: false
-          }],
-          query: [{
-            name: 'work_date',
-            value: workDate
-          }, {
-            name: 'pack_tcd',
-            value: 'D'
           }]
         };
         jobListAjax.generateRequest();
@@ -469,14 +523,14 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} event
        */
       reprint(event) {
-        if (this.currentJobItem && this.currentJobItem.invoice_id) {
+        if (this.currentJobItem && this.currentJobItem.waybill_no) {
           var reprintAjax = this.$['reprint-ajax'];
-          reprintAjax.curl = '/device_process/dynamic/dps/print_invoice';
+          reprintAjax.curl = '/device_process/dynamic/dps/single_pack_print_invoice';
           reprintAjax.customParams = {
             equipType: LOGIS_UTIL.getEquipType(),
             equipCd: LOGIS_UTIL.getEquipCd(),
             orderNo: this.currentJobItem.ref_no,
-            invoiceId: this.currentJobItem.invoice_id,
+            invoiceId: this.currentJobItem.waybill_no,
             printerId: LOGIS_UTIL.getPrinterId()
           };
           reprintAjax.generateRequest();
@@ -511,6 +565,12 @@ Copyright © HatioLab Inc. All rights reserved.
         const data = event.detail.data;
         this.currentJobItem = data;
         this.$['reprint-btn'].hidden = false;
+
+        let list = event.currentTarget.getRows();
+        list.forEach(row => {
+          row.classList.remove('canceled');
+        })
+        event.detail.row.classList.add('canceled');
       }
 
       /**
@@ -521,6 +581,20 @@ Copyright © HatioLab Inc. All rights reserved.
       _singlePackProcessSuccess(event) {
         SOUND.playInfoSound();
         this.refresh();
+      }
+
+      /**
+       * @description 단포 처리 에러 시  
+       ******************
+       * @param {Object} event
+       */
+      _singlePackProcessError(event) {
+        if (event && event.detail && event.detail.msg) {
+          LOGIS_UTIL.showToastErrorMessage(event.detail.msg);
+        }
+
+        SOUND.playErrorSound();
+        this._initialSetup();
       }
     }
 

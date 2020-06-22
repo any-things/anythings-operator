@@ -338,8 +338,16 @@ Copyright © HatioLab Inc. All rights reserved.
       </div>
 
       <!-- 투입 박스 리스트 -->
-      <item-list id="item-list" header="[[header]]" page="[[page]]" total="[[total]]" limit="[[limit]]" data="[[items]]"
-        show-paginator on-data-list-click="showOrderItems" on-paginator-changed="_pageChanged">
+      <item-list 
+        id="item-list" 
+        header="[[header]]" 
+        page="[[page]]" 
+        total="[[total]]" 
+        limit="[[limit]]" 
+        data="[[items]]"
+        show-paginator 
+        on-data-list-click="showOrderItems" 
+        on-paginator-changed="_pageChanged">
       </item-list>
     </div>
   </template>
@@ -881,12 +889,16 @@ Copyright © HatioLab Inc. All rights reserved.
         var equipType = LOGIS_UTIL.getEquipType();
 
         if (equipCd) {
-          var showOrderAjax = this.$['batch-summary-ajax'];
+          var showInputAjax = this.$['batch-summary-ajax'];
           var url = '/device_process/dynamic/dps/batch_summary';
-          url += '?page=' + this.page + '&limit=' + this.limit;
-          url += '&equipType=' + equipType + '&equipCd=' + equipCd;
-          showOrderAjax.curl = url;
-          showOrderAjax.generateRequest();
+          showInputAjax.customParams = {
+            page: this.page,
+            limit: this.limit,
+            equipType: equipType,
+            equipCd: equipCd
+          };
+          showInputAjax.curl = url;
+          showInputAjax.generateRequest();
         } else {
           LOGIS_UTIL.showMessage(t('text.selecting_equipment'), t('text.select_equipment'));
         }
@@ -902,6 +914,7 @@ Copyright © HatioLab Inc. All rights reserved.
       _pageChanged(event) {
         this.page = event.detail.page;
         this.limit = event.detail.limit;
+        this.refresh();
       }
 
       /**

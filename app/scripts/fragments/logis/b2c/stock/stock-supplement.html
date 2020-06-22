@@ -149,8 +149,8 @@ Copyright © HatioLab Inc. All rights reserved.
         <input id="change-cell" on-focus="_hideKeyboard" on-keypress="_onCellChanged">
 
         <!-- 셀 유형 -->
-        <span class="label">[[stockCellTypeLabel]]</span>
-        <input id="stock-cell-type" readonly></input>
+        <span class="label" hidden>[[stockCellTypeLabel]]</span>
+        <input id="stock-cell-type" readonly hidden></input>
         
         <!-- 보충 단위 입력 박스 -->
         <span class="label" hidden>[[loadUnitLabel]]</span>
@@ -671,6 +671,7 @@ Copyright © HatioLab Inc. All rights reserved.
         this.$['sku-nm'].value = '';
         this.$['change-cell'].value = '';
         this.$['order-qty'].value = '';
+        this.$['alloc-qty'].value = '';
         this.$['stock-qty'].value = '';
         this.$['input-qty'].value = '';
         this.$['stock-cell-type'].value = '';

@@ -153,6 +153,7 @@ Copyright © HatioLab Inc. All rights reserved.
       curl="/device_process/dynamic/dps/inspection/by_item/:order_no/:rfid_id"
       method="PUT"
       content-type="application/json"
+      custom-error-handler
       on-sys-ajax-response="_onItemInpspectionSuccess"
       on-sys-ajax-error="_onItemInspectionError">
     </sys-ajax>
@@ -218,13 +219,13 @@ Copyright © HatioLab Inc. All rights reserved.
         <!-- 상품 건수 -->
         <div class="sku-info">
           <span class="smalltitle">[[skuCntLabel]]</span>
-          <span class="proc"><b>[[pickedSkuCnt]]</b> / [[confirmSkuCnt]]</span>
+          <span class="proc"><b>[[confirmSkuCnt]]</b> / [[pickedSkuCnt]]</span>
         </div>
 
         <!-- 상품 수량 -->
         <div class="sku-info">
           <span class="smalltitle">[[skuQtyLabel]]</span>
-          <span class="proc"><b>[[pickedSkuPcsQty]]</b> / [[confirmSkuPcsQty]]</span>
+          <span class="proc"><b>[[confirmSkuPcsQty]]</b> / [[pickedSkuPcsQty]]</span>
         </div>
       </div>
 
@@ -580,6 +581,13 @@ Copyright © HatioLab Inc. All rights reserved.
                   textAlign: 'center'
                 },
                 columnWidth: '1fr'
+              }, {
+                display: '바코드2',
+                fieldname: 'sku_barcd2',
+                style: {
+                  textAlign: 'center'
+                },
+                columnWidth: '0.8fr'
               }, {
                 display: t('label.sku_nm'),
                 fieldname: 'sku_nm',
@@ -1171,7 +1179,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
         // 2. 검수 대상 리스트 중 입력한 상품 코드와 일치하는 상품이 있는지 체크 
         let found = this.items.find((item) => {
-          return (item.sku_cd === skuBarcode || item.sku_barcd === skuBarcode);
+          return (item.sku_cd === skuBarcode || item.sku_barcd === skuBarcode || item.sku_barcd2 === skuBarcode);
         });
 
         // 3. 검수 대상 리스트 중 입력한 상품 코드와 일치하는 것이 없다면 에러 
