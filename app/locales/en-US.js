@@ -55,6 +55,7 @@ window.locales['en-US'] = {
   'label.rack_nm': 'Rack Name',
   'label.station_cd': 'Station',
   'label.order': 'Order',
+  'label.inspection': 'Inspection',
   'label.inputable_boxes': 'Boxes to Input',
   'label.picked_qty': 'Picked',
   'label.picking_qty': 'Picking',

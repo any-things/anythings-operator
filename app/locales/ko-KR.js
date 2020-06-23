@@ -55,6 +55,7 @@ window.locales['ko-KR'] = {
   'label.rack_nm': '랙 이름',
   'label.station_cd': '작업 스테이션',
   'label.order': '주문',
+  'label.inspection': '검수',
   'label.inputable_boxes': '투입할 박스',
   'label.picked_qty': '확정',
   'label.picking_qty': '처리중',

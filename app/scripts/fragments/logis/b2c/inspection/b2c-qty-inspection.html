@@ -167,15 +167,6 @@ Copyright © HatioLab Inc. All rights reserved.
       last-response="{{inspectionResult}}">
     </sys-ajax>
 
-    <!-- 송장 재발행을 위한 Ajax -->
-    <sys-ajax
-      id="reprint-invoice-ajax"
-      curl="/device_process/dynamic/dps/inspection/print/:order_id"
-      method="PUT"
-      content-type="application/json"
-      on-sys-ajax-response="_reprintSuccess">
-    </sys-ajax>
-
     <!-- 박스 분할을 위한 Ajax -->
     <sys-ajax
       id="split-box-ajax"
@@ -185,12 +176,13 @@ Copyright © HatioLab Inc. All rights reserved.
       on-sys-ajax-response="_splitBoxSuccess">
     </sys-ajax>
 
-    <!-- 상품 추가 작업을 위한 Ajax -->
+    <!-- 송장 재발행을 위한 Ajax -->
     <sys-ajax
-      id="add-item-ajax"
+      id="reprint-invoice-ajax"
+      curl="/device_process/dynamic/dps/inspection/print/:order_id"
       method="PUT"
       content-type="application/json"
-      on-sys-ajax-response="_addItemSuccess">
+      on-sys-ajax-response="_reprintSuccess">
     </sys-ajax>
 
     <!-- 레이아웃 -->
@@ -597,14 +589,14 @@ Copyright © HatioLab Inc. All rights reserved.
                 },
                 columnWidth: '2fr'
               }, {
-                display: t('label.order_qty'),
+                display: t('label.order'),
                 fieldname: 'picked_qty',
                 style: {
                   textAlign: 'right'
                 },
                 columnWidth: '0.45fr'
               }, {
-                display: t('label.confirm_qty'),
+                display: t('label.inspection'),
                 fieldname: 'confirm_qty',
                 style: {
                   textAlign: 'right'
@@ -833,24 +825,19 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * @description 상품 추가 완료 체크
-       ***************
-       * @param {Array} items
-       */
-      _addItemSuccess(items) {
-        // 피킹이 완료되면 검수완료 작업.
-        if (items.length <= 0) {
-          this.completeInspection();
-        }
-      }
-
-      /**
        * @description 검사항목 정보 및 내품 내역 정보 변경 핸들러
        *****************
        * @param {Object} inspection
        */
       _inspectionChanged(inspection) {
         if (inspection == null) return;
+
+        if (inspection.status == 'C') {
+          LOGIS_UTIL.showToastWarnMessage(t('text.this_order_has_been_canceled'));
+          this.clearView();
+          this.focusDefaultInput();
+          return;
+        }
 
         if (!(/([BES])/.test(inspection.status))) {
           LOGIS_UTIL.showToastWarnMessage(t('text.cannot_inspection_now'));
@@ -906,18 +893,61 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} inspectionResult
        */
       _inspectionResultChanged(inspectionResult) {
-        if (inspectionResult && inspectionResult.result && inspectionResult.result) {
+        if (inspectionResult && inspectionResult.result) {
           if (inspectionResult.result.status == 'C') {
             LOGIS_UTIL.showMessage(t('button.confirm'), t('text.this_order_has_been_canceled'), this.clearView.bind(this));
+
           } else {
-            this.clearView();
             SOUND.playInfoSound();
+
+            // 사은품 리스트가 있다면 ...
+            if (inspectionResult.result.items && inspectionResult.result.items.length > 0) {
+              this.showGiftListPopup(inspectionResult.result.items);
+
+              // 그렇지 않으면 완료 ...
+            } else {
+              this.clearView();
+            }
           }
 
         } else {
           LOGIS_UTIL.showToastInfoMessage('처리 결과를 알 수 없습니다.');
           SOUND.playErrorSound();
         }
+      }
+
+      /**
+       * @description 사은품 리스트 표시 팝업
+       ******************
+       * @param {Array} giftItems
+       */
+      showGiftListPopup(giftItems) {
+        document.dispatchEvent(new CustomEvent('open-form-list-dialog', {
+          detail: {
+            title: '사은품을 담으세요.',
+            closeCallback: this.clearView.bind(this),
+            listFields: [{
+              display: t('label.sku_cd'),
+              fieldname: 'sku_cd',
+              columnWidth: '2fr',
+              style: {
+                textAlign: 'center'
+              }
+            }, {
+              display: t('label.sku_nm'),
+              fieldname: 'sku_nm',
+              columnWidth: '2.5fr'
+            }, {
+              display: t('label.qty'),
+              fieldname: 'order_qty',
+              columnWidth: '0.5fr',
+              style: {
+                textAlign: 'center'
+              }
+            }],
+            listData: giftItems
+          }
+        }));
       }
 
       /**
@@ -1126,14 +1156,15 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} event
        */
       _splitBoxSuccess(event) {
-        var newBox = event.detail;
-        let trayCd = this.currentTrayCd;
-        this.clearView();
-        SOUND.playInfoSound();
+        if (event && event.detail) {
+          let trayCd = this.currentTrayCd;
+          this.clearView();
+          SOUND.playInfoSound();
 
-        LOGIS_UTIL.showMessage(t('button.confirm'), t('text.split_invoice_complete'), function() {
-          this.refreshInspection('box', trayCd, 'tray');
-        }.bind(this));
+          LOGIS_UTIL.showMessage(t('button.confirm'), t('text.split_invoice_complete'), function() {
+            this.refreshInspection('box', trayCd, 'tray');
+          }.bind(this));
+        }
       }
 
       /**
