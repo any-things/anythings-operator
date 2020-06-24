@@ -500,6 +500,7 @@ Copyright © HatioLab Inc. All rights reserved.
         var jobListAjax = this.$['job-list-ajax'];
         let custNm = this.$['cust-input'].value;
         let workDate = this.jobDate.replace('-', '').replace('-', '');
+        let outbTcd = this.$['outb-tcd-combo'].value;
         let user = LOGIS_UTIL.getLocalStorage('setting.user');
         let userId = user ? user.id : null;
 
@@ -512,6 +513,9 @@ Copyright © HatioLab Inc. All rights reserved.
         }, {
           name: 'inspector_id',
           value: userId
+        }, {
+          name: 'outb_tcd',
+          value: outbTcd
         }];
 
         if (custNm && custNm.length >= 1) {

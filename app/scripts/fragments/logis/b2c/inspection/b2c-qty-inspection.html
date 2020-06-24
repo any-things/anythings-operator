@@ -628,6 +628,9 @@ Copyright © HatioLab Inc. All rights reserved.
               }, {
                 fieldname: 'order_qty',
                 columnWidth: '0px'
+              }, {
+                fieldname: 'outb_ect_date',
+                columnWidth: '0px'
               }]
             }
           }
@@ -1133,7 +1136,7 @@ Copyright © HatioLab Inc. All rights reserved.
         // 2. 수동 바코드 스캔 정보 추출
         if (this.items && this.items.length > 0) {
           this.items.forEach(function(item) {
-            if (item.confirm_qty && item.confirm_qty > 0) {
+            if (item.confirm_qty && item.confirm_qty > 0 && item.rfid_item_yn != 'Y') {
               inspectionItems.push(JSON.parse(JSON.stringify(item)));
             }
           });
@@ -1141,9 +1144,25 @@ Copyright © HatioLab Inc. All rights reserved.
 
         // 3. RFID 검수 정보 추출 
         if (this.currentRfidList && this.currentRfidList.length > 0) {
-          this.currentRfidList.forEach(function(item) {
-            inspectionItems.push(item);
-          });
+          // 현재 스캔하여 보관 중인 RFID 정보를 모두 서버에 전달할 검수 항목으로 추가한다.
+          this.currentRfidList.forEach(function(rfidItem) {
+            let skuCd = rfidItem.sku_cd;
+
+            // 맨 처음 조회된 박스 내품 정보 중에 RFID 항목이면서 해당 상품인 정보를 찾는다.
+            let foundInspectionItem = this.items.find(function(item) {
+              return (item.rfid_item_yn == 'Y' && skuCd == item.sku_cd);
+            });
+
+            // 찾았으면 해당 정보를 clone한 후 현재 순환중인 RFID 정보의 RFID_ID 값을 추가하고 
+            if (foundInspectionItem) {
+              let clonedRfidItem = JSON.parse(JSON.stringify(foundInspectionItem));
+              clonedRfidItem.rfid_id = rfidItem.rfid_id;
+              clonedRfidItem.order_qty = 1;
+              clonedRfidItem.confirm_qty = 1;
+              clonedRfidItem.diff_qty = 0;
+              inspectionItems.push(clonedRfidItem);
+            }
+          }.bind(this));
         }
 
         // 4. 검수 항목을 리턴
@@ -1199,8 +1218,9 @@ Copyright © HatioLab Inc. All rights reserved.
        * @description 내품 항목 검수 전 유효성 체크
        ***************************
        * @param {String} skuBarcode
+       * @param {String} rfidInfo
        */
-      _validateForInspectionItem(skuBarcode) {
+      _validateForInspectionItem(skuBarcode, rfidInfo) {
         // 1. 검수 대상 리스트가 존재 하지 않는다면 alert
         if (!this.items || this.items.length == 0) {
           LOGIS_UTIL.showMessageWithSound('error', t('error.VALIDATION_ERROR'), t('text.target_not_exist'), this.focusDefaultInput.bind(this));
@@ -1221,8 +1241,9 @@ Copyright © HatioLab Inc. All rights reserved.
         }
 
         // 4. 검수 항목을 찾았는데 해당 항목이 RFID 검수 항목이면 에러
-        if (found.rfid_item_yn && found.rfid_item_yn == 'Y') {
+        if (found.rfid_item_yn && found.rfid_item_yn == 'Y' && (!rfidInfo || rfidInfo.rfid_id.length < 30)) {
           LOGIS_UTIL.showMessage(t('error.invalid_sku_cd'), 'RFID 검수 항목입니다. RFID 검수를 해주세요.', this.focusSkuBarcdInput.bind(this));
+          return false;
         }
 
         // 5. 찾은 박스 내품 리턴
@@ -1255,7 +1276,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _doItemInspectionByScan(skuBarcode, rfidInfo) {
         // 1. 박스 내품 내역 중에 스캔한 상품 바코드에 해당하는 항목을 추출
-        let item = this._validateForInspectionItem(skuBarcode);
+        let item = this._validateForInspectionItem(skuBarcode, rfidInfo);
         if (item === false) {
           return false;
         }
