@@ -260,7 +260,7 @@ Copyright © HatioLab Inc. All rights reserved.
               }, {
                 display: '',
                 fieldname: 'box_input_seq',
-                columnWidth: '0.4fr',
+                columnWidth: '0.2fr',
                 style: {
                   textAlign: 'center',
                   color: '#fff'
@@ -507,7 +507,7 @@ Copyright © HatioLab Inc. All rights reserved.
         jobListAjax.customParams = {
           page: this.page,
           limit: this.limit,
-          select: 'id,strr_id,ref_no,item_cd,barcode2,waybill_no,box_input_at',
+          select: 'id,strr_id,ref_no,item_cd,barcode2,waybill_no,box_input_at,box_input_seq,shipto_nm',
           query: queryList,
           sort: [{
             field: 'box_input_at',
