@@ -10,7 +10,10 @@ Copyright © HatioLab Inc. All rights reserved.
 -->
 <dom-module id="b2c-no-order-single-pack">
   <template>
-    <style>
+    <style include="shared-styles any-setting-styles">
+      .button-container {
+        margin-left: .5rem;
+      }
       #container {
         display: flex;
         flex-direction: column;
@@ -21,7 +24,7 @@ Copyright © HatioLab Inc. All rights reserved.
       #input-container {
         display: grid;
         background-color: var(--things-white-opacity-background-color);
-        grid-template-columns: 400px auto auto auto auto auto auto;
+        grid-template-columns: auto auto auto auto auto auto auto auto;
         grid-gap: 10px;
         padding: 10px 10px;
         border-radius:var(--things-default-border-radius);
@@ -31,7 +34,7 @@ Copyright © HatioLab Inc. All rights reserved.
       #date-picker {
         display: flex;
         margin: auto 0;
-        height: 50px;
+        height: 60px;
         width: 370px;
       }
 
@@ -57,8 +60,8 @@ Copyright © HatioLab Inc. All rights reserved.
       input {
         background-color: rgba(0, 0, 0, .25);
         border: 2px solid rgba(255, 255, 255, .2);
-        height: 50px;
-        width: 200px;
+        height: 60px;
+        width: 250px;
         color: #fff;
         font-size: 1.1rem;
         text-align: center;
@@ -99,6 +102,13 @@ Copyright © HatioLab Inc. All rights reserved.
       <!-- 상단 행 : 상품 코드 스캔 -->
       <div id="input-container">
         <input id="date-picker" type="date" required value="[[jobDate]]" on-change="_jobDateChanged">
+
+        <select id="outb-tcd-combo" on-change="_outbTcdChanged">
+          <option value="F300" selected>직영몰판매출고</option>
+          <option value="F350">제휴몰판매출고</option>
+          <option value="F370">인풀루언서출고</option>
+          <option value="F360">매장선판매직배송</option>
+        </select>
 
         <span class="label">[[barcodeLabel]]</span>
         <input id="sku-input" on-keypress="_onSkuCdScan" max-length=32>
@@ -406,10 +416,12 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {String} skuCd
        */
       processSinglePack(skuCd) {
+        let outbTcd = this.$['outb-tcd-combo'].value;
         var processAjax = this.$['single-pack-process-ajax'];
         processAjax.customParams = {
           jobDate: this.jobDate,
           skuCd: skuCd,
+          outbTcd: outbTcd,
           printerId: LOGIS_UTIL.getPrinterId()
         };
         processAjax.generateRequest();
@@ -488,6 +500,8 @@ Copyright © HatioLab Inc. All rights reserved.
         var jobListAjax = this.$['job-list-ajax'];
         let custNm = this.$['cust-input'].value;
         let workDate = this.jobDate.replace('-', '').replace('-', '');
+        let user = LOGIS_UTIL.getLocalStorage('setting.user');
+        let userId = user ? user.id : null;
 
         let queryList = [{
           name: 'work_date',
@@ -495,6 +509,9 @@ Copyright © HatioLab Inc. All rights reserved.
         }, {
           name: 'pack_tcd',
           value: 'D'
+        }, {
+          name: 'inspector_id',
+          value: userId
         }];
 
         if (custNm && custNm.length >= 1) {
