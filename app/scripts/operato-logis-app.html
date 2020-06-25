@@ -221,25 +221,25 @@ Copyright © HatioLab Inc. All rights reserved.
           <span id="header">
                 <div id="menu-btn">
                   <img src="./images/icon-brand.png" />
-                  <span>[[currentSite]]</span>
+                  <!--span>[[currentSite]]</span-->
         </div>
         <span id="title">[[title]]</span>
-        </span>
+          </span>
 
-        <div id="input-container">
-          <span id="equip-name" is-kiosk$="[[isKIOSK]]">[[equipNm]]</span>
-          <span id="station-code">[[stationCd]]</span>
-          <span id="work-side" is-kiosk$="[[isKIOSK]]" hidden>[[workSideNm]]</span>
-        </div>
+          <div id="input-container">
+            <span id="equip-name" is-kiosk$="[[isKIOSK]]">[[equipNm]]</span>
+            <span id="station-code">[[stationCd]]</span>
+            <span id="work-side" is-kiosk$="[[isKIOSK]]" hidden>[[workSideNm]]</span>
+          </div>
 
-        <div id="buttons">
-          <iron-icon id="refresh-btn" icon="refresh" on-click="refresh" hidden></iron-icon>
-          <iron-icon id="ind-off-btn" icon="lightbulb-outline" on-click="showCodePopup" hidden></iron-icon>
-          <iron-icon id="ind-on-last-btn" icon="list" on-click="showCodePopup" hidden></iron-icon>
-          <iron-icon id="batch-full-box-btn" icon="move-to-inbox" on-click="showCodePopup" hidden></iron-icon>
-          <iron-icon id="kiosk-setting-btn" icon="settings" on-click="toSetting" hidden></iron-icon>
-          <iron-icon id="logout-btn" icon="power-settings-new" on-click="logout" hidden></iron-icon>
-        </div>
+          <div id="buttons">
+            <iron-icon id="refresh-btn" icon="refresh" on-click="refresh" hidden></iron-icon>
+            <iron-icon id="ind-off-btn" icon="lightbulb-outline" on-click="showCodePopup" hidden></iron-icon>
+            <iron-icon id="ind-on-last-btn" icon="list" on-click="showCodePopup" hidden></iron-icon>
+            <iron-icon id="batch-full-box-btn" icon="move-to-inbox" on-click="showCodePopup" hidden></iron-icon>
+            <iron-icon id="kiosk-setting-btn" icon="settings" on-click="toSetting" hidden></iron-icon>
+            <iron-icon id="logout-btn" icon="power-settings-new" on-click="logout" hidden></iron-icon>
+          </div>
         </div>
       </app-toolbar>
     </app-header>

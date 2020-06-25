@@ -72,8 +72,9 @@ Copyright © HatioLab Inc. All rights reserved.
       id="load-stock-ajax"
       method="PUT"
       content-type="application/json"
-      on-sys-ajax-error="_clearView"
-      on-sys-ajax-response="_stockSuccess">
+      custom-error-handler
+      on-sys-ajax-error="_onLoadError"
+      on-sys-ajax-response="_onLoadSuccess">
     </sys-ajax>
 
     <!-- LED ON Ajax -->
@@ -547,10 +548,10 @@ Copyright © HatioLab Inc. All rights reserved.
 
         if (stock.input_qty <= 0) {
           LOGIS_UTIL.showToastInfoMessage(t('text.stock_load_done'));
-          // TODO 3 초후 this._clearView();
         }
 
         stock.input_qty <= 1 ? this.$['change-cell'].select() : this.$['input-qty'].select();
+        SOUND.playInfoSound();
       }
 
       /**
@@ -655,10 +656,27 @@ Copyright © HatioLab Inc. All rights reserved.
       /**
        * @description 재고 보충 성공시
        *******************
+       * @param {Object} event
        */
-      _stockSuccess() {
+      _onLoadSuccess(event) {
+        SOUND.playInfoSound();
         LOGIS_UTIL.showToastInfoMessage(t('text.stock_load_success'));
         this._clearView();
+      }
+
+      /**
+       * @description 재고 보충 에러 시
+       *******************
+       * @param {Object} event
+       */
+      _onLoadError(event) {
+        SOUND.playErrorSound();
+
+        if (event && event.detail) {
+          LOGIS_UTIL.showMessage(t('text.error'), event.detail.msg, this._clearView.bind(this));
+        } else {
+          LOGIS_UTIL.showMessage(t('text.error'), t('error.transaction_failed'), this._clearView.bind(this));
+        }
       }
 
       /**
