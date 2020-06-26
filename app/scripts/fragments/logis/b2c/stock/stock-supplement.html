@@ -571,6 +571,7 @@ Copyright © HatioLab Inc. All rights reserved.
             this._load();
 
           } else {
+            SOUND.playErrorSound();
             LOGIS_UTIL.showMessage(t('text.error'), t('error.loc_cd_invalid'), function() {
               changeCellInput.value = '';
               changeCellInput.select();
@@ -591,6 +592,7 @@ Copyright © HatioLab Inc. All rights reserved.
           let inputQty = Number(this.$['input-qty'].value);
 
           if (orderQty - stockQty < inputQty) {
+            SOUND.playErrorSound();
             LOGIS_UTIL.showMessage(t('error.VALIDATION_ERROR'), '입력 가능한 수량을 초과했습니다.', function() {
               this.$['input-qty'].value = '';
               this.$['input-qty'].select();
@@ -621,22 +623,26 @@ Copyright © HatioLab Inc. All rights reserved.
         var inputQty = Number(inputQtyInput.value);
 
         if (!changeCellCd || changeCellCd == '' || changeCellCd.length < 1 || !LOGIS_UTIL.isCellCdValid(changeCellCd)) {
+          SOUND.playErrorSound();
           LOGIS_UTIL.showMessage(t('error.VALIDATION_ERROR'), t('error.loc_cd_invalid'), function() {
             changeCellInput.value = '';
             changeCellInput.select();
           });
 
         } else if (inputQtyInput.value == undefined || inputQtyInput.value == '' || inputQty <= 0) {
+          SOUND.playErrorSound();
           LOGIS_UTIL.showMessage(t('error.VALIDATION_ERROR'), t('text.input_qty_none'), function() {
             inputQtyInput.select()
           });
 
         } else if (orderQty - stockQty < inputQty) {
+          SOUND.playErrorSound();
           LOGIS_UTIL.showMessage(t('error.VALIDATION_ERROR'), '입력 가능한 수량을 초과했습니다.', function() {
             inputQtyInput.select()
           });
 
         } else if (!this.skuCd) {
+          SOUND.playErrorSound();
           LOGIS_UTIL.showMessage(t('text.error'), t('text.invalid_sku_cd'));
 
         } else {
