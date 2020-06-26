@@ -547,11 +547,12 @@ Copyright © HatioLab Inc. All rights reserved.
         this.$['input-qty'].value = stock.input_qty;
 
         if (stock.input_qty <= 0) {
-          LOGIS_UTIL.showToastInfoMessage(t('text.stock_load_done'));
+          SOUND.playErrorSound();
+          LOGIS_UTIL.showMessage(t('text.error'), t('text.stock_load_done'), this._clearView.bind(this));
+        } else {
+          SOUND.playInfoSound();
+          stock.input_qty <= 1 ? this.$['change-cell'].select() : this.$['input-qty'].select();
         }
-
-        stock.input_qty <= 1 ? this.$['change-cell'].select() : this.$['input-qty'].select();
-        SOUND.playInfoSound();
       }
 
       /**
@@ -560,18 +561,20 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} event
        */
       _onCellChanged(event) {
-        let changeCellCd = this.$['change-cell'].value;
-
         if (event.keyCode === 13) {
+          let changeCellInput = this.$['change-cell'];
+          let changeCellCd = changeCellInput.value;
+
           if (LOGIS_UTIL.isCellCdValid(changeCellCd)) {
             this.$['cell'].value = '';
-            this.$['change-cell'].select();
+            changeCellInput.select();
             this._load();
 
           } else {
-            LOGIS_UTIL.showToastWarnMessage(t('error.loc_cd_invalid'));
-            this.$['change-cell'].value = '';
-            this.$['change-cell'].select();
+            LOGIS_UTIL.showMessage(t('text.error'), t('error.loc_cd_invalid'), function() {
+              changeCellInput.value = '';
+              changeCellInput.select();
+            });
           }
         }
       }
@@ -588,7 +591,10 @@ Copyright © HatioLab Inc. All rights reserved.
           let inputQty = Number(this.$['input-qty'].value);
 
           if (orderQty - stockQty < inputQty) {
-            LOGIS_UTIL.showToastWarnMessage(t('error.out_of_valid_qty'));
+            LOGIS_UTIL.showMessage(t('error.VALIDATION_ERROR'), '입력 가능한 수량을 초과했습니다.', function() {
+              this.$['input-qty'].value = '';
+              this.$['input-qty'].select();
+            }.bind(this));
           } else {
             this.$['change-cell'].select();
           }
@@ -615,30 +621,29 @@ Copyright © HatioLab Inc. All rights reserved.
         var inputQty = Number(inputQtyInput.value);
 
         if (!changeCellCd || changeCellCd == '' || changeCellCd.length < 1 || !LOGIS_UTIL.isCellCdValid(changeCellCd)) {
-          LOGIS_UTIL.showToastErrorMessage(t('error.loc_cd_invalid'));
-          changeCellInput.select();
+          LOGIS_UTIL.showMessage(t('error.VALIDATION_ERROR'), t('error.loc_cd_invalid'), function() {
+            changeCellInput.value = '';
+            changeCellInput.select();
+          });
 
         } else if (inputQtyInput.value == undefined || inputQtyInput.value == '' || inputQty <= 0) {
-          LOGIS_UTIL.showToastWarnMessage(t('text.input_qty_none'));
-          inputQtyInput.select();
+          LOGIS_UTIL.showMessage(t('error.VALIDATION_ERROR'), t('text.input_qty_none'), function() {
+            inputQtyInput.select()
+          });
 
         } else if (orderQty - stockQty < inputQty) {
-          LOGIS_UTIL.showToastWarnMessage(t('error.out_of_valid_qty'));
-          inputQtyInput.select();
+          LOGIS_UTIL.showMessage(t('error.VALIDATION_ERROR'), '입력 가능한 수량을 초과했습니다.', function() {
+            inputQtyInput.select()
+          });
 
         } else if (!this.skuCd) {
-          LOGIS_UTIL.showToastWarnMessage(t('text.invalid_sku_cd'));
+          LOGIS_UTIL.showMessage(t('text.error'), t('text.invalid_sku_cd'));
 
         } else {
-          try {
-            let rackCd = LOGIS_UTIL.getEquipCd();
-            const loadStockAjax = this.$['load-stock-ajax'];
-            loadStockAjax.curl = `/stocks/load_stock/${rackCd}/${changeCellCd}/${this.comCd}/${this.skuCd}/P/${inputQty}`;
-            loadStockAjax.generateRequest();
-          } catch (error) {
-            LOGIS_UTIL.showToastErrorMessage(error.message);
-            changeCellInput.select();
-          }
+          let rackCd = LOGIS_UTIL.getEquipCd();
+          const loadStockAjax = this.$['load-stock-ajax'];
+          loadStockAjax.curl = `/stocks/load_stock/${rackCd}/${changeCellCd}/${this.comCd}/${this.skuCd}/P/${inputQty}`;
+          loadStockAjax.generateRequest();
         }
       }
 
