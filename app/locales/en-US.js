@@ -244,6 +244,7 @@ window.locales['en-US'] = {
   'button.cancel_full': 'Cancel Fullbox',
   'button.detailed_content': 'View Contents',
   'button.update': 'Update',
+  'button.manual_picking': 'Picking',
 
   // text list
   'text.login_failure': 'Failed to Login',
@@ -409,6 +410,7 @@ window.locales['en-US'] = {
   'error.invalid_sku_cd': 'Invalid SKU Code',
   'error.already_processed': 'Already processed.',
   'error.out_of_valid_qty': 'Out of valid quantity',
+  'error.exceeded_input_qty': 'Input Qty. Exceeded.',
   'error.please_check_site_info': 'Please check site information.',
   'error.box_id_invalid': 'Box ID is not valid.',
   'error.no_scan_mpi_code': 'Please scan first MPICode.',

@@ -245,6 +245,7 @@ window.locales['ko-KR'] = {
   'button.cancel_full': '풀박스 취소',
   'button.detailed_content': '내역보기',
   'button.update': '업데이트',
+  'button.manual_picking': '피킹',
 
   // text list
   'text.login_failure': '로그인 실패',
@@ -411,6 +412,7 @@ window.locales['ko-KR'] = {
   'error.invalid_sku_cd': '유효하지 않은 상품코드',
   'error.already_processed': '이미 처리 되었습니다.',
   'error.out_of_valid_qty': '수량 초과',
+  'error.exceeded_input_qty': '입력 가능한 수량을 초과했습니다.',
   'error.please_check_site_info': '사이트 정보를 확인 하세요.',
   'error.box_id_invalid': '박스 ID가 유효하지 않습니다.',
   'error.no_scan_mpi_code': '표시기 코드부터 스캔해주세요.',

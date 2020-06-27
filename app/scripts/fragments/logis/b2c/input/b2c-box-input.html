@@ -255,8 +255,8 @@ Copyright © HatioLab Inc. All rights reserved.
       content-type="application/json" 
       last-response="{{orderDataSet}}"
       custom-error-handler
-      on-sys-ajax-response="_onBoxInputSuccess"
-      on-sys-ajax-error="_onBoxInputError">
+      on-sys-ajax-response="_afterTransactionSuccess"
+      on-sys-ajax-error="_afterTransactionFail">
     </sys-ajax>
       
     <div id="container">
@@ -746,7 +746,10 @@ Copyright © HatioLab Inc. All rights reserved.
           this._routingChanged(e);
         });
 
-        // 2. 페이지 리프레쉬
+        // 2. 초기화 셋업
+        this._initialSetup();
+
+        // 3. 데이터 자동 새로고침 
         this.enableAutoRefresh = true;
         this.startAutoRefresh();
       }
@@ -770,7 +773,34 @@ Copyright © HatioLab Inc. All rights reserved.
        *******************
        */
       _initialSetup() {
-        this.$['input-box-id'].select();
+        var boxInput = this.$['input-box-id'];
+        boxInput.disabled = false;
+        boxInput.value = '';
+        boxInput.focus();
+      }
+
+      /**
+       * @description 트랜잭션 처리 성공 후 
+       *******************
+       * @param {Object} event
+       */
+      _afterTransactionSuccess(event) {
+        SOUND.playInfoSound();
+        this._initialSetup();
+      }
+
+      /**
+       * @description 트랜잭션 처리 실패 후 
+       *******************
+       * @param {Object} event
+       */
+      _afterTransactionFail(event) {
+        SOUND.playErrorSound();
+        this._initialSetup();
+
+        if (event.detail && event.detail.msg) {
+          LOGIS_UTIL.showToastErrorMessage(event.detail.msg);
+        }
       }
 
       /**
@@ -788,7 +818,7 @@ Copyright © HatioLab Inc. All rights reserved.
         try {
           interval = LOGIS_UTIL.getRefreshInterval();
         } catch (e) {
-          interval = 20 * 10000;
+          interval = 20 * 1000;
         }
 
         setTimeout(function() {
@@ -802,20 +832,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Array} items
        */
       _itemsChanged(items) {
-        this._barcodeInputReset();
-      }
-
-      /**
-       * @description 바코드 인풋 박스 리셋
-       *******************
-       */
-      _barcodeInputReset() {
-        var inputBoxId = this.$['input-box-id'];
-        if (this._scannedFlag) {
-          inputBoxId.value = '';
-          this._scannedFlag = false;
-        }
-        inputBoxId.focus();
+        this._initialSetup();
       }
 
       /**
@@ -866,12 +883,11 @@ Copyright © HatioLab Inc. All rights reserved.
             boxCd = boxCd.toUpperCase();
 
             if (LOGIS_UTIL.isBoxIdValidate(boxCd)) {
-              event.currentTarget.value = '';
               this.inputBox(boxCd);
-              this._scannedFlag = true;
 
             } else {
               SOUND.playErrorSound();
+              this._initialSetup();
               LOGIS_UTIL.showToastWarnMessage(t('text.box_form_check'));
             }
           }
@@ -884,7 +900,6 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} event
        */
       refresh(event) {
-        this._barcodeInputReset();
         var equipCd = LOGIS_UTIL.getEquipCd();
         var equipType = LOGIS_UTIL.getEquipType();
 
@@ -899,6 +914,7 @@ Copyright © HatioLab Inc. All rights reserved.
           };
           showInputAjax.curl = url;
           showInputAjax.generateRequest();
+
         } else {
           LOGIS_UTIL.showMessage(t('text.selecting_equipment'), t('text.select_equipment'));
         }
@@ -939,6 +955,7 @@ Copyright © HatioLab Inc. All rights reserved.
           var equipType = LOGIS_UTIL.getEquipType();
 
           if (equipCd) {
+            this.$['input-box-id'].disabled = true;
             var inputBoxAjax = this.$['input-ajax'];
             var url = '/device_process/dynamic/dps/input_bucket';
             url += '?page=' + this.page + '&limit=' + this.limit;
@@ -950,26 +967,6 @@ Copyright © HatioLab Inc. All rights reserved.
           } else {
             LOGIS_UTIL.showMessage(t('text.selecting_equipment'), t('text.select_equipment'));
           }
-        }
-      }
-
-      /**
-       * @description 박스 ID 투입 성공 시 
-       *******************
-       * @param {Object} event
-       */
-      _onBoxInputSuccess(event) {
-        SOUND.playInfoSound();
-      }
-
-      /**
-       * @description 박스 ID 스캔 에러시
-       *******************
-       * @param {Object} event
-       */
-      _onBoxInputError(event) {
-        if (event.detail && event.detail.msg) {
-          LOGIS_UTIL.showToastErrorMessage(event.detail.msg);
         }
       }
 

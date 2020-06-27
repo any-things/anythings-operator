@@ -245,6 +245,7 @@ window.locales['zh-CN'] = {
   'button.cancel_full': '满箱取消',
   'button.detailed_content': 'View Contents',
   'button.update': 'Update',
+  'button.manual_picking': 'Picking',
 
   // text list
   'text.login_failure': '认证失败！',
@@ -410,6 +411,7 @@ window.locales['zh-CN'] = {
   'error.invalid_sku_cd': '无效商品编码！',
   'error.already_processed': '已完成作业。',
   'error.out_of_valid_qty': '已超出有效数量！',
+  'error.exceeded_input_qty': '입력 가능한 수량을 초과했습니다.',
   'error.please_check_site_info': '请确认Site信息。',
   'error.box_id_invalid': '箱编码无效。',
   'error.no_scan_mpi_code': '请先扫描MPI编码。',

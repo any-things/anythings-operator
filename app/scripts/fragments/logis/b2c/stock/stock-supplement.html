@@ -593,7 +593,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
           if (orderQty - stockQty < inputQty) {
             SOUND.playErrorSound();
-            LOGIS_UTIL.showMessage(t('error.VALIDATION_ERROR'), '입력 가능한 수량을 초과했습니다.', function() {
+            LOGIS_UTIL.showMessage(t('error.VALIDATION_ERROR'), t('error.exceeded_input_qty'), function() {
               this.$['input-qty'].value = '';
               this.$['input-qty'].select();
             }.bind(this));
@@ -637,13 +637,13 @@ Copyright © HatioLab Inc. All rights reserved.
 
         } else if (orderQty - stockQty < inputQty) {
           SOUND.playErrorSound();
-          LOGIS_UTIL.showMessage(t('error.VALIDATION_ERROR'), '입력 가능한 수량을 초과했습니다.', function() {
+          LOGIS_UTIL.showMessage(t('error.VALIDATION_ERROR'), t('error.exceeded_input_qty'), function() {
             inputQtyInput.select()
           });
 
         } else if (!this.skuCd) {
           SOUND.playErrorSound();
-          LOGIS_UTIL.showMessage(t('text.error'), t('text.invalid_sku_cd'));
+          LOGIS_UTIL.showMessage(t('error.VALIDATION_ERROR'), t('text.invalid_sku_cd'));
 
         } else {
           let rackCd = LOGIS_UTIL.getEquipCd();

@@ -54,6 +54,13 @@ Copyright © HatioLab Inc. All rights reserved.
         width:62%;height:40px;
         margin-bottom:5px
       }
+      .check-section {
+        display:grid;
+        grid-template: 1fr 1fr 1fr 1fr;
+        padding: 5px 0px 0px 32px;
+        display: flex;
+        flex-direction: row;
+      }
       span.bigtitle{
         margin:20px 0 15px 0;
         font-size:0.9rem;
@@ -158,6 +165,24 @@ Copyright © HatioLab Inc. All rights reserved.
       on-sys-ajax-error="_onItemInspectionError">
     </sys-ajax>
 
+    <!-- 피킹 완료 가능 여부 체크를 위한 Ajax -->
+    <sys-ajax
+      id="check-manual-picking-ajax"
+      curl="/device_process/dynamic/dps/picking/finish/possible"
+      method="GET"
+      content-type="application/json"
+      on-sys-ajax-response="_onPickingCheckSuccess">
+    </sys-ajax>
+    
+    <!-- 피킹 완료를 위한 Ajax -->
+    <sys-ajax
+      id="picking-complete-ajax"
+      curl="/device_process/dynamic/dps/picking/finish"
+      method="PUT"
+      content-type="application/json"
+      on-sys-ajax-response="_onPickingCompleteSuccess">
+    </sys-ajax>
+
     <!-- 검수 완료를 위한 Ajax -->
     <sys-ajax
       id="inspection-complete-ajax"
@@ -195,7 +220,17 @@ Copyright © HatioLab Inc. All rights reserved.
           <span class="label">[[skuBarcdLabel]]</span>
           <input id="sku-barcode" on-keypress="_onSkuBarcodeScan">
           <span class="label">[[reprintLabel]]</span>
+          
           <input type="checkbox" id="reprint-invoice" on-click="focusDefaultInput">
+          <div hidden><input type="checkbox" id="manual-picking" on-click="focusDefaultInput"></div>
+
+          <!--div class="check-section" hidden>
+            <span class="label" hidden>[[manualPickingLabel]]</span>
+            <input type="checkbox" id="manual-picking" on-click="focusDefaultInput" hidden>
+
+            <span class="label">[[reprintLabel]]</span>
+            <input type="checkbox" id="reprint-invoice" on-click="focusDefaultInput">
+          </div-->
         </div>
 
         <div class="input1">
@@ -360,6 +395,16 @@ Copyright © HatioLab Inc. All rights reserved.
           resetAllLabel: {
             type: String,
             value: t('button.reset_all')
+          },
+
+          /**
+           * @description 수작업 피킹 라벨
+           ****************
+           * @type {String}
+           */
+          manualPickingLabel: {
+            type: String,
+            value: t('button.manual_picking')
           },
 
           /**
@@ -667,19 +712,7 @@ Copyright © HatioLab Inc. All rights reserved.
       _onTrayCdScan(e) {
         if (e && e.key == 'Enter' && e.currentTarget && e.currentTarget.value) {
           let barcode = e.currentTarget.value;
-          this.refreshInspection('box', barcode, 'tray');
-        }
-      }
-
-      /**
-       * @description 박스 바코드 스캔 시
-       ****************************
-       * @param {Object} e
-       */
-      _onBoxIdScan(e) {
-        if (e && e.key == 'Enter' && e.currentTarget && e.currentTarget.value) {
-          let barcode = e.currentTarget.value;
-          this.refreshInspection('box', barcode, 'box');
+          this.readyTransaction('box', barcode, 'tray');
         }
       }
 
@@ -691,7 +724,19 @@ Copyright © HatioLab Inc. All rights reserved.
       _onOrderNoScan(e) {
         if (e && e.key == 'Enter' && e.currentTarget && e.currentTarget.value) {
           let orderNo = e.currentTarget.value;
-          this.refreshInspection('order', orderNo);
+          this.readyTransaction('order', orderNo);
+        }
+      }
+
+      /**
+       * @description 박스 ID 스캔 시
+       ****************************
+       * @param {Object} e
+       */
+      _onBoxIdScan(e) {
+        if (e && e.key == 'Enter' && e.currentTarget && e.currentTarget.value) {
+          let barcode = e.currentTarget.value;
+          this.refreshInspection('box', barcode, 'box');
         }
       }
 
@@ -728,6 +773,28 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
+       * @description 트랜잭션 실행 준비
+       *******************
+       * @param {String} inputType
+       * @param {String} inputId
+       * @param {String} boxType
+       */
+      readyTransaction(inputType, inputId, boxType) {
+        let manualPickingFlag = this.$['manual-picking'].checked;
+        let reprintFlag = this.$['reprint-invoice'].checked;
+
+        if (manualPickingFlag === true) {
+          this.checkManualPickingPossible(inputType, inputId, boxType);
+        } else {
+          if (reprintFlag === true) {
+            this.refreshInspection(inputType, inputId, boxType);
+          } else {
+            this.refreshInspection(inputType, inputId, boxType);
+          }
+        }
+      }
+
+      /**
        * @description 검수 화면 데이터 조회
        *******************
        * @param {String} inputType
@@ -737,11 +804,9 @@ Copyright © HatioLab Inc. All rights reserved.
       refreshInspection(inputType, inputId, boxType) {
         var findAjax = this.$['find-inspection-ajax'];
         findAjax.curl = `/device_process/dynamic/dps/inspection/find_by_${inputType}`;
-
         // reprintMode는 재 인쇄 모드 체크 박스 선택시 true로 ...
         let reprintMode = this.$['reprint-invoice'].checked;
         inputId = inputId.toUpperCase();
-
         findAjax.customParams = {
           equipType: LOGIS_UTIL.getEquipType(),
           equipCd: LOGIS_UTIL.getEquipCd(),
@@ -753,6 +818,104 @@ Copyright © HatioLab Inc. All rights reserved.
         };
 
         findAjax.generateRequest();
+      }
+
+      /**
+       * @description 수동 피킹 확정 처리 가능한 지 체크
+       *******************
+       * @param {String} inputType
+       * @param {String} inputId
+       * @param {String} boxType
+       */
+      checkManualPickingPossible(inputType, inputId, boxType) {
+        var manualPickingAjax = this.$['check-manual-picking-ajax'];
+        inputId = inputId.toUpperCase();
+        let params = {
+          equipType: LOGIS_UTIL.getEquipType(),
+          equipCd: LOGIS_UTIL.getEquipCd()
+        };
+
+        if (inputType == 'order') {
+          params['orderNo'] = inputId;
+
+        } else if (inputType == 'box') {
+          if (boxType && boxType == 'box') {
+            params['boxId'] = inputId;
+          } else if (boxType == 'tray') {
+            params['trayCd'] = inputId;
+          }
+        }
+
+        manualPickingAjax.customParams = params;
+        manualPickingAjax.generateRequest();
+      }
+
+      /**
+       * @description 수동 피킹 확정 처리 
+       *******************
+       * @param {String} orderNo
+       */
+      manualPickingComplete(orderNo) {
+        var completeAjax = this.$['picking-complete-ajax'];
+        completeAjax.customParams = {
+          equipType: LOGIS_UTIL.getEquipType(),
+          equipCd: LOGIS_UTIL.getEquipCd(),
+          orderNo: orderNo
+        };
+
+        completeAjax.generateRequest();
+      }
+
+      /**
+       * @description 수동 피킹 처리 가능 여부 체크
+       **********************
+       * @param {Object} event
+       */
+      _onPickingCheckSuccess(event) {
+        if (event && event.detail) {
+          if (event.detail.success && event.detail.result) {
+            let orderNo = event.detail.result;
+            this.clearView();
+            SOUND.playInfoSound();
+
+            LOGIS_UTIL.showMessage(t('button.confirm'), '주문 확정이 가능합니다. 주문 확정하시겠습니까?', function() {
+              this.$['manual-picking'].checked = false;
+              this.$['reprint-invoice'].checked = false;
+              this.manualPickingComplete(orderNo);
+            }.bind(this));
+
+          } else {
+            this.clearView();
+            SOUND.playErrorSound();
+            LOGIS_UTIL.showToastErrorMessage(event.detail.message);
+          }
+        }
+      }
+
+      /**
+       * @description 수동 피킹 완료 성공 후 
+       **********************
+       * @param {Object} event
+       */
+      _onPickingCompleteSuccess(event) {
+        if (event && event.detail) {
+          if (event.detail.success && event.detail.result) {
+            let orderNo = event.detail.result;
+            this.clearView();
+            SOUND.playInfoSound();
+
+            LOGIS_UTIL.showMessage(t('button.confirm'), '수동피킹 완료했습니다. 이어서 검수하시겠습니까?', function() {
+              this.$['manual-picking'].checked = false;
+              this.$['reprint-invoice'].checked = false;
+              this.refreshInspection('order', orderNo);
+            }.bind(this));
+
+          } else {
+            this.clearView();
+            SOUND.playErrorSound();
+            LOGIS_UTIL.showToastErrorMessage(event.detail.message);
+          }
+        }
       }
 
       /**
