@@ -347,7 +347,8 @@ Copyright © HatioLab Inc. All rights reserved.
         data="[[items]]"
         show-paginator 
         on-data-list-click="showOrderItems" 
-        on-paginator-changed="_pageChanged">
+        on-paginator-changed="_pageChanged"
+        on-configured="_addCompleteClass">
       </item-list>
     </div>
   </template>
@@ -692,6 +693,9 @@ Copyright © HatioLab Inc. All rights reserved.
                 }, {
                   fieldname: 'color_cd',
                   hidden: true
+                }, {
+                  fieldname: 'is_selected_item',
+                  hidden: true
                 }
               ]
             }
@@ -833,6 +837,28 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _itemsChanged(items) {
         this._initialSetup();
+      }
+
+      /**
+       * @description 검수 리스트가 configured 될 때 호출 되며
+       * diff_qty가 0이면 complete 클래스를 로우에 추가함
+       * item-list의 header 설정에 의해 결정된 color를 제거함
+       *********************
+       * @param {Object} event
+       */
+      _addCompleteClass(event) {
+        let list = event.detail.contentElements;
+
+        list.forEach(row => {
+          let data = row.getData();
+          if (data.is_selected_item && data.is_selected_item === true) {
+            row.classList.add('complete')
+            let columns = Array.from(row.querySelectorAll('span.data-item'));
+            columns.forEach(column => {
+              column.style.color = '';
+            })
+          }
+        });
       }
 
       /**
