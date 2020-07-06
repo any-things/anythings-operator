@@ -174,8 +174,48 @@ Copyright © HatioLab Inc. All rights reserved.
         overflow: hidden;
       }
 
+      .bucket-home {
+        position: relative;
+        text-align: center;
+      }
+
       .bucket-section {
         background-color: #c2671c;
+        width: 100%;
+        height: 100%;
+      }
+
+      .bucket-overlay {
+        position: absolute;
+				top: 0px;
+        left: 0px;
+        width: 100%;
+        height: 100%;
+        display: table;
+        margin: 0 auto;
+        /* border: 1px solid black; */
+        z-index: 100;
+      }
+
+      .blinking {
+        background-color: rgb(8, 146, 237);
+        width: 100%;
+        height: 100%;
+        -webkit-animation:blink 1s ease-in-out infinite alternate;
+        -moz-animation:blink 1s ease-in-out infinite alternate;
+        animation:blink 1s ease-in-out infinite alternate;
+      }
+      @-webkit-keyframes blink {
+          0% {opacity:0;}
+          100% {opacity:1;}
+      }
+      @-moz-keyframes blink {
+          0% {opacity:0;}
+          100% {opacity:1;}
+      }
+      @keyframes blink {
+          0% {opacity:0;}
+          100% {opacity:1;}
       }
 
       span.bigtitle {
@@ -231,7 +271,7 @@ Copyright © HatioLab Inc. All rights reserved.
         width: 55px;
       }
 
-      .bucket-section b {
+      .bucket-overlay b {
         display: block;
         color: #fff;
         font-size: 4rem;
@@ -259,15 +299,27 @@ Copyright © HatioLab Inc. All rights reserved.
       on-sys-ajax-error="_afterTransactionFail">
     </sys-ajax>
       
+    <sys-ajax 
+      id="setting-box-split-ajax" 
+      method="GET" 
+      auto="true"
+      curl='/settings/show_by_name?name=fnf.box.input.split.pcs'
+      content-type="application/json" 
+      last-response="{{boxInputSplitSetting}}">
+    </sys-ajax>
+
     <div id="container">
       <div id="top-container">
         <!-- 투입 가능 박스 수 -->
-        <div class="bucket-section">
-          <span class="bucket">
-            <img src="./images/icon-greenbox.png">
-            [[inputableBoxLabel]]
-          </span>
-          <b>[[inputableBoxes]]</b>
+        <div class="bucket-home">
+          <div id="bucket" class="bucket-section"></div>
+          <div class="bucket-overlay">
+            <span class="bucket">
+              <img src="./images/icon-greenbox.png">
+              [[inputableBoxLabel]]
+            </span>
+            <b>[[inputableBoxes]]</b>
+          </div>
         </div>
 
         <!-- 전체 진행율 -->
@@ -511,6 +563,11 @@ Copyright © HatioLab Inc. All rights reserved.
           progressRate: {
             type: Number,
             value: 0
+          },
+
+          boxInputSplitSetting: {
+            type: Object,
+            observer: '_boxInputSplitSettingChanged'
           },
 
           /**
@@ -772,6 +829,12 @@ Copyright © HatioLab Inc. All rights reserved.
         }
       }
 
+      _boxInputSplitSettingChanged(obj) {
+        if (obj && obj.value) {
+          this.maxOneBox = obj.value
+        }
+      }
+
       /**
        * @description 초기 셋업
        *******************
@@ -892,6 +955,24 @@ Copyright © HatioLab Inc. All rights reserved.
           } else {
             this.items = [];
             this.total = 0;
+          }
+        }
+
+        if (orderDataSet && orderDataSet.result) {
+          let result = orderDataSet.result;
+          let inputList = result.input_list;
+          if (!inputList) {
+            return;
+          }
+          if (!inputList.items || inputList.items.length == 0) {
+            return;
+          }
+          let items = inputList.items
+
+          if (items[0].plan_qty >= this.maxOneBox) {
+            this.$.bucket.classList = ['blinking']
+          } else {
+            this.$.bucket.classList = ['bucket-section']
           }
         }
       }
