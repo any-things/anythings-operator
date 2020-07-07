@@ -123,7 +123,7 @@ window.locales['ko-KR'] = {
   'label.left': '좌',
   'label.right': '우',
   'label.sku_weight': '상품 중량 (오차 범위)',
-  'label.max_load_qty': '적치 가능 수량',
+  'label.max_load_qty': '최대 적치 수량',
   'label.continue_box_scan': '연속 박스 스캔',
   'label.message': '메시지',
   'label.job_type_rtn': '반품',

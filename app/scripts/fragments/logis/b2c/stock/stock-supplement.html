@@ -17,21 +17,25 @@ Copyright © HatioLab Inc. All rights reserved.
         height: calc(100% - 40px);
         overflow-y: auto;
       }
+
       #container {
         padding: 20px;
         background-color: var(--things-white-opacity-background-color);
         border-radius: var(--things-default-border-radius);
-        color: rgba(255,255,255,.8);
+        color: rgba(255, 255, 255, .8);
       }
+
       .input-container {
         display: grid;
         grid-template-columns: 35% 65%;
-        grid-gap:7px 0;
+        grid-gap: 7px 0;
       }
+
       .label {
-        font-size:.8rem;
+        font-size: .8rem;
         margin: auto 5px auto auto;
       }
+
       #button-group {
         display: grid;
         grid-template-columns: 1fr auto;
@@ -39,6 +43,7 @@ Copyright © HatioLab Inc. All rights reserved.
         margin-top: 15px;
         justify-items: end;
       }
+
       #bottom-container {
         display: grid;
         grid-template-columns: 30% 30% 30%;
@@ -47,56 +52,35 @@ Copyright © HatioLab Inc. All rights reserved.
         padding: 20px;
         background-color: var(--things-white-opacity-background-color);
         border-radius: var(--things-default-border-radius);
-        color: rgba(255,255,255,.8);
+        color: rgba(255, 255, 255, .8);
       }
     </style>
 
     <!-- 상품 적치를 가이드할 추천 셀 정보 조회를 위한 Ajax -->
-    <sys-ajax
-      id="recommend-cell-ajax"
-      method="GET"
-      content-type="application/json"
+    <sys-ajax id="recommend-cell-ajax" method="GET" content-type="application/json"
       on-sys-ajax-response="_renderCellCombo">
     </sys-ajax>
 
     <!-- 추천 로케이션 리스트에서 선택시에 해당 셀 재고 정보 조회를 위한 Ajax -->
-    <sys-ajax
-      id="order-stock-ajax"
-      method="GET"
-      content-type="application/json"
+    <sys-ajax id="order-stock-ajax" method="GET" content-type="application/json"
       on-sys-ajax-response="_fillOrderStockInfo">
     </sys-ajax>
 
     <!-- 재고 적치 트랜잭션을 위한 Ajax -->
-    <sys-ajax
-      id="load-stock-ajax"
-      method="PUT"
-      content-type="application/json"
-      custom-error-handler
-      on-sys-ajax-error="_onLoadError"
-      on-sys-ajax-response="_onLoadSuccess">
+    <sys-ajax id="load-stock-ajax" method="PUT" content-type="application/json" custom-error-handler
+      on-sys-ajax-error="_onLoadError" on-sys-ajax-response="_onLoadSuccess">
     </sys-ajax>
 
     <!-- LED ON Ajax -->
-    <sys-ajax
-      id="led-on-ajax"
-      method="GET"
-      content-type="application/json">
+    <sys-ajax id="led-on-ajax" method="GET" content-type="application/json">
     </sys-ajax>
 
     <!-- LED OFF Ajax -->
-    <sys-ajax
-      id="led-off-ajax"
-      method="GET"
-      content-type="application/json">
+    <sys-ajax id="led-off-ajax" method="GET" content-type="application/json">
     </sys-ajax>
 
     <!-- 보충 랙 조회 Ajax -->
-    <sys-ajax
-      id="rack-list-ajax"
-      method="GET"
-      content-type="application/json"
-      on-sys-ajax-response="_rackSetting">
+    <sys-ajax id="rack-list-ajax" method="GET" content-type="application/json" on-sys-ajax-response="_rackSetting">
     </sys-ajax>
 
     <div id="container">
@@ -109,14 +93,8 @@ Copyright © HatioLab Inc. All rights reserved.
         <span class="label">[[skuBarcdLabel]]</span>
 
         <!-- SKU 정보 조회 시 복수개가 조회된 경우 실행되는 사용자가 고를 수 있는 팝업이 가미된 SKU Input -->
-        <auto-popup-input
-          hide-keyboard
-          id="sku-barcd"
-          resource-url="[[findSkuUrl]]"
-          popup-title="[[popupTitleLabel]]"
-          allowed-focus-out
-          button-txt-callback="[[_skuButtonTxtCallback]]"
-          on-item-selected="_onFoundStock">
+        <auto-popup-input hide-keyboard id="sku-barcd" resource-url="[[findSkuUrl]]" popup-title="[[popupTitleLabel]]"
+          allowed-focus-out button-txt-callback="[[_skuButtonTxtCallback]]" on-item-selected="_onFoundStock">
         </auto-popup-input>
 
         <!-- 상품 명 입력 박스 -->
@@ -137,7 +115,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
         <!-- 입력 수량 입력 박스 -->
         <span class="label">[[inputQtyLabel]]</span>
-        <input id="input-qty" type="number" min="1" max = "[[inputMaxQty]]" on-keypress="_onInputQtyChanged">
+        <input id="input-qty" type="number" min="1" max="[[inputMaxQty]]" on-keypress="_onInputQtyChanged">
 
         <!-- 추천 셀 셀렉트 박스 -->
         <span class="label">[[recommendCellLabel]]</span>
@@ -152,7 +130,7 @@ Copyright © HatioLab Inc. All rights reserved.
         <!-- 셀 유형 -->
         <span class="label" hidden>[[stockCellTypeLabel]]</span>
         <input id="stock-cell-type" readonly hidden></input>
-        
+
         <!-- 보충 단위 입력 박스 -->
         <span class="label" hidden>[[loadUnitLabel]]</span>
         <select id="load-unit" hidden>
@@ -319,7 +297,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           findSkuUrl: {
             type: String,
-            value: `/sku/search/${LOGIS_UTIL.getEquipType()}/${LOGIS_UTIL.getEquipCd()}/:inputValue`
+            value: `/stocks/sku/search/${LOGIS_UTIL.getEquipType()}/${LOGIS_UTIL.getEquipCd()}/:inputValue`
           },
 
           /**
@@ -572,7 +550,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
           } else {
             SOUND.playErrorSound();
-            LOGIS_UTIL.showMessage(t('text.error'), t('error.loc_cd_invalid'), function() {
+            LOGIS_UTIL.showMessage(t('text.error'), t('error.loc_cd_invalid'), function () {
               changeCellInput.value = '';
               changeCellInput.select();
             });
@@ -593,7 +571,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
           if (orderQty - stockQty < inputQty) {
             SOUND.playErrorSound();
-            LOGIS_UTIL.showMessage(t('error.VALIDATION_ERROR'), t('error.exceeded_input_qty'), function() {
+            LOGIS_UTIL.showMessage(t('error.VALIDATION_ERROR'), t('error.exceeded_input_qty'), function () {
               this.$['input-qty'].value = '';
               this.$['input-qty'].select();
             }.bind(this));
@@ -624,20 +602,20 @@ Copyright © HatioLab Inc. All rights reserved.
 
         if (!changeCellCd || changeCellCd == '' || changeCellCd.length < 1 || !LOGIS_UTIL.isCellCdValid(changeCellCd)) {
           SOUND.playErrorSound();
-          LOGIS_UTIL.showMessage(t('error.VALIDATION_ERROR'), t('error.loc_cd_invalid'), function() {
+          LOGIS_UTIL.showMessage(t('error.VALIDATION_ERROR'), t('error.loc_cd_invalid'), function () {
             changeCellInput.value = '';
             changeCellInput.select();
           });
 
         } else if (inputQtyInput.value == undefined || inputQtyInput.value == '' || inputQty <= 0) {
           SOUND.playErrorSound();
-          LOGIS_UTIL.showMessage(t('error.VALIDATION_ERROR'), t('text.input_qty_none'), function() {
+          LOGIS_UTIL.showMessage(t('error.VALIDATION_ERROR'), t('text.input_qty_none'), function () {
             inputQtyInput.select()
           });
 
         } else if (orderQty - stockQty < inputQty) {
           SOUND.playErrorSound();
-          LOGIS_UTIL.showMessage(t('error.VALIDATION_ERROR'), t('error.exceeded_input_qty'), function() {
+          LOGIS_UTIL.showMessage(t('error.VALIDATION_ERROR'), t('error.exceeded_input_qty'), function () {
             inputQtyInput.select()
           });
 
