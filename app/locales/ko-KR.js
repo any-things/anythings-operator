@@ -152,6 +152,7 @@ window.locales['ko-KR'] = {
   'label.brand_cd': '브랜드',
   'label.batch_title': '배치 타이틀',
   'label.created_at': '생성시간',
+  'label.supply_work_type': '작업유형',
 
   // menu list
   'menu.Settings': '설정',
