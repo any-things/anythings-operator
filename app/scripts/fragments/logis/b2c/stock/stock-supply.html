@@ -65,7 +65,8 @@ Copyright © HatioLab Inc. All rights reserved.
       method="GET" 
       curl="/wcs/sku_stock_list_search"
       content-type="application/json" 
-      on-sys-ajax-response="_handleSkuStockListResponse">
+      on-sys-ajax-response="_handleSkuStockListResponse"
+      on-sys-ajax-error="_onQueryStockError" >
     </sys-ajax>
 
     <!-- 재고 적치 트랜잭션을 위한 Ajax -->
@@ -453,6 +454,8 @@ Copyright © HatioLab Inc. All rights reserved.
           this.$['stock-qty'].value = values.stockQty;
           this.$['input-qty'].value = values.inputQty;
           this.hasRackBatch = values.hasRackBatch;
+
+          this.$['change-cell'].select();
         }
       }
 
@@ -610,6 +613,12 @@ Copyright © HatioLab Inc. All rights reserved.
         SOUND.playInfoSound();
         LOGIS_UTIL.showToastInfoMessage(t('text.stock_load_success'));
         this._clearView();
+      }
+
+      _onQueryStockError(event) {
+        SOUND.playErrorSound();
+
+        this.$['sku-barcd'].select();
       }
 
       /**
