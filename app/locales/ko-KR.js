@@ -27,6 +27,7 @@ window.locales['ko-KR'] = {
   'label.order_id': '주문 ID',
   'label.order_line_no': '주문 라인',
   'label.order_qty': '주문 수량',
+  'label.can_load_qty': '적치가능량',
   'label.status': '상태',
   'label.input_seq': '투입순서',
   'label.order_no': '주문 번호',
@@ -197,6 +198,7 @@ window.locales['ko-KR'] = {
   'menu.RtnPickedByCell': '반품 셀 별현황',
   'menu.RtnRemainsBox': '반품 잔량처리',
   'menu.StockLoadFixed': '고정셀 적치',
+  'menu.StockSupply': '사전 보충',
 
   // button list
   'button.logout': '로그아웃',
