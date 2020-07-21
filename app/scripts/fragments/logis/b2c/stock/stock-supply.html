@@ -61,7 +61,8 @@ Copyright © HatioLab Inc. All rights reserved.
     </style>
 
     <!-- 상품 적치를 가이드할 추천 셀 정보 조회를 위한 Ajax -->
-    <sys-ajax id="cell-stock-query" 
+    <sys-ajax 
+      id="cell-stock-query" 
       method="GET" 
       curl="/wcs/sku_stock_list_search"
       content-type="application/json" 
@@ -97,6 +98,7 @@ Copyright © HatioLab Inc. All rights reserved.
           allowed-focus-out button-txt-callback="[[_skuButtonTxtCallback]]" on-item-selected="_onFoundStock">
         </auto-popup-input>
 
+        <!-- 재고 보충 작업 유형 -->
         <span class="label">[[supplyWorkTypeLabel]]</span>
         <input id="dps-work-type" value="[[dpsStockWorkType]]" readonly></input>
 
@@ -169,9 +171,14 @@ Copyright © HatioLab Inc. All rights reserved.
             value: () => t('label.rack')
           },
 
-          supplyWorkTypeLabel: {  // 재고보충유형
+          /**
+           * @description 작업 유형 라벨
+           ***************
+           * @type {String}
+           */
+          supplyWorkTypeLabel: {
             type: String,
-            value: () => t('label.supply_work_type')
+            value: () => t('label.job_type')
           },
 
           /**
@@ -344,10 +351,20 @@ Copyright © HatioLab Inc. All rights reserved.
             value: () => t('label.stock_load_unit_box')
           },
 
+          /**
+           * @description 재고 보충 유형 값 
+           ****************
+           * @type {String}
+           */
           dpsStockWorkType: {
             type: String
           },
 
+          /**
+           * @description 적치 단위 박스 라벨
+           ****************
+           * @type {String}
+           */
           hasRackBatch: {
             type: Boolean,
             observer: '_hasRackBatchChanged'
@@ -371,6 +388,11 @@ Copyright © HatioLab Inc. All rights reserved.
         this._searchRackList();
       }
 
+      /**
+       * @description hasRackBatch 값 변경시
+       *******************
+       * @param {Boolean} value
+       */
       _hasRackBatchChanged(value) {
         if (value == 'undefined') {
           return;
@@ -408,7 +430,7 @@ Copyright © HatioLab Inc. All rights reserved.
        *******************
        * @param {Object} skuInfo
        */
-       _getCellStockList(skuInfo) {
+      _getCellStockList(skuInfo) {
         if (skuInfo && skuInfo.sku_cd && skuInfo.sku_cd.length >= 4) {
           const recommendCellAjax = this.$['cell-stock-query'];
           recommendCellAjax.params = {
@@ -417,7 +439,7 @@ Copyright © HatioLab Inc. All rights reserved.
             skuCd: skuInfo.sku_cd,
             comCd: skuInfo.com_cd
           };
-          
+
           recommendCellAjax.generateRequest();
         }
       }
@@ -427,7 +449,7 @@ Copyright © HatioLab Inc. All rights reserved.
        *******************
        * @param {Object} response
        */
-       _handleSkuStockListResponse(response) {
+      _handleSkuStockListResponse(response) {
         if (!response || !response.detail) {
           return;
         }
@@ -486,9 +508,10 @@ Copyright © HatioLab Inc. All rights reserved.
           this.$['cell'].value = '';
           changeCellInput.select();
           this._load();
+
         } else {
           SOUND.playErrorSound();
-          LOGIS_UTIL.showMessage(t('text.error'), t('error.loc_cd_invalid'), function () {
+          LOGIS_UTIL.showMessage(t('text.error'), t('error.loc_cd_invalid'), function() {
             changeCellInput.value = '';
             changeCellInput.select();
           });
@@ -499,7 +522,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @description 재고 적치 트랜잭션 처리
        *******************
        */
-       _load() {
+      _load() {
         var changeCellInput = this.$['change-cell'];
         var orderQtyInput = this.$['order-qty'];
         var stockQtyInput = this.$['stock-qty'];
@@ -513,36 +536,32 @@ Copyright © HatioLab Inc. All rights reserved.
         if (!this.skuCd) {
           SOUND.playErrorSound();
           LOGIS_UTIL.showMessage(t('error.VALIDATION_ERROR'), t('text.invalid_sku_cd'));
-
           return;
         }
 
         if (!changeCellCd || changeCellCd == '' || changeCellCd.length < 1 || !LOGIS_UTIL.isCellCdValid(changeCellCd)) {
           SOUND.playErrorSound();
-          LOGIS_UTIL.showMessage(t('error.VALIDATION_ERROR'), t('error.loc_cd_invalid'), function () {
+          LOGIS_UTIL.showMessage(t('error.VALIDATION_ERROR'), t('error.loc_cd_invalid'), function() {
             changeCellInput.value = '';
             changeCellInput.select();
           });
-
           return;
         }
 
         if (inputQtyInput.value == undefined || inputQtyInput.value == '' || inputQty <= 0) { // 투입수량 체크
           SOUND.playErrorSound();
-          LOGIS_UTIL.showMessage(t('error.VALIDATION_ERROR'), t('text.input_qty_none'), function () {
+          LOGIS_UTIL.showMessage(t('error.VALIDATION_ERROR'), t('text.input_qty_none'), function() {
             inputQtyInput.select()
           });
-
           return;
         }
 
         if (this.hasRackBatch) {
-          if (orderQty - stockQty < inputQty) {   // 투입수량 초과 체크
+          if (orderQty - stockQty < inputQty) { // 투입수량 초과 체크
             SOUND.playErrorSound();
-            LOGIS_UTIL.showMessage(t('error.VALIDATION_ERROR'), t('error.exceeded_input_qty'), function () {
+            LOGIS_UTIL.showMessage(t('error.VALIDATION_ERROR'), t('error.exceeded_input_qty'), function() {
               inputQtyInput.select()
             });
-
             return;
           }
         }
@@ -567,7 +586,7 @@ Copyright © HatioLab Inc. All rights reserved.
         if (event.charCode != 13) {
           return;
         }
-        
+
         let orderQty = Number(this.$['order-qty'].value);
         let stockQty = Number(this.$['stock-qty'].value);
         let inputQty = Number(this.$['input-qty'].value);
@@ -575,15 +594,16 @@ Copyright © HatioLab Inc. All rights reserved.
         if (this.hasRackBatch) {
           if (orderQty - stockQty < inputQty) {
             SOUND.playErrorSound();
-            LOGIS_UTIL.showMessage(t('error.VALIDATION_ERROR'), t('error.exceeded_input_qty'), function () {
+            LOGIS_UTIL.showMessage(t('error.VALIDATION_ERROR'), t('error.exceeded_input_qty'), function() {
               this.$['input-qty'].value = '';
               this.$['input-qty'].select();
             }.bind(this));
             return;
           }
+
         } else if (!inputQty || inputQty == '' || inputQty == 0) {
           SOUND.playErrorSound();
-          LOGIS_UTIL.showMessage(t('error.VALIDATION_ERROR'), t('text.input_qty_none'), function () {
+          LOGIS_UTIL.showMessage(t('error.VALIDATION_ERROR'), t('text.input_qty_none'), function() {
             this.$['input-qty'].value = '';
             this.$['input-qty'].select();
           });
@@ -615,9 +635,13 @@ Copyright © HatioLab Inc. All rights reserved.
         this._clearView();
       }
 
+      /**
+       * @description 추천 로케이션 조회 에러 시 
+       *******************
+       * @param {Object} event
+       */
       _onQueryStockError(event) {
         SOUND.playErrorSound();
-
         this.$['sku-barcd'].select();
       }
 
@@ -642,11 +666,11 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _clearView() {
         this._clearCombobox(this.$['cell']);
-        this.$['cell'].value='';
+        this.$['cell'].value = '';
         this.$['sku-barcd'].value = '';
         this.$['sku-nm'].value = '';
         this.$['change-cell'].value = '';
-        this.$['dps-work-type'].value='';
+        this.$['dps-work-type'].value = '';
         this.$['order-qty'].value = '';
         this.$['alloc-qty'].value = '';
         this.$['stock-qty'].value = '';

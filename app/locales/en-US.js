@@ -151,6 +151,9 @@ window.locales['en-US'] = {
   'label.brand_cd': 'Brand Code',
   'label.batch_title': 'Batch Title',
   'label.created_at': 'Crated At',
+  'label.status_wait': 'Wait',
+  'label.status_run': 'Run',
+  'label.status_end': 'End',
 
   // menu list
   'menu.Settings': 'Setting',
@@ -159,6 +162,7 @@ window.locales['en-US'] = {
   'menu.B2CPickingJob': 'B2C Picking Job',
   'menu.QpsOrderInfo': 'QPS Task',
   'menu.B2BSkuInput': 'SKU Input',
+  'menu.B2BSkuInput2': 'SKU Input',
   'menu.B2CBoxInput': 'Box Input',
   'menu.B2CBoxRequirement': 'Box Requirement',
   'menu.KioskQpsOrderInfo': 'QPS Task',
@@ -203,6 +207,7 @@ window.locales['en-US'] = {
   'button.job_complete': 'Job Complete',
   'button.job_cancel': 'Job Cancel',
   'button.print_label': 'Print Label',
+  'button.print_all': 'Print All',
   'button.back': 'Back',
   'button.refresh': 'Refresh',
   'button.fullbox_inspect': 'Box Inspection',

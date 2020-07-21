@@ -153,7 +153,9 @@ window.locales['ko-KR'] = {
   'label.brand_cd': '브랜드',
   'label.batch_title': '배치 타이틀',
   'label.created_at': '생성시간',
-  'label.supply_work_type': '작업유형',
+  'label.status_wait': '대기',
+  'label.status_run': '진행',
+  'label.status_end': '완료',
 
   // menu list
   'menu.Settings': '설정',
@@ -162,6 +164,7 @@ window.locales['ko-KR'] = {
   'menu.B2CPickingJob': 'B2C 피킹작업',
   'menu.QpsOrderInfo': 'QPS 작업',
   'menu.B2BSkuInput': '상품 투입',
+  'menu.B2BSkuInput2': '상품 투입',
   'menu.B2CBoxInput': '박스 투입',
   'menu.B2CBoxRequirement': '박스 소요량',
   'menu.KioskQpsOrderInfo': 'QPS 작업',
@@ -207,6 +210,7 @@ window.locales['ko-KR'] = {
   'button.job_complete': '작업완료',
   'button.job_cancel': '작업취소',
   'button.print_label': '라벨출력',
+  'button.print_all': '일괄출력',
   'button.back': '뒤로',
   'button.refresh': '새로고침',
   'button.fullbox_inspect': '박스검수',
