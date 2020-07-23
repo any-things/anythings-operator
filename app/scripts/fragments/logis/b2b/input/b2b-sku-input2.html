@@ -165,49 +165,28 @@ Copyright © HatioLab Inc. All rights reserved.
     </style>
 
     <!-- KIOSK 스캔 Ajax -->
-    <sys-ajax 
-      id="input-sku-ajax" 
-      curl="/device_process/input/Rack/:rack_cd/:com_cd/:sku_cd" 
-      method="POST"
-      content-type="application/json" 
-      last-response="{{inputDataSet}}" 
-      custom-error-handler
+    <sys-ajax id="input-sku-ajax" curl="/device_process/input/Rack/:rack_cd/:com_cd/:sku_cd" method="POST"
+      content-type="application/json" last-response="{{inputDataSet}}" custom-error-handler
       on-sys-ajax-error="_onInputSkuError">
     </sys-ajax>
 
     <!-- 상품 검수 트랜잭션을 위한 Ajax -->
-    <sys-ajax 
-      id="inspect-sku-ajax" 
-      method="POST" 
-      content-type="application/json" 
-      custom-error-handler
-      on-sys-ajax-response="_onInspectionSuccess" 
-      on-sys-ajax-error="_onInputSkuError">
+    <sys-ajax id="inspect-sku-ajax" method="POST" content-type="application/json" custom-error-handler
+      on-sys-ajax-response="_onInspectionSuccess" on-sys-ajax-error="_onInputSkuError">
     </sys-ajax>
 
     <!-- 배치 작업 진행율 표시를 위한 Ajax -->
-    <sys-ajax
-      id="batch-summary-ajax" 
-      method="GET" 
-      content-type="application/json" 
-      last-response="{{batchSummaryData}}"
+    <sys-ajax id="batch-summary-ajax" method="GET" content-type="application/json" last-response="{{batchSummaryData}}"
       on-sys-ajax-error="_stopAutoRefresh">
     </sys-ajax>
 
     <!-- 송장 일괄 출력을 위한 Ajax -->
-    <sys-ajax
-      id="print-all-ajax" 
-      method="POST" 
-      content-type="application/json" 
+    <sys-ajax id="print-all-ajax" method="POST" content-type="application/json"
       on-sys-ajax-response="_onPrintAllSuccess">
     </sys-ajax>
-      
+
     <!-- 투입 리스트 표시를 위한 Ajax -->
-    <sys-ajax 
-      id="input-list-ajax" 
-      method="GET" 
-      content-type="application/json" 
-      last-response="{{inputDataSet}}">
+    <sys-ajax id="input-list-ajax" method="GET" content-type="application/json" last-response="{{inputDataSet}}">
     </sys-ajax>
 
     <div id="container">
@@ -330,11 +309,8 @@ Copyright © HatioLab Inc. All rights reserved.
 
         <!-- 상품 바코드 -->
         <span class="label">[[skuBarcdLabel]]</span>
-        <auto-popup-input 
-          id="sku-barcode" 
-          popup-title="[[popupTitleLabel]]"
-          button-txt-callback="[[_skuButtonTxtCallback]]" 
-          on-before-request="_customAjaxHandler"
+        <auto-popup-input id="sku-barcode" popup-title="[[popupTitleLabel]]"
+          button-txt-callback="[[_skuButtonTxtCallback]]" on-before-request="_customAjaxHandler"
           on-item-selected="itemSelected">
         </auto-popup-input>
 
@@ -349,15 +325,8 @@ Copyright © HatioLab Inc. All rights reserved.
       </div>
 
       <!-- 투입 리스트 -->
-      <item-list 
-        show-paginator
-        header="[[header]]" 
-        page="[[page]]" 
-        total="[[total]]" 
-        limit="[[limit]]" 
-        data="[[items]]"
-        on-data-list-click="showDetailList"  
-        on-paginator-changed="_pageChanged">
+      <item-list show-paginator header="[[header]]" page="[[page]]" total="[[total]]" limit="[[limit]]" data="[[items]]"
+        on-data-list-click="showDetailList" on-paginator-changed="_pageChanged">
       </item-list>
     </div>
   </template>
@@ -397,7 +366,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           skuBarcdLabel: {
             type: String,
-            value: function() {
+            value: function () {
               return t('label.sku_barcd');
             }
           },
@@ -409,7 +378,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           unfinishedLabel: {
             type: String,
-            value: function() {
+            value: function () {
               return t('label.unfinished');
             }
           },
@@ -421,7 +390,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           qtyLabel: {
             type: String,
-            value: function() {
+            value: function () {
               return t('label.qty');
             }
           },
@@ -433,7 +402,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           refreshLabel: {
             type: String,
-            value: function() {
+            value: function () {
               return t('button.refresh');
             }
           },
@@ -445,7 +414,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           printAllLabel: {
             type: String,
-            value: function() {
+            value: function () {
               return t('button.print_all');
             }
           },
@@ -477,7 +446,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           orderLabel: {
             type: String,
-            value: function() {
+            value: function () {
               return t('label.customer');
             }
           },
@@ -489,7 +458,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           pickedLabel: {
             type: String,
-            value: function() {
+            value: function () {
               return t('label.picked_qty');
             }
           },
@@ -501,7 +470,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           pickingLabel: {
             type: String,
-            value: function() {
+            value: function () {
               return t('label.pick_qty');
             }
           },
@@ -522,7 +491,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           header: {
             type: Array,
-            value: function() {
+            value: function () {
               return [{
                 display: t('label.input_seq'),
                 fieldname: 'input_seq',
@@ -864,7 +833,7 @@ Copyright © HatioLab Inc. All rights reserved.
           this.refresh();
         }
 
-        setTimeout(function() {
+        setTimeout(function () {
           this.startAutoRefresh();
         }.bind(this), LOGIS_UTIL.getRefreshInterval());
       }
@@ -886,9 +855,9 @@ Copyright © HatioLab Inc. All rights reserved.
       _itemsChanged(items) {
         if (this._scannedFlag) {
           if (items && items.length > 0) {
-            var totalPcs = items.map(function(item) {
+            var totalPcs = items.map(function (item) {
               return item.plan_qty;
-            }).reduce(function(sum, current) {
+            }).reduce(function (sum, current) {
               return sum + current;
             });
             this._makeTotalAssortQty(totalPcs);
@@ -1030,20 +999,20 @@ Copyright © HatioLab Inc. All rights reserved.
           this.pcsPicking = batchSummaryData.plan_pcs;
           this.pcsPicked = batchSummaryData.actual_pcs;
 
-          this.totalOrderPicking = batchSummaryData.plan_order;
-          this.totalOrderPicked = batchSummaryData.actual_order;
-          this.totalSkuPicking = batchSummaryData.plan_sku;
-          this.totalSkuPicked = batchSummaryData.actual_sku;
-          this.totalPcsPicking = batchSummaryData.plan_pcs;
-          this.totalPcsPicked = batchSummaryData.actual_pcs;
+          this.totalOrderPicking = batchSummaryData.tot_plan_order;
+          this.totalOrderPicked = batchSummaryData.tot_actual_order;
+          this.totalSkuPicking = batchSummaryData.tot_plan_sku;
+          this.totalSkuPicked = batchSummaryData.tot_actual_sku;
+          this.totalPcsPicking = batchSummaryData.tot_plan_pcs;
+          this.totalPcsPicked = batchSummaryData.tot_actual_pcs;
 
           this.progressRate = batchSummaryData.rate_order;
           this.progressRateBySku = batchSummaryData.rate_sku;
           this.gaugeRate = batchSummaryData.rate_pcs;
 
-          this.totalProgressRate = batchSummaryData.rate_order;
-          this.totalProgressRateBySku = batchSummaryData.rate_sku;
-          this.totalGaugeRate = batchSummaryData.rate_pcs;
+          this.totalProgressRate = batchSummaryData.tot_rate_order;
+          this.totalProgressRateBySku = batchSummaryData.tot_rate_sku;
+          this.totalGaugeRate = batchSummaryData.tot_rate_pcs;
 
           let inputListAjax = this.$['input-list-ajax'];
           let equipCd = LOGIS_UTIL.getEquipCd();
@@ -1130,7 +1099,7 @@ Copyright © HatioLab Inc. All rights reserved.
         var detail = event.detail ? event.detail : event.detail.body;
 
         if (detail && detail.msg == 'already-input-sku-want-to-inspection') {
-          LOGIS_UTIL.showConfirm(t('text.checking_inspection'), t('text.check_inspection'), this._barcodeInputReset.bind(this), function() {
+          LOGIS_UTIL.showConfirm(t('text.checking_inspection'), t('text.check_inspection'), this._barcodeInputReset.bind(this), function () {
             const equipCd = LOGIS_UTIL.getEquipCd();
             let stationCd = LOGIS_UTIL.getStationCd();
             let comCd = this.sku.com_cd;
@@ -1187,7 +1156,7 @@ Copyright © HatioLab Inc. All rights reserved.
       printLabelAll(event) {
         var title = t('button.print_all');
         var msg = title + ' ' + t('text.Sure to process');
-        LOGIS_UTIL.showConfirm(title, msg, this._barcodeInputReset.bind(this), function() {
+        LOGIS_UTIL.showConfirm(title, msg, this._barcodeInputReset.bind(this), function () {
           var ajax = this.$['print-all-ajax'];
           ajax.curl = `/device_process/dynamic/DAS/print_invoice/last_all`;
           ajax.customParams = {
