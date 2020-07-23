@@ -154,6 +154,7 @@ window.locales['en-US'] = {
   'label.status_wait': 'Wait',
   'label.status_run': 'Run',
   'label.status_end': 'End',
+  'label.class_cd': 'Class Code',
 
   // menu list
   'menu.Settings': 'Setting',

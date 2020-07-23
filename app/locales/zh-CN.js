@@ -155,6 +155,7 @@ window.locales['zh-CN'] = {
   'label.status_wait': '대기',
   'label.status_run': '진행',
   'label.status_end': '완료',
+  'label.class_cd': '분류 코드',
 
   // menu list
   'menu.Settings': '设置',
