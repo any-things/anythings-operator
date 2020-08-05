@@ -1193,7 +1193,7 @@ Copyright © HatioLab Inc. All rights reserved.
         var msg = title + ' ' + t('text.Sure to process');
         LOGIS_UTIL.showConfirm(title, msg, this._barcodeInputReset.bind(this), function() {
           var ajax = this.$['print-all-ajax'];
-          ajax.curl = `/device_process/dynamic/DAS/print_invoice/last_all`;
+          ajax.curl = `/device_process/dynamic/DAS/print_invoice_all`;
           ajax.customParams = {
             equipCd: LOGIS_UTIL.getEquipCd()
           };
