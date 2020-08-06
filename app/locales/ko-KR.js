@@ -157,6 +157,7 @@ window.locales['ko-KR'] = {
   'label.status_run': '진행',
   'label.status_end': '완료',
   'label.class_cd': '분류 코드',
+  'label.remain_box': '남은 박스',
 
   // menu list
   'menu.Settings': '설정',

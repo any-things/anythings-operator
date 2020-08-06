@@ -1,0 +1,814 @@
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+
+<link rel="import" href="../../../../../bower_components/polymer/polymer-element.html">
+
+<link rel="import" href="../../../../../styles/shared-styles.html">
+
+<link rel="import" href="../../../../components/logis/sku-selection-popup.html">
+
+<!--
+  물류 > B2C > 소분류 - 박스 투입 없는 단포 작업 화면 (KIOSK)
+-->
+<dom-module id="b2c-no-box-single-pack">
+  <template>
+    <style include="shared-styles">
+      :host {
+        display: grid;
+        grid-template-columns: 45% 55%;
+        height: calc(100% - 20px);
+        padding: 10px;
+        border-radius: var(--things-default-border-radius);
+        color: rgba(255, 255, 255, .8);
+        text-align: center;
+      }
+
+      #left-container {
+        height: 100%;
+        overflow-y: hidden;
+      }
+
+      #right-container {
+        display: grid;
+        grid-template-rows: 45% 45% 10%;
+      }
+
+      #top-container {
+        margin: 5px 5px 10px 10px;
+        display: grid;
+        grid-template-columns: 30% 70%;
+        background-color: var(--things-white-opacity-background-color);
+        border-radius: var(--things-default-border-radius);
+      }
+
+      #bottom-container {
+        display: grid;
+        grid-template-rows: 25% 75%;
+        grid-template-columns: 50% 50%;
+        margin: 5px 5px 10px 10px;
+        background-color: var(--things-white-opacity-background-color);
+        border-radius: var(--things-default-border-radius);
+      }
+
+      .label {
+        color: #D5D7DB;
+        font-size: 25pt;
+        align-self: center;
+        grid-column-start: 1;
+        grid-column-end: 2;
+      }
+
+      #top-container input {
+        align-self: center;
+        width: 80%;
+      }
+
+      auto-popup-input {
+        align-self: center;
+        width: 81.5%;
+      }
+
+      #totalOrderContainer {
+        grid-column-start: 1;
+        grid-column-end: 3;
+      }
+
+      .order {
+        align-self: center;
+        font-size: larger;
+      }
+
+      span.smalltitle {
+        display: inline-block !important;
+        border-bottom: 3px solid var(--things-secondary-color);
+      }
+
+      span.proc b {
+        display: block;
+        color: #fff;
+        font-size: 2.5rem;
+        text-shadow: 1px 3px 3px rgba(0, 0, 0, .3);
+        line-height: 1.3;
+      }
+
+      #boxId-container {
+        display: grid;
+        grid-template-columns: 1r 2fr;
+      }
+
+      .big-label {
+        font-size: larger;
+        align-self: center;
+      }
+
+      .bigproc {
+        align-self: center;
+      }
+
+      .bigproc b {
+        display: block;
+        color: #fff;
+        font-size: 5rem;
+        text-shadow: 1px 3px 3px rgba(0, 0, 0, .3);
+        line-height: 1.3;
+      }
+
+      #input-container {
+        text-align: right;
+        align-self: center;
+      }
+
+      #input-container input {
+        height: 20px;
+      }
+
+      item-list {
+        height: 67%;
+        margin: 10px 10px 10px 5px;
+      }
+
+      #left-top-container {
+        margin: 5px;
+        height: 30%;
+        display: grid;
+        grid-template-columns: 50% 50%;
+        background-color: var(--things-white-opacity-background-color);
+        border-radius: var(--things-default-border-radius);
+      }
+    </style>
+
+    <!-- 상품 코드로 단포 작업 현황 조회를 위한 Ajax -->
+    <sys-ajax 
+      id="single-pack-summary-ajax" 
+      method="GET" 
+      content-type="application/json" 
+      on-sys-ajax-response="_onSearchSinglePackSummary">
+    </sys-ajax>
+
+    <!-- 단포 작업 처리 Ajax -->
+    <sys-ajax 
+      id="finish-job-ajax" 
+      method="PUT" 
+      content-type="application/json" 
+      on-sys-ajax-response="_onSinglePickSuccess">
+    </sys-ajax>
+
+    <!-- 송장 발행을 위한 Ajax -->
+    <sys-ajax 
+      id="print-invoice-ajax"
+      curl="/device_process/dynamic/dps/print_invoice" 
+      method="PUT"
+      content-type="application/json" 
+      on-sys-ajax-response="_printLabelSucceed">
+    </sys-ajax>
+
+    <!-- 좌측 컨테이너 -->
+    <div id="left-container">
+      <!-- 좌측 상단 작업 진행 요약 컨테이너 -->
+      <div id="left-top-container">
+        <!-- 전체 박스 수량 표시 컨테이너 -->
+        <div class="order">
+          <span class="smalltitle">[[total]] [[box]]</span>
+          <span class="proc"><b>[[boxPicking]]</b></span>
+        </div>
+
+        <!-- 완료 박스 수량 표시 컨테이너 -->
+        <div class="order">
+          <span class="smalltitle">[[finishLabel]] [[box]]</span>
+          <span class="proc"><b>[[boxPicked]]</b></span>
+        </div>
+      </div>
+
+      <!-- 좌측 하단 그리드 컨테이너 -->
+      <item-list 
+        id="item-list" 
+        header="[[header]]" 
+        data="[[items]]" 
+        on-data-list-click="selectItem"
+        on-configured="_changeGridRowStyle">
+      </item-list>
+    </div>
+
+    <!-- 우측 컨테이너 -->
+    <div id="right-container">
+      <!-- 우측 상단 작업 진행 요약 컨테이너 -->
+      <div id="top-container">
+        <!-- 상품 코드 라벨 -->
+        <span class="label">[[skuCdLabel]]</span>
+
+        <!-- 상품 코드 Input -->
+        <auto-popup-input 
+          hide-keyboard 
+          id="sku-code" 
+          resource-url="[[getSkuAjaxUrl]]" 
+          popup-title="[[popupTitleLabel]]"
+          button-txt-callback="[[_skuButtonTxtCallback]]" 
+          on-item-selected="skuSelectionChanged"
+          on-sys-ajax-error="_findSkuError">
+        </auto-popup-input>
+
+        <!-- 상품 명 -->
+        <span class="label">[[skuNmLabel]]</span>
+        <input id="sku-name" readonly></input>
+
+        <!-- 박스 ID -->
+        <span class="label">[[remainBoxLabel]]</span>
+        <input id="remain-box" type="number" readonly></input>
+      </div>
+
+      <!-- 우측 하단 단포 진행 요약 컨테이너 -->
+      <div id="bottom-container">
+        <span id='box-type-label' class="big-label">[[boxTypeLabel]]</span>
+        <span id='order-qty-label' class="big-label">[[orderQtyLabel]]</span>
+        <span id='box-type' class="bigproc"><b>[[boxType]]</b></span>
+        <span id='order-qty' class="bigproc"><b>[[orderQty]]</b></span>
+      </div>
+
+      <!-- 우측 최하단 옵션 컨테이너 -->
+      <div id="input-container">
+        <button id="finish-btn" on-click="finishPicking">[[finishLabel]]</button>
+        <!--button id="reprint-btn" on-click="printInvoiceLabel">[[printLabel]]</button-->
+        <button id="reset-btn" on-click="clearView">[[clearLabel]]</button>
+      </div>  
+    </div>
+  </template>
+
+  <script>
+    class B2CNoBoxSinglePack extends Polymer.Element {
+      static get is() {
+        return 'b2c-no-box-single-pack';
+      }
+      static get properties() {
+        return {
+          /**
+           * @description 그리드 데이터 
+           ****************
+           * @type {Array}
+           */
+          items: {
+            type: Array
+          },
+
+          /**
+           * @description 그리드 헤더 
+           ****************
+           * @type {Array}
+           */
+          header: {
+            type: Array,
+            value: function() {
+              // 피스 수량 / 박스타입 / 주문 수 / 완료주문 수
+              return [{
+                display: t('label.pcs_qty'),
+                fieldname: 'pick_qty',
+                columnWidth: '0.15fr',
+                style: {
+                  textAlign: 'center',
+                }
+              }, {
+                display: t('label.box_type'),
+                fieldname: 'box_type_cd',
+                columnWidth: '0.3fr',
+                style: {
+                  textAlign: 'center',
+                },
+              }, {
+                display: t('label.order_cnt'),
+                fieldname: 'tot_order_cnt',
+                columnWidth: '0.3fr',
+                style: {
+                  textAlign: 'center',
+                },
+              }, {
+                display: t('label.com_cnt'),
+                fieldname: 'comp_order_cnt',
+                columnWidth: '0.3fr',
+                style: {
+                  textAlign: 'center',
+                },
+              }, {
+                hidden: true,
+                fieldname: 'selected_job',
+              }]
+            }
+          },
+
+          /**
+           * @description 랙 코드 
+           ****************
+           * @type {String}
+           */
+          rackCd: {
+            type: String,
+            value: function() {
+              return JSON.parse(localStorage.getItem('setting.equipCd'));
+            }
+          },
+
+          /**
+           * @description 상품 코드 
+           ****************
+           * @type {String}
+           */
+          skuCdLabel: {
+            type: String,
+            value: function() {
+              return t('label.sku_cd');
+            }
+          },
+
+          /**
+           * @description 상품 명 
+           ****************
+           * @type {String}
+           */
+          skuNmLabel: {
+            type: String,
+            value: function() {
+              return t('label.sku_nm');
+            }
+          },
+
+          /**
+           * @description 박스 유형 라벨 
+           ****************
+           * @type {String}
+           */
+          boxTypeLabel: {
+            type: String,
+            value: function() {
+              return t('label.box_type');
+            }
+          },
+
+          /**
+           * @description 남은 박스 라벨 
+           ****************
+           * @type {String}
+           */
+          remainBoxLabel: {
+            type: String,
+            value: function() {
+              return t('label.remain_box');
+            }
+          },
+
+          /**
+           * @description 총 라벨 
+           ****************
+           * @type {String}
+           */
+          total: {
+            type: String,
+            value: function() {
+              return t('label.total')
+            }
+          },
+
+          /**
+           * @description 완료 라벨 
+           ****************
+           * @type {String}
+           */
+          finishLabel: {
+            type: String,
+            value: function() {
+              return t('label.finished')
+            }
+          },
+
+          /**
+           * @description 주문 수량 라벨 
+           ****************
+           * @type {String}
+           */
+          orderQtyLabel: {
+            type: String,
+            value: function() {
+              return t('label.order_qty');
+            }
+          },
+
+          /**
+           * @description 수량 라벨
+           ****************
+           * @type {String}
+           */
+          qtyLabel: {
+            type: String,
+            value: function() {
+              return t('label.qty');
+            }
+          },
+
+          /**
+           * @description 초기화 라벨
+           ****************
+           * @type {String}
+           */
+          clearLabel: {
+            type: String,
+            value: function() {
+              return t('button.reset');
+            }
+          },
+
+          /**
+           * @description SKU 정보 조회 후 복수개가 조회된 경우 사용자가 고를 수 있는 팝업이 실행되는데 그 팝업에 표시할 타이틀
+           ****************
+           * @type {String}
+           */
+          popupTitleLabel: {
+            type: String,
+            value: () => t('label.sku')
+          },
+
+          /**
+           * @description SKU 정보 조회를 위한 URL
+           ****************
+           * @type {String}
+           */
+          getSkuAjaxUrl: {
+            type: String,
+            value: `/device_process/sku/search_by_like/${LOGIS_UTIL.getEquipType()}/${LOGIS_UTIL.getEquipCd()}/:inputValue`
+          },
+
+          /**
+           * @description 송장 발행 라벨
+           ****************
+           * @type {String}
+           */
+          printLabel: {
+            type: String,
+            value: t('button.print_label')
+          },
+
+          /**
+           * @description 페이지 정보
+           ****************
+           * @type {Number}
+           */
+          page: {
+            type: Number,
+            value: 1
+          },
+
+          /**
+           * @description Limit 정보
+           ****************
+           * @type {Number}
+           */
+          limit: {
+            type: Number,
+            value: 100
+          },
+
+          /**
+           * @description 현재 선택된 상품 정보 
+           ****************
+           * @type {Object}
+           */
+          selectedSku: {
+            type: Object
+          },
+
+          /**
+           * @description 현재 선택된 행 정보 
+           ****************
+           * @type {Object}
+           */
+          currentRow: {
+            type: Object
+          }
+        };
+      }
+
+      static get listeners() {
+        return {
+          'page-changed-to-b2c_no_box_single_pack': '_routingChanged'
+        }
+      }
+
+      /**
+       * @description life cycle
+       *******************
+       */
+      connectedCallback() {
+        super.connectedCallback();
+
+        document.addEventListener('page-changed', event => {
+          if (event.detail.currentPage === location.hash.replace('#/', '')) {
+            this._focusDefaultInput(event);
+          }
+        });
+
+        this._focusDefaultInput();
+      }
+
+      /**
+       * @description 기본 Input Box로 (상품 코드 Input) 포커스 이동
+       *******************
+       */
+      _focusDefaultInput() {
+        this.skuSelectionChanged();
+        this._setInputFocus();
+      }
+
+      /**
+       * @description 그리드 행에 대한 스타일 변경
+       *******************
+       * @param {Object} event
+       */
+      _changeGridRowStyle(event) {
+        let list = event.detail.contentElements;
+        let prevData = this.currentRow ? this.currentRow.getData() : null;
+
+        list.forEach(row => {
+          let data = row.getData();
+          if (prevData && prevData.box_type_cd == data.box_type_cd && prevData.pick_qty == data.pick_qty) {
+            row.classList.add('selected');
+            this.currentRow = row;
+          } else {
+            row.classList.remove('selected');
+          }
+        })
+      }
+
+      /**
+       * @description SKU 정보 조회 시 복수개가 조회된 경우 사용자가 고를 수 있는 버튼이 실행되는데 그 버튼에 표시할 내용
+       *******************
+       * @param {Object} item
+       */
+      _skuButtonTxtCallback(item) {
+        return `(${item.sku_cd})
+                  ${item.sku_nm}`;
+      }
+
+      /**
+       * @description 상품 선택이 변경된 경우 처리
+       *******************
+       * @param {Object} event
+       */
+      skuSelectionChanged(event) {
+        if (!event) return;
+
+        if (this.selectedSku && this.selectedSku.sku_cd != event.detail.sku_cd && this._getSkuNmInput().value != '') {
+          // 다른 상품 코드를 스캔 했을때 확인 메시지 
+          this._skuChangeConfirm(event.detail);
+
+        } else {
+          // 같은 상품 계속 scan 
+          this.selectedSku = event.detail;
+          let skuCode = this.selectedSku.sku_cd;
+
+          // 대상 상품 변경 
+          let summaryAjax = this._getSinglePackSummaryAjax();
+          summaryAjax.curl = `/device_process/dynamic/dps/single_pack/sku_change?equipType=${LOGIS_UTIL.getEquipType()}&equipCd=${this.rackCd}&skuCd=${skuCode}`;
+          summaryAjax.generateRequest();
+        }
+      }
+
+      /**
+       * @description 상품 코드 변경시 메시지 처리
+       *******************
+       * @param {Object} event
+       */
+      _skuChangeConfirm(skuInform) {
+        LOGIS_UTIL.showConfirm(t('button.confirm'), t('text.confirm_sku_change'), function() {
+          this._getSkuCdInput().value = this.skuCode;
+          this._getSkuNmInput().value = this.selectedSku.sku_nm;
+          this._getSkuCdInput().select();
+        }.bind(this), function() {
+          this.selectedSku = skuInform;
+          this.boxType = '';
+          this.orderQty = '';
+          this._getSkuNmInput().value = '';
+          this.skuCode = skuInform.sku_cd;
+          this.skuBarcd = skuInform.sku_barcd;
+          this._getSinglePackSummaryAjax().curl = `/device_process/dynamic/dps/single_pack/sku_change?equipType=${LOGIS_UTIL.getEquipType()}&equipCd=${this.rackCd}&skuCd=${skuInform.sku_cd}`;
+          this._getSinglePackSummaryAjax().generateRequest();
+        }.bind(this));
+
+        this.blur();
+      }
+
+      /**
+       * @description 상품에 대한 단포 작업 현황 조회 완료시 
+       *******************
+       * @param {Object} e
+       */
+      _onSearchSinglePackSummary(e) {
+        if (e.detail && e.detail.result && e.detail.result[0]) {
+          this._resetScreen(e.detail.result);
+
+        } else {
+          LOGIS_UTIL.showToastWarnMessage(t('text.order_not_exist'));
+          this.clearView();
+        }
+
+        this._setInputFocus();
+      }
+
+      /**
+       * @description 작업 대상 그리드 선택
+       ******************
+       * @param {Object} event
+       */
+      selectItem(event) {
+        if (this.currentRow) {
+          this.currentRow.classList.remove('selected');
+        }
+
+        this.currentRow = event.detail.row;
+        this.currentRow.classList.add('selected');
+
+        let currentData = this.currentRow.getData();
+        this.boxType = currentData.box_type_cd;
+        this.orderQty = currentData.pick_qty;
+        this._getRemainBoxInput().value = currentData.tot_order_cnt - currentData.comp_order_cnt;
+      }
+
+      /**
+       * @description 작업 현황 그리드를 리셋시키고 현재 상품 정보를 표시 
+       *******************
+       * @param {Array} items
+       */
+      _resetScreen(result) {
+        this.boxPicking = result[0].tot_cnt;
+        this.boxPicked = result[0].comp_cnt;
+        this.orderQty = '';
+        this.boxType = '';
+        this.currentRow = null;
+        this.items = result;
+
+        this._getRemainBoxInput().value = '';
+        this._getSkuNmInput().value = this.selectedSku.sku_nm;
+        this._setInputFocus();
+      }
+
+      /**
+       * @description 단포 작업 처리 후
+       *******************
+       * @param {Object} e
+       */
+      _onSinglePickSuccess(e) {
+        // 현재 박스 타입에 대한 주문 처리가 완료되었는지 확인 후 완료되었다면 다음 박스 타입에 PCS로 넘어가기 위해 사용자에게 물어본다.
+        if (e && e.detail && e.detail.result) {
+          LOGIS_UTIL.showToastInfoMessage(t('text.single_box_complete'));
+          let result = e.detail.result;
+          this.items = result;
+          this.boxPicking = result[0].tot_cnt;
+          this.boxPicked = result[0].comp_cnt;
+          let currentData = this.currentRow.getData();
+          this._getRemainBoxInput().value = currentData.tot_order_cnt - currentData.comp_order_cnt;
+        }
+      }
+
+      /**
+       * @description 화면 클리어 
+       *******************
+       */
+      clearView() {
+        this.boxType = '';
+        this.orderQty = '';
+        this.boxPicking = '';
+        this.boxPicked = '';
+        this.items = [];
+        this.selectedSku = null;
+        this.currentRow = null;
+
+        this._getRemainBoxInput().value = '';
+        this._getSkuNmInput().value = '';
+        this._getSkuCdInput().value = '';
+        this._getSkuCdInput().select();
+      }
+
+      /**
+       * @description 단포 처리 완료
+       *******************
+       * @param {Object} e
+       */
+      finishPicking(e) {
+        let remainBoxQty = this._getRemainBoxInput().value;
+
+        if (this.currentRow && this.boxType && this.boxType >= 1 && remainBoxQty && remainBoxQty >= 1) {
+          let ajax = this._getFinishJobAjax();
+          ajax.curl = '/device_process/dynamic/dps/single_pack/pick';
+          ajax.customParams = {
+            equipCd: LOGIS_UTIL.getEquipCd(),
+            comCd: this.selectedSku.com_cd,
+            skuCd: this.selectedSku.sku_cd,
+            boxType: this.currentRow.getData().box_type_cd,
+            pickQty: this.currentRow.getData().pick_qty
+          }
+          ajax.generateRequest();
+
+        } else {
+          LOGIS_UTIL.showToastWarnMessage('선택된 작업 대상이 없습니다.');
+        }
+      }
+
+      /**
+       * @description 송장 발행
+       *******************
+       */
+      printInvoiceLabel() {
+        var printerId = LOGIS_UTIL.getPrinterId();
+        let invoiceId = null; // TODO 송장 출력시 송장 번호를 추출할 수 있어야 함 
+
+        if (printerId && printerId.length > 2) {
+          var printAjax = this.$['print-invoice-ajax'];
+          printAjax.curl = '/device_process/dynamic/dps/print_invoice';
+          printAjax.customParams = {
+            equipCd: LOGIS_UTIL.getEquipCd(),
+            equipType: LOGIS_UTIL.getEquipType(),
+            invoiceId: invoiceId,
+            printerId: printerId
+          };
+          printAjax.generateRequest();
+
+        } else {
+          LOGIS_UTIL.showToastWarnMessage(t('text.printer_is_not_set'));
+        }
+      }
+
+      /**
+       * @description 송장 발행 처리 후
+       *******************
+       * @param {Object} e
+       */
+      _printLabelSucceed(e) {
+        if (!e || !e.detail || !e.detail.success) {
+          LOGIS_UTIL.showToastWarnMessage(t('error.transaction_failed'));
+          this._setInputFocus();
+        }
+      }
+
+      /**
+       * @description 상품 조회 에러시 
+       *******************
+       */
+      _findSkuError() {
+        this.clearView();
+        this.items = [];
+      }
+
+      /**
+       * @description 단포 작업 현황 조회 Ajax 리턴
+       *******************
+       * @return 
+       */
+      _getSinglePackSummaryAjax() {
+        return this.$['single-pack-summary-ajax']
+      }
+
+      /**
+       * @description 단포 처리 Ajax 리턴
+       *******************
+       * @return 
+       */
+      _getFinishJobAjax() {
+        return this.$['finish-job-ajax']
+      }
+
+      /**
+       * @description 상품 코드 입력 박스 리턴
+       *******************
+       * @return 
+       */
+      _getSkuCdInput() {
+        return this.$['sku-code']
+      }
+
+      /**
+       * @description 상품 명 입력 박스 리턴
+       *******************
+       * @return 
+       */
+      _getSkuNmInput() {
+        return this.$['sku-name']
+      }
+
+      /**
+       * @description 남은 박스 입력 박스 리턴
+       *******************
+       * @return 
+       */
+      _getRemainBoxInput() {
+        return this.$['remain-box']
+      }
+
+      /**
+       * @description 인풋 박스 상태에 따라 포커스 이동 
+       *******************
+       */
+      _setInputFocus() {
+        this._getSkuCdInput().select();
+      }
+    }
+
+    window.customElements.define(B2CNoBoxSinglePack.is, B2CNoBoxSinglePack);
+  </script>
+</dom-module>

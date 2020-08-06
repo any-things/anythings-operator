@@ -155,6 +155,7 @@ window.locales['en-US'] = {
   'label.status_run': 'Run',
   'label.status_end': 'End',
   'label.class_cd': 'Class Code',
+  'label.remain_box': 'Remain Box',
 
   // menu list
   'menu.Settings': 'Setting',
