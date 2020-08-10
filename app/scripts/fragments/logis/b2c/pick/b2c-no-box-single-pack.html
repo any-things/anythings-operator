@@ -205,6 +205,7 @@ Copyright © HatioLab Inc. All rights reserved.
           resource-url="[[getSkuAjaxUrl]]" 
           popup-title="[[popupTitleLabel]]"
           button-txt-callback="[[_skuButtonTxtCallback]]" 
+          on-before-request="_customAjaxHandler"
           on-item-selected="skuSelectionChanged"
           on-sys-ajax-error="_findSkuError">
         </auto-popup-input>
@@ -533,6 +534,10 @@ Copyright © HatioLab Inc. All rights reserved.
           } else {
             row.classList.remove('selected');
           }
+
+          if (data.tot_order_cnt == data.comp_order_cnt) {
+            row.classList.add('complete');
+          }
         })
       }
 
@@ -595,6 +600,21 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
+       * @description auto-popup-input before-request event handler
+       ***********************
+       * @param {Object} event
+       */
+      _customAjaxHandler(event) {
+        const input = event.detail.input;
+        const ajax = event.detail.ajax;
+
+        if (input.value == 'FINISH') {
+          this.finishPicking();
+          event.preventDefault();
+        }
+      }
+
+      /**
        * @description 상품에 대한 단포 작업 현황 조회 완료시 
        *******************
        * @param {Object} e
@@ -607,8 +627,6 @@ Copyright © HatioLab Inc. All rights reserved.
           LOGIS_UTIL.showToastWarnMessage(t('text.order_not_exist'));
           this.clearView();
         }
-
-        this._setInputFocus();
       }
 
       /**
@@ -627,7 +645,11 @@ Copyright © HatioLab Inc. All rights reserved.
         let currentData = this.currentRow.getData();
         this.boxType = currentData.box_type_cd;
         this.orderQty = currentData.pick_qty;
-        this._getRemainBoxInput().value = currentData.tot_order_cnt - currentData.comp_order_cnt;
+        let remainQty = currentData.tot_order_cnt - currentData.comp_order_cnt;
+        this._getRemainBoxInput().value = remainQty;
+
+        // 포커스를 작업 완료 처리 입력 박스로 이동
+        this._resetInputFocus();
       }
 
       /**
@@ -654,7 +676,6 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} e
        */
       _onSinglePickSuccess(e) {
-        // 현재 박스 타입에 대한 주문 처리가 완료되었는지 확인 후 완료되었다면 다음 박스 타입에 PCS로 넘어가기 위해 사용자에게 물어본다.
         if (e && e.detail && e.detail.result) {
           LOGIS_UTIL.showToastInfoMessage(t('text.single_box_complete'));
           let result = e.detail.result;
@@ -662,7 +683,20 @@ Copyright © HatioLab Inc. All rights reserved.
           this.boxPicking = result[0].tot_cnt;
           this.boxPicked = result[0].comp_cnt;
           let currentData = this.currentRow.getData();
-          this._getRemainBoxInput().value = currentData.tot_order_cnt - currentData.comp_order_cnt;
+          let remainQty = currentData.tot_order_cnt - currentData.comp_order_cnt;
+          this._getRemainBoxInput().value = remainQty;
+
+          // 남은 박스가 0이면 ...
+          if (remainQty == 0) {
+            if (this.boxPicking == this.boxPicked) {
+              LOGIS_UTIL.showToastInfoMessage('상품 [' + this.selectedSku.sku_cd + ']의 모든 단포 작업이 완료되었습니다.');
+            } else {
+              LOGIS_UTIL.showToastInfoMessage('박스 유형 [' + this.boxType + '], PCS [' + this.orderQty + '] 작업이 완료되었습니다.');
+            }
+          }
+
+          // 포커스를 작업 완료 처리 입력 박스로 이동
+          this._resetInputFocus();
         }
       }
 
@@ -682,7 +716,8 @@ Copyright © HatioLab Inc. All rights reserved.
         this._getRemainBoxInput().value = '';
         this._getSkuNmInput().value = '';
         this._getSkuCdInput().value = '';
-        this._getSkuCdInput().select();
+        //this._getSkuCdInput().select();
+        this._setInputFocus();
       }
 
       /**
@@ -701,7 +736,8 @@ Copyright © HatioLab Inc. All rights reserved.
             comCd: this.selectedSku.com_cd,
             skuCd: this.selectedSku.sku_cd,
             boxType: this.currentRow.getData().box_type_cd,
-            pickQty: this.currentRow.getData().pick_qty
+            pickQty: this.currentRow.getData().pick_qty,
+            printerId: LOGIS_UTIL.getPrinterId()
           }
           ajax.generateRequest();
 
@@ -805,6 +841,18 @@ Copyright © HatioLab Inc. All rights reserved.
        *******************
        */
       _setInputFocus() {
+        this._getSkuCdInput().select();
+      }
+
+      /**
+       * @description 
+       *******************
+       */
+      _resetInputFocus() {
+        if (this.selectedSku) {
+          this._getSkuCdInput().value = this.selectedSku.sku_cd;
+        }
+
         this._getSkuCdInput().select();
       }
     }
