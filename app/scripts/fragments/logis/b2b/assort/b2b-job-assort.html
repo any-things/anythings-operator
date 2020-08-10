@@ -371,7 +371,9 @@ Copyright © HatioLab Inc. All rights reserved.
         let list = event.detail.contentElements;
         list.forEach(row => {
           let data = row.getData();
-          if (data.status === 'C') { // 취소된 데이터에 canceled class 추가
+
+          if (data.status === 'C') {
+            // 취소된 데이터에 canceled class 추가
             row.classList.add('canceled');
           } else if (data.status !== 'W' && data.status !== 'I' && data.status !== 'P') {
             if (parseInt(data.picked_qty) >= parseInt(data.pick_qty)) {

@@ -27,7 +27,7 @@ Copyright © HatioLab Inc. All rights reserved.
         color: rgba(255,255,255,.8);
       }
       #input-container {
-        display: grid;
+        display: none;
         grid-template-columns: 30% calc(70% - 12px);
         grid-gap:12px;
       }
@@ -72,20 +72,20 @@ Copyright © HatioLab Inc. All rights reserved.
     </sys-ajax>
 
     <div id="container">
-      <!-- 로케이션 / 박스 ID Input Box -->
-      <div id="input-container">
+      <!-- 셀 / 박스 ID Input Box -->
+      <div id="input-container" hidden>
         <span class="label">[[cellLabel]]</span>
-        <input barcode id="loc-cd" type="text" name="location_cd" on-keypress="_locInputKeypress">
+        <input barcode id="cell-cd" type="text" name="cell_cd" on-keypress="_locInputKeypress">
 
         <span class="label">[[boxIdLabel]]</span>
         <input id="box-id" type="text" name="box_id" on-focus="_hideKeyboard" on-keypress="_boxInputKeypress">
       </div>
 
-      <!-- 로케이션 - 박스 ID 할당 정보 리스트 -->
+      <!-- 셀 - 박스 ID 할당 정보 리스트 -->
       <div class="list-container">
         <item-list
           header="[[header]]"
-          data="[[locations]]"
+          data="[[cells]]"
           on-btn-click="_cellButtonClicked"
           on-data-list-click="_onItemClick">
         </item-list>
@@ -94,7 +94,7 @@ Copyright © HatioLab Inc. All rights reserved.
       <!-- 버튼 -->
       <div class="button-container">
         <button on-click="refreshList">[[refreshBtnLabel]]</button>
-        <button on-click="_clearView">[[resetBtnLabel]]</button>
+        <button on-click="_clearView" hidden>[[resetBtnLabel]]</button>
       </div>
     </div>
   </template>
@@ -176,10 +176,21 @@ Copyright © HatioLab Inc. All rights reserved.
             value: () => {
               return [{
                   display: t('label.cell'),
-                  fieldname: 'sub_equip_cd',
+                  fieldname: 'cell_cd',
                   style: {
-                    textAlign: 'center'
-                  }
+                    textAlign: 'left'
+                  },
+                  columnWidth: '1fr',
+                }, {
+                  display: t('label.order'),
+                  fieldname: 'class_cd',
+                  displayCallback: value => {
+                    return value || '';
+                  },
+                  style: {
+                    textAlign: 'left'
+                  },
+                  columnWidth: '2fr',
                 }, {
                   display: t('label.box_id'),
                   fieldname: 'box_id',
@@ -187,8 +198,9 @@ Copyright © HatioLab Inc. All rights reserved.
                     return value || '';
                   },
                   style: {
-                    textAlign: 'center'
-                  }
+                    textAlign: 'left'
+                  },
+                  columnWidth: '1.5fr',
                 }, {
                   display: '',
                   fieldname: 'clear_box_id',
@@ -207,15 +219,15 @@ Copyright © HatioLab Inc. All rights reserved.
                   }
                 }
                 /*, {
-                                display: t('menu.BoxAssign'),
-                                fieldname: 'result',
-                                displayCallback: value => {
-                                  return t('label.success');
-                                },
-                                style: {
-                                  textAlign: 'center'
-                                }
-                              }*/
+                  display: t('menu.BoxAssign'),
+                  fieldname: 'result',
+                  displayCallback: value => {
+                    return t('label.success');
+                  },
+                  style: {
+                    textAlign: 'center'
+                  }
+                }*/
               ]
             }
           },
@@ -227,13 +239,13 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           refreshResponse: {
             type: Object,
-            observer: "_refreshResponseChanged"
+            observer: '_refreshResponseChanged'
           },
 
           /**
            * @description 새로고침 서비스 호출 결과
            ****************
-           * @type {Object}
+           * @type {Array}
            */
           data: {
             type: Array,
@@ -284,7 +296,9 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} response
        */
       _refreshResponseChanged(response) {
-        this.locations = response && response.items;
+        if (response) {
+          this.cells = response;
+        }
       }
 
       /**
@@ -292,33 +306,12 @@ Copyright © HatioLab Inc. All rights reserved.
        *********************
        */
       refreshList() {
+        let equipType = LOGIS_UTIL.getEquipType();
+        let equipCd = LOGIS_UTIL.getEquipCd();
         const refreshAjax = this.$['refresh-ajax'];
-        var rackCd = LOGIS_UTIL.getEquipCd();
-        var equipZoneCd = LOGIS_UTIL.getStationCd();
-        var params = {
-          query: JSON.stringify([{
-            name: 'rack_cd',
-            operator: 'eq',
-            value: rackCd
-          }, {
-            name: 'com_cd',
-            operator: 'is_not_null'
-          }, {
-            name: 'equip_zone_cd',
-            operator: 'eq',
-            value: equipZoneCd
-          }]),
-          sort: JSON.stringify([{
-            field: 'loc_cd',
-            ascending: true
-          }]),
-          limit: 1000
-        };
-
-        refreshAjax.curl = encodeURI(`/location`);
-        refreshAjax.params = params;
+        refreshAjax.curl = `/device_process/search/cell_mappings/${equipType}/${equipCd}`;
         this._clearView();
-        // refreshAjax.generateRequest();
+        refreshAjax.generateRequest();
       }
 
       /**
@@ -329,10 +322,10 @@ Copyright © HatioLab Inc. All rights reserved.
       _cellButtonClicked(event) {
         let fieldname = event && event.detail && event.detail.fieldname;
         let data = event && event.detail && event.detail.data;
-        let locCd = data.loc_cd;
+        let cellCd = data.cell_cd;
 
         if (fieldname === 'clear_box_id') {
-          this.clearJobMapping(locCd);
+          this.clearJobMapping(cellCd);
         }
       }
 
@@ -349,8 +342,8 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * @description loc-cd input keypress event handler
-       * loc-cd 바코드 스캔시 box-id 필드로 이동
+       * @description cell-cd input keypress event handler
+       * cell-cd 바코드 스캔시 box-id 필드로 이동
        *********************
        * @param {Object} event
        */
@@ -380,10 +373,10 @@ Copyright © HatioLab Inc. All rights reserved.
         try {
           this.validateBeforeMapping();
           const execJobMappingAjax = this.$['exec-job-mapping'];
-          const locCd = this.$['loc-cd'].value;
+          const cellCd = this.$['cell-cd'].value;
           const boxId = this.$['box-id'].value;
           var rackCd = LOGIS_UTIL.getEquipCd();
-          execJobMappingAjax.curl = `/pda_process/assign/location_box/${rackCd}/${locCd}/${boxId}`;
+          execJobMappingAjax.curl = `/pda_process/assign/location_box/${rackCd}/${cellCd}/${boxId}`;
           execJobMappingAjax.generateRequest();
 
         } catch (error) {
@@ -396,15 +389,15 @@ Copyright © HatioLab Inc. All rights reserved.
        *********************
        */
       validateBeforeMapping() {
-        let locCd = this.$['loc-cd'].value;
+        let cellCd = this.$['cell-cd'].value;
         let boxId = this.$['box-id'].value;
 
-        let isValidLocCd = false,
+        let isValidCellCd = false,
           isValidBoxId = false;
 
-        if (locCd) {
-          isValidLocCd = this.locations && this.locations.find(rowData => {
-            return locCd === rowData.loc_cd;
+        if (cellCd) {
+          isValidCellCd = this.cells && this.cells.find(rowData => {
+            return cellCd === rowData.cell_cd;
           }) ? true : false;
         }
 
@@ -412,7 +405,7 @@ Copyright © HatioLab Inc. All rights reserved.
           isValidBoxId = true;
         }
 
-        if (!isValidLocCd) {
+        if (!isValidCellCd) {
           throw {
             title: t('error.VALIDATION_ERROR'),
             message: t('error.loc_cd_invalid'),
@@ -446,7 +439,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} event
        */
       _onItemClick(event) {
-        this.$['loc-cd'].value = event.detail.data.loc_cd;
+        this.$['cell-cd'].value = event.detail.data.cell_cd;
         this.$['box-id'].select();
       }
 
@@ -455,7 +448,7 @@ Copyright © HatioLab Inc. All rights reserved.
        *********************
        */
       _clearView() {
-        this.$['loc-cd'].value = '';
+        this.$['cell-cd'].value = '';
         this.$['box-id'].value = '';
         this._initialSetup();
       }

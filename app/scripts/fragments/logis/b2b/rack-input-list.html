@@ -29,14 +29,13 @@ Copyright © HatioLab Inc. All rights reserved.
       }
       #button-container {
         display: grid;
-        margin-top: 5px;
+        margin-top: 10px;
         justify-content: end;
       }
     </style>
 
     <!-- 랙별 상품 투입 리스트 Ajax -->
     <sys-ajax
-      auto
       id="input-list-ajax"
       method="GET"
       content-type="application/json"
@@ -46,7 +45,7 @@ Copyright © HatioLab Inc. All rights reserved.
     <div id="container">
       <!-- 랙별 투입 상품 투입 리스트 표시 영역 -->
       <item-list
-        id="sku-list"
+        id="item-list"
         header="[[header]]"
         page="[[page]]" 
         total="[[total]]" 
@@ -197,14 +196,18 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       connectedCallback() {
         super.connectedCallback();
-        this.refresh();
 
         // 현재 페이지로 라우팅 변경시 데이터 다시 조회하도록
         document.addEventListener('page-changed', event => {
-          if (event.detail.currentPage === 'rack-input-list') {
+          if (event.detail.currentPage === 'rack_input_list') {
             this.refresh();
           }
         });
+
+        // 3초 후에 새로고침
+        setTimeout(function() {
+          this.refresh();
+        }.bind(this), 3000);
       }
 
       /**
@@ -212,22 +215,26 @@ Copyright © HatioLab Inc. All rights reserved.
        ****************
        * @type {Object} data
        */
-      isComplete(data) {
-        return data.picked_qty >= data.pick_qty;
+      _isComplete(data) {
+        return data.result_qty >= data.plan_qty;
       }
 
       /**
        * @description item-list paginator-changed event handler
        * item-list의 page, limit, total property가 변경 되면 호출 됨
-       * event.detail을 통해 현재 리스트의 page, limit을 초기화 하고
-       * batch summary 조회를 요청
+       * event.detail을 통해 현재 리스트의 page, limit을 초기화 하고 refresh 요청
        ***********************
        * @param {Object} event
        */
       _pageChanged(event) {
-        this.page = event.detail.page;
-        this.limit = event.detail.limit;
-        this.refresh();
+        if (event && event.detail) {
+          this.page = event.detail.page;
+          this.limit = event.detail.limit;
+
+          if (this.itemListConfigured && this.itemListConfigured === true) {
+            this.refresh();
+          }
+        }
       }
 
       /**
@@ -255,27 +262,31 @@ Copyright © HatioLab Inc. All rights reserved.
         inputListAjax.curl = `/device_process/search/input_list/${equipType}/${equipCd}`;
         inputListAjax.customParams = {
           stationCd: stationCd,
-          page: 1,
-          limit: 100
+          page: this.page,
+          limit: this.limit
         };
         inputListAjax.generateRequest();
       }
 
       /**
        * @description 리스트의 데이터 상태에 따라 행의 색상을 변경
-       * R: Running 진행중, F: Finished 완료, U: Unfinished 미완료 (취소 건이 포함되어 있어서 완료되지 않은 상태)
        ****************
        * @type {Object} event
        */
       _addCompleteAttribute(event) {
+        this.itemListConfigured = true;
         const rows = event.detail.contentElements;
         rows.forEach(row => {
-          const status = row.getData().status;
+          const rowData = row.getData();
+          if (rowData.plan_qty === rowData.result_qty) {
+            row.classList.add('complete');
+          }
+          /*const status = row.getData().status;
           if (status === 'F') { // 완료 상태
             row.classList.add('complete');
           } else if (status === 'U') { // 미완료 상태
             row.classList.add('canceled');
-          }
+          }*/
         });
       }
 

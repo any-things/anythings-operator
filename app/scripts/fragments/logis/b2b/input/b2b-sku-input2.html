@@ -524,9 +524,9 @@ Copyright © HatioLab Inc. All rights reserved.
             type: Array,
             value: function() {
               return [{
-                display: t('label.input_seq'),
+                display: '', //t('label.input_seq'),
                 fieldname: 'input_seq',
-                columnWidth: '0.7fr',
+                columnWidth: '0.4fr',
                 style: {
                   color: '#fff',
                   textAlign: 'center'
@@ -534,10 +534,10 @@ Copyright © HatioLab Inc. All rights reserved.
               }, {
                 display: t('label.sku_cd'),
                 fieldname: 'sku_cd',
-                columnWidth: '1.75fr',
+                columnWidth: '1.6fr',
                 style: {
                   color: '#fff',
-                  textAlign: 'left'
+                  textAlign: 'center'
                 }
               }, {
                 display: t('label.sku_nm'),
@@ -1218,14 +1218,15 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} event
        */
       showDetailList(event) {
+        const equipType = LOGIS_UTIL.getEquipType();
         const equipCd = LOGIS_UTIL.getEquipCd();
         const jobInputId = event.detail.data.id;
 
         document.dispatchEvent(new CustomEvent('open-form-list-dialog', {
           detail: {
-            title: t('title.das_order_info_detail') + ' [' + event.detail.data.sku_nm + ']',
+            title: event.detail.data.sku_nm,
             listFields: this.detailListFields,
-            listDataReqUrl: `/device_process/search/input_jobs/Rack/${equipCd}?job_input_id=${jobInputId}`,
+            listDataReqUrl: `/device_process/search/input_jobs/${equipType}/${equipCd}?job_input_id=${jobInputId}`,
             handleListDataAfterSet: params => {
               const rows = params.listElement.getRows();
               rows.forEach(row => {
