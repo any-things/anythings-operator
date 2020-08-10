@@ -162,7 +162,7 @@ window.locales['ko-KR'] = {
   // menu list
   'menu.Settings': '설정',
   'menu.B2BJobAssort': 'DAS 분류작업',
-  'menu.Das2OrderInfo': '출고(2차분류)',
+  'menu.DasJobAssort': 'DAS 분류작업',
   'menu.B2CPickingJob': 'DPS 피킹작업',
   'menu.QpsOrderInfo': 'DPS 작업',
   'menu.B2BSkuInput': '상품 투입',
@@ -175,7 +175,7 @@ window.locales['ko-KR'] = {
   'menu.Dps2JobProcess': 'B2C 작업',
   'menu.B2BRtnAssortJob': '반품 분류작업',
   'menu.B2BRtnInspection': '반품 검수',
-  'menu.DasOrderList': 'DAS작업목록',
+  'menu.RackInputList': '투입목록',
   'menu.TabletLabelList': '라벨발행이력',
   'menu.LabelList': '라벨 리스트',
   'menu.StockStatusByCell': '셀 재고조회',

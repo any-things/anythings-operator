@@ -40,7 +40,7 @@ Copyright © HatioLab Inc. All rights reserved.
       id="input-list-ajax"
       method="GET"
       content-type="application/json"
-      last-response="{{items}}">
+      last-response="{{inputDataSet}}" >
     </sys-ajax>
 
     <div id="container">
@@ -48,9 +48,13 @@ Copyright © HatioLab Inc. All rights reserved.
       <item-list
         id="sku-list"
         header="[[header]]"
+        page="[[page]]" 
+        total="[[total]]" 
+        limit="[[limit]]"
         data="[[items]]"
         on-configured="_addCompleteAttribute"
-        on-data-list-click="_skuSelected">
+        on-data-list-click="_skuSelected"
+        on-paginator-changed="_pageChanged">
       </item-list>
 
       <!-- 버튼 표시 영역 -->
@@ -93,21 +97,21 @@ Copyright © HatioLab Inc. All rights reserved.
                   return `(${rowData['input_seq']}) ${rowData['sku_nm']}`
                 }
               }, {
-                display: t('label.customer'),
-                fieldname: 'cust_cnt',
-                columnWidth: '0.3fr',
+                display: t('label.order'),
+                fieldname: 'input_qty',
+                columnWidth: '0.15fr',
                 style: {
-                  textAlign: 'center'
+                  textAlign: 'right'
                 }
               }, {
-                display: t('label.picked_qty') + ' / ' + t('label.picking_qty'),
+                display: t('label.picked_qty') + ' / ' + t('label.pick_qty'),
                 fieldname: 'total_pick_qty',
-                columnWidth: '0.4fr',
+                columnWidth: '0.25fr',
                 style: {
-                  textAlign: 'center'
+                  textAlign: 'right'
                 },
                 displayCallback: (value, rowData) => {
-                  return rowData['picked_qty'] + '/' + rowData['pick_qty'];
+                  return rowData['result_qty'] + '/' + rowData['plan_qty'];
                 }
               }, {
                 fieldname: 'com_cd',
@@ -122,13 +126,16 @@ Copyright © HatioLab Inc. All rights reserved.
                 fieldname: 'input_seq',
                 hidden: true
               }, {
-                fieldname: 'picked_qty',
+                fieldname: 'result_qty',
                 hidden: true
               }, {
-                fieldname: 'pick_qty',
+                fieldname: 'plan_qty',
                 hidden: true
               }, {
                 fieldname: 'status',
+                hidden: true
+              }, {
+                fieldname: 'id',
                 hidden: true
               }]
             }
@@ -141,6 +148,45 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           items: {
             type: Array
+          },
+
+          /**
+           * @description 투입 리스트 데이터 셋
+           ****************
+           * @type {Object}
+           */
+          inputDataSet: {
+            type: Object,
+            observer: '_inputDataSetChanged'
+          },
+
+          /**
+           * @description 페이지 정보
+           ****************
+           * @type {Number}
+           */
+          page: {
+            type: Number,
+            value: 1
+          },
+
+          /**
+           * @description Limit 정보
+           ****************
+           * @type {Number}
+           */
+          limit: {
+            type: Number,
+            value: 100
+          },
+
+          /**
+           * @description 총 아이템 개수
+           ****************
+           * @type {Number}
+           */
+          total: {
+            type: Number
           }
         }
       }
@@ -171,14 +217,50 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
+       * @description item-list paginator-changed event handler
+       * item-list의 page, limit, total property가 변경 되면 호출 됨
+       * event.detail을 통해 현재 리스트의 page, limit을 초기화 하고
+       * batch summary 조회를 요청
+       ***********************
+       * @param {Object} event
+       */
+      _pageChanged(event) {
+        this.page = event.detail.page;
+        this.limit = event.detail.limit;
+        this.refresh();
+      }
+
+      /**
+       * @description 투입 데이터 데이터 셋 변경시 핸들러
+       *******************
+       * @param {Object} inputDataSet
+       */
+      _inputDataSetChanged(inputDataSet) {
+        if (inputDataSet && inputDataSet.success && inputDataSet.result) {
+          this.total = inputDataSet.result.total;
+          this.items = inputDataSet.result.items;
+        }
+      }
+
+      /**
        * @description 설정을 통해 선택한 랙와 존 영역내의 상품 리스트 조회
        ****************
        */
       refresh() {
-        let rackCd = LOGIS_UTIL.getEquipCd();
-        let zoneCd = LOGIS_UTIL.getStationCd();
+        let equipType = LOGIS_UTIL.getEquipType();
+        let equipCd = LOGIS_UTIL.getEquipCd();
+        let stationCd = LOGIS_UTIL.getStationCd();
+
         const inputListAjax = this.$['input-list-ajax'];
-        inputListAjax.curl = `/tablet_process/input_status/${rackCd}/${zoneCd}/ALL`;
+        inputListAjax.curl = '/device_process/dynamic/DAS/input_list';
+        inputListAjax.customParams = {
+          equipType: equipType,
+          equipCd: equipCd,
+          stationCd: stationCd,
+          sideCd: 'ALL',
+          page: 1,
+          limit: 100
+        };
         inputListAjax.generateRequest();
       }
 

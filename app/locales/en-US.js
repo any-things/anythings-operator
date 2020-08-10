@@ -160,7 +160,7 @@ window.locales['en-US'] = {
   // menu list
   'menu.Settings': 'Setting',
   'menu.B2BJobAssort': 'B2B Assorting',
-  'menu.Das2OrderInfo': 'DAS2 Task',
+  'menu.DasJobAssort': 'DAS Assorting',
   'menu.B2CPickingJob': 'B2C Picking Job',
   'menu.QpsOrderInfo': 'QPS Task',
   'menu.B2BSkuInput': 'SKU Input',
@@ -173,7 +173,7 @@ window.locales['en-US'] = {
   'menu.Dps2JobProcess': 'B2C Process',
   'menu.B2BRtnAssortJob': 'Return Assorting',
   'menu.B2BRtnInspection': 'Return Inspection',
-  'menu.DasOrderList': 'DAS Order List',
+  'menu.RackInputList': 'Input List',
   'menu.TabletLabelList': 'Label List',
   'menu.LabelList': 'Label List',
   'menu.StockStatusByCell': 'Stock Status',

@@ -161,7 +161,7 @@ window.locales['zh-CN'] = {
   // menu list
   'menu.Settings': '设置',
   'menu.B2BJobAssort': 'B2B 분류작업',
-  'menu.Das2OrderInfo': 'DAS2作业信息',
+  'menu.DasJobAssort': 'DAS作业信息',
   'menu.B2CPickingJob': 'B2C 피킹작업',
   'menu.QpsOrderInfo': 'QPS作业',
   'menu.B2BSkuInput': '상품 투입',
@@ -174,7 +174,7 @@ window.locales['zh-CN'] = {
   'menu.Dps2JobProcess': 'B2C处理',
   'menu.B2BRtnAssortJob': '反库处理',
   'menu.B2BRtnInspection': '退货订单检验',
-  'menu.DasOrderList': 'DAS作业目录',
+  'menu.RackInputList': 'Input List',
   'menu.TabletLabelList': '라벨발행이력',
   'menu.LabelList': '标签重打',
   'menu.StockStatusByCell': '库位库存检索',
