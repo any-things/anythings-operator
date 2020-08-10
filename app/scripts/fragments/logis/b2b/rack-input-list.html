@@ -236,9 +236,9 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} inputDataSet
        */
       _inputDataSetChanged(inputDataSet) {
-        if (inputDataSet && inputDataSet.success && inputDataSet.result) {
-          this.total = inputDataSet.result.total;
-          this.items = inputDataSet.result.items;
+        if (inputDataSet && inputDataSet.total) {
+          this.total = inputDataSet.total;
+          this.items = inputDataSet.items;
         }
       }
 
@@ -252,12 +252,9 @@ Copyright © HatioLab Inc. All rights reserved.
         let stationCd = LOGIS_UTIL.getStationCd();
 
         const inputListAjax = this.$['input-list-ajax'];
-        inputListAjax.curl = '/device_process/dynamic/DAS/input_list';
+        inputListAjax.curl = `/device_process/search/input_list/${equipType}/${equipCd}`;
         inputListAjax.customParams = {
-          equipType: equipType,
-          equipCd: equipCd,
           stationCd: stationCd,
-          sideCd: 'ALL',
           page: 1,
           limit: 100
         };
@@ -291,15 +288,6 @@ Copyright © HatioLab Inc. All rights reserved.
         const content = document.createElement('rack-input-details');
         content.data = event.detail.data;
         LOGIS_UTIL.showPopup(null, content, 'fit', 'fit');
-
-        /*document.dispatchEvent(new CustomEvent('open-dialog', {
-          detail: {
-            content: content,
-            closeCallback: () => {
-              //this.refresh();
-            }
-          }
-        }))*/
       }
     }
 

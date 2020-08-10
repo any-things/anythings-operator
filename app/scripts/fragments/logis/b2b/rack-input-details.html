@@ -72,7 +72,7 @@ Copyright © HatioLab Inc. All rights reserved.
       id="input-details-ajax"
       method="GET"
       content-type="application/json"
-      last-response="{{inputDataSet}}">
+      last-response="{{items}}">
     </sys-ajax>
 
     <!-- 팝업 상단 요약 정보 표시 영역 -->
@@ -201,16 +201,6 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * @description 조회 결과 셋 
-           ****************
-           * @type {Object}
-           */
-          inputDataSet: {
-            type: Object,
-            observer: '_inputDataSetChanged'
-          },
-
-          /**
            * @description 그리드 데이터
            ****************
            * @type {Array}
@@ -283,23 +273,11 @@ Copyright © HatioLab Inc. All rights reserved.
           this.skuName = data.sku_nm;
           this.inputSeq = data.input_seq;
 
+          let equipType = LOGIS_UTIL.getEquipType();
+          let equipCd = LOGIS_UTIL.getEquipCd();
           let stationCd = LOGIS_UTIL.getStationCd();
           const inputDetailsAjax = this.$['input-details-ajax'];
-          inputDetailsAjax.curl = '/device_process/dynamic/DAS/input_details';
-          inputDetailsAjax.customParams = {
-            inputSeqId: data.id
-          };
-        }
-      }
-
-      /**
-       * @description 투입 데이터 데이터 셋 변경시 핸들러
-       *******************
-       * @param {Object} inputDataSet
-       */
-      _inputDataSetChanged(inputDataSet) {
-        if (inputDataSet && inputDataSet.success && inputDataSet.result) {
-          this.items = inputDataSet.result;
+          inputDetailsAjax.curl = `/device_process/search/input_jobs/${data.id}/${equipType}/${equipCd}/${stationCd}/false`;
         }
       }
 

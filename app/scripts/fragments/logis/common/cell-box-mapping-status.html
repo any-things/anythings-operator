@@ -74,7 +74,7 @@ Copyright © HatioLab Inc. All rights reserved.
     <div id="container">
       <!-- 로케이션 / 박스 ID Input Box -->
       <div id="input-container">
-        <span class="label">[[locCodeLabel]]</span>
+        <span class="label">[[cellLabel]]</span>
         <input barcode id="loc-cd" type="text" name="location_cd" on-keypress="_locInputKeypress">
 
         <span class="label">[[boxIdLabel]]</span>
@@ -127,13 +127,13 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * @description 로케이션 코드 라벨
+           * @description 셀 코드 라벨
            ****************
            * @type {String}
            */
-          locCodeLabel: {
+          cellLabel: {
             type: String,
-            value: () => t('label.location')
+            value: () => t('label.cell')
           },
 
           /**
@@ -175,8 +175,8 @@ Copyright © HatioLab Inc. All rights reserved.
             type: Array,
             value: () => {
               return [{
-                  display: t('label.location'),
-                  fieldname: 'loc_cd',
+                  display: t('label.cell'),
+                  fieldname: 'sub_equip_cd',
                   style: {
                     textAlign: 'center'
                   }
