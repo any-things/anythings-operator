@@ -36,6 +36,8 @@ Copyright © HatioLab Inc. All rights reserved.
         super.connectedCallback();
 
         let equipCd = LOGIS_UTIL.getEquipCd();
+        let equipType = LOGIS_UTIL.getEquipType();
+        let stageCd = LOGIS_UTIL.getStageCd();
         let stationCd = LOGIS_UTIL.getStationCd();
         let deviceType = LOGIS_UTIL.getDeviceType();
         let brokerAddr = LOGIS_UTIL.getBrokerAddress();
@@ -44,6 +46,8 @@ Copyright © HatioLab Inc. All rights reserved.
 
         // MQTT 연결
         WEB_MQTT.startConnectionMonitor(
+          stageCd,
+          equipType,
           equipCd,
           stationCd,
           deviceType,
@@ -128,7 +132,7 @@ Copyright © HatioLab Inc. All rights reserved.
        *******************
        * @param {String} message
        */
-      refreshByWs(message) {}
+      refreshByWs(message) { }
     };
   };
 </script>
