@@ -200,10 +200,10 @@ if (!(typeof WEB_MQTT === 'object')) {
       // 장비 타입에 따라 미들웨어에서 사용할 ID 설정
       if (deviceType === 'PDA' || deviceType === 'TABLET') {
         deviceTopic.push(deviceType, 'MOBILE');
-        this.SOURCE_ID = [brokerSiteCd, deviceType, equipType, equipCd, stageCd, stationCd].join('/');
+        this.SOURCE_ID = [brokerSiteCd, deviceType, equipType, equipCd, stationCd].join('/');
       } else {
         deviceTopic.push(deviceType);
-        this.SOURCE_ID = [brokerSiteCd, deviceType, equipType, equipCd, stageCd].join('/');
+        this.SOURCE_ID = [brokerSiteCd, deviceType, equipType, equipCd].join('/');
       }
 
       this.CLIENT_ID = [
@@ -217,10 +217,10 @@ if (!(typeof WEB_MQTT === 'object')) {
       this.TOPICS = [];
 
       deviceTopic.forEach(topic => {
-        this.TOPICS.push([brokerSiteCd, topic].join('/'), [brokerSiteCd, topic, equipType, equipCd, stageCd].join('/'));
+        this.TOPICS.push([brokerSiteCd, topic].join('/'), [brokerSiteCd, topic, equipType, equipCd].join('/'));
 
         if (deviceType === 'PDA' || deviceType === 'TABLET') {
-          this.TOPICS.push([brokerSiteCd, topic, equipType, equipCd, stageCd, stationCd].join('/'));
+          this.TOPICS.push([brokerSiteCd, topic, equipType, equipCd, stationCd].join('/'));
         }
       });
 
