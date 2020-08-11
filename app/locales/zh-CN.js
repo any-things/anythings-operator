@@ -109,6 +109,7 @@ window.locales['zh-CN'] = {
   'label.current_qty': '当前数量',
   'label.total_proc_rate': '整体完成率',
   'label.rack_proc_rate': '机组完成率',
+  'label.progress_rate': '完成率',
   'label.please_wait': '请等待…',
   'label.fixed': '固定',
   'label.nonfixed': '非固定',

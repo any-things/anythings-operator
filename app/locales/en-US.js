@@ -108,6 +108,7 @@ window.locales['en-US'] = {
   'label.current_qty': 'Current QTY',
   'label.total_proc_rate': 'Total Process Rate',
   'label.rack_proc_rate': 'Process Rate by Rack',
+  'label.progress_rate': 'Progress Rate',
   'label.please_wait': 'Please wait...',
   'label.fixed': 'Fixed',
   'label.nonfixed': 'Non-Fixed',

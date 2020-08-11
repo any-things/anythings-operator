@@ -110,6 +110,7 @@ window.locales['ko-KR'] = {
   'label.current_qty': '현재 수량',
   'label.total_proc_rate': '전체 진행율',
   'label.rack_proc_rate': '랙 별 진행율',
+  'label.progress_rate': '진행율',
   'label.please_wait': '잠시만 기다려주세요...',
   'label.fixed': '고정',
   'label.nonfixed': '비고정',
