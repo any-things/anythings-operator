@@ -22,8 +22,8 @@ Copyright © HatioLab Inc. All rights reserved.
         border-radius: 12px;
       }
 
-      #status img:active {
-        background-color: rgba(0, 0, 0, .2);
+      #status img[active] {
+        background-color: rgba(0, 0, 0, .3);
         border-radius: 7px;
       }
 
@@ -97,7 +97,6 @@ Copyright © HatioLab Inc. All rights reserved.
       #status #chart {
         font-size: 1.5rem;
         font-weight: bold;
-        color: #333;
       }
 
       #status #chart span {
@@ -120,8 +119,8 @@ Copyright © HatioLab Inc. All rights reserved.
       #content {
         display: flex;
         flex: 1;
-        flex-direction: column;
-        margin-top: 20px;
+        flex-direction: row;
+        margin-bottom: 15px;
       }
 
       #left-section,
@@ -129,13 +128,28 @@ Copyright © HatioLab Inc. All rights reserved.
       #total-section {
         flex: 1;
         display: grid;
-        grid-template-columns: auto 1fr;
-        /* margin-left: 7.5px; */
-        /* margin-right: 7.5px; */
+        grid-template-rows: auto 1fr;
+        margin-left: 7.5px;
+        margin-right: 7.5px;
       }
 
-      #right-section{
-        margin-top: 15px;
+      #content-rows {
+        overflow: hidden;
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+        margin-bottom: 5px;
+        margin-top: 5px;
+      }
+
+      #top-section,
+      #bottom-section,
+      #total-section-rows {
+        flex: 1;
+        display: grid;
+        grid-template-columns: auto 1fr;
+        margin-top: 7.5px;
+        margin-bottom: 7.5px;
       }
 
       #picked-qty,
@@ -143,8 +157,6 @@ Copyright © HatioLab Inc. All rights reserved.
         text-align: right;
         font-size: .5rem;
         line-height: 1.2;
-        color: #333;
-        font-weight: bold;
       }
 
       #picked-qty span,
@@ -176,14 +188,12 @@ Copyright © HatioLab Inc. All rights reserved.
         border-left: none;
         border-right: none;
         border-radius: 12px;
-        /* margin: 15px 0;
-        padding: .3rem; */
-        padding: 22px 10px;
+        margin: 15px 0;
+        padding: .3rem;
         color: #fff;
         text-shadow: 0px .03rem .03rem rgba(0, 0, 0, 0.4);
         font-size: 1rem;
         outline: 0;
-        margin-right: 15px;
       }
 
       button:active {

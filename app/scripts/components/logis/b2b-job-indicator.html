@@ -1,0 +1,551 @@
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+
+<link rel="import" href="../../../bower_components/polymer/polymer-element.html">
+
+<!--
+  B2B 태블릿 작업 화면 Job Block 스타일 && 동작 지정 - Job Block 리스트 표시 및 Job Block 선택 시 액션 처리
+-->
+<dom-module id="b2b-job-indicator">
+  <template>
+    <style>
+      #container {
+        display: grid;
+        height: 70px;
+        grid-template-columns: 1fr 1fr 1fr 1fr;
+        background: url(../../../images/bg_prodprocess.png) 0 100% repeat-x #667495;
+        border-top: .03rem solid #93a4bd;
+        border-bottom: .03rem solid #2f333c;
+        border-radius: 12px;
+        box-shadow: 0px .03rem .03rem rgba(0, 0, 0, 0.2);
+        line-height: 65px;
+      }
+
+      .job-block {
+        position: relative;
+        text-align: center;
+      }
+
+      .job-block[active] {
+        background: url(../../../images/bg_prodprocess.png) 0 100% repeat-x #54b8dd;
+        margin-top: -9px !important;
+        height: 85px !important;
+        /* border: .04rem solid #12c8e6; */
+        border: .08rem solid red;
+        border-radius: 9px;
+        box-shadow: .04rem .04rem .04rem rgba(0, 0, 0, 0.3);
+        font-size: 1.2rem;
+        line-height: 80px;
+      }
+
+      .job-block[others] {
+        background: url(../../../images/bg_prodprocess.png) 0 100% repeat-x #999;
+        border-top: .03rem solid #ccc !important;
+        border-bottom: .03rem solid #666 !important;
+        margin-top: -1px;
+        height: 69px;
+      }
+
+      .job-block[others][active] {
+        background: url(../../../images/bg_prodprocess.png) 0 100% repeat-x #999;
+        margin-top: -15px !important;
+        height: 95px !important;
+        border: .04rem solid #ccc;
+        border-bottom: .04rem solid #ccc !important;
+      }
+
+      .job-block.last-job {
+        background: url(../../../images/bg_prodprocess.png) 50% 50% repeat-x #9cd484;
+        border-top: .03rem solid #a0ec7f;
+        border-bottom: .03rem solid #325224;
+        margin-top: -1px;
+        height: 69px;
+        outline: 1px solid #434854;
+      }
+
+      .job-block.last-job[active] {
+        background: url(../../../images/bg_prodprocess.png) 50% 50% repeat-x #9cd484;
+        border: .04rem solid #a0ec7f;
+      }
+
+      .job-block.last-job::after {
+        content: "";
+        display: block;
+        margin: auto;
+        width: 0;
+        height: 0;
+        position: relative;
+        top: -98px;
+        border-left: 80px solid transparent;
+        border-right: 80px solid transparent;
+        border-bottom: 25px solid #90c47a;
+      }
+
+      .job-block.last-job[active]::after {
+        top: -125px;
+      }
+
+      .job-block::before {
+        content: "";
+        display: block;
+        width: 35px;
+        height: 35px;
+        position: absolute;
+        z-index: 1;
+        margin-top: -12px;
+        margin-left: calc(50% - 15px);
+      }
+
+      .job-block.status-none::before {
+        background: url(../../../images/dps/icon-dps-none-status.png) no-repeat;
+      }
+
+      .job-block.status-move-right::before {
+        background: url(../../../images/dps/icon-dps-move-right.png) no-repeat;
+        background-size: 100px 100px;
+        width: 100px;
+        height: 100px;
+        margin-top: -90px;
+        margin-left: calc(50% - 50px);
+      }
+
+      .job-block.status-move-left::before {
+        background: url(../../../images/dps/icon-dps-move-left.png) no-repeat;
+        background-size: 100px 100px;
+        width: 100px;
+        height: 100px;
+        margin-top: -90px;
+        margin-left: calc(50% - 50px);
+      }
+
+      .job-block.status-last-job::before {
+        background: url(../../../images/dps/icon-dps-last-zone.png) no-repeat;
+        background-size: 100px 100px;
+        width: 100px;
+        height: 100px;
+        margin-top: -90px;
+        margin-left: calc(50% - 50px);
+      }
+
+      .job-block.status-done::before {
+        background: url(../../../images/dps/icon-dps-done-status.png) no-repeat;
+      }
+
+      span.begin-text {
+        font-size: 0.5em;
+      }
+
+      span.end-text {
+        font-size: 0.8em;
+      }
+
+      .job-block-chart {
+        display: block;
+        width: 70%;
+        height: 3px;
+        margin: auto;
+        position: relative;
+        top: -18px;
+        border: 2px solid rgba(0, 0, 0, .2);
+        background-color: rgba(0, 0, 0, .5);
+      }
+
+      .job-block[active] .job-block-chart {
+        height: 5px;
+        top: -22px;
+      }
+
+      .job-block-chart span {
+        display: block;
+        height: 3px;
+        min-width: 5% !important;
+      }
+
+      .job-block[active] .job-block-chart span {
+        height: 5px;
+      }
+
+      .job-block-chart span.colorR {
+        background-color: var(--things-chartcolor-type1);
+      }
+
+      .job-block-chart span.colorY {
+        background-color: var(--things-chartcolor-type3);
+      }
+
+      .job-block-chart span.colorG {
+        background-color: var(--things-chartcolor-type4);
+      }
+
+      .job-block-chart span.colorB {
+        background-color: var(--things-chartcolor-type5);
+      }
+    </style>
+
+    <div id="container" on-track="_handleTrack"></div>
+  </template>
+
+  <script>
+    class B2BJobIndicator extends Polymer.GestureEventListeners(Polymer.Element) {
+      static get is() {
+        return 'b2b-job-indicator'
+      }
+      static get properties() {
+        return {
+          /**
+           * @description 최종적으로 하단에 표시(Job Block)할 박스(주문) 리스트
+           ****************
+           * @type {Array}
+           */
+          visibleList: {
+            type: Array,
+            value: []
+          },
+
+          /**
+           * @description 하단에 표시(Job Block)된 박스(주문) 리스트 중에 선택된 항목
+           ****************
+           * @type {Object}
+           */
+          selectedInput: {
+            type: Object,
+            notify: true
+          },
+
+          /**
+           * @description 하단에 표시(Job Block)할 박스(주문) 리스트 조회 정보
+           ****************
+           * @type {Array}
+           */
+          inputList: {
+            type: Array,
+            readonly: true,
+            observer: '_inputListChanged'
+          },
+
+          /**
+           * @description 하단에 표시(Job Block)할 박스(주문) 최대 개수
+           ****************
+           * @type {Number}
+           */
+          maxCnt: {
+            type: Number,
+            value: 4
+          },
+
+          /**
+           * @description swipe 제스쳐 이벤트 발생 민감도, 값이 높을수록 둔감
+           ****************
+           * @type {Number}
+           */
+          sensitivity: {
+            type: Number,
+            value: 50
+          }
+        }
+      }
+
+      /**
+       * @description 투입 리스트가 변경된 경우
+       ****************
+       * @param {Array} inputList
+       */
+      _inputListChanged(inputList) {
+        if (!inputList) return;
+
+        // 1. 투입 리스트가 있다면 Job Block 렌더링
+        if (inputList.length > 0) {
+          // 2. 투입 리스트를 기준으로 하단에 표시할 박스 리스트 정보를 생성
+          let activeInputId = this._sortInputListByBoxFlowDir(inputList);
+
+          // 3. 하단에 박스 표시 렌더링
+          this._renderJobIndicator(this.visibleList);
+
+          // 4. 작업 대상 Job Block 활성화
+          if (activeInputId) {
+            this.activateWorkingJobBlock(activeInputId);
+          }
+
+          // 5. 투입 리스트가 없다면 Job Block을 클리어          
+        } else {
+          this._clearJobIndicator();
+        }
+      }
+
+      /**
+       * @description 박스 흐름 방향에 따라 투입 리스트 정렬
+       ****************
+       * @param {Object} inputList
+       * @return 활성화 할 투입 ID 리턴
+       */
+      _sortInputListByBoxFlowDir(inputList) {
+        // 1. Job Block에 표시할 데이터 리스트 클리어
+        this.visibleList = [];
+
+        // 2. 활성화된 투입 ID 찾기 
+        let activeItem = inputList.find(item => (item.status == 'R'));
+        let activeItemId = activeItem ? activeItem.id : null;
+        activeItemId = activeItemId ? activeItemId : inputList[0].id;
+
+        for (let i = 0; i < inputList.length; i++) {
+          // 2.1 투입 리스트가 최대 Job Block 개수 보다 많으면 스킵
+          if (this.visibleList.length <= this.maxCnt) {
+            // 2.2 좌 -> 우 방향 박스 흐름인 경우 정방향
+            if (this._isBoxFlowLeftToRight()) {
+              this.visibleList.push(inputList[i]);
+              // 2.3 우 -> 좌 방향 박스 흐름인 경우 역방향
+            } else {
+              this.visibleList.unshift(inputList[i]);
+            }
+          }
+        }
+
+        // 3. 활성화된 투입 ID 리턴
+        return activeItemId;
+      }
+
+      /**
+       * @description 박스 흐름 방향이 좌 -> 우 인지 여부
+       ****************
+       * @param {Object} list
+       */
+      _isBoxFlowLeftToRight() {
+        //return MPS_UTIL.getBoxFlowDirection() == 'LTR';
+        return true;
+      }
+
+      /**
+       * @description 투입 리스트 정보로 하단 박스 작업 대상 리스트 렌더링
+       ****************
+       * @param {Object} inputList
+       */
+      _renderJobIndicator(inputList) {
+        // 1. Job Blocks 클리어 
+        this._clearJobIndicator();
+
+        // 2. 투입 리스트 데이터로 Job Block을 생성 
+        inputList.forEach(item => {
+          // 2.1 Job Block 엘리먼트 생성
+          const block = document.createElement('div');
+          block.setAttribute('target-id', item.id);
+          block.classList.add('job-block');
+          block.onclick = this._itemSelected.bind(this);
+          block.getData = function() {
+            return item;
+          };
+
+          // 2.2 Job Block에 표시할 투입 정보 설정 
+          let innerCode = item.sku_cd;
+          //let innerCode = item.bucket_cd;
+          if (!innerCode) return;
+
+          // 2.3 설정 화면에서 설정한 투입 코드 전부 보기 값이 [예]이면 앞자리를 표시 
+          //if (LOGIS_UTIL.getShowFullCode()) { // TODO LOGIS_UTIL에 나오도록 장비 설정 프로파일에 추가
+          const beginSpan = document.createElement('span');
+          beginSpan.classList.add('begin-text');
+          beginSpan.innerHTML = innerCode.substr(0, innerCode.length - 4);
+          block.appendChild(beginSpan);
+          //}
+
+          // 2.4 투입 코드 마지막 네자리를 표시
+          const endSpan = document.createElement('span');
+          endSpan.classList.add('end-text');
+          endSpan.innerHTML = innerCode.substr(-4);
+          block.appendChild(endSpan);
+
+          // 2.5 Job Block에 작업 진행율 표시를 위한 프로그레스 바 추가
+          const jobBlockChart = document.createElement('div');
+          jobBlockChart.classList.add('job-block-chart');
+          const jobBlockChartBar = document.createElement('span');
+          jobBlockChartBar.style.width = item.progress_rate + "%";
+          jobBlockChart.appendChild(jobBlockChartBar);
+          block.appendChild(jobBlockChart)
+
+          block.getProgressBar = function() {
+            return jobBlockChartBar;
+          }
+
+          // 2.6 컨테이너에 Job Block 엘리먼트 추가
+          this.$['container'].appendChild(block);
+        });
+
+        // 3. 투입 리스트의 수량이 4 미만일 경우 박스 흐름 방향에 따라 오른쪽 (혹은 왼쪽) 부터 채워지도록 스타일 적용
+        if (inputList.length < 4) {
+          this._setBlockOrderStyle();
+        }
+
+        // 4. job indicator 렌더링 이후 configured 커스텀 이벤트 발생
+        this.dispatchEvent(new CustomEvent('configured', {
+          detail: {
+            inputList: inputList,
+            contentElements: this._getJobBlocks()
+          }
+        }));
+      }
+
+      /**
+       * @description Job Blocks 리턴 
+       ****************
+       * @return Job Blocks 엘리먼트 리턴
+       */
+      _getJobBlocks() {
+        return Array.from(this.$['container'].querySelectorAll('div.job-block'));
+      }
+
+      /**
+       * @description Job Block이 최대 개수보다 작을 경우 가장 박스 흐름 방향에 따라 오른쪽 혹은 왼쪽 부터 채워지도록 스타일을 적용함
+       ****************
+       */
+      _setBlockOrderStyle() {
+        if (!this._isBoxFlowLeftToRight()) {
+          let jobBlocks = Array.from(this.$['container'].querySelectorAll('div.job-block'));
+          let reverseJobBlocks = jobBlocks.reverse();
+          reverseJobBlocks.forEach((jobBlock, idx) => {
+            jobBlock.style.gridColumnStart = this.maxCnt - idx;
+          });
+        }
+      }
+
+      /**
+       * @description Job Blocks 엘리먼트를 모두 클리어
+       ****************
+       */
+      _clearJobIndicator() {
+        let container = this.$['container'];
+        while (container.children.length) {
+          container.removeChild(container.firstChild);
+        }
+      }
+
+      /**
+       * @description activeItemId로 Job Block 엘리먼트를 찾아 활성화시킴
+       ****************
+       * @param {activeItemId}
+       */
+      activateWorkingJobBlock(activeItemId) {
+        this._itemSelected({
+          currentTarget: this._getJobBlockElementById(activeItemId)
+        });
+      }
+
+      /**
+       * @description 다음 투입 정보를 선택
+       ****************
+       */
+      selectNextItem() {
+        // 선택할 아이템이 없으면 무조건 투입 리스트 리프레쉬한다.
+        return false;
+      }
+
+      /**
+       * @description Job Block 선택
+       ****************
+       * @param {Object} event
+       */
+      _itemSelected(event) {
+        if (!event || !event.currentTarget) return;
+
+        if (this.selectedElement) {
+          this.selectedElement.removeAttribute('active');
+        }
+
+        this.selectedElement = event.currentTarget;
+        this.selectedElement.setAttribute('active', '');
+        let targetId = this.selectedElement.getAttribute('target-id');
+        this.selectedInput = this.visibleList.filter(item => item.id === targetId)[0];
+        let customEvent;
+
+        // 클릭 이벤트를 통해 발생할 경우
+        if (event.type === 'click') {
+          customEvent = new CustomEvent('item-selected-by-click', {
+            detail: this.selectedInput
+          });
+          // select-next에 의해 발생할 경우
+        } else {
+          customEvent = new CustomEvent('item-selected', {
+            detail: this.selectedInput
+          });
+        }
+
+        this.dispatchEvent(customEvent);
+      }
+
+      /**
+       * @description 사용자 이벤트 감시하여 Swipe 이벤트를 발생 
+       ****************
+       * @param {Object} event
+       */
+      _handleTrack(event) {
+        let state = event.detail.state;
+
+        switch (state) {
+          case 'start':
+            this.startX = event.detail.x;
+            break;
+          case 'end':
+            this.endX = event.detail.x;
+            break;
+        }
+
+        if (this.startX && this.endX) {
+          if (this.startX - this.endX < -this.sensitivity) {
+            this._swipeToRight();
+
+          } else if (this.startX - this.endX > this.sensitivity) {
+            this._swipeToLeft()
+          }
+
+          this.startX = 0;
+          this.endX = 0;
+        }
+      }
+
+      /**
+       * @description 오른쪽 swipe 이벤트 발생 시 액션
+       ****************
+       */
+      _swipeToRight() {
+        this.dispatchEvent(new CustomEvent('swipe-right'));
+      }
+
+      /**
+       * @description 왼쪽 swipe 이벤트 발생 시 액션
+       ****************
+       */
+      _swipeToLeft() {
+        this.dispatchEvent(new CustomEvent('swipe-left'));
+      }
+
+      /**
+       * @description 엘리먼트 ID로 해당 Job Block을 찾아 리턴
+       ****************
+       * @param {String} targetId
+       */
+      _getJobBlockElementById(targetId) {
+        return this.shadowRoot.querySelector(`div[target-id="${targetId}"]`);
+      }
+
+      /**
+       * @description 현재 태블릿의 작업 존 코드 리턴
+       *****************
+       * @return
+       */
+      _getZoneCd() {
+        return LOGIS_UTIL.getStationCd();
+      }
+
+      /**
+       * @description id로 Job Block 찾아 리턴
+       *****************
+       * @return
+       */
+      getBlockById(id) {
+        return id ? this.shadowRoot.querySelector('div[target-id="' + id + '"]') : null;
+      }
+    }
+
+    customElements.define(B2BJobIndicator.is, B2BJobIndicator);
+  </script>
+</dom-module>

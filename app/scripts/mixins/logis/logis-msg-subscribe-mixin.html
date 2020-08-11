@@ -69,7 +69,8 @@ Copyright © HatioLab Inc. All rights reserved.
               job_type: jobType,
               rack_cd: rackCd,
               action,
-              message
+              message,
+              command
             } = event.detail;
 
             // 메시지 내용이 프로토콜과 관계없는 경우
@@ -79,6 +80,13 @@ Copyright © HatioLab Inc. All rights reserved.
 
           // 메시지 프로퍼티의 action 값에 따라 동작 (새로고침, 정보 메시지, 에러 메시지)
           switch (action) {
+            case 'DEVICE_CMD':
+              {
+                // 화면 리프레시. 이 믹스인을 사용하는 화면에서 구현
+                this.refreshByWs(message);
+              }
+              break;
+
             case WEB_MQTT.ACTION.REFRESH:
               {
                 // 화면 리프레시. 이 믹스인을 사용하는 화면에서 구현
@@ -132,7 +140,7 @@ Copyright © HatioLab Inc. All rights reserved.
        *******************
        * @param {String} message
        */
-      refreshByWs(message) { }
+      refreshByWs(message) {}
     };
   };
 </script>

@@ -168,10 +168,11 @@ Copyright © HatioLab Inc. All rights reserved.
       static get is() {
         return 'job-progress-bar'
       }
+
       static get properties() {
         return {
           /**
-           * 작업 타입 - DAS, DPS
+           * @description 작업 타입 - DAS, DPS
            ****************
            * @type {String}
            */
@@ -179,37 +180,63 @@ Copyright © HatioLab Inc. All rights reserved.
             type: String
           },
 
+          /**
+           * @description 작업 블록 표시를 위한 투입 리스트 데이터 
+           ****************
+           * @type {Array}
+           */
           visibleList: {
             type: Array,
             value: []
           },
 
+          /**
+           * @description 선택한 투입 작업
+           ****************
+           * @type {Object}
+           */
           selectedInput: {
             type: Object,
             // observer: '_selectedInputChanged',
             notify: true
           },
 
+          /**
+           * @description 투입 리스트
+           ****************
+           * @type {Array}
+           */
           inputList: {
             type: Array,
             readonly: true,
             observer: '_inputListChanged'
           },
 
+          /**
+           * @description 최대 작업 블록 개수 
+           ****************
+           * @type {Number}
+           */
           maxCnt: {
             type: Number,
             value: 4
           },
 
           /**
-           * swipe left, swipe right event 발생 민감도
-           * 수가 클수록 둔감
+           * @description swipe left, swipe right event 발생 민감도, 수가 클수록 둔감
+           ****************
+           * @type {Number}
            */
           sensitivity: {
             type: Number,
             value: 50
           },
 
+          /**
+           * @description 투입 코드를 다 표시할 지 줄여서 표시할 지 여부
+           ****************
+           * @type {Boolean}
+           */
           showFullCode: {
             type: Boolean,
             value: () => {
