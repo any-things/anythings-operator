@@ -190,7 +190,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
     <!-- 투입 리스트 표시를 위한 Ajax -->
     <sys-ajax 
-      id="input-list-ajax" 
+      id="input-pages-ajax" 
       method="GET" 
       content-type="application/json" 
       last-response="{{inputDataSet}}">
@@ -996,11 +996,11 @@ Copyright © HatioLab Inc. All rights reserved.
           this.totalProgressRateBySku = batchSummaryData.rate_sku;
           this.totalGaugeRate = batchSummaryData.rate_pcs;
 
-          let inputListAjax = this.$['input-list-ajax'];
+          let inputListAjax = this.$['input-pages-ajax'];
           let equipCd = LOGIS_UTIL.getEquipCd();
           let status = this.$['unfinished-only'].checked == true ? 'U' : '';
 
-          inputListAjax.curl = `/device_process/search/input_list/Rack/${equipCd}`;
+          inputListAjax.curl = `/device_process/search/input_pages/Rack/${equipCd}`;
           inputListAjax.customParams = {
             page: this.page,
             limit: this.limit,
@@ -1136,14 +1136,15 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} event
        */
       showDetailList(event) {
+        const equipType = LOGIS_UTIL.getEquipType();
         const equipCd = LOGIS_UTIL.getEquipCd();
         const jobInputId = event.detail.data.id;
 
         document.dispatchEvent(new CustomEvent('open-form-list-dialog', {
           detail: {
-            title: t('title.das_order_info_detail') + ' [' + event.detail.data.sku_nm + ']',
+            title: event.detail.data.sku_nm,
             listFields: this.detailListFields,
-            listDataReqUrl: `/device_process/search/input_jobs/Rack/${equipCd}?job_input_id=${jobInputId}`,
+            listDataReqUrl: `/device_process/search/input_jobs/${jobInputId}/${equipType}/${equipCd}`,
             handleListDataAfterSet: params => {
               const rows = params.listElement.getRows();
               rows.forEach(row => {

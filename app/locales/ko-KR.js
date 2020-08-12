@@ -167,6 +167,7 @@ window.locales['ko-KR'] = {
   'label.scan_qty': '스캔 수량',
   'label.disposal': '폐기',
   'label.normal': '정상',
+  'label.station_only': '작업 존 범위',
 
   // menu list
   'menu.Settings': '설정',

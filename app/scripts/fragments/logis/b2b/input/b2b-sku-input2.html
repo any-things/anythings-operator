@@ -204,7 +204,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
     <!-- 투입 리스트 표시를 위한 Ajax -->
     <sys-ajax 
-      id="input-list-ajax" 
+      id="input-pages-ajax" 
       method="GET" 
       content-type="application/json" 
       last-response="{{inputDataSet}}">
@@ -580,7 +580,7 @@ Copyright © HatioLab Inc. All rights reserved.
                   textAlign: 'right'
                 },
                 displayCallback: (status) => {
-                  return status == 'W' ? t('label.status_wait') : status == 'F' ? t('label.status_end') : (status == 'R' ? t(label.status_run) : '');
+                  return status == 'W' ? t('label.status_wait') : status == 'F' ? t('label.status_end') : (status == 'R' ? t('label.status_run') : '');
                 }
               }, {
                 fieldname: 'id',
@@ -768,7 +768,7 @@ Copyright © HatioLab Inc. All rights reserved.
             value: () => [{
               display: t('label.class_cd'),
               fieldname: 'class_cd',
-              columnWidth: '200px',
+              columnWidth: '300px',
             }, {
               display: t('label.cell'),
               fieldname: 'sub_equip_cd',
@@ -1030,11 +1030,11 @@ Copyright © HatioLab Inc. All rights reserved.
           this.totalProgressRateBySku = batchSummaryData.tot_rate_sku;
           this.totalGaugeRate = batchSummaryData.tot_rate_pcs;
 
-          let inputListAjax = this.$['input-list-ajax'];
+          let inputListAjax = this.$['input-pages-ajax'];
           let equipCd = LOGIS_UTIL.getEquipCd();
           let status = this.$['unfinished-only'].checked == true ? 'U' : '';
 
-          inputListAjax.curl = `/device_process/search/input_list/Rack/${equipCd}`;
+          inputListAjax.curl = `/device_process/search/input_pages/Rack/${equipCd}`;
           inputListAjax.customParams = {
             page: this.page,
             limit: this.limit,
@@ -1226,7 +1226,7 @@ Copyright © HatioLab Inc. All rights reserved.
           detail: {
             title: event.detail.data.sku_nm,
             listFields: this.detailListFields,
-            listDataReqUrl: `/device_process/search/input_jobs/${equipType}/${equipCd}?job_input_id=${jobInputId}`,
+            listDataReqUrl: `/device_process/search/input_jobs/${jobInputId}/${equipType}/${equipCd}`,
             handleListDataAfterSet: params => {
               const rows = params.listElement.getRows();
               rows.forEach(row => {

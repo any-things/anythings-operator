@@ -165,6 +165,7 @@ window.locales['en-US'] = {
   'label.scan_qty': 'Scan Qty',
   'label.disposal': 'disposal',
   'label.normal': 'normal',
+  'label.station_only': 'Station Only',
 
   // menu list
   'menu.Settings': 'Setting',

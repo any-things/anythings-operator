@@ -29,14 +29,31 @@ Copyright © HatioLab Inc. All rights reserved.
       }
       #button-container {
         display: grid;
+        grid-template-columns: auto 0.35fr auto 0.45fr auto;
         margin-top: 10px;
         justify-content: end;
+      }
+
+      #button-container input[type=checkbox] {
+        width: 5vw;
+        margin: auto;
+      }
+
+      #button-container input {
+        width: 10vw;
+        margin: 20px;
+      }
+
+      #button-container .label {
+        color: white;
+        font-size: .8rem;
+        margin: auto 15px;
       }
     </style>
 
     <!-- 랙별 상품 투입 리스트 Ajax -->
     <sys-ajax
-      id="input-list-ajax"
+      id="input-pages-ajax"
       method="GET"
       content-type="application/json"
       last-response="{{inputDataSet}}" >
@@ -58,6 +75,10 @@ Copyright © HatioLab Inc. All rights reserved.
 
       <!-- 버튼 표시 영역 -->
       <div id="button-container">
+        <span class="label">[[stationOnlyLabel]]</span>
+        <input type="checkbox" id="station-only">
+        <span class="label">[[unfinishedLabel]]</span>
+        <input type="checkbox" id="unfinished-only">
         <button on-click="refresh">[[refreshBtnLabel]]</button>
       </div>
     </div>
@@ -71,6 +92,30 @@ Copyright © HatioLab Inc. All rights reserved.
 
       static get properties() {
         return {
+          /**
+           * @description 미완료 라벨
+           ****************
+           * @type {String}
+           */
+          stationOnlyLabel: {
+            type: String,
+            value: function() {
+              return t('label.station_only');
+            }
+          },
+
+          /**
+           * @description 미완료 라벨
+           ****************
+           * @type {String}
+           */
+          unfinishedLabel: {
+            type: String,
+            value: function() {
+              return t('label.unfinished');
+            }
+          },
+
           /**
            * @description 새로고침 버튼 라벨
            ****************
@@ -243,7 +288,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} inputDataSet
        */
       _inputDataSetChanged(inputDataSet) {
-        if (inputDataSet && inputDataSet.total) {
+        if (inputDataSet) {
           this.total = inputDataSet.total;
           this.items = inputDataSet.items;
         }
@@ -256,16 +301,24 @@ Copyright © HatioLab Inc. All rights reserved.
       refresh() {
         let equipType = LOGIS_UTIL.getEquipType();
         let equipCd = LOGIS_UTIL.getEquipCd();
-        let stationCd = LOGIS_UTIL.getStationCd();
 
-        const inputListAjax = this.$['input-list-ajax'];
-        inputListAjax.curl = `/device_process/search/input_list/${equipType}/${equipCd}`;
-        inputListAjax.customParams = {
-          stationCd: stationCd,
+        const inputPagesAjax = this.$['input-pages-ajax'];
+        inputPagesAjax.curl = `/device_process/search/input_pages/${equipType}/${equipCd}`;
+        let customParams = {
           page: this.page,
           limit: this.limit
         };
-        inputListAjax.generateRequest();
+
+        if (this.$['station-only'].checked == true) {
+          customParams['station_cd'] = LOGIS_UTIL.getStationCd();
+        }
+
+        if (this.$['unfinished-only'].checked == true) {
+          customParams['status'] = 'U';
+        }
+
+        inputPagesAjax.customParams = customParams;
+        inputPagesAjax.generateRequest();
       }
 
       /**
@@ -298,6 +351,7 @@ Copyright © HatioLab Inc. All rights reserved.
       _skuSelected(event) {
         const content = document.createElement('rack-input-details');
         content.data = event.detail.data;
+        content.stationOnly = this.$['station-only'].checked == true ? true : false;
         LOGIS_UTIL.showPopup(null, content, 'fit', 'fit');
       }
     }

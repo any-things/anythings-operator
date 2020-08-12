@@ -166,6 +166,7 @@ window.locales['zh-CN'] = {
   'label.scan_qty': '掃描數量',
   'label.disposal': '廢棄',
   'label.normal': '正常',
+  'label.station_only': '작업 존 범위',
 
   // menu list
   'menu.Settings': '设置',

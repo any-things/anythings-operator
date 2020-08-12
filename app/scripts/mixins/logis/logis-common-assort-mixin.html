@@ -180,11 +180,11 @@ Copyright © HatioLab Inc. All rights reserved.
       refreshInputDetails(indOnFlag) {
         if (!indOnFlag) {
           // TODO 옵션 처리 
-          indOnFlag = true;
+          indOnFlag = false;
         }
 
         this.setListHeaderColor(this.selectedInput.color_cd);
-        let inputSeqId = this.selectedInput.id;
+        let jobInputId = this.selectedInput.id;
         let equipType = LOGIS_UTIL.getEquipType();
         let equipCd = LOGIS_UTIL.getEquipCd();
         let stationCd = LOGIS_UTIL.getStationCd();
@@ -193,9 +193,9 @@ Copyright © HatioLab Inc. All rights reserved.
         try {
           this.validationBeforeRefreshDetail(stationCd, workSideCd);
           let detailAjax = this.$['input-job-details-ajax'];
-
+          let indOnYn = indOnFlag ? 'Y' : 'N';
           detailAjax.curl =
-            `/device_process/search/input_jobs/${inputSeqId}/${equipType}/${equipCd}/${stationCd}/${indOnFlag}`;
+            `/device_process/search/input_jobs/${jobInputId}/${equipType}/${equipCd}?station_cd=${stationCd}&ind_on_yn=${indOnYn}`;
 
           detailAjax.generateRequest();
         } catch (error) {

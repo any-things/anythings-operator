@@ -69,7 +69,7 @@ Copyright © HatioLab Inc. All rights reserved.
     <!-- 투입 상품별 작업 리스트 조회 Ajax -->
     <sys-ajax
       auto
-      id="input-details-ajax"
+      id="input-jobs-ajax"
       method="GET"
       content-type="application/json"
       last-response="{{items}}">
@@ -191,6 +191,16 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
+           * @description 작업 존 정보만 조회 여부
+           ****************
+           * @type {String}
+           */
+          stationOnly: {
+            type: Boolean,
+            value: false
+          },
+
+          /**
            * @description 부모 화면에서 선택한 데이터
            ****************
            * @type {Object}
@@ -220,14 +230,15 @@ Copyright © HatioLab Inc. All rights reserved.
             value: function() {
               return [{
                 display: t('label.cell'),
-                fieldname: 'sub_equip_cd'
+                fieldname: 'sub_equip_cd',
+                columnWidth: '110px'
               }, {
                 display: t('label.order'),
                 fieldname: 'class_cd'
               }, {
                 display: t('label.qty'),
                 fieldname: 'display_qty',
-                columnWidth: '0.75fr',
+                columnWidth: '90px',
                 style: {
                   textAlign: 'right'
                 },
@@ -276,8 +287,12 @@ Copyright © HatioLab Inc. All rights reserved.
           let equipType = LOGIS_UTIL.getEquipType();
           let equipCd = LOGIS_UTIL.getEquipCd();
           let stationCd = LOGIS_UTIL.getStationCd();
-          const inputDetailsAjax = this.$['input-details-ajax'];
-          inputDetailsAjax.curl = `/device_process/search/input_jobs/${data.id}/${equipType}/${equipCd}/${stationCd}/false`;
+          const inputDetailsAjax = this.$['input-jobs-ajax'];
+          let curl = `/device_process/search/input_jobs/${data.id}/${equipType}/${equipCd}`;
+          if (this.stationOnly) {
+            curl += `?station_cd=${stationCd}`;
+          }
+          inputDetailsAjax.curl = curl;
         }
       }
 
@@ -299,6 +314,7 @@ Copyright © HatioLab Inc. All rights reserved.
           this.totalPickQty = `${totalPicked} / ${totalPlan}`;
 
         } else {
+          this.items = [];
           this.totalPickQty = '';
         }
       }
