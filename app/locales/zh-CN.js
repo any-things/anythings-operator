@@ -158,6 +158,14 @@ window.locales['zh-CN'] = {
   'label.status_end': '완료',
   'label.class_cd': '분류 코드',
   'label.remain_box': '남은 박스',
+  'label.rtn_date': '退貨日期',
+  'label.rtn_invoice': '退貨運輸單',
+  'label.cust_nm': '客戶名',
+  'label.out_invoice': '出庫運單',
+  'label.rtn_class': '退貨分類',
+  'label.scan_qty': '掃描數量',
+  'label.disposal': '廢棄',
+  'label.normal': '正常',
 
   // menu list
   'menu.Settings': '设置',
@@ -203,6 +211,7 @@ window.locales['zh-CN'] = {
   'menu.RtnPickedByCell': '退货库位状态',
   'menu.RtnRemainsBox': '退货残量处理',
   'menu.StockLoadFixed': '固化库位补充',
+  'menu.ReturnInspection': '退貨驗收',
 
   // button list
   'button.logout': '注销',

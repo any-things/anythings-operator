@@ -159,6 +159,14 @@ window.locales['ko-KR'] = {
   'label.status_end': '완료',
   'label.class_cd': '분류 코드',
   'label.remain_box': '남은 박스',
+  'label.rtn_date': '반품 일자',
+  'label.rtn_invoice': '반품 운송장',
+  'label.cust_nm': '고객명',
+  'label.out_invoice': '출고 운송장',
+  'label.rtn_class': '반품 구분',
+  'label.scan_qty': '스캔 수량',
+  'label.disposal': '폐기',
+  'label.normal': '정상',
 
   // menu list
   'menu.Settings': '설정',
@@ -205,6 +213,7 @@ window.locales['ko-KR'] = {
   'menu.RtnRemainsBox': '반품 잔량처리',
   'menu.StockLoadFixed': '고정셀 적치',
   'menu.StockSupply': '사전 보충',
+  'menu.ReturnInspection': '반품 검수',
 
   // button list
   'button.logout': '로그아웃',
