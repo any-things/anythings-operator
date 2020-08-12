@@ -157,6 +157,14 @@ window.locales['en-US'] = {
   'label.status_end': 'End',
   'label.class_cd': 'Class Code',
   'label.remain_box': 'Remain Box',
+  'label.rtn_date': 'Return Date',
+  'label.rtn_invoice': 'Return Invoice',
+  'label.cust_nm': 'Customer Name',
+  'label.out_invoice': 'Out Invoice',
+  'label.rtn_class': 'Return Class',
+  'label.scan_qty': 'Scan Qty',
+  'label.disposal': 'disposal',
+  'label.normal': 'normal',
 
   // menu list
   'menu.Settings': 'Setting',
@@ -202,6 +210,7 @@ window.locales['en-US'] = {
   'menu.RtnPickedByCell': 'Cell Status',
   'menu.RtnRemainsBox': 'Fullbox Remains',
   'menu.StockLoadFixed': 'Load Stock To Fixed',
+  'menu.ReturnInspection': 'Return Inspection',
 
   // button list
   'button.logout': 'Logout',
