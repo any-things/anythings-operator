@@ -27,9 +27,9 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       #prod-info {
-        /*border-top-left-radius: 0px;
+        border-top-left-radius: 0px;
         border-bottom-left-radius: 0px;
-        overflow: scroll;*/
+        overflow: hidden;
         margin-top: 10px;
       }
 
@@ -40,7 +40,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
       #info-section .prod-img {
         grid-row: 1 / 3;
-        background: url("../../../../images/bg-noimg.png") 50% 50% no-repeat;
+        background: url("../../../../../images/bg-noimg.png") 50% 50% no-repeat;
         width: 200px;
         height: 200px;
         border-top-left-radius: 12px;
@@ -207,7 +207,7 @@ Copyright © HatioLab Inc. All rights reserved.
   </dom-if>
   </div>
 
-  <!-- 작업 진도율 표시기 -->
+  <!-- 투입 목록 기반 블락 표시기 -->
   <b2b-job-indicator id="das-job-indicator" job-type="[[jobType]]" selected-input="{{selectedInput}}" on-item-selected="_selectedInputChanged" on-item-selected-by-click="_selectedInputChanged" show-full-code$="[[showFullCode]]" input-list="[[inputList]]"
     on-swipe-left="swipeLeft" on-swipe-right="swipeRight" on-configured="_addJobStatusAttr">
   </b2b-job-indicator>
