@@ -526,7 +526,7 @@ Copyright © HatioLab Inc. All rights reserved.
               return [{
                 display: '', //t('label.input_seq'),
                 fieldname: 'input_seq',
-                columnWidth: '0.4fr',
+                columnWidth: '0.3fr',
                 style: {
                   color: '#fff',
                   textAlign: 'center'
@@ -538,6 +538,18 @@ Copyright © HatioLab Inc. All rights reserved.
                 style: {
                   color: '#fff',
                   textAlign: 'center'
+                },
+                classCallback: (data) => {
+                  let boxColor = data['color_cd'].toLowerCase();
+                  if (boxColor === 'r') {
+                    return 'red';
+                  } else if (boxColor === 'g') {
+                    return 'green';
+                  } else if (boxColor === 'b') {
+                    return 'blue';
+                  } else if (boxColor === 'y') {
+                    return 'yellow'
+                  }
                 }
               }, {
                 display: t('label.sku_nm'),
@@ -550,7 +562,7 @@ Copyright © HatioLab Inc. All rights reserved.
               }, {
                 display: t('label.order'),
                 fieldname: 'input_qty',
-                columnWidth: '0.6fr',
+                columnWidth: '0.4fr',
                 style: {
                   color: '#fff',
                   textAlign: 'right'
