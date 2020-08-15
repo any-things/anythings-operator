@@ -5,440 +5,461 @@ Copyright © HatioLab Inc. All rights reserved.
 
 <link rel="import" href="../../../../../bower_components/polymer/polymer-element.html">
 
-
+<!--
+    KIOSK > B2C 반품 처리 화면 
+-->
 <dom-module id="b2c-rtn-inspection">
-    <template>
+  <template>
 <!-- Style Begin -->
-        <style include="shared-styles">
-            :host {
-                display: grid;
-                height: calc(100% - 20px);
-                padding: 10px;
-                border-radius: var(--things-default-border-radius);
-                color: rgba(255, 255, 255, .8);
-                text-align: center;
-            }
-            #container {
-                height: 100%;
-                overflow-y: hidden;
-            }
-            #top-container {
-                margin: 5px 5px 10px 10px;
-                display: grid;
-                grid-template-columns: 15% 35% 15% 35%;
-                background-color: var(--things-white-opacity-background-color);
-                border-radius: var(--things-default-border-radius);
-            }
-            .label {
-                color: #D5D7DB;
-                font-size: 25pt;
-                align-self: center;
-                grid-column-start: 1;
-                grid-column-end: 2;
-            }
-            item-list {
-                height: 75%;
-                margin: 10px 10px 10px 5px;
-            }
-            input {
-                flex: 1;
-                width: 100%;
-            }
-            .top-input {
-                display: flex;
-            }
-            .top-input:nth-child(7) {
-                flex: 1;
-                width: 100%;
-                color: crimson;
-                grid-row: span 2;
-                text-align: center;
-            }
-            .top-input:nth-child(12) {
-                flex: 1;
-                width: 100%;
-                color: crimson;
-                grid-row: 1 / 4;
-                text-align: center;
-            }
-            #scan-qty-label-div {
-                grid-row: span 2;
-                font-size: 50pt;
-            }
-            #scan-qty-input-div {
-                grid-row: span 2;
-            }
-            .bigproc {
-                align-self: center;
-            }
-            .bigproc b {
-                display: block;
-                color: #fff;
-                font-size: 50pt;
-                text-shadow: 1px 3px 3px rgba(0, 0, 0, .3);
-                line-height: 2;
-            }
-            .radio-btn-container {
-                display: grid;
-                grid-template-columns: 0.1fr 0.4fr 0.1fr 0.4fr;
-            }
-            .radio-btn-container input {
-                justify-self: right;
-            }
-            .radio-btn-container label {
-                margin-top: 5px;
-            }
-            input[type=radio] {
-                width: 60%;
-            }
-        </style>
+    <style include="shared-styles">
+      :host {
+        display: grid;
+        height: calc(100% - 20px);
+        padding: 10px;
+        border-radius: var(--things-default-border-radius);
+        color: rgba(255, 255, 255, .8);
+        text-align: center;
+      }
+      #container {
+        height: 100%;
+        overflow-y: hidden;
+      }
+      #top-container {
+        padding: 10px 10px 10px 10px;
+        display: grid;
+        grid-template-columns: 15% 35% 15% 35%;
+        background-color: var(--things-white-opacity-background-color);
+        border-radius: var(--things-default-border-radius);
+      }
+      .label {
+        color: #D5D7DB;
+        font-size: 25pt;
+        align-self: center;
+        grid-column-start: 1;
+        grid-column-end: 2;
+      }
+      item-list {
+        height: 75%;
+        margin: 10px 10px 10px 5px;
+      }
+      input {
+        flex: 1;
+        width: 100%;
+      }
+      .top-input {
+        display: flex;
+        padding-top: 5px;
+      }
+      .top-input:nth-child(7) {
+        flex: 1;
+        width: 100%;
+        color: crimson;
+        grid-row: span 2;
+        text-align: center;
+      }
+      .top-input:nth-child(12) {
+        flex: 1;
+        width: 100%;
+        color: crimson;
+        grid-row: 1 / 4;
+        text-align: center;
+      }
+      #scan-qty-label-div {
+        grid-row: span 2;
+        font-size: 50pt;
+      }
+      #scan-qty-input-div {
+        grid-row: span 2;
+      }
+      .bigproc {
+        align-self: center;
+      }
+      .bigproc b {
+        display: block;
+        color: #fff;
+        font-size: 50pt;
+        text-shadow: 1px 3px 3px rgba(0, 0, 0, .3);
+        line-height: 2;
+      }
+      .radio-btn-container {
+        display: grid;
+        grid-template-columns: 0.1fr 0.4fr 0.1fr 0.4fr;
+      }
+      .radio-btn-container input {
+        justify-self: right;
+      }
+      .radio-btn-container label {
+        margin-top: 5px;
+      }
+      input[type=radio] {
+        width: 60%;
+      }
+    </style>
 <!-- Style End -->
+
 <!-- Ajax Begin -->
 <!-- Ajax End -->
+
 <!-- View Begin -->
-        <div id="container">
-            <div id="top-container">
-                <!-- 반품 일자 -->
-                <div><span class="label">[[rtnDateLabel]]</span></div>
-                <div class="top-input"><input id="rtn-date" type="date" required value="[[_jobDateDefaultValue]]"></input></div>
-                <!-- 반품 운송장 -->
-                <div><span class="label">[[rtnInvoiceLabel]]</span></div>
-                <div class="top-input"><input id="rtn-invoice"></input></div>
-                
-                <!-- 고객명 -->
-                <div><span class="label">[[custNmLabel]]</span></div>
-                <div class="top-input"><input id="cust-nm"></input></div>
-                <!-- 출고 운송장 -->
-                <div><span class="label">[[outInvoiceLabel]]</span></div>
-                <div class="top-input"><input id="out-invoice"></input></div>
-                
-
-                <!-- 반품 구분 -->
-                <div><span class="label">[[rtnClassLabel]]</span></div>
-                <!--
-                <div class="top-input"><input id="rtn-class"></input></div>
-                -->
-                <div class="radio-btn-container">
-                    <input value="DISPOSAL" name="rtn-class" type="radio" job-name$="[[disposalLabel]]" checked>
-                    <label>[[disposalLabel]]</label>
-                    <input value="NORMAL" name="rtn-class" type="radio" job-name$="[[normalLabel]]">
-                    <label>[[normalLabel]]</label>
-                </div>
-                <!-- 스캔 수량 -->
-                <div id="scan-qty-label-div"><span class="label">[[scanQtyLabel]]</span></div>
-                <div id="scan-qty-input-div"><span id='scan-qty' class="bigproc"><b>10[[scanQty]]</b></span></div>
-                
-                <!-- 상품 바코드 -->
-                <div><span class="label">[[skuCdLabel]]</span></div>
-                <auto-popup-input 
-                    hide-keyboard 
-                    id="sku-code" 
-                    resource-url="[[getSkuAjaxUrl]]" 
-                    popup-title="[[popupTitleLabel]]"
-                    button-txt-callback="[[_skuButtonTxtCallback]]" 
-                    on-before-request="_customAjaxHandler"
-                    on-item-selected="skuSelectionChanged"
-                    on-sys-ajax-error="_findSkuError">
-                </auto-popup-input>
-            </div>
-
-            <item-list 
-                id="item-list" 
-                header="[[header]]" 
-                data="[[items]]" 
-                on-data-list-click="selectItem"
-                on-configured="_changeGridRowStyle">
-            </item-list>
+    <div id="container">
+      <div id="top-container">
+        <!-- 반품 일자 -->
+        <div><span class="label">[[rtnDateLabel]]</span></div>
+        <div class="top-input"><input id="rtn-date" type="date" required value="[[_jobDateDefaultValue]]"></input></div>
+        
+        <!-- 반품 운송장 -->
+        <div><span class="label">[[rtnInvoiceLabel]]</span></div>
+        <div class="top-input"><input id="rtn-invoice"></input></div>
+        
+        <!-- 고객명 -->
+        <div><span class="label">[[custNmLabel]]</span></div>
+        <div class="top-input"><input id="cust-nm"></input></div>
+        
+        <!-- 출고 운송장 -->
+        <div><span class="label">[[outInvoiceLabel]]</span></div>
+        <div class="top-input"><input id="out-invoice"></input></div>
+            
+        <!-- 반품 구분 -->
+        <div><span class="label">[[rtnClassLabel]]</span></div>
+        <!--
+        <div class="top-input"><input id="rtn-class"></input></div>
+        -->
+        
+        <div class="radio-btn-container">
+          <input value="DISPOSAL" name="rtn-class" type="radio" job-name$="[[disposalLabel]]" checked>
+          <label>[[disposalLabel]]</label>
+          <input value="NORMAL" name="rtn-class" type="radio" job-name$="[[normalLabel]]">
+          <label>[[normalLabel]]</label>
         </div>
+
+        <!-- 스캔 수량 -->
+        <div id="scan-qty-label-div"><span class="label">[[scanQtyLabel]]</span></div>
+        <div id="scan-qty-input-div"><span id='scan-qty' class="bigproc"><b>10[[scanQty]]</b></span></div>
+            
+        <!-- 상품 바코드 -->
+        <div><span class="label">[[skuCdLabel]]</span></div>
+        <auto-popup-input 
+          hide-keyboard 
+          id="sku-code" 
+          resource-url="[[getSkuAjaxUrl]]" 
+          popup-title="[[popupTitleLabel]]"
+          button-txt-callback="[[_skuButtonTxtCallback]]" 
+          on-before-request="_customAjaxHandler"
+          on-item-selected="skuSelectionChanged"
+          on-sys-ajax-error="_findSkuError">
+        </auto-popup-input>
+      </div>
+
+      <!-- 박스 내품 정보 리스트 -->
+      <item-list 
+        id="item-list" 
+        header="[[header]]" 
+        data="[[items]]" 
+        on-data-list-click="selectItem"
+        on-configured="_changeGridRowStyle">
+      </item-list>
+    </div>
 <!-- View End -->
-    </template>
-<!-- Scipt Begin -->
-    <script>
-        class B2CRtnInspection extends Polymer.Element {
-            static get is() {
-                return 'b2c-rtn-inspection'
+  </template>
+
+  <!-- Scipt Begin -->
+  <script>
+    class B2CRtnInspection extends Polymer.Element {
+      static get is() {
+        return 'b2c-rtn-inspection'
+      }
+      static get properties() {
+        return {
+          /**
+           * @description 반품 일자 라벨
+           ****************
+           * @type {String}
+           */
+          rtnDateLabel: {
+            type: String,
+            value: () => t('label.rtn_date')
+          },
+
+          /**
+           * @description 반품 운송장 라벨
+           ****************
+           * @type {String}
+           */
+          rtnInvoiceLabel: {
+            type: String,
+            value: () => t('label.rtn_invoice')
+          },
+
+          /**
+           * @description 고객명 라벨
+           ****************
+           * @type {String}
+           */
+          custNmLabel: {
+            type: String,
+            value: () => t('label.cust_nm')
+          },
+
+          /**
+           * @description 출고 운송장 라벨
+           ****************
+           * @type {String}
+           */
+          outInvoiceLabel: {
+            type: String,
+            value: () => t('label.out_invoice')
+          },
+
+          /**
+           * @description 반품 구분 라벨
+           ****************
+           * @type {String}
+           */
+          rtnClassLabel: {
+            type: String,
+            value: () => t('label.rtn_class')
+          },
+
+          /**
+           * @description 폐기 라벨
+           ****************
+           * @type {String}
+           */
+          disposalLabel: {
+            type: String,
+            value: () => t('label.disposal')
+          },
+
+          /**
+           * @description 정상 라벨
+           ****************
+           * @type {String}
+           */
+          normalLabel: {
+            type: String,
+            value: () => t('label.normal')
+          },
+
+          /**
+           * @description 스캔 수량 라벨
+           ****************
+           * @type {String}
+           */
+          scanQtyLabel: {
+            type: String,
+            value: () => t('label.scan_qty')
+          },
+
+          /**
+           * @description 상품 코드 
+           ****************
+           * @type {String}
+           */
+          skuCdLabel: {
+            type: String,
+            value: () => t('label.sku_cd')
+          },
+
+          /**
+           * @description 작업일자 기본 값
+           ****************
+           * @type {String}
+           */
+          _jobDateDefaultValue: {
+            type: String,
+            value: () => {
+              let today = new Date();
+              return today.toISOString().slice(0, 10);
             }
-            static get properties() {
-                return {
-                    /**
-                    * 반품 일자 라벨
-                    ****************
-                    * @type {String}
-                    */
-                    rtnDateLabel: {
-                        type: String,
-                        value: () => t('label.rtn_date')
-                    },
-                    /**
-                    * 반품 운송장 라벨
-                    ****************
-                    * @type {String}
-                    */
-                    rtnInvoiceLabel: {
-                        type: String,
-                        value: () => t('label.rtn_invoice')
-                    },
-                    /**
-                    * 고객명 라벨
-                    ****************
-                    * @type {String}
-                    */
-                    custNmLabel: {
-                        type: String,
-                        value: () => t('label.cust_nm')
-                    },
-                    /**
-                    * 출고 운송장 라벨
-                    ****************
-                    * @type {String}
-                    */
-                    outInvoiceLabel: {
-                        type: String,
-                        value: () => t('label.out_invoice')
-                    },
-                    /**
-                    * 반품 구분 라벨
-                    ****************
-                    * @type {String}
-                    */
-                    rtnClassLabel: {
-                        type: String,
-                        value: () => t('label.rtn_class')
-                    },
-                    /**
-                    * 폐기 라벨
-                    ****************
-                    * @type {String}
-                    */
-                    disposalLabel: {
-                        type: String,
-                        value: () => t('label.disposal')
-                    },
-                    /**
-                    * 정상 라벨
-                    ****************
-                    * @type {String}
-                    */
-                    normalLabel: {
-                        type: String,
-                        value: () => t('label.normal')
-                    },
-                    /**
-                    * 스캔 수량 라벨
-                    ****************
-                    * @type {String}
-                    */
-                    scanQtyLabel: {
-                        type: String,
-                        value: () => t('label.scan_qty')
-                    },
-                    /**
-                    * @description 상품 코드 
-                    ****************
-                    * @type {String}
-                    */
-                    skuCdLabel: {
-                        type: String,
-                        value: () => t('label.sku_cd')
-                    },
-                    /**
-                    * 작업일자 기본 값
-                    ****************
-                    * @type {String}
-                    */
-                    _jobDateDefaultValue: {
-                        type: String,
-                        value: () => {
-                        let today = new Date();
-                        return today.toISOString().slice(0, 10);
-                        }
-                    },
-                    /**
-                    * @description SKU 정보 조회를 위한 URL
-                    ****************
-                    * @type {String}
-                    */
-                    getSkuAjaxUrl: {
-                        type: String,
-                        value: `/device_process/sku/search_by_like/${LOGIS_UTIL.getEquipType()}/${LOGIS_UTIL.getEquipCd()}/:inputValue`
-                    },
-                    /**
-                    * @description SKU 정보 조회 후 복수개가 조회된 경우 사용자가 고를 수 있는 팝업이 실행되는데 그 팝업에 표시할 타이틀
-                    ****************
-                    * @type {String}
-                    */
-                    popupTitleLabel: {
-                        type: String,
-                        value: () => t('label.sku')
-                    },
-                    /**
-                    * @description 그리드 헤더 
-                    ****************
-                    * @type {Array}
-                    */
-                    header: {
-                        type: Array,
-                        value: function() {
-                            // 피스 수량 / 박스타입 / 주문 수 / 완료주문 수
-                            return [{
-                                display: t('label.rtn_class'),
-                                fieldname: 'rtn_class',
-                                columnWidth: '0.15fr',
-                                style: {
-                                textAlign: 'center',
-                                }
-                            }, {
-                                display: t('label.sku_cd'),
-                                fieldname: 'sku_cd',
-                                columnWidth: '0.3fr',
-                                style: {
-                                textAlign: 'center',
-                                },
-                            }, {
-                                display: t('label.sku_nm'),
-                                fieldname: 'sku_nm',
-                                columnWidth: '0.4fr',
-                                style: {
-                                textAlign: 'center',
-                                },
-                            }, {
-                                display: t('label.qty'),
-                                fieldname: 'qty',
-                                columnWidth: '0.2fr',
-                                style: {
-                                textAlign: 'center',
-                                },
-                            }, {
-                                hidden: true,
-                                fieldname: 'selected_job',
-                            }]
-                        }
-                    }
+          },
+
+          /**
+           * @description SKU 정보 조회를 위한 URL
+           ****************
+           * @type {String}
+           */
+          getSkuAjaxUrl: {
+            type: String,
+            value: `/device_process/sku/search_by_like/${LOGIS_UTIL.getEquipType()}/${LOGIS_UTIL.getEquipCd()}/:inputValue`
+          },
+
+          /**
+           * @description SKU 정보 조회 후 복수개가 조회된 경우 사용자가 고를 수 있는 팝업이 실행되는데 그 팝업에 표시할 타이틀
+           ****************
+           * @type {String}
+           */
+          popupTitleLabel: {
+            type: String,
+            value: () => t('label.sku')
+          },
+
+          /**
+           * @description 그리드 헤더 
+           ****************
+           * @type {Array}
+           */
+          header: {
+            type: Array,
+            value: function() {
+              // 피스 수량 / 박스타입 / 주문 수 / 완료주문 수
+              return [{
+                display: t('label.rtn_class'),
+                fieldname: 'rtn_class',
+                columnWidth: '0.15fr',
+                style: {
+                  textAlign: 'center',
                 }
+              }, {
+                display: t('label.sku_cd'),
+                fieldname: 'sku_cd',
+                columnWidth: '0.2fr',
+                style: {
+                  textAlign: 'center',
+                },
+              }, {
+                display: t('label.sku_nm'),
+                fieldname: 'sku_nm',
+                columnWidth: '0.5fr',
+                style: {
+                  textAlign: 'left',
+                },
+              }, {
+                display: t('label.qty'),
+                fieldname: 'qty',
+                columnWidth: '0.1fr',
+                style: {
+                  textAlign: 'right',
+                },
+              }, {
+                hidden: true,
+                fieldname: 'selected_job',
+              }]
             }
+          }
+        }
+      }
 
-            /**
-            * @description ready
-            ******************
-            */
-            connectedCallback() {
-                super.connectedCallback();
+      /**
+       * @description ready
+       ******************
+       */
+      connectedCallback() {
+        super.connectedCallback();
 
-
-                // 3. 설비 선택 체크
-                if (!LOGIS_UTIL.getEquipCd()) {
-                    LOGIS_UTIL.showMessage(t('text.selecting_equipment'), t('text.select_equipment'));
-                }
-
-                document.addEventListener(`alert-closed-at-${location.hash.replace('#/', '')}`, event => {
-                    if (!event.detail.hasCallback) {
-                        this._initialSetup();
-                    }
-                });
-            }
-
-            /**
-            * @description 초기 셋업
-            ******************
-            */
-            _initialSetup() {
-                this.$['sku-barcode'].select();
-            }
-
-            /**
-            * @description SKU 정보 조회 시 복수개가 조회된 경우 사용자가 고를 수 있는 버튼이 실행되는데 그 버튼에 표시할 내용
-            *******************
-            * @param {Object} item
-            */
-            _skuButtonTxtCallback(item) {
-                return `(${item.sku_cd})
-                        ${item.sku_nm}`;
-            }
-
-            _customAjaxHandler(event) {
-                const input = event.detail.input;
-                const ajax = event.detail.ajax;
-            }
-
-            /**
-            * @description 상품 선택이 변경된 경우 처리
-            *******************
-            * @param {Object} event
-            */
-            skuSelectionChanged(event) {
-            }
-
-            /**
-            * @description 인풋 박스 상태에 따라 포커스 이동 
-            *******************
-            */
-            _setInputFocus() {
-                this._getSkuCdInput().select();
-            }
-
-            /**
-            * @description 상품 코드 입력 박스 리턴
-            *******************
-            * @return 
-            */
-            _getSkuCdInput() {
-                return this.$['sku-code']
-            }
-
-            /**
-            * @description 상품 조회 에러시 
-            *******************
-            */
-            _findSkuError() {
-                this.clearView();
-                this.items = [];
-            }
-
-            /**
-            * @description 화면 클리어 
-            *******************
-            */
-            clearView() {
-            }
-
-            /**
-            * @description 작업 대상 그리드 선택
-            ******************
-            * @param {Object} event
-            */
-            selectItem(event) {
-            }
-
-            /**
-            * @description 그리드 행에 대한 스타일 변경
-            *******************
-            * @param {Object} event
-            */
-            _changeGridRowStyle(event) {
-                let list = event.detail.contentElements;
-                let prevData = this.currentRow ? this.currentRow.getData() : null;
-
-                /*
-                list.forEach(row => {
-                        let data = row.getData();
-                        
-                        if (prevData && prevData.box_type_cd == data.box_type_cd && prevData.pick_qty == data.pick_qty) {
-                            row.classList.add('selected');
-                            this.currentRow = row;
-                        } else {
-                            row.classList.remove('selected');
-                        }
-
-                        if (data.tot_order_cnt == data.comp_order_cnt) {
-                            row.classList.add('complete');
-                        }
-                    }
-                )
-                */
-            }
+        // 3. 설비 선택 체크
+        if (!LOGIS_UTIL.getEquipCd()) {
+          LOGIS_UTIL.showMessage(t('text.selecting_equipment'), t('text.select_equipment'));
         }
 
-        customElements.define(B2CRtnInspection.is, B2CRtnInspection);
-    </script>
-<!-- Scipt End -->
+        document.addEventListener(`alert-closed-at-${location.hash.replace('#/', '')}`, event => {
+          if (!event.detail.hasCallback) {
+            this._initialSetup();
+          }
+        });
+      }
+
+      /**
+       * @description 초기 셋업
+       ******************
+       */
+      _initialSetup() {
+        this.$['sku-barcode'].select();
+      }
+
+      /**
+       * @description SKU 정보 조회 시 복수개가 조회된 경우 사용자가 고를 수 있는 버튼이 실행되는데 그 버튼에 표시할 내용
+       *******************
+       * @param {Object} item
+       */
+      _skuButtonTxtCallback(item) {
+        return `(${item.sku_cd})
+                ${item.sku_nm}`;
+      }
+
+      /**
+       * @description 커스텀 Ajax Handler
+       *******************
+       * @param {Object} event
+       */
+      _customAjaxHandler(event) {
+        const input = event.detail.input;
+        const ajax = event.detail.ajax;
+      }
+
+      /**
+       * @description 상품 선택이 변경된 경우 처리
+       *******************
+       * @param {Object} event
+       */
+      skuSelectionChanged(event) {}
+
+      /**
+       * @description 인풋 박스 상태에 따라 포커스 이동 
+       *******************
+       */
+      _setInputFocus() {
+        this._getSkuCdInput().select();
+      }
+
+      /**
+       * @description 상품 코드 입력 박스 리턴
+       *******************
+       * @return 
+       */
+      _getSkuCdInput() {
+        return this.$['sku-code']
+      }
+
+      /**
+       * @description 상품 조회 에러시 
+       *******************
+       */
+      _findSkuError() {
+        this.clearView();
+        this.items = [];
+      }
+
+      /**
+       * @description 화면 클리어 
+       *******************
+       */
+      clearView() {}
+
+      /**
+       * @description 작업 대상 그리드 선택
+       ******************
+       * @param {Object} event
+       */
+      selectItem(event) {}
+
+      /**
+       * @description 그리드 행에 대한 스타일 변경
+       *******************
+       * @param {Object} event
+       */
+      _changeGridRowStyle(event) {
+        let list = event.detail.contentElements;
+        let prevData = this.currentRow ? this.currentRow.getData() : null;
+
+        /*list.forEach(row => {
+          let data = row.getData();
+          
+          if (prevData && prevData.box_type_cd == data.box_type_cd && prevData.pick_qty == data.pick_qty) {
+              row.classList.add('selected');
+              this.currentRow = row;
+          } else {
+              row.classList.remove('selected');
+          }
+
+          if (data.tot_order_cnt == data.comp_order_cnt) {
+              row.classList.add('complete');
+          }
+        }
+        )*/
+      }
+    }
+
+    customElements.define(B2CRtnInspection.is, B2CRtnInspection);
+  </script>
+  <!-- Scipt End -->
 </dom-module>

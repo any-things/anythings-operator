@@ -353,14 +353,14 @@ Copyright © HatioLab Inc. All rights reserved.
           let data = content.getData();
           let status = data.status;
           let indColor = data.color_cd;
-          let relatedMyZone = data.has_my_jobs; // 내 작업존과 관계 여부
-          let lastZone = data.is_my_zone_is_last; // 마지막 작업 처리 존 여부
+          //let relatedMyZone = data.has_my_jobs; // 내 작업존과 관계 여부
+          //let lastZone = data.is_my_zone_is_last; // 마지막 작업 처리 존 여부
           let progressBar = content.getProgressBar();
 
           this.addBarStatusTypeClass(status, content); // indicator의 상태에 따른 아이콘 적용
           this.addIndColorClass(indColor, progressBar); // 프로그레스 바에 ind 색상 적용
-          this.addOthersZoneAttr(relatedMyZone, content); // 나와 관계 없는 작업 attribute 추가
-          this.addLastZoneClass(lastZone, content); // 마지막 작업존 여부에 따른 class 추가
+          //this.addOthersZoneAttr(relatedMyZone, content); // 나와 관계 없는 작업 attribute 추가
+          //this.addLastZoneClass(lastZone, content); // 마지막 작업존 여부에 따른 class 추가
         });
       }
 
