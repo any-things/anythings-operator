@@ -7,8 +7,8 @@ Copyright © HatioLab Inc. All rights reserved.
 <link rel="import" href="../../../../../styles/tab-order-info-styles.html">
 
 <link rel="import" href="../../../../mixins/common/ble-scanner-mixin.html">
-<link rel="import" href="../../../../mixins/logis/logis-common-assort-mixin.html">
 <link rel="import" href="../../../../mixins/logis/logis-msg-subscribe-mixin.html">
+<link rel="import" href="../../../../mixins/logis/b2b/logis-b2b-picker-mixin.html">
 
 <link rel="import" href="../../../../components/common/bluetooth-scanner-selector.html">
 <link rel="import" href="../../../../components/logis/adjust-qty-popup.html">
@@ -53,7 +53,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
     </style>
 
-    <!-- 삭제 - 상품 정보 스캔 투입 리스트 -->
+    <!-- 상품 정보 스캔 투입 리스트 -->
     <sys-ajax
       id="input-list-ajax" 
       method="GET" 
@@ -61,7 +61,7 @@ Copyright © HatioLab Inc. All rights reserved.
       on-sys-ajax-response="_inputListResponsed">
     </sys-ajax>
 
-    <!-- 삭제 - 투입 이벤트의 매장 작업 리스트 -->
+    <!-- 투입 이벤트의 매장 작업 리스트, Mixin에서 투입 상세 조회를 위해 사용 -->
     <sys-ajax 
       id="input-job-details-ajax" 
       method="GET"
@@ -144,12 +144,17 @@ Copyright © HatioLab Inc. All rights reserved.
           <span>[[skuCd]]</span>
           <span class="prodname">[[skuNm]]</span>
         </div>
-        <iron-icon id="bluetooth-btn" icon="[[bluetoothIcon]]" on-click="bluetoothIconClicked"></iron-icon>
-      </div>
-    </div>
 
-    <!-- 작업 내용 표시를 위한 영역 -->
-    <div id="content">
+        <dom-if if="[[useBloothScanner]]">
+          <template>
+            <iron-icon id="bluetooth-btn" icon="[[bluetoothIcon]]" on-click="bluetoothIconClicked"></iron-icon>
+          </template>
+  </dom-if>
+  </div>
+  </div>
+
+  <!-- 작업 내용 표시를 위한 영역 -->
+  <div id="content">
 
     <!-- 앞쪽 로케이션 작업 표시를 위한 영역 -->
     <dom-if if="[[showFront]]">
@@ -167,11 +172,11 @@ Copyright © HatioLab Inc. All rights reserved.
           </item-list>
         </div>
       </template>
-  </dom-if>
+    </dom-if>
 
-  <!-- 뒤쪽 로케이션 작업 표시를 위한 영역 -->
-  <dom-if if="[[showRear]]">
-    <template>
+    <!-- 뒤쪽 로케이션 작업 표시를 위한 영역 -->
+    <dom-if if="[[showRear]]">
+      <template>
         <div id="right-section">
           <!-- 뒤 로케이션 라벨 -->
           <button class="list-header-btn" disabled>[[rearBtnLabel]]</button>
@@ -185,11 +190,11 @@ Copyright © HatioLab Inc. All rights reserved.
           </item-list>
         </div>
       </template>
-  </dom-if>
+    </dom-if>
 
-  <!-- 앞/뒤 모든 로케이션 작업 표시를 위한 영역 -->
-  <dom-if if="[[showTotal]]">
-    <template>
+    <!-- 앞/뒤 모든 로케이션 작업 표시를 위한 영역 -->
+    <dom-if if="[[showTotal]]">
+      <template>
         <div id="total-section">
           <!-- 전체 로케이션 라벨 -->
           <button class="list-header-btn" disabled>[[totalBtnLabel]]</button>
@@ -204,7 +209,7 @@ Copyright © HatioLab Inc. All rights reserved.
           </item-list>
         </div>
       </template>
-  </dom-if>
+    </dom-if>
   </div>
 
   <!-- 투입 목록 기반 블락 표시기 -->
@@ -218,7 +223,7 @@ Copyright © HatioLab Inc. All rights reserved.
   </template>
 
   <script>
-    class B2BJobAssort extends LogisMsgSubscribeMixin(LosigCommonAssortMixin(BleScannerMixin(Polymer.Element))) {
+    class B2BJobAssort extends LogisMsgSubscribeMixin(LosisB2BPickerMixin(BleScannerMixin(Polymer.Element))) {
       static get is() {
         return 'b2b-job-assort'
       }
@@ -306,6 +311,16 @@ Copyright © HatioLab Inc. All rights reserved.
             value: () => {
               return LOGIS_UTIL.isShowFullSkuCode()
             }
+          },
+
+          /**
+           * @description 블루투스 스캐너를 사용할 것인지 여부 설정
+           ****************
+           * @type {Boolean}
+           */
+          useBloothScanner: {
+            type: Boolean,
+            value: false
           },
 
           /**
@@ -403,13 +418,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Array} inputDetails
        */
       _updateStatus(inputDetails) {
-        // input detail의 내용이 없을 경우 다음 아이템을 선택함 == 나와 관계 없는 작업들 처리...
-        if (inputDetails.length === 0 && !this.holdIndicator && LOGIS_UTIL.isAutoSelectionNextOrder()) {
-          if (!this.$['das-job-indicator'].selectNextItem()) {
-            this.refreshInputList();
-          }
-        }
-
+        // 작업 리스트 정보로 총 주문 수 / 총 확정 수 계산 
         let totalPickQty = 0; // 총 주문 수량
         let pickedQty = 0; // 총 확정 수량
         let canceledQty = 0; // 작업 취소된 상품 수량
@@ -418,40 +427,32 @@ Copyright © HatioLab Inc. All rights reserved.
           totalPickQty += item.pick_qty;
           pickedQty += item.picked_qty;
           item.left_qty = item.pick_qty - item.picked_qty;
-          if (item.status === 'C') canceledQty += item.pick_qty;
+
+          if (item.status === 'C') {
+            canceledQty += item.pick_qty;
+          }
         });
 
-        // pickedCanceldPercent를 완료 + 취소된 작업의 전체 작업 대비 퍼센트를 계산하여
-        // 다음 블럭을 선택하는 기준 percent로 삼는다.
-        // inputDetails 중에 완료되지 않았지만 취소상태인 작업이 있다면 해당 작업도 이후에 처리할 것이기 때문에
-        // 다음 블럭을 선택하거나 inputList를 다시 조회해야함
-        const pickedCanceldPercent =
-          (totalPickQty && totalPickQty > 0 && pickedQty && pickedQty > 0) ?
-          Math.floor((pickedQty + canceledQty) / totalPickQty * 100) : 0;
+        // 총 주문 수 / 총 확정 수 설정
         this.totalPickQty = totalPickQty;
         this.pickedQty = pickedQty;
 
-        const selectedInputData = this.$['das-job-indicator'].getBlockById(this.selectedInput.id).getData();
-        if (selectedInputData.my_zone_progress_rate > 0) {
-          this.pickedPercent = selectedInputData.my_zone_progress_rate;
-        } else {
-          this.pickedPercent =
-            (totalPickQty && totalPickQty > 0 && pickedQty && pickedQty > 0) ?
-            Math.floor(pickedQty / totalPickQty * 100) : 0;
-        }
+        // 총 퍼센트 계산
+        this.pickedPercent =
+          (totalPickQty && totalPickQty > 0 && pickedQty && pickedQty > 0) ?
+          Math.floor(pickedQty / totalPickQty * 100) : 0;
 
+        // Job Block의 퍼센트 차트 업데이트
         this._updateBlockChart(this.pickedPercent);
 
-        // 작업률 100% & 자동피킹이 true로 설정 && 사용자에 의해 클릭을 통해 변경되지 않은 경우 => true
-        if (pickedCanceldPercent === 100 && LOGIS_UTIL.isAutoSelectionNextOrder() && !this.holdIndicator) {
-          // 다음 아이템이 없을 경우 false를 리턴함
-          if (!this.$['das-job-indicator'].selectNextItem()) {
-            // 마지막 아이템일 경우 input list를 다시 조회
+        if (this.holdIndicator) {
+          // 사용자에 의한 상품 탭 터치시 ...
+          this.holdIndicator = false;
+        } else {
+          // 사용자에 의한 상품 탭 터치가 아닌 경우 작업 진행율 100%이면 다음 상품으로 이동하기 위해 전체 리스트 리프레쉬
+          if (this.holdIndicator === false && (pickedQty + canceledQty == totalPickQty)) {
             this.refreshInputList();
           }
-        } else if (this.holdIndicator) {
-          // holdIndicator flag에 의해 selectNextItem을 호출 하지 않은 경우 holdIndicator의 값을 변경
-          this.holdIndicator = false;
         }
       }
 
@@ -461,13 +462,9 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} data
        */
       refreshByWs(data) {
-        if (data == 'refresh-details') {
-          // 작업 상세 정보 리프레쉬
+        // 작업 상세 정보 리프레쉬
+        if (data && data.startsWith('refresh')) {
           this.refreshInputDetails();
-
-        } else if (data == 'refresh') {
-          // 투입 리스트가 없는 경우 투입 리스트 조회
-          this.refreshInputList();
         }
       }
 

@@ -3,14 +3,14 @@
 Copyright © HatioLab Inc. All rights reserved.
 -->
 
-<link rel="import" href="../../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
 
 <!--
-  태블릿 작업 화면 공통 믹스 인
+  태블릿 DAS 피킹 작업 화면 공통 믹스 인
 -->
 <script>
-  LosigCommonAssortMixin = superClass => {
-    return class LosigCommonAssortMixin extends superClass {
+  LosisB2BPickerMixin = superClass => {
+    return class LosisB2BPickerMixin extends superClass {
       static get properties() {
         return {
           /**
@@ -87,6 +87,16 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           totalDetailList: {
             type: Array
+          },
+
+          /**
+           * @description 자동 
+           ****************
+           * @type {Boolean}
+           */
+          holdIndicator: {
+            type: Boolean,
+            value: false
           },
 
           /**
@@ -175,14 +185,9 @@ Copyright © HatioLab Inc. All rights reserved.
       /**
        * @description 상품 리스트 중 선택된 상품 정보 상세 조회
        *********************
-       * @param {Boolean} indOnFlag 지시기 점등 여부 
+       * @param {Boolean} indOnFlag 지시기 점등 여부 DAS에서는 해당 없음
        */
       refreshInputDetails(indOnFlag) {
-        if (!indOnFlag) {
-          // TODO 옵션 처리 
-          indOnFlag = false;
-        }
-
         this.setListHeaderColor(this.selectedInput.color_cd);
         let jobInputId = this.selectedInput.id;
         let equipType = LOGIS_UTIL.getEquipType();
@@ -193,9 +198,8 @@ Copyright © HatioLab Inc. All rights reserved.
         try {
           this.validationBeforeRefreshDetail(stationCd, workSideCd);
           let detailAjax = this.$['input-job-details-ajax'];
-          let indOnYn = indOnFlag ? 'Y' : 'N';
           detailAjax.curl =
-            `/device_process/search/input_jobs/${jobInputId}/${equipType}/${equipCd}?station_cd=${stationCd}&ind_on_yn=${indOnYn}`;
+            `/device_process/search/input_jobs/${jobInputId}/${equipType}/${equipCd}?station_cd=${stationCd}&ind_on_yn=N`;
 
           detailAjax.generateRequest();
         } catch (error) {
@@ -240,16 +244,18 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _inputListResponsed(event) {
         let inputList = event.currentTarget.lastResponse;
+
         if (this.inputList && inputList && inputList.length > 0) {
           let newIdList = inputList.map(input => input.id + input.status);
           let newIdStr = newIdList.join('');
-
           let currentIdList = this.inputList.map(input => input.id + input.status);
           let currentIdStr = currentIdList.join('');
 
-          if (newIdStr === currentIdStr && !this.forceRefresh) { // 데이터 변화 없고 forceRefresh가 false일 때 (새로고침 버튼으로 인한 refresh가 아닐때)
+          if (newIdStr === currentIdStr && !this.forceRefresh) {
+            // 데이터 변화 없고 forceRefresh가 false일 때 (새로고침 버튼으로 인한 refresh가 아닐때)
             return;
-          } else { // 데이터 변화 없거나 새로고침 버튼 클릭으로 인한 refresh일 때 => this.inputList에 초기화
+          } else {
+            // 데이터 변화 없거나 새로고침 버튼 클릭으로 인한 refresh일 때 => this.inputList에 초기화
             this.inputList = inputList;
             this.forceRefresh = false;
           }
@@ -257,7 +263,7 @@ Copyright © HatioLab Inc. All rights reserved.
           this.inputList = inputList ? inputList : [];
         }
 
-        SOUND.playInfoSound()
+        SOUND.playInfoSound();
       }
 
       /**
@@ -271,11 +277,7 @@ Copyright © HatioLab Inc. All rights reserved.
         if (selectedInput) {
           this.skuCd = selectedInput.sku_cd;
           this.skuNm = selectedInput.sku_nm;
-          this.orderNo = selectedInput.order_no;
-
-          if (this.jobType === 'DAS') {
-            this.prodImgSrc = '../../../images/product.jpeg';
-          }
+          this.prodImgSrc = '../../../images/product.jpeg';
 
           // 사용자의 클릭으로 인해 selectedInput이 변경 되었을 경우
           // job-progress-bar가 자동피킹 되지 않도록 holdIndicator flag를 on
@@ -296,31 +298,33 @@ Copyright © HatioLab Inc. All rights reserved.
         if (!inputDetails) {
           this.frontDetailList = [];
           this.rearDetailList = [];
-          return;
+
+        } else {
+          let workSideCd = LOGIS_UTIL.getWorkSideCd();
+          this._updateStatus(inputDetails);
+
+          // 앞 / 뒤 작업 분리 
+          let frontDetailListData = inputDetails.filter(function(detail) {
+            return detail.side_cd === 'F';
+          });
+          let rearDetailListData = inputDetails.filter(function(detail) {
+            return detail.side_cd === 'R';
+          });
+
+          // 주문 소팅 
+          this.frontDetailList = LOGIS_UTIL.sortByLeftQty(frontDetailListData);
+          this.rearDetailList = LOGIS_UTIL.sortByLeftQty(rearDetailListData);;
+
+          // 처리 완료 사운드
+          SOUND.playInfoSound();
         }
-        let workSideCd = LOGIS_UTIL.getWorkSideCd();
-
-        this._updateStatus(inputDetails);
-
-        let frontDetailListData = [];
-        let rearDetailListData = [];
-
-        inputDetails.forEach(inputDetail => {
-          if (inputDetail.side_cd == 'F') frontDetailListData.push(inputDetail);
-          else rearDetailListData.push(inputDetail);
-        });
-
-        this.frontDetailList = LOGIS_UTIL.sortByLeftQty(frontDetailListData);
-        this.rearDetailList = LOGIS_UTIL.sortByLeftQty(rearDetailListData);;
-
-        SOUND.playInfoSound()
       }
 
       /**
        * @description _updateBlockChart를 통해 상품 투입 상세 정보 업데이트하는 과정 중
        * job indicator의 progress bar의 값을 업데이트함
        ******************
-       * @param {Number} 진행률
+       * @param {Number} rate 진행률
        */
       _updateBlockChart(rate) {
         const jobBlock = this._getJobIndicator().getBlockById(this.selectedInput.id);
@@ -334,11 +338,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @return {Object} job-progress-bar element
        */
       _getJobIndicator() {
-        if (this.jobType === 'DAS') {
-          return this.$['das-job-indicator'];
-        } else {
-          return this.$['dps-job-indicator'];
-        }
+        return this.$['das-job-indicator'];
       }
 
       /**
@@ -353,21 +353,17 @@ Copyright © HatioLab Inc. All rights reserved.
           let data = content.getData();
           let status = data.status;
           let indColor = data.color_cd;
-          let relatedMyZone = data.has_my_jobs; // 내 작업존과 관계 여부
-          let lastZone = data.is_my_zone_is_last; // 마지막 작업 처리 존 여부
           let progressBar = content.getProgressBar();
 
           this.addBarStatusTypeClass(status, content); // indicator의 상태에 따른 아이콘 적용
           this.addIndColorClass(indColor, progressBar); // 프로그레스 바에 ind 색상 적용
-          this.addOthersZoneAttr(relatedMyZone, content); // 나와 관계 없는 작업 attribute 추가
-          this.addLastZoneClass(lastZone, content); // 마지막 작업존 여부에 따른 class 추가
         });
       }
 
       /**
        * @description 작업 상태에 따른 아이콘 적용
        ***********************
-       * @param {Object} status W: 작업대기, R: 작업중 F: 작업 완료
+       * @param {Object} status W: 작업대기, R: 작업 중 F: 작업 완료
        * @param {Object} content
        */
       addBarStatusTypeClass(status, content) {
@@ -397,32 +393,6 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * @description 내 작업존과의 관계 여부
-       * 무관: others 추가
-       ******************************
-       * @param {String} relatedMyZone
-       * @param {String} content
-       */
-      addOthersZoneAttr(relatedMyZone, content) {
-        if (!relatedMyZone) {
-          content.setAttribute('others', '');
-        }
-      }
-
-      /**
-       * @description 마지막 작업존 여부
-       * 마지막: last-job 클래스 추가
-       ***********************
-       * @param {String} lastZone
-       * @param {String} content
-       */
-      addLastZoneClass(lastZone, content) {
-        if (lastZone) {
-          content.classList.add('last-job');
-        }
-      }
-
-      /**
        * @description input list pagination 조회 response event handler
        * 조회 결과가 있다면 inputList에 초기화
        ********************
@@ -438,6 +408,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
       /**
        * @description 설정 화면으로 이동
+       ******************
        */
       moveToSetting() {
         location.hash = '/logis_setting';
@@ -446,6 +417,7 @@ Copyright © HatioLab Inc. All rights reserved.
       /**
        * @description 상품 리스트 중 선택한 상품 정보의 버킷 색상을 리스트 상단에 표시하기 위해서
        * button의 attribute를 변경함
+       ******************
        */
       setListHeaderColor(color) {
         let headerButtons = Array.from(this.shadowRoot.querySelectorAll('button.list-header-btn'));
@@ -457,6 +429,7 @@ Copyright © HatioLab Inc. All rights reserved.
       /**
        * @description 블루투스 아이콘 클릭 이벤트 핸들러
        * 블루투스 연결 상태에 따라 연결 / 해제
+       ******************
        */
       bluetoothIconClicked() {
         this.isConnected()
@@ -528,6 +501,7 @@ Copyright © HatioLab Inc. All rights reserved.
       /**
        * @description 블루투스 연결 완료 후 MpsBluetoothScannerMixin에 의해 호출됨
        * 연결 후 처리를 위해 구현
+       ******************
        */
       afterConnect() {
         this.bluetoothIcon = 'device:bluetooth-connected';
@@ -536,6 +510,7 @@ Copyright © HatioLab Inc. All rights reserved.
       /**
        * @description 블루투스 연결 해제 후 MpsBluetoothScannerMixin에 의해 호출됨
        * 연결 해제 후 처리를 위해 구현
+       ******************
        */
       afterDisconnect() {
         this.deviceName = '';
