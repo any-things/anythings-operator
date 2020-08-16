@@ -129,27 +129,31 @@ Copyright © HatioLab Inc. All rights reserved.
       .job-block-chart {
         display: block;
         width: 70%;
-        height: 3px;
+        height: 10px;
         margin: auto;
         position: relative;
-        top: -18px;
+        /* top: -18px; */
+        top: 15px;
         border: 2px solid rgba(0, 0, 0, .2);
         background-color: rgba(0, 0, 0, .5);
+        border-radius: 5px;
+        /* border-radius: var(--things-default-border-radius); */
       }
 
       .job-block[active] .job-block-chart {
-        height: 5px;
-        top: -22px;
+        height: 10px;
+        /* top: -22px; */
+        top: 15px;
       }
 
       .job-block-chart span {
         display: block;
-        height: 3px;
+        height: 10px;
         min-width: 5% !important;
       }
 
       .job-block[active] .job-block-chart span {
-        height: 5px;
+        height: 10px;
       }
 
       .job-block-chart span.colorR {
@@ -328,7 +332,7 @@ Copyright © HatioLab Inc. All rights reserved.
           block.setAttribute('target-id', item.id);
           block.classList.add('job-block');
           block.onclick = this._itemSelected.bind(this);
-          block.getData = function() {
+          block.getData = function () {
             return item;
           };
 
@@ -344,13 +348,8 @@ Copyright © HatioLab Inc. All rights reserved.
             block.appendChild(beginSpan);
           }
 
-          // 2.4 투입 코드 마지막 네자리를 표시
-          const endSpan = document.createElement('span');
-          endSpan.classList.add('end-text');
-          endSpan.innerHTML = innerCode.substr(-4);
-          block.appendChild(endSpan);
 
-          // 2.5 Job Block에 작업 진행율 표시를 위한 프로그레스 바 추가
+          // 2.4 Job Block에 작업 진행율 표시를 위한 프로그레스 바 추가
           const jobBlockChart = document.createElement('div');
           jobBlockChart.classList.add('job-block-chart');
           const jobBlockChartBar = document.createElement('span');
@@ -358,7 +357,14 @@ Copyright © HatioLab Inc. All rights reserved.
           jobBlockChart.appendChild(jobBlockChartBar);
           block.appendChild(jobBlockChart)
 
-          block.getProgressBar = function() {
+          // 2.5 투입 코드 마지막 네자리를 표시
+          const endSpan = document.createElement('span');
+          endSpan.classList.add('end-text');
+          endSpan.innerHTML = innerCode.substr(-4);
+          block.appendChild(endSpan);
+
+
+          block.getProgressBar = function () {
             return jobBlockChartBar;
           }
 
