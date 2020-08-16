@@ -320,7 +320,9 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           useBloothScanner: {
             type: Boolean,
-            value: false
+            value: () => {
+              return LOGIS_UTIL.isUseBloothScanner()
+            }
           },
 
           /**
