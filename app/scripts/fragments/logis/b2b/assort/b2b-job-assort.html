@@ -321,7 +321,7 @@ Copyright © HatioLab Inc. All rights reserved.
           useBloothScanner: {
             type: Boolean,
             value: () => {
-              return LOGIS_UTIL.isUseBloothScanner()
+              return LOGIS_UTIL.isUseBloothScanner();
             }
           },
 
@@ -562,6 +562,8 @@ Copyright © HatioLab Inc. All rights reserved.
           popup.pickQty = data.pick_qty;
           popup.pickedQty = data.picked_qty;
           popup.isFinished = (status === 'F');
+          popup.skuCd = this.selectedInput.sku_cd;
+
           LOGIS_UTIL.showPopup(t('title.job_select'), popup, 'fit', 'fit', null, closeParam => {
             if (closeParam && typeof closeParam === 'object' && closeParam.type === 'adjust-qty') {
               const adjustPopup = document.createElement('adjust-qty-popup');

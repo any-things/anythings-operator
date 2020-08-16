@@ -152,7 +152,8 @@ LOGIS_UTIL.getDeviceSettingValue = function(key) {
  */
 LOGIS_UTIL.getBooleanDeviceSetting = function(key) {
   let value = LOGIS_UTIL.getDeviceSettingValue(key);
-  return value ? Boolean(value) : false;
+  value = value ? value.toLowerCase() : 'false';
+  return (value == 'true' || value == 't' || value == 'on') ? true : false;
 };
 
 /**

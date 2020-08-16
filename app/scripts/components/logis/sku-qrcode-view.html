@@ -3,55 +3,63 @@
 Copyright © HatioLab Inc. All rights reserved.
 -->
 
-<script type= "text/javascript" src = "../lib/qrcode.min.js"></script>
+<script type="text/javascript" src="../lib/qrcode.min.js"></script>
 
 <!--
-  QRCode 팝업
+  공통 > QR Code 팝업
 -->
 <dom-module id='sku-qrcode-view'>
-    <template>
-        <style>
-            :host {
-                display: block;
-                margin-top: 50px;
-                margin-bottom: 50px;
-            }
-        </style>
+  <template>
+    <style>
+      :host {
+        display: block;
+        margin-top: 15px;
+        margin-bottom: 15px;
+      }
+    </style>
 
-        <div id = "qrcode" >[[data]]</div>
-    </template>
+    <!-- OR 코드 -->
+    <div id="qrcode">[[data]]</div>
+  </template>
 
-    <script>
-        class SkuQrcodeView extends Polymer.Element {
-            static get is() {
-                return 'sku-qrcode-view';
-            }
+  <script>
+    class SkuQrcodeView extends Polymer.Element {
+      static get is() {
+        return 'sku-qrcode-view';
+      }
 
-            static get properties() {
-                return {
-                    data: {
-                        type: String
-                    }
-                };
-            }
+      static get properties() {
+        return {
+          /**
+           * @description QR 코드 표시할 데이터 
+           ********************
+           * @type {String}
+           */
+          data: {
+            type: String
+          }
+        };
+      }
 
-            static get observers() {
-                return ['_renderCode(data)'];
-            }
+      static get observers() {
+        return ['_renderCode(data)'];
+      }
 
-            _renderCode(data) {
-                var element = this.$['qrcode'];
-                var content = {
-                    text : '',
-                    width: 380,
-                    height: 380
-                };
+      /**
+       * @description QR 코드 렌더링
+       ********************
+       * @param {Object} data
+       */
+      _renderCode(data) {
+        var element = this.$['qrcode'];
+        var qrcodeImg = new QRCode(element, {
+          text: data,
+          width: 200,
+          height: 200
+        });
+      }
+    }
 
-                content.text = data;
-                var qrcodeImg = new QRCode(element, content);
-            }
-        }
-
-        window.customElements.define(SkuQrcodeView.is, SkuQrcodeView);
-    </script>
+    window.customElements.define(SkuQrcodeView.is, SkuQrcodeView);
+  </script>
 </dom-module>
