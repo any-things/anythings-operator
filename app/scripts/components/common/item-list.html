@@ -18,202 +18,267 @@ Copyright © HatioLab Inc. All rights reserved.
         flex: 1;
         overflow: auto;
       }
+
       #container {
         display: flex;
         flex-direction: column;
         flex: 1;
       }
+
       .header-list {
         display: grid;
         color: #353535;
         background: #e6b84b;
         padding: .3rem .5rem .2rem .5rem;
         border-radius: 5px;
-        margin-bottom:9px;
+        margin-bottom: 9px;
         font-size: .7rem;
         text-align: center;
       }
+
       .header-list span {
         margin: auto;
       }
+
       #body-container {
         display: flex;
         flex: 1;
         overflow-y: auto;
-        background-color:rgba(0,0,0,.2);
-        border-radius:var(--things-default-border-radius);
+        background-color: rgba(0, 0, 0, .2);
+        border-radius: var(--things-default-border-radius);
       }
+
       #data-container {
         flex: 1;
         height: 0;
       }
+
+      #data-container {
+        flex: 1;
+        height: 0;
+      }
+
       .data-list {
         display: grid;
         color: #CCCCCE;
-        font-size:.8rem;
-        border-bottom: 1px solid rgba(0,0,0,.2);
+        font-size: .8rem;
+        border-bottom: 1px solid rgba(0, 0, 0, .2);
         padding: .3rem .5rem .2rem .5rem;
       }
-      .data-list.complete{
+
+      .data-list.complete {
         color: #FF0013;
-        font-weight:bold;
+        font-weight: bold;
       }
-      .data-list.underline{
+
+      .data-list.underline {
         text-decoration-line: underline;
       }
-      .data-list.wait{
+
+      .data-list.wait {
         color: gray;
         /* font-weight: bold; */
       }
+
       .data-list.selected {
         color: #FF0013;
-        font-weight:bold;
-        background-color:#fcf8e2;
+        font-weight: bold;
+        background-color: #fcf8e2;
       }
-      .data-list.canceled{
+
+      .data-list.canceled {
         color: #ffe240;
-        font-weight:bold;
+        font-weight: bold;
       }
-      li:nth-child(even){
-        background-color:rgba(83,98,127,.1);
+
+      li:nth-child(even) {
+        background-color: rgba(83, 98, 127, .1);
       }
+
       .data-item {
         overflow: hidden;
         white-space: nowrap;
         text-overflow: ellipsis;
         margin: auto 0;
       }
-      .data-item.red::before,.data-item.blue::before,.data-item.yellow::before,.data-item.green::before{
-        content:"";
-        background:url('../../../images/icon-box.png') no-repeat 50% 0 transparent;
-        display:inline-block;
+
+      .data-item.red::before,
+      .data-item.blue::before,
+      .data-item.yellow::before,
+      .data-item.green::before {
+        content: "";
+        background: url('../../../images/icon-box.png') no-repeat 50% 0 transparent;
+        display: inline-block;
         position: relative;
-        top:1px;
-        width:28px;height:20px;
-        margin:0 5px 0 0;
-        border-radius:4px;
+        top: 1px;
+        width: 28px;
+        height: 20px;
+        margin: 0 5px 0 0;
+        border-radius: 4px;
       }
-      .data-item.red::before   {background-color:#e25f4e}
-      .data-item.blue::before  {background-color:#23a6e6}
-      .data-item.yellow::before{background-color:#fca714}
-      .data-item.green::before {background-color:#85be48}
-      button:focus{
-        outline:0;
+
+      .data-item.red::before {
+        background-color: #e25f4e
       }
+
+      .data-item.blue::before {
+        background-color: #23a6e6
+      }
+
+      .data-item.yellow::before {
+        background-color: #fca714
+      }
+
+      .data-item.green::before {
+        background-color: #85be48
+      }
+
+      button:focus {
+        outline: 0;
+      }
+
       button {
         background: #90cc5d;
         background: linear-gradient(to bottom, #90cc5d 0%, #5a9802 100%);
-        border-top:.06rem solid #cdff9a;border-bottom:.2rem solid #2e7b00;
-        border-left:none;border-right:none;
-        border-radius:12px;
-        margin:15px 0;padding:.3rem;
+        border-top: .06rem solid #cdff9a;
+        border-bottom: .2rem solid #2e7b00;
+        border-left: none;
+        border-right: none;
+        border-radius: 12px;
+        margin: 15px 0;
+        padding: .3rem;
         color: #fff;
         text-shadow: 0px .03rem .03rem rgba(0, 0, 0, 0.4);
         font-size: 15pt;
       }
-      button:active{
+
+      button:active {
         background: #90cc5d;
         background: linear-gradient(to bottom, #5a9802 0%, #90cc5d 100%);
         text-shadow: .03rem 0rem .03rem rgba(0, 0, 0, 0.4);
       }
-      #data-container button{
-        margin:0px;
+
+      #data-container button {
+        margin: 0px;
       }
-      #data-container[dialog]{
-        background-color:transparent
+
+      #data-container[dialog] {
+        background-color: transparent;
+        height: 500px;
       }
-      #data-container[dialog] li{
-        color:var(--things-dark-text-color);
-        font-size:.6rem
+
+      #data-container[dialog] li {
+        color: var(--things-dark-text-color);
+        font-size: .6rem
       }
-      #data-container[dialog] li.complete{
+
+      #data-container[dialog] li.complete {
         color: #FF0013;
-        font-size:.6rem
+        font-size: .6rem
       }
-      #data-container[dialog] li.underline{
+
+      #data-container[dialog] li.underline {
         text-decoration-line: underline;
       }
-      #data-container[dialog] li.selected{
+
+      #data-container[dialog] li.selected {
         color: #FF0013;
-        font-weight:bold;
-        background-color:#fcf8e2;
+        font-weight: bold;
+        background-color: #fcf8e2;
       }
-      #data-container[dialog] li.canceled{
+
+      #data-container[dialog] li.canceled {
         color: #ffe240;
-        font-weight:bold;
+        font-weight: bold;
       }
+
       #paginator-container {
         display: none;
-        background-color:rgba(0,0,0,.2);
-        border:1px solid rgba(0,0,0,.2);
-        border-radius:10px;
-        margin-top:5px;padding:5px 12px 5px 5px;
+        background-color: rgba(0, 0, 0, .2);
+        border: 1px solid rgba(0, 0, 0, .2);
+        border-radius: 10px;
+        margin-top: 5px;
+        padding: 5px 12px 5px 5px;
         flex-direction: row;
-        height:30px;
+        height: 30px;
         justify-content: end;
         font-size: initial;
       }
+
       #paginator {
         display: flex;
         flex-direction: row;
         flex: 1;
       }
+
       #paginator iron-icon {
         fill: #fff;
         height: auto;
       }
-      #paginator b{
-        padding-left:15px;
-        color:#fff;
+
+      #paginator b {
+        padding-left: 15px;
+        color: #fff;
       }
-      #paginator iron-icon{
+
+      #paginator iron-icon {
         background: linear-gradient(to bottom, #5a5959 0%, #383737 100%);
-        padding:0 3px;
+        padding: 0 3px;
         color: #7f95bd;
       }
-      #paginator iron-icon:active{
+
+      #paginator iron-icon:active {
         background: linear-gradient(to bottom, #3c3c3c 0%, #303030 100%);
       }
-      #paginator iron-icon.prevPage{
+
+      #paginator iron-icon.prevPage {
         -webkit-border-top-left-radius: 10px;
         -webkit-border-bottom-left-radius: 10px;
         -moz-border-radius-topleft: 10px;
         -moz-border-radius-bottomleft: 10px;
         border-top-left-radius: 10px;
         border-bottom-left-radius: 10px;
-        border-width:1px 0 1px 1px;
+        border-width: 1px 0 1px 1px;
       }
-      #paginator iron-icon.nextPage{
+
+      #paginator iron-icon.nextPage {
         -webkit-border-top-right-radius: 10px;
         -webkit-border-bottom-right-radius: 10px;
         -moz-border-radius-topright: 10px;
         -moz-border-radius-bottomright: 10px;
         border-top-right-radius: 10px;
         border-bottom-right-radius: 10px;
-        border-width:1px 1px 1px 0;
+        border-width: 1px 1px 1px 0;
       }
+
       #page-summary {
         display: flex;
         flex-direction: row;
         flex: 1;
         justify-content: flex-end;
       }
-      #paginator span, #page-summary span {
+
+      #paginator span,
+      #page-summary span {
         color: silver;
-        margin-top: auto; margin-bottom: auto;
+        margin-top: auto;
+        margin-bottom: auto;
       }
-      input#page, input#limit {
+
+      input#page,
+      input#limit {
         width: 50px;
-        background-color: rgba(0,0,0,.25);
-        border: 1px solid rgba(255,255,255,.2);
+        background-color: rgba(0, 0, 0, .25);
+        border: 1px solid rgba(255, 255, 255, .2);
         color: #fff;
         text-align: right;
         font-size: initial;
       }
+
       input#limit {
         margin-left: .2rem;
         margin-right: .2rem;
-        border-radius:10px;
+        border-radius: 10px;
       }
     </style>
 
@@ -224,29 +289,30 @@ Copyright © HatioLab Inc. All rights reserved.
             <template>
               <span class="header-item">[[item.display]]</span>
             </template>
-  </dom-repeat>
-  </li>
-  </div>
+          </dom-repeat>
+        </li>
+      </div>
 
-  <div id="body-container">
-    <div id="data-container" dialog$="[[dialog]]"></div>
-  </div>
+      <div id="body-container">
+        <div id="data-container" dialog$="[[dialog]]"></div>
+      </div>
 
-  <div id="paginator-container">
-    <div id="paginator">
-      <iron-icon icon="icons:chevron-left" on-click="prevPage" class="prevPage"></iron-icon>
-      <input id="page" type="number" name="page" max="[[lastPage]]" on-change="_initPage" value="[[page]]">
-      <iron-icon icon="icons:chevron-right" on-click="nextPage" class="nextPage"></iron-icon>
-      <span><b>[[page]]</b> Page of [[endPage]] Pages</span>
+      <div id="paginator-container">
+        <div id="paginator">
+          <iron-icon icon="icons:chevron-left" on-click="prevPage" class="prevPage"></iron-icon>
+          <input id="page" type="number" name="page" max="[[lastPage]]" on-change="_initPage" value="[[page]]">
+          <iron-icon icon="icons:chevron-right" on-click="nextPage" class="nextPage"></iron-icon>
+          <span><b>[[page]]</b> Page of [[endPage]] Pages</span>
+        </div>
+
+        <div id="page-summary">
+          <span>Limit</span>
+          <input id="limit" type="number" name="limit" id="limit" min="[[minLimit]]" max="[[maxLimit]]"
+            on-change="_initLimit" value="[[limit]]">
+          <span>from [[beginDataNumber]] to [[endDataNumber]] Total [[total]]</span>
+        </div>
+      </div>
     </div>
-
-    <div id="page-summary">
-      <span>Limit</span>
-      <input id="limit" type="number" name="limit" id="limit" min="[[minLimit]]" max="[[maxLimit]]" on-change="_initLimit" value="[[limit]]">
-      <span>from [[beginDataNumber]] to [[endDataNumber]] Total [[total]]</span>
-    </div>
-  </div>
-  </div>
   </template>
 
   <script>
@@ -488,7 +554,7 @@ Copyright © HatioLab Inc. All rights reserved.
           rows.push(dataList);
         });
 
-        this.getRows = function() {
+        this.getRows = function () {
           return rows;
         }
       }
@@ -527,7 +593,7 @@ Copyright © HatioLab Inc. All rights reserved.
         let me = this;
 
         // 3. 로우의 data object를 리턴하는 getData 함수 추가
-        dataList.getData = function(event) {
+        dataList.getData = function (event) {
           let fieldList = me.header.map(item => item.fieldname);
           let data = {};
           // 리스트 내부의 차일드를 찾아 button-cell이 아닌 경우에
@@ -604,12 +670,12 @@ Copyright © HatioLab Inc. All rights reserved.
         const imgTag = new Image(imageObj.width, imageObj.height);
         imgTag.setAttribute('src', src);
         imgTag.setAttribute('image-cell', '');
-        imgTag.getValue = function() {
+        imgTag.getValue = function () {
           return src;
         }
 
         if (imageObj.zoomDialog) {
-          imgTag.onclick = function(event) {
+          imgTag.onclick = function (event) {
             const content = new Image(imgTag.clientWidth * 2, imgTag.clientHeight * 2);
             content.setAttribute('src', src);
 
@@ -653,7 +719,7 @@ Copyright © HatioLab Inc. All rights reserved.
         }
 
         // 3. getValue function 추가 span 엘리먼트의 innerHTML (필드의 값)을 리턴함
-        dataItem.getValue = function() {
+        dataItem.getValue = function () {
           return this.value;
         }
 
