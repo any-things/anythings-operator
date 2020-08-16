@@ -114,12 +114,12 @@ Copyright © HatioLab Inc. All rights reserved.
       <dom-if if="[[showFront]]">
         <template>
           <div id="left-section">
-            <!-- 앞 로케이션 라벨 -->
-            <button class="list-header-btn" disabled>[[frontBtnLabel]]</button>
             <!-- 앞 로케이션의 작업 리스트 -->
             <item-list id="front-list" hide-header header="[[header]]" data="[[frontDetailList]]"
               on-data-list-click="showProcessPopup" on-configured="_addOrderStatusAttr">
             </item-list>
+            <!-- 앞 로케이션 라벨 -->
+            <button class="list-header-btn" disabled>[[frontBtnLabel]]</button>
           </div>
         </template>
       </dom-if>
@@ -128,12 +128,12 @@ Copyright © HatioLab Inc. All rights reserved.
       <dom-if if="[[showRear]]">
         <template>
           <div id="right-section">
-            <!-- 뒤 로케이션 라벨 -->
-            <button class="list-header-btn" disabled>[[rearBtnLabel]]</button>
             <!-- 뒤 로케이션의 작업 리스트 -->
             <item-list id="rear-list" hide-header header="[[header]]" data="[[rearDetailList]]"
               on-data-list-click="showProcessPopup" on-configured="_addOrderStatusAttr">
             </item-list>
+            <!-- 뒤 로케이션 라벨 -->
+            <button class="list-header-btn" disabled>[[rearBtnLabel]]</button>
           </div>
         </template>
       </dom-if>
@@ -142,12 +142,12 @@ Copyright © HatioLab Inc. All rights reserved.
       <dom-if if="[[showTotal]]">
         <template>
           <div id="total-section">
-            <!-- 전체 로케이션 라벨 -->
-            <button class="list-header-btn" disabled>[[totalBtnLabel]]</button>
             <!-- 전체 로케이션의 작업 리스트 -->
             <item-list id="total-list" hide-header header="[[header]]" data="[[totalDetailList]]"
               on-data-list-click="showProcessPopup" on-configured="_addOrderStatusAttr">
             </item-list>
+            <!-- 전체 로케이션 라벨 -->
+            <button class="list-header-btn" disabled>[[totalBtnLabel]]</button>
           </div>
         </template>
       </dom-if>
