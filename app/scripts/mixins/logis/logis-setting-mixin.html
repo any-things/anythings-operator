@@ -581,6 +581,7 @@ Copyright © HatioLab Inc. All rights reserved.
         const stationCombo = this._getStationCombo();
         this._clearCombo(stationCombo);
         let stationList = (event && event.detail) ? event.detail : [];
+        stationList.unshift('ALL');
 
         stationList.forEach(station => {
           const option = new Option(station, station);
