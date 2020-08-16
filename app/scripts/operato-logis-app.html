@@ -210,112 +210,116 @@ Copyright © HatioLab Inc. All rights reserved.
         <template is="dom-if" if="[[!isKIOSK]]">
           <menu-tiles route="{{route}}" device-type="[[deviceType]]"></menu-tiles>
         </template>
-  </app-drawer>
+      </app-drawer>
 
-  <!-- Main content -->
-  <app-header-layout has-scrolling-region>
-    <app-header slot="header" fixed reveals effects="waterfall">
+      <!-- Main content -->
+      <app-header-layout has-scrolling-region>
+        <app-header slot="header" fixed reveals effects="waterfall">
 
-      <app-toolbar>
-        <div id="top-bar">
-          <span id="header">
+          <app-toolbar>
+            <div id="top-bar">
+              <span id="header">
                 <div id="menu-btn">
                   <img src="./images/icon-brand.png" />
                   <!--span>[[currentSite]]</span-->
-        </div>
-        <span id="title">[[title]]</span>
-          </span>
+                </div>
+                <span id="title">[[title]]</span>
+              </span>
 
-          <div id="input-container">
-            <span id="equip-name" is-kiosk$="[[isKIOSK]]">[[equipNm]]</span>
-            <span id="station-code">[[stationCd]]</span>
-            <span id="work-side" is-kiosk$="[[isKIOSK]]" hidden>[[workSideNm]]</span>
-          </div>
+              <div id="input-container">
+                <span id="equip-name" is-kiosk$="[[isKIOSK]]">[[equipNm]]</span>
+                <span id="station-code">[[stationCd]]</span>
+                <span id="work-side" is-kiosk$="[[isKIOSK]]" hidden>[[workSideNm]]</span>
+              </div>
 
-          <div id="buttons">
-            <iron-icon id="refresh-btn" icon="refresh" on-click="refresh" hidden></iron-icon>
-            <iron-icon id="ind-off-btn" icon="lightbulb-outline" on-click="showCodePopup" hidden></iron-icon>
-            <iron-icon id="ind-on-last-btn" icon="list" on-click="showCodePopup" hidden></iron-icon>
-            <iron-icon id="batch-full-box-btn" icon="move-to-inbox" on-click="showCodePopup" hidden></iron-icon>
-            <iron-icon id="kiosk-setting-btn" icon="settings" on-click="toSetting" hidden></iron-icon>
-            <iron-icon id="logout-btn" icon="power-settings-new" on-click="logout" hidden></iron-icon>
-          </div>
-        </div>
-      </app-toolbar>
-    </app-header>
+              <div id="buttons">
+                <iron-icon id="refresh-btn" icon="refresh" on-click="refresh" hidden></iron-icon>
+                <iron-icon id="ind-off-btn" icon="lightbulb-outline" on-click="showCodePopup" hidden></iron-icon>
+                <iron-icon id="ind-on-last-btn" icon="list" on-click="showCodePopup" hidden></iron-icon>
+                <iron-icon id="batch-full-box-btn" icon="move-to-inbox" on-click="showCodePopup" hidden></iron-icon>
+                <iron-icon id="kiosk-setting-btn" icon="settings" on-click="toSetting" hidden></iron-icon>
+                <iron-icon id="logout-btn" icon="power-settings-new" on-click="logout" hidden></iron-icon>
+              </div>
+            </div>
+          </app-toolbar>
+        </app-header>
 
-    <iron-pages id="main" role="main" selected="[[page]]" attr-for-selected="name" selected-attribute="visible">
+        <iron-pages id="main" role="main" selected="[[page]]" attr-for-selected="name" selected-attribute="visible">
 
-      <!-- Common Views -->
-      <cell-box-mapping-status name="cell_box_mapping_status" is-pda="[[isPDA]]"></cell-box-mapping-status>
-      <picking-status name="picking_status" is-kiosk="[[isKIOSK]]"></picking-status>
-      <picking-status-by-cell name="picking_status_by_cell" is-pda="[[isPDA]]"></picking-status-by-cell>
-      <box-list name="box_list" is-kiosk="[[isKIOSK]]"></box-list>
-      <label-list name="label_list" is-pda="[[isPDA]]"></label-list>
-      <!-- Common Views -->
+          <!-- Common Views -->
+          <cell-box-mapping-status name="cell_box_mapping_status" is-pda="[[isPDA]]"></cell-box-mapping-status>
+          <picking-status name="picking_status" is-kiosk="[[isKIOSK]]"></picking-status>
+          <picking-status-by-cell name="picking_status_by_cell" is-pda="[[isPDA]]"></picking-status-by-cell>
+          <box-list name="box_list" is-kiosk="[[isKIOSK]]"></box-list>
+          <label-list name="label_list" is-pda="[[isPDA]]"></label-list>
+          <!-- Common Views -->
 
-      <!-- DAS Views -->
-      <rack-input-list name="rack_input_list" is-pda="[[isPDA]]"></rack-input-list>
-      <!-- DAS Views -->
+          <!-- DAS Views -->
+          <rack-input-list name="rack_input_list" is-pda="[[isPDA]]"></rack-input-list>
+          <!-- DAS Views -->
 
-      <!-- Tablet Views -->
-      <b2b-job-assort name="b2b_job_assort"></b2b-job-assort>
-      <b2c-picking-job name="b2c_picking_job"></b2c-picking-job>
+          <!-- Tablet Views -->
+          <b2b-job-assort name="b2b_job_assort"></b2b-job-assort>
+          <b2b-job-assort-new name="b2b_job_assort_new"></b2b-job-assort-new>
+          <b2c-picking-job name="b2c_picking_job"></b2c-picking-job>
 
-      <!--tab-das2-order-info name="tab_das2_ord_info"></tab-das2-order-info-->
-      <rack-input-list name="rack_input_list"></rack-input-list>
-      <!-- Tablet Views -->
+          <!--tab-das2-order-info name="tab_das2_ord_info"></tab-das2-order-info-->
+          <rack-input-list name="rack_input_list"></rack-input-list>
+          <!-- Tablet Views -->
 
-      <!-- PDA Views -->
-      <stock-status-by-cell name="stock_status_by_cell"></stock-status-by-cell>
-      <stock-supplement name="stock_supplement"></stock-supplement>
-      <stock-supply name="stock_supply"></stock-supply>
-      <fixed-stock-supplement name="fixed_stock_supplement"></fixed-stock-supplement>
-      <b2c-one-sku-order name="b2c_one_sku_order"></b2c-one-sku-order>
+          <!-- PDA Views -->
+          <stock-status-by-cell name="stock_status_by_cell"></stock-status-by-cell>
+          <stock-supplement name="stock_supplement"></stock-supplement>
+          <stock-supply name="stock_supply"></stock-supply>
+          <fixed-stock-supplement name="fixed_stock_supplement"></fixed-stock-supplement>
+          <b2c-one-sku-order name="b2c_one_sku_order"></b2c-one-sku-order>
 
-      <b2b-cell-box-mapping-status name="b2b_cell_box_mapping_status"></b2b-cell-box-mapping-status>
-      <b2b-assort-job name="b2b_assort_job"></b2b-assort-job>
-      <b2b-rtn-assort-job name="b2b_rtn_assort_job" rack-nm="{{equipNm}}" zone-cd="{{stationCd}}">
-      </b2b-rtn-assort-job>
-      <b2b-rtn-inspection name="b2b_rtn_inspection" rack-nm="{{equipNm}}" zone-cd="{{stationCd}}">
-      </b2b-rtn-inspection>
-      <b2b-remains-fullbox name="b2b_remains_fullbox" rack-nm="{{equipNm}}" zone-cd="{{stationCd}}">
-      </b2b-remains-fullbox>
+          <b2b-cell-box-mapping-status name="b2b_cell_box_mapping_status"></b2b-cell-box-mapping-status>
+          <b2b-assort-job name="b2b_assort_job"></b2b-assort-job>
+          <b2b-rtn-assort-job name="b2b_rtn_assort_job" rack-nm="{{equipNm}}" zone-cd="{{stationCd}}">
+          </b2b-rtn-assort-job>
+          <b2b-rtn-inspection name="b2b_rtn_inspection" rack-nm="{{equipNm}}" zone-cd="{{stationCd}}">
+          </b2b-rtn-inspection>
+          <b2b-remains-fullbox name="b2b_remains_fullbox" rack-nm="{{equipNm}}" zone-cd="{{stationCd}}">
+          </b2b-remains-fullbox>
 
-      <pda-region-sku-info name="pda_region_sku_info"></pda-region-sku-info>
-      <pda-das2-process name="pda_das2_process" rack-nm="{{equipNm}}" zone-cd="{{stationCd}}"></pda-das2-process>
-      <pda-dps2-process name="pda_dps2_process" rack-nm="{{equipNm}}" zone-cd="{{stationCd}}"></pda-dps2-process>
-      <!-- PDA Views -->
+          <pda-region-sku-info name="pda_region_sku_info"></pda-region-sku-info>
+          <pda-das2-process name="pda_das2_process" rack-nm="{{equipNm}}" zone-cd="{{stationCd}}"></pda-das2-process>
+          <pda-dps2-process name="pda_dps2_process" rack-nm="{{equipNm}}" zone-cd="{{stationCd}}"></pda-dps2-process>
+          <!-- PDA Views -->
 
-      <!-- KIOSK View -->
-      <b2b-out-middle-assort name="b2b_out_middle_assort"></b2b-out-middle-assort>
-      <b2b-out-middle-assort-with-weight name="b2b_out_middle_assort_weight"></b2b-out-middle-assort-with-weight>
-      <b2b-rtn-middle-assort name="b2b_rtn_middle_assort"></b2b-rtn-middle-assort>
-      <b2b-qty-inspection name="b2b_qty_inspection"></b2b-qty-inspection>
-      <b2b-weight-inspection name="b2b_weight_inspection"></b2b-weight-inspection>
-      <b2b-sku-input name="b2b_sku_input"></b2b-sku-input>
-      <b2b-sku-input2 name="b2b_sku_input2"></b2b-sku-input2>
-      <b2c-box-input name="b2c_box_input"></b2c-box-input>
-      <b2c-box-requirement name="b2c_box_requirement"></b2c-box-requirement>
-      <b2c-pick-single-pack name="b2c_pick_single_pack"></b2c-pick-single-pack>
-      <b2c-no-order-single-pack name="b2c_no_order_single_pack"></b2c-no-order-single-pack>
-      <b2c-no-box-single-pack name="b2c_no_box_single_pack"></b2c-no-box-single-pack>
-      <b2c-packing-check name="b2c_packing_check"></b2c-packing-check>
-      <b2c-packing-popup name="b2c_packing_popup"></b2c-packing-popup>
-      <b2c-qty-inspection name="b2c_qty_inspection"></b2c-qty-inspection>
-      <b2c-rtn-inspection name="b2c_rtn_inspection"></b2c-rtn-inspection>
-      <!-- KIOSK View -->
+          <!-- KIOSK View -->
+          <b2b-out-middle-assort name="b2b_out_middle_assort"></b2b-out-middle-assort>
+          <b2b-out-middle-assort-with-weight name="b2b_out_middle_assort_weight"></b2b-out-middle-assort-with-weight>
+          <b2b-rtn-middle-assort name="b2b_rtn_middle_assort"></b2b-rtn-middle-assort>
+          <b2b-qty-inspection name="b2b_qty_inspection"></b2b-qty-inspection>
+          <b2b-weight-inspection name="b2b_weight_inspection"></b2b-weight-inspection>
+          <b2b-sku-input name="b2b_sku_input"></b2b-sku-input>
+          <b2b-sku-input2 name="b2b_sku_input2"></b2b-sku-input2>
+          <b2c-box-input name="b2c_box_input"></b2c-box-input>
+          <b2c-box-requirement name="b2c_box_requirement"></b2c-box-requirement>
+          <b2c-pick-single-pack name="b2c_pick_single_pack"></b2c-pick-single-pack>
+          <b2c-no-order-single-pack name="b2c_no_order_single_pack"></b2c-no-order-single-pack>
+          <b2c-no-box-single-pack name="b2c_no_box_single_pack"></b2c-no-box-single-pack>
+          <b2c-packing-check name="b2c_packing_check"></b2c-packing-check>
+          <b2c-packing-popup name="b2c_packing_popup"></b2c-packing-popup>
+          <b2c-qty-inspection name="b2c_qty_inspection"></b2c-qty-inspection>
+          <b2c-rtn-inspection name="b2c_rtn_inspection"></b2c-rtn-inspection>
+          <!-- KIOSK View -->
 
-      <logis-login name="login" resources="[[resources]]" language="[[language]]" is-dev-mode="[[_computeIsDev()]]" on-login-succeed="_handleLoginSuccess">
-      </logis-login>
+          <logis-login name="login" resources="[[resources]]" language="[[language]]" is-dev-mode="[[_computeIsDev()]]"
+            on-login-succeed="_handleLoginSuccess">
+          </logis-login>
 
-      <logis-setting id="logis-setting" name="logis_setting" device-type="[[deviceType]]" is-dev-mode="[[isDevMode]]" is-not-login="[[isNotLogin]]" on-session-responsed="_sessionResponsed" on-session-unauthorized="_sessionUnauthorized">
-      </logis-setting>
+          <logis-setting id="logis-setting" name="logis_setting" device-type="[[deviceType]]"
+            is-dev-mode="[[isDevMode]]" is-not-login="[[isNotLogin]]" on-session-responsed="_sessionResponsed"
+            on-session-unauthorized="_sessionUnauthorized">
+          </logis-setting>
 
-      <logis-home name="home"></logis-home>
-    </iron-pages>
-  </app-header-layout>
-  </app-drawer-layout>
+          <logis-home name="home"></logis-home>
+        </iron-pages>
+      </app-header-layout>
+    </app-drawer-layout>
   </template>
 
   <script>
@@ -834,7 +838,7 @@ Copyright © HatioLab Inc. All rights reserved.
        ******************************
        */
       logout() {
-        LOGIS_UTIL.showConfirm(t('button.logout'), t('text.Sure to logout'), null, function() {
+        LOGIS_UTIL.showConfirm(t('button.logout'), t('text.Sure to logout'), null, function () {
           const sysLogout = this.$['sys-logout'];
           sysLogout.logout();
         }.bind(this));
@@ -1120,7 +1124,7 @@ Copyright © HatioLab Inc. All rights reserved.
           title = t('title.ind_on_last');
         }
 
-        LOGIS_UTIL.showPopup(title, popup, 'fit', 'fit', function() {
+        LOGIS_UTIL.showPopup(title, popup, 'fit', 'fit', function () {
           popup.initialSetup.bind(popup);
         }.bind(this));
       }
