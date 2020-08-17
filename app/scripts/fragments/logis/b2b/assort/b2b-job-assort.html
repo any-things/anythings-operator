@@ -106,7 +106,7 @@ Copyright © HatioLab Inc. All rights reserved.
           <div id="left-section">
             <!-- 앞 로케이션의 작업 리스트 -->
             <item-list id="front-list" hide-header header="[[header]]" data="[[frontDetailList]]"
-              on-data-list-click="showProcessPopup" on-configured="_addOrderStatusAttr">
+              on-data-list-click="showProcessPopup" on-configured="_addInputStatusAttr">
             </item-list>
             <!-- 앞 로케이션 라벨 -->
             <button class="list-header-btn" disabled>[[frontBtnLabel]]</button>
@@ -120,7 +120,7 @@ Copyright © HatioLab Inc. All rights reserved.
           <div id="right-section">
             <!-- 뒤 로케이션의 작업 리스트 -->
             <item-list id="rear-list" hide-header header="[[header]]" data="[[rearDetailList]]"
-              on-data-list-click="showProcessPopup" on-configured="_addOrderStatusAttr">
+              on-data-list-click="showProcessPopup" on-configured="_addInputStatusAttr">
             </item-list>
             <!-- 뒤 로케이션 라벨 -->
             <button class="list-header-btn" disabled>[[rearBtnLabel]]</button>
@@ -134,7 +134,7 @@ Copyright © HatioLab Inc. All rights reserved.
           <div id="total-section">
             <!-- 전체 로케이션의 작업 리스트 -->
             <item-list id="total-list" hide-header header="[[header]]" data="[[totalDetailList]]"
-              on-data-list-click="showProcessPopup" on-configured="_addOrderStatusAttr">
+              on-data-list-click="showProcessPopup" on-configured="_addInputStatusAttr">
             </item-list>
             <!-- 전체 로케이션 라벨 -->
             <button class="list-header-btn" disabled>[[totalBtnLabel]]</button>
@@ -333,7 +333,7 @@ Copyright © HatioLab Inc. All rights reserved.
        *********************
        * @param {Object} event
        */
-      _addOrderStatusAttr(event) {
+      _addInputStatusAttr(event) {
         let list = event.detail.contentElements;
         list.forEach(row => {
           let data = row.getData();

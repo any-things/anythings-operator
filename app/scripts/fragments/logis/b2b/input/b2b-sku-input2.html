@@ -356,6 +356,7 @@ Copyright © HatioLab Inc. All rights reserved.
         total="[[total]]" 
         limit="[[limit]]" 
         data="[[items]]"
+        on-configured="_addInputStatusAttr"
         on-data-list-click="showDetailList" 
         on-paginator-changed="_pageChanged">
       </item-list>
@@ -853,6 +854,22 @@ Copyright © HatioLab Inc. All rights reserved.
         } else {
           this.enableAutoRefresh = false;
         }
+      }
+
+      /**
+       * @description list configured event handler
+       * list 구성이 완료 되면 status 데이터를 바탕으로 status attribute를 추가함
+       *********************
+       * @param {Object} event
+       */
+      _addInputStatusAttr(event) {
+        let list = event.detail.contentElements;
+        list.forEach(row => {
+          let data = row.getData();
+          if (data.plan_qty == data.result_qty) {
+            row.classList.add('complete');
+          }
+        });
       }
 
       /**

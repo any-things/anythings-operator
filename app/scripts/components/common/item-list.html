@@ -53,11 +53,6 @@ Copyright © HatioLab Inc. All rights reserved.
         height: 0;
       }
 
-      #data-container {
-        flex: 1;
-        height: 0;
-      }
-
       .data-list {
         display: grid;
         color: #CCCCCE;
@@ -289,30 +284,29 @@ Copyright © HatioLab Inc. All rights reserved.
             <template>
               <span class="header-item">[[item.display]]</span>
             </template>
-          </dom-repeat>
-        </li>
-      </div>
+  </dom-repeat>
+  </li>
+  </div>
 
-      <div id="body-container">
-        <div id="data-container" dialog$="[[dialog]]"></div>
-      </div>
+  <div id="body-container">
+    <div id="data-container" dialog$="[[dialog]]"></div>
+  </div>
 
-      <div id="paginator-container">
-        <div id="paginator">
-          <iron-icon icon="icons:chevron-left" on-click="prevPage" class="prevPage"></iron-icon>
-          <input id="page" type="number" name="page" max="[[lastPage]]" on-change="_initPage" value="[[page]]">
-          <iron-icon icon="icons:chevron-right" on-click="nextPage" class="nextPage"></iron-icon>
-          <span><b>[[page]]</b> Page of [[endPage]] Pages</span>
-        </div>
-
-        <div id="page-summary">
-          <span>Limit</span>
-          <input id="limit" type="number" name="limit" id="limit" min="[[minLimit]]" max="[[maxLimit]]"
-            on-change="_initLimit" value="[[limit]]">
-          <span>from [[beginDataNumber]] to [[endDataNumber]] Total [[total]]</span>
-        </div>
-      </div>
+  <div id="paginator-container">
+    <div id="paginator">
+      <iron-icon icon="icons:chevron-left" on-click="prevPage" class="prevPage"></iron-icon>
+      <input id="page" type="number" name="page" max="[[lastPage]]" on-change="_initPage" value="[[page]]">
+      <iron-icon icon="icons:chevron-right" on-click="nextPage" class="nextPage"></iron-icon>
+      <span><b>[[page]]</b> Page of [[endPage]] Pages</span>
     </div>
+
+    <div id="page-summary">
+      <span>Limit</span>
+      <input id="limit" type="number" name="limit" id="limit" min="[[minLimit]]" max="[[maxLimit]]" on-change="_initLimit" value="[[limit]]">
+      <span>from [[beginDataNumber]] to [[endDataNumber]] Total [[total]]</span>
+    </div>
+  </div>
+  </div>
   </template>
 
   <script>
@@ -554,7 +548,7 @@ Copyright © HatioLab Inc. All rights reserved.
           rows.push(dataList);
         });
 
-        this.getRows = function () {
+        this.getRows = function() {
           return rows;
         }
       }
@@ -593,7 +587,7 @@ Copyright © HatioLab Inc. All rights reserved.
         let me = this;
 
         // 3. 로우의 data object를 리턴하는 getData 함수 추가
-        dataList.getData = function (event) {
+        dataList.getData = function(event) {
           let fieldList = me.header.map(item => item.fieldname);
           let data = {};
           // 리스트 내부의 차일드를 찾아 button-cell이 아닌 경우에
@@ -670,12 +664,12 @@ Copyright © HatioLab Inc. All rights reserved.
         const imgTag = new Image(imageObj.width, imageObj.height);
         imgTag.setAttribute('src', src);
         imgTag.setAttribute('image-cell', '');
-        imgTag.getValue = function () {
+        imgTag.getValue = function() {
           return src;
         }
 
         if (imageObj.zoomDialog) {
-          imgTag.onclick = function (event) {
+          imgTag.onclick = function(event) {
             const content = new Image(imgTag.clientWidth * 2, imgTag.clientHeight * 2);
             content.setAttribute('src', src);
 
@@ -719,7 +713,7 @@ Copyright © HatioLab Inc. All rights reserved.
         }
 
         // 3. getValue function 추가 span 엘리먼트의 innerHTML (필드의 값)을 리턴함
-        dataItem.getValue = function () {
+        dataItem.getValue = function() {
           return this.value;
         }
 
