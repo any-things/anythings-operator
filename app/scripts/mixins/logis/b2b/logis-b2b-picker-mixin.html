@@ -278,6 +278,7 @@ Copyright © HatioLab Inc. All rights reserved.
         let selectedInput = event.detail;
 
         if (selectedInput) {
+          this.inputSeq = selectedInput.input_seq;
           this.skuCd = selectedInput.sku_cd;
           this.skuNm = selectedInput.sku_nm;
           this.prodImgSrc = '../../../images/product.jpeg';
@@ -307,10 +308,10 @@ Copyright © HatioLab Inc. All rights reserved.
           this._updateStatus(inputDetails);
 
           // 앞 / 뒤 작업 분리 
-          let frontDetailListData = inputDetails.filter(function (detail) {
+          let frontDetailListData = inputDetails.filter(function(detail) {
             return detail.side_cd === 'F';
           });
-          let rearDetailListData = inputDetails.filter(function (detail) {
+          let rearDetailListData = inputDetails.filter(function(detail) {
             return detail.side_cd === 'R';
           });
 
@@ -324,16 +325,14 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * @description _updateBlockChart를 통해 상품 투입 상세 정보 업데이트하는 과정 중
-       * job indicator의 progress bar의 값을 업데이트함
+       * @description job indicator의 progress bar의 값을 업데이트
        ******************
        * @param {Number} rate 진행률
        */
       _updateBlockChart(rate) {
         const jobBlock = this._getJobIndicator().getBlockById(this.selectedInput.id);
         const progressBar = jobBlock.getProgressBar();
-        //        progressBar.style.width = rate + '%';
-        progressBar.style.width = '100%';
+        progressBar.style.width = rate + '%';
       }
 
       /**
@@ -461,12 +460,12 @@ Copyright © HatioLab Inc. All rights reserved.
             this.popup = document.createElement('bluetooth-scanner-selector');
           }
 
-          LOGIS_UTIL.showPopup(t('text.select'), this.popup, 'fit', 'fit', function () {
+          LOGIS_UTIL.showPopup(t('text.select'), this.popup, 'fit', 'fit', function() {
             this.popupOpened = true;
             this.popup.clearOptions();
             this.popup.appendDevice(device);
 
-          }.bind(this), function () {
+          }.bind(this), function() {
             this.popupOpened = false;
             this.stopScanDevices();
 

@@ -132,7 +132,6 @@ Copyright © HatioLab Inc. All rights reserved.
         height: 10px;
         margin: auto;
         position: relative;
-        /* top: -18px; */
         top: 15px;
         background-color: transparent;
         /* border: 2px solid rgba(0, 0, 0, .2); */
@@ -143,7 +142,6 @@ Copyright © HatioLab Inc. All rights reserved.
 
       .job-block[active] .job-block-chart {
         height: 10px;
-        /* top: -22px; */
         top: 15px;
       }
 
@@ -302,20 +300,30 @@ Copyright © HatioLab Inc. All rights reserved.
         if (!this.visibleList || this.visibleList.length == 0) {
           return null;
         } else {
-          let activeItem = this.visibleList.find(item => (item.status == 'R'));
+          // 투입 상태가 진행 ('R')이면서 투입 순서가 가장 낮은 투입 정보를 조회해서 리턴  
+          let activeItem = null;
+          for (var i = 0; i < this.visibleList.length - 1; i++) {
+            var item = this.visibleList[i];
+            if (item.status == 'R') {
+              if (activeItem == null) {
+                activeItem = item;
+              } else if (activeItem.input_seq > item.input_seq) {
+                activeItem = item;
+              }
+            }
+          }
           let activeItemId = activeItem ? activeItem.id : null;
           return activeItemId ? activeItemId : this.visibleList[this.visibleList.length - 1].id;
         }
       }
 
       /**
-       * @description 박스 흐름 방향이 좌 -> 우 인지 여부
+       * @description 작업 동선 방향이 좌 -> 우 인지 여부
        ****************
-       * @param {Object} list
+       * @return 
        */
       _isMovingLineLeftToRight() {
-        //return LOGIS_UTIL.getWorkMovingLine() == 'LTR';
-        return true;
+        return !LOGIS_UTIL.getWorkFlowDirection() || LOGIS_UTIL.getWorkFlowDirection() == 'LTR';
       }
 
       /**
@@ -334,7 +342,7 @@ Copyright © HatioLab Inc. All rights reserved.
           block.setAttribute('target-id', item.id);
           block.classList.add('job-block');
           block.onclick = this._itemSelected.bind(this);
-          block.getData = function () {
+          block.getData = function() {
             return item;
           };
 
@@ -350,7 +358,6 @@ Copyright © HatioLab Inc. All rights reserved.
             block.appendChild(beginSpan);
           }
 
-
           // 2.4 Job Block에 작업 진행율 표시를 위한 프로그레스 바 추가
           const jobBlockChart = document.createElement('div');
           jobBlockChart.classList.add('job-block-chart');
@@ -365,8 +372,7 @@ Copyright © HatioLab Inc. All rights reserved.
           endSpan.innerHTML = innerCode.substr(-4);
           block.appendChild(endSpan);
 
-
-          block.getProgressBar = function () {
+          block.getProgressBar = function() {
             return jobBlockChartBar;
           }
 
@@ -519,15 +525,6 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _getJobBlockElementById(targetId) {
         return this.shadowRoot.querySelector(`div[target-id="${targetId}"]`);
-      }
-
-      /**
-       * @description 현재 태블릿의 작업 존 코드 리턴, TODO 태블릿의 장비 존 설정을 추가하고 장비 존 코드를 리턴해야 한다.
-       *****************
-       * @return
-       */
-      _getZoneCd() {
-        return LOGIS_UTIL.getStationCd();
       }
 
       /**

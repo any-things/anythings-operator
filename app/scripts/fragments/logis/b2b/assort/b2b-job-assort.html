@@ -60,7 +60,6 @@ Copyright © HatioLab Inc. All rights reserved.
 
     <!-- 상품 및 작업 정보 표시를 위한 영역 -->
     <div id="info-section">
-
       <div id="status">
         <!-- 표시기 재점등 버튼을 표시하기 위한 영역 -->
         <img id="mpi-on-todo-btn" src="./images/iconbtn-das-order1.png" on-click="indOnTodoJobs" />
@@ -81,7 +80,7 @@ Copyright © HatioLab Inc. All rights reserved.
       <!-- 상품 코드, 상품 명, 블루투스 연결 버튼 표시를 위한 영역 -->
       <div id="prod-info">
         <div id="prod-info-left">
-          <span>[[skuCd]]</span>
+          <span>([[inputSeq]]) [[skuCd]]</span>
           <span class="prodname">[[skuNm]]</span>
         </div>
 
@@ -279,6 +278,16 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           skuInfo: {
             type: Object
+          },
+
+          /**
+           * @description 상품 투입 순서
+           ****************
+           * @type {Number}
+           */
+          inputSeq: {
+            type: Number,
+            value: 0
           }
         }
       }
@@ -371,8 +380,8 @@ Copyright © HatioLab Inc. All rights reserved.
           (totalPickQty && totalPickQty > 0 && pickedQty && pickedQty > 0) ?
           Math.floor(pickedQty / totalPickQty * 100) : 0;
 
-        // Job Block의 퍼센트 차트 업데이트
-        this._updateBlockChart(this.pickedPercent);
+        // Job Block의 색상을 투입 정보의 색상과 동일하게 표시 (DAS에서는 진척율이 아닌 단지 색상 표시용으로 사용)
+        this._updateBlockChart(100);
 
         if (this.holdIndicator) {
           // 사용자에 의한 상품 탭 터치시 ...
@@ -481,7 +490,7 @@ Copyright © HatioLab Inc. All rights reserved.
       showProcessPopup(event) {
         // status가 'F'면 완료된 작업
         let status = event.detail.data.status;
-        if (status === 'W' || status == 'I' || status == 'P' || status == 'F') {
+        if (status === 'W' || status == 'I' || status == 'P') {
           const popup = document.createElement('job-transaction-popup');
           const data = event.detail.data;
           popup.jobType = this.jobType;
@@ -507,42 +516,42 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * @description 왼쪽으로 Swipe - 현재 페이지보다 이전 페이지로 페이지네이션 처리
+       * @description 왼쪽으로 Swipe - 현재 페이지보다 한 페이지 이후 페이지로 페이지네이션 처리
        ********************
        * @param {Object} event
        */
       swipeLeft(event) {
-        /*if(!this.inputList || this.inputList.length == 0) return;
-        let startInputSeq = this.inputList[0].input_seq;
-        this.paginateInputList(startInputSeq, 'DOWN');*/
+        // TODO Swipe 활성화 여부에 따라서 처리 ...
+        /*if (this.inputList && this.inputList.length > 0) {
+          let startInputId = this.inputList[this.inputList.length - 1].id;
+          this.paginateInputList(startInputId, 'UP');
+        }*/
       }
 
       /**
-       * @description 오른쪽으로 Swipe - 현재 페이지보다 이후 페이지로 페이지네이션 처리
+       * @description 오른쪽으로 Swipe - 현재 페이지보다 한 페이지 이전 페이지로 페이지네이션 처리
        ********************
        * @param {Object} event
        */
       swipeRight(event) {
-        /*if(!this.inputList || this.inputList.length == 0) return;
-        let startInputSeq = this.inputList[this.inputList.length - 1].input_seq;
-        this.paginateInputList(startInputSeq, 'UP');*/
+        /*if (this.inputList && this.inputList.length > 0) {
+          let startInputId = this.inputList[0].id;
+          //let startInputId = this.inputList[0].id;
+          this.paginateInputList(startInputId, 'DOWN');
+        }*/
       }
 
       /**
        * @description 투입 상품 리스트 페이지네이션 조회
        ********************
-       * @param {Number} startInputSeq
+       * @param {Number} startInputId
        * @param {String} upDownMode UP / DOWN
        */
-      paginateInputList(startInputSeq, upDownMode) {
+      paginateInputList(startInputId, upDownMode) {
         let rackCd = LOGIS_UTIL.getEquipCd();
-        let zoneCd = LOGIS_UTIL.getStationCd();
-        let sideCd = LOGIS_UTIL.getWorkSideCd();
+        let stationCd = LOGIS_UTIL.getStationCd();
         let pageAjax = this.$['input-list-pages-ajax'];
-        pageAjax.customParams = {
-          show_others_order: LOGIS_UTIL.isShowOthersOrder()
-        };
-        pageAjax.curl = `/tablet_process/input_pages/${rackCd}/${zoneCd}/${sideCd}/${upDownMode}/${startInputSeq}`;
+        pageAjax.curl = `/device_process/search/input_list/Rack/${rackCd}/${stationCd}?selected_input_id=${startInputId}`;
         pageAjax.generateRequest();
       }
 

@@ -377,6 +377,15 @@ LOGIS_UTIL.getJobTransactionList = function() {
 };
 
 /**
+ * @description 태블릿 피킹 화면에서 하단 투입 리스트의 방향을 설정하기 위한 작업 동선 방향 정보
+ ********************
+ * @return 작업 화면에서 분류 처리 할 수 있는 처리 옵션
+ */
+LOGIS_UTIL.getWorkFlowDirection = function() {
+  return LOGIS_UTIL.getDeviceSettingValue('job.work.flow.direction');
+};
+
+/**
  * @description 테스트를 위해서 QR Code를 생성하기 위한 유형을 리턴
  ********************
  * @return 바코드 유형
