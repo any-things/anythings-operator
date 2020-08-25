@@ -228,7 +228,8 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           orderQtyLabel: {
             type: String,
-            value: () => t('label.order_qty')
+            // value: () => t('label.order_qty')
+            value: () => t('label.can_load_qty')
           },
 
           /**
@@ -557,6 +558,7 @@ Copyright © HatioLab Inc. All rights reserved.
         }
 
         if (this.hasRackBatch) {
+          // if (orderQty < inputQty) { // 투입수량 초과 체크
           if (orderQty - stockQty < inputQty) { // 투입수량 초과 체크
             SOUND.playErrorSound();
             LOGIS_UTIL.showMessage(t('error.VALIDATION_ERROR'), t('error.exceeded_input_qty'), function() {
