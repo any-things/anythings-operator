@@ -425,6 +425,10 @@ Copyright © HatioLab Inc. All rights reserved.
           printerId: LOGIS_UTIL.getPrinterId()
         };
         processAjax.generateRequest();
+
+        this.$['cust-input'].value = '';
+        this.$['sku-input'].value = '';
+        this.$['sku-input'].focus();
       }
 
       /**
@@ -600,8 +604,18 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} event
        */
       _singlePackProcessSuccess(event) {
+        var response = event.detail;
         SOUND.playInfoSound();
         this.refresh();
+
+        if (!response || !response.result) {
+          return;
+        }
+
+        // 사은품 리스트가 있다면 ...
+        if (response.result.items && response.result.items.length > 0) {
+          this.showGiftListPopup(response.result.items);
+        }
       }
 
       /**
@@ -616,6 +630,40 @@ Copyright © HatioLab Inc. All rights reserved.
 
         SOUND.playErrorSound();
         this._initialSetup();
+      }
+
+      /**
+       * @description 사은품 리스트 표시 팝업
+       ******************
+      * @param {Array} giftItems
+      */
+      showGiftListPopup(giftItems) {
+        document.dispatchEvent(new CustomEvent('open-form-list-dialog', {
+          detail: {
+            title: '사은품을 담으세요.',
+            closeCallback: this.refresh.bind(this),
+            listFields: [{
+              display: t('label.sku_cd'),
+              fieldname: 'sku_cd',
+              columnWidth: '2fr',
+              style: {
+                textAlign: 'center'
+              }
+            }, {
+              display: t('label.sku_nm'),
+              fieldname: 'sku_nm',
+              columnWidth: '2.5fr'
+            }, {
+              display: t('label.qty'),
+              fieldname: 'order_qty',
+              columnWidth: '0.5fr',
+              style: {
+                textAlign: 'center'
+              }
+            }],
+            listData: giftItems
+          }
+        }));
       }
     }
 
