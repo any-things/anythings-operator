@@ -72,6 +72,8 @@ Copyright © HatioLab Inc. All rights reserved.
         grid-row: span 2;
       }
       .bigproc {
+        display: grid;
+        grid-template-columns: 1.5fr 1fr;
         align-self: center;
       }
       .bigproc b {
@@ -80,6 +82,10 @@ Copyright © HatioLab Inc. All rights reserved.
         font-size: 50pt;
         text-shadow: 1px 3px 3px rgba(0, 0, 0, .3);
         line-height: 2;
+      }
+      #save-btn {
+        height: 65px;
+        align-self: center;
       }
       .radio-btn-container {
         display: grid;
@@ -98,6 +104,15 @@ Copyright © HatioLab Inc. All rights reserved.
 <!-- Style End -->
 
 <!-- Ajax Begin -->
+  <!-- 반품 저장 Ajax -->
+  <sys-ajax 
+    id="save-return-ajax" 
+    method="POST" 
+    content-type="application/json" 
+    curl="/return_instances/update_multiple"
+    on-sys-ajax-response="_onSaveSuccess">
+  </sys-ajax>
+
 <!-- Ajax End -->
 
 <!-- View Begin -->
@@ -113,19 +128,15 @@ Copyright © HatioLab Inc. All rights reserved.
         
         <!-- 고객명 -->
         <div><span class="label">[[custNmLabel]]</span></div>
-        <div class="top-input"><input id="cust-nm"></input></div>
+        <div class="top-input"><input id="orderer-nm"></input></div>
         
         <!-- 출고 운송장 -->
         <div><span class="label">[[outInvoiceLabel]]</span></div>
         <div class="top-input"><input id="out-invoice"></input></div>
             
         <!-- 반품 구분 -->
-        <div><span class="label">[[rtnClassLabel]]</span></div>
-        <!--
-        <div class="top-input"><input id="rtn-class"></input></div>
-        -->
-        
-        <div class="radio-btn-container">
+        <div><span class="label">[[rtnClassLabel]]</span></div>        
+        <div id="type-radio" class="radio-btn-container">
           <input value="DISPOSAL" name="rtn-class" type="radio" job-name$="[[disposalLabel]]" checked>
           <label>[[disposalLabel]]</label>
           <input value="NORMAL" name="rtn-class" type="radio" job-name$="[[normalLabel]]">
@@ -134,19 +145,19 @@ Copyright © HatioLab Inc. All rights reserved.
 
         <!-- 스캔 수량 -->
         <div id="scan-qty-label-div"><span class="label">[[scanQtyLabel]]</span></div>
-        <div id="scan-qty-input-div"><span id='scan-qty' class="bigproc"><b>10[[scanQty]]</b></span></div>
-            
+        <div id="scan-qty-input-div"><span id='scan-qty' class="bigproc"><b>[[scanQty]]</b><button id="save-btn" on-click="saveReturnItems">[[saveLabel]]</button></span></div>
+        
         <!-- 상품 바코드 -->
         <div><span class="label">[[skuCdLabel]]</span></div>
         <auto-popup-input 
-          hide-keyboard 
+          hide-keyboard
+          allowed-focus-out
           id="sku-code" 
           resource-url="[[getSkuAjaxUrl]]" 
           popup-title="[[popupTitleLabel]]"
           button-txt-callback="[[_skuButtonTxtCallback]]" 
           on-before-request="_customAjaxHandler"
-          on-item-selected="skuSelectionChanged"
-          on-sys-ajax-error="_findSkuError">
+          on-item-selected="skuSelectionChanged">
         </auto-popup-input>
       </div>
 
@@ -154,9 +165,7 @@ Copyright © HatioLab Inc. All rights reserved.
       <item-list 
         id="item-list" 
         header="[[header]]" 
-        data="[[items]]" 
-        on-data-list-click="selectItem"
-        on-configured="_changeGridRowStyle">
+        data="[[items]]">
       </item-list>
     </div>
 <!-- View End -->
@@ -261,6 +270,16 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
+           * @description 저장 버튼  
+           ****************
+           * @type {String}
+           */
+          saveLabel: {
+            type: String,
+            value: () => t('button.save')
+          },
+
+          /**
            * @description 작업일자 기본 값
            ****************
            * @type {String}
@@ -274,13 +293,23 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
+           * @description 스캔 수량
+           ****************
+           * @type {Number}
+           */
+          scanQty: {
+            type: Number,
+            value: 0
+          },
+
+          /**
            * @description SKU 정보 조회를 위한 URL
            ****************
            * @type {String}
            */
           getSkuAjaxUrl: {
             type: String,
-            value: `/device_process/sku/search_by_like/${LOGIS_UTIL.getEquipType()}/${LOGIS_UTIL.getEquipCd()}/:inputValue`
+            value: `/sku/search/:inputValue`
           },
 
           /**
@@ -294,6 +323,25 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
+           * @description 이전 상품 
+           ****************
+           * @type {Object}
+           */
+          prevSku: {
+            type: Object
+          },
+
+          /**
+           * @description 그리드 아이템 
+           ****************
+           * @type {Array}
+           */
+          items: {
+            type: Array,
+            value: []
+          },
+
+          /**
            * @description 그리드 헤더 
            ****************
            * @type {Array}
@@ -301,7 +349,6 @@ Copyright © HatioLab Inc. All rights reserved.
           header: {
             type: Array,
             value: function() {
-              // 피스 수량 / 박스타입 / 주문 수 / 완료주문 수
               return [{
                 display: t('label.rtn_class'),
                 fieldname: 'rtn_class',
@@ -325,7 +372,7 @@ Copyright © HatioLab Inc. All rights reserved.
                 },
               }, {
                 display: t('label.qty'),
-                fieldname: 'qty',
+                fieldname: 'return_pcs',
                 columnWidth: '0.1fr',
                 style: {
                   textAlign: 'right',
@@ -340,7 +387,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * @description ready
+       * @description Life Cycle
        ******************
        */
       connectedCallback() {
@@ -363,7 +410,7 @@ Copyright © HatioLab Inc. All rights reserved.
        ******************
        */
       _initialSetup() {
-        this.$['sku-barcode'].select();
+        this._getSkuCdInput().select();
       }
 
       /**
@@ -383,7 +430,13 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _customAjaxHandler(event) {
         const input = event.detail.input;
-        const ajax = event.detail.ajax;
+
+        if (this.prevSku && this.prevSku.sku_cd == input.value) {
+          event.preventDefault();
+          this.skuSelectionChanged({
+            detail: this.prevSku
+          });
+        }
       }
 
       /**
@@ -391,14 +444,52 @@ Copyright © HatioLab Inc. All rights reserved.
        *******************
        * @param {Object} event
        */
-      skuSelectionChanged(event) {}
+      skuSelectionChanged(event) {
+        let sku = event.detail;
+        this.$['sku-code'].value = sku.sku_cd;
+        let newItems = JSON.parse(JSON.stringify(this.items));
+        let currentRtnClass = this._getSelectedRtnClass();
+
+        let foundItem = (newItems.length == 0) ? null : newItems.find(item => {
+          return item.sku_cd == sku.sku_cd && item.rtn_class == currentRtnClass;
+        });
+
+        if (foundItem == null) {
+          foundItem = {
+            rtn_class: currentRtnClass,
+            sku_cd: sku.sku_cd,
+            sku_nm: sku.sku_nm,
+            return_pcs: 0,
+            selected_job: null
+          };
+        }
+
+        foundItem.return_pcs += 1;
+        if (foundItem.selected_job === null) {
+          newItems.push(foundItem);
+          foundItem.selected_job = true;
+        }
+
+        this.items = newItems;
+        this.scanQty = this.items.reduce((prev, item) => {
+          return prev + item.return_pcs;
+        }, 0);
+        this.prevSku = sku;
+        this._initialSetup();
+      }
 
       /**
-       * @description 인풋 박스 상태에 따라 포커스 이동 
-       *******************
+       * @description 현재 선택된 반품 유형 리턴 
+       *********************
+       * @return
        */
-      _setInputFocus() {
-        this._getSkuCdInput().select();
+      _getSelectedRtnClass() {
+        var options = Array.from(this.$['type-radio'].querySelectorAll('input[name=rtn-class]'));
+        var selectedRtnType = options.filter(option => {
+          return option.checked
+        });
+
+        return selectedRtnType ? selectedRtnType[0].value : 'all';
       }
 
       /**
@@ -411,55 +502,59 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * @description 상품 조회 에러시 
-       *******************
-       */
-      _findSkuError() {
-        this.clearView();
-        this.items = [];
-      }
-
-      /**
        * @description 화면 클리어 
        *******************
        */
-      clearView() {}
+      clearView() {
+        this.scanQty = 0;
+        this.prevSku = null;
+        this.items = [];
+        this._getSkuCdInput().value = '';
+        this._initialSetup();
+      }
 
       /**
-       * @description 작업 대상 그리드 선택
-       ******************
-       * @param {Object} event
-       */
-      selectItem(event) {}
-
-      /**
-       * @description 그리드 행에 대한 스타일 변경
+       * @description 반품 아이템 처리 
        *******************
        * @param {Object} event
        */
-      _changeGridRowStyle(event) {
-        let list = event.detail.contentElements;
-        let prevData = this.currentRow ? this.currentRow.getData() : null;
+      saveReturnItems(event) {
+        let ajax = this.$['save-return-ajax'];
+        let rtnDate = this.$['rtn-date'].value;
+        let rtnInvoiceId = this.$['rtn-invoice'].value;
+        let outInvoiceId = this.$['out-invoice'].value;
+        let ordererNm = this.$['orderer-nm'].value;
+        let returnClass = this._getSelectedRtnClass();
+        let totalSku = this.items.reduce((unique, item) => unique.includes(item.sku_cd) ? unique : [...unique, item.sku_cd], []).length;
 
-        /*list.forEach(row => {
-          let data = row.getData();
-          
-          if (prevData && prevData.box_type_cd == data.box_type_cd && prevData.pick_qty == data.pick_qty) {
-              row.classList.add('selected');
-              this.currentRow = row;
-          } else {
-              row.classList.remove('selected');
-          }
+        let returnItems = this.items.map(item => {
+          item.return_date = rtnDate;
+          item.return_class = returnClass;
+          item.return_invoice_id = rtnInvoiceId;
+          item.out_invoice_id = outInvoiceId;
+          item.orderer_nm = ordererNm;
+          item.total_sku = totalSku;
+          item.total_pcs = this.scanQty;
+          item.cud_flag_ = 'c';
+          return item;
+        });
 
-          if (data.tot_order_cnt == data.comp_order_cnt) {
-              row.classList.add('complete');
-          }
-        }
-        )*/
+        ajax.body = returnItems;
+        ajax.generateRequest();
+      }
+
+      /**
+       * @description 반품 처리 성공시 ... 
+       *******************
+       * @param {Object} event
+       */
+      _onSaveSuccess(event) {
+        this.clearView();
+        SOUND.playInfoSound();
       }
     }
 
     customElements.define(B2CRtnInspection.is, B2CRtnInspection);
   </script>
-  <!-- Scipt End -->
+  <!-- Script End -->
 </dom-module>
