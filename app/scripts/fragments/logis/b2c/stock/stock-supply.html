@@ -107,8 +107,12 @@ Copyright © HatioLab Inc. All rights reserved.
         <input id="sku-nm" value="[[skuNm]]" readonly></input>
 
         <!-- 주문 수량 입력 박스 -->
-        <span class="label">[[orderQtyLabel]]</span>
-        <input id="order-qty" readonly></input>
+        <span class="label" hidden>[[orderQtyLabel]]</span>
+        <input id="order-qty" readonly hidden></input>
+
+        <!-- 투입 가능 수량 -->
+        <span class="label">[[needQtyLabel]]</span>
+        <input id="need-qty" readonly></input>
 
         <!-- 할당 수량 입력 박스 -->
         <span class="label" hidden>[[allocQtyLabel]]</span>
@@ -227,6 +231,11 @@ Copyright © HatioLab Inc. All rights reserved.
            * @type {String}
            */
           orderQtyLabel: {
+            type: String,
+            value: () => t('label.order_qty')
+          },
+
+          needQtyLabel: {
             type: String,
             // value: () => t('label.order_qty')
             value: () => t('label.can_load_qty')
@@ -473,6 +482,7 @@ Copyright © HatioLab Inc. All rights reserved.
         var values = data.values;
         if (values) {
           this.$['order-qty'].value = values.orderQty;
+          this.$['need-qty'].value = values.orderQty - values.allocQty - values.stockQty;
           this.$['alloc-qty'].value = values.allocQty;
           this.$['stock-qty'].value = values.stockQty;
           this.$['input-qty'].value = values.inputQty;
@@ -506,7 +516,7 @@ Copyright © HatioLab Inc. All rights reserved.
         let changeCellCd = changeCellInput.value;
 
         if (LOGIS_UTIL.isCellCdValid(changeCellCd)) {
-          this.$['cell'].value = '';
+          // this.$['cell'].value = '';
           changeCellInput.select();
           this._load();
 
@@ -557,16 +567,15 @@ Copyright © HatioLab Inc. All rights reserved.
           return;
         }
 
-        if (this.hasRackBatch) {
-          // if (orderQty < inputQty) { // 투입수량 초과 체크
-          if (orderQty - stockQty < inputQty) { // 투입수량 초과 체크
-            SOUND.playErrorSound();
-            LOGIS_UTIL.showMessage(t('error.VALIDATION_ERROR'), t('error.exceeded_input_qty'), function() {
-              inputQtyInput.select()
-            });
-            return;
-          }
+        // if (this.hasRackBatch) {
+        if (orderQty - stockQty < inputQty) { // 투입수량 초과 체크
+          SOUND.playErrorSound();
+          LOGIS_UTIL.showMessage(t('error.VALIDATION_ERROR'), t('error.exceeded_input_qty'), function() {
+            inputQtyInput.select()
+          });
+          return;
         }
+        // }
 
         const loadStockAjax = this.$['load-stock-ajax'];
         loadStockAjax.body = {
@@ -593,8 +602,8 @@ Copyright © HatioLab Inc. All rights reserved.
         let stockQty = Number(this.$['stock-qty'].value);
         let inputQty = Number(this.$['input-qty'].value);
 
-        if (this.hasRackBatch) {
-          if (orderQty - stockQty < inputQty) {
+        // if (this.hasRackBatch) {
+          if (orderQty - stockQty < inputQty) {  // 투입수량 초과 체크
             SOUND.playErrorSound();
             LOGIS_UTIL.showMessage(t('error.VALIDATION_ERROR'), t('error.exceeded_input_qty'), function() {
               this.$['input-qty'].value = '';
@@ -603,7 +612,8 @@ Copyright © HatioLab Inc. All rights reserved.
             return;
           }
 
-        } else if (!inputQty || inputQty == '' || inputQty == 0) {
+        // } else 
+        if (!inputQty || inputQty == '' || inputQty == 0) {
           SOUND.playErrorSound();
           LOGIS_UTIL.showMessage(t('error.VALIDATION_ERROR'), t('text.input_qty_none'), function() {
             this.$['input-qty'].value = '';
@@ -674,6 +684,7 @@ Copyright © HatioLab Inc. All rights reserved.
         this.$['change-cell'].value = '';
         this.$['dps-work-type'].value = '';
         this.$['order-qty'].value = '';
+        this.$['need-qty'].value = '';
         this.$['alloc-qty'].value = '';
         this.$['stock-qty'].value = '';
         this.$['input-qty'].value = '';
