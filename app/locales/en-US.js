@@ -166,6 +166,7 @@ window.locales['en-US'] = {
   'label.disposal': 'disposal',
   'label.normal': 'normal',
   'label.station_only': 'Station Only',
+  'label.date': 'Date',
 
   // menu list
   'menu.Settings': 'Setting',
@@ -276,7 +277,7 @@ window.locales['en-US'] = {
   'text.select': 'Please select ...',
   'text.invalid_value': 'Please type valid value.',
   'text.Sure to process': 'Are you sure to process?',
-  'text.NOTHING_SELECTED': 'Nothing is selected',
+  'text.nothing_selected': 'Nothing is selected',
   'text.Sure to logout': 'Are you sure you want to logout?',
   'text.out_of_valid_range': 'Out of Valid Range',
   'text.target_not_exist': 'Processing Target is not Exist.',
@@ -391,6 +392,7 @@ window.locales['en-US'] = {
   'text.single_box_complete': '처리 완료 되었습니다.',
   'text.printer_is_not_set': '프린터가 설정되지 않았습니다. 설정화면에서 설정하세요.',
   'text.this_order_has_been_canceled': 'This order has been canceled.',
+  'text.please_scan_sku': 'Please scan sku code',
 
   // title list
   'title.confirm_inspect': 'Confirm Inspection',
@@ -433,5 +435,6 @@ window.locales['en-US'] = {
   'error.box_id_invalid': 'Box ID is not valid.',
   'error.no_scan_mpi_code': 'Please scan first MPICode.',
   'error.not_recommanded_box': 'It is not recommanded box.',
-  'error.transaction_failed': 'An error occurred during processing.'
+  'error.transaction_failed': 'An error occurred during processing.',
+  'error.value_is_empty': ' empty value is not allowed.'
 };

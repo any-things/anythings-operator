@@ -104,14 +104,14 @@ Copyright © HatioLab Inc. All rights reserved.
 <!-- Style End -->
 
 <!-- Ajax Begin -->
-  <!-- 반품 저장 Ajax -->
-  <sys-ajax 
-    id="save-return-ajax" 
-    method="POST" 
-    content-type="application/json" 
-    curl="/return_instances/update_multiple"
-    on-sys-ajax-response="_onSaveSuccess">
-  </sys-ajax>
+    <!-- 반품 저장 Ajax -->
+    <sys-ajax 
+      id="save-return-ajax" 
+      method="POST" 
+      content-type="application/json" 
+      curl="/return_instances/update_multiple"
+      on-sys-ajax-response="_onSaveSuccess">
+    </sys-ajax>
 
 <!-- Ajax End -->
 
@@ -145,7 +145,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
         <!-- 스캔 수량 -->
         <div id="scan-qty-label-div"><span class="label">[[scanQtyLabel]]</span></div>
-        <div id="scan-qty-input-div"><span id='scan-qty' class="bigproc"><b>[[scanQty]]</b><button id="save-btn" on-click="saveReturnItems">[[saveLabel]]</button></span></div>
+        <div id="scan-qty-input-div"><span id='scan-qty' class="bigproc"><b>[[scanQty]]</b><button id="save-btn" on-click="processReturn">[[saveLabel]]</button></span></div>
         
         <!-- 상품 바코드 -->
         <div><span class="label">[[skuCdLabel]]</span></div>
@@ -410,6 +410,14 @@ Copyright © HatioLab Inc. All rights reserved.
        ******************
        */
       _initialSetup() {
+        this.$['rtn-invoice'].select();
+      }
+
+      /**
+       * @description 상품 코드 입력 항목 포커스
+       ******************
+       */
+      _focusSkuCd() {
         this._getSkuCdInput().select();
       }
 
@@ -475,7 +483,7 @@ Copyright © HatioLab Inc. All rights reserved.
           return prev + item.return_pcs;
         }, 0);
         this.prevSku = sku;
-        this._initialSetup();
+        this._focusSkuCd();
       }
 
       /**
@@ -508,8 +516,11 @@ Copyright © HatioLab Inc. All rights reserved.
       clearView() {
         this.scanQty = 0;
         this.prevSku = null;
-        this.items = [];
+        this.$['rtn-invoice'].value = '';
+        this.$['out-invoice'].value = '';
+        this.$['orderer-nm'].value = '';
         this._getSkuCdInput().value = '';
+        this.items = [];
         this._initialSetup();
       }
 
@@ -518,7 +529,17 @@ Copyright © HatioLab Inc. All rights reserved.
        *******************
        * @param {Object} event
        */
-      saveReturnItems(event) {
+      processReturn(event) {
+        if (this._checkValidInputsBeforeSave()) {
+          LOGIS_UTIL.showConfirm(t('menu.ReturnInspection'), t('text.Sure to process'), this._initialSetup.bind(this), this._executeReturn.bind(this));
+        }
+      }
+
+      /**
+       * @description 반품 처리
+       *******************
+       */
+      _executeReturn() {
         let ajax = this.$['save-return-ajax'];
         let rtnDate = this.$['rtn-date'].value;
         let rtnInvoiceId = this.$['rtn-invoice'].value;
@@ -541,6 +562,49 @@ Copyright © HatioLab Inc. All rights reserved.
 
         ajax.body = returnItems;
         ajax.generateRequest();
+      }
+
+      /**
+       * @description 반품 처리 전 유효성 체크 
+       *******************
+       */
+      _checkValidInputsBeforeSave() {
+        let rtnDate = this.$['rtn-date'].value;
+        if (!rtnDate || rtnDate < 10) {
+          LOGIS_UTIL.showToastWarnMessage(t('label.rtn_date') + t('error.value_is_empty'));
+          return false;
+        }
+
+        let rtnInvoiceId = this.$['rtn-invoice'].value;
+        if (!rtnInvoiceId || rtnInvoiceId.length < 1) {
+          LOGIS_UTIL.showToastWarnMessage(t('label.rtn_invoice') + t('error.value_is_empty'));
+          return false;
+        }
+
+        /*let outInvoiceId = this.$['out-invoice'].value;
+        if (!outInvoiceId || outInvoiceId.length < 1) {
+          LOGIS_UTIL.showToastWarnMessage(t('label.out_invoice') + t('text.value_is_empty'));
+          return false;
+        }*/
+
+        let ordererNm = this.$['orderer-nm'].value;
+        if (!ordererNm || ordererNm.length < 1) {
+          LOGIS_UTIL.showToastWarnMessage(t('label.cust_nm') + t('error.value_is_empty'));
+          return false;
+        }
+
+        let returnClass = this._getSelectedRtnClass();
+        if (!returnClass || returnClass.length < 1) {
+          LOGIS_UTIL.showToastWarnMessage(t('label.rtn_class') + t('error.value_is_empty'));
+          return false;
+        }
+
+        if (!this.items || this.items.length == 0) {
+          LOGIS_UTIL.showToastWarnMessage(t('label.sku') + t('error.value_is_empty'));
+          return false;
+        }
+
+        return true;
       }
 
       /**

@@ -168,6 +168,7 @@ window.locales['ko-KR'] = {
   'label.disposal': '폐기',
   'label.normal': '정상',
   'label.station_only': '작업 존 범위',
+  'label.date': '날짜',
 
   // menu list
   'menu.Settings': '설정',
@@ -279,7 +280,7 @@ window.locales['ko-KR'] = {
   'text.select': '선택하세요',
   'text.invalid_value': '올바른 값을 입력하세요.',
   'text.Sure to process': '처리하시겠습니까?',
-  'text.NOTHING_SELECTED': '선택된 항목이 없습니다.',
+  'text.nothing_selected': '선택된 항목이 없습니다.',
   'text.Sure to logout': '로그아웃하시겠습니까?',
   'text.out_of_valid_range': '주문 수량을 초과하였습니다.',
   'text.target_not_exist': '주문하지 않은 상품입니다.',
@@ -363,7 +364,7 @@ window.locales['ko-KR'] = {
   'text.scan_location_mpi': '셀 코드 혹은 표시기 코드를 스캔하세요.',
   'text.already_used': '이미 사용된 박스입니다.',
   'text.scan_first': '박스 ID를 먼저 스캔하세요.',
-  'text.location_upto_5': '셀 다섯개까지만 처리 가능합니다.',
+  'text.location_upto_5': '셀 다섯개 까지만 처리 가능합니다.',
   'text.location_already_add': '셀은 이미 추가되었습니다.',
   'text.process_cell_[': '처리할 셀[',
   'text.adjust_sku_count': ']의 상품 수량을 조정하세요.',
@@ -390,10 +391,11 @@ window.locales['ko-KR'] = {
   'text.]_process': '] 체크 - 박스가 정상 처리되었습니다.',
   'text.box_check': '박스 체크',
   'text.box_no_process': '박스 처리 안 됨!',
-  'text.single_box_done': '이미 처리 완료된 박스 입니다.',
-  'text.single_box_complete': '처리 완료 되었습니다.',
+  'text.single_box_done': '이미 처리 완료된 박스입니다.',
+  'text.single_box_complete': '처리 완료되었습니다.',
   'text.printer_is_not_set': '프린터가 설정되지 않았습니다. 설정화면에서 설정하세요.',
   'text.this_order_has_been_canceled': '본 주문은 취소되었습니다',
+  'text.please_scan_sku': '상품을 스캔하세요.',
 
   // title list
   'title.confirm_inspect': '검수 확인',
@@ -417,7 +419,6 @@ window.locales['ko-KR'] = {
   'title.selecting_rack': '랙 선택',
   'title.patch_notes': '업데이트 내역',
 
-
   // error list
   'error.VALIDATION_ERROR': '유효성 검사 오류!',
   'error.barcd_is_not_typed': '바코드를 입력하세요.',
@@ -437,5 +438,6 @@ window.locales['ko-KR'] = {
   'error.box_id_invalid': '박스 ID가 유효하지 않습니다.',
   'error.no_scan_mpi_code': '표시기 코드부터 스캔해주세요.',
   'error.not_recommanded_box': '추천 박스가 아닙니다.',
-  'error.transaction_failed': '처리 도중 에러가 발생했습니다.'
+  'error.transaction_failed': '처리 도중 에러가 발생했습니다.',
+  'error.value_is_empty': ' 빈 값은 허용하지 않습니다.'
 };

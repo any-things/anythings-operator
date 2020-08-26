@@ -167,6 +167,7 @@ window.locales['zh-CN'] = {
   'label.disposal': '廢棄',
   'label.normal': '正常',
   'label.station_only': '작업 존 범위',
+  'label.date': 'Date',
 
   // menu list
   'menu.Settings': '设置',
@@ -277,7 +278,7 @@ window.locales['zh-CN'] = {
   'text.select': '请选择...',
   'text.invalid_value': '请输入正确的值。',
   'text.Suretoprocess': '是否确定执行？',
-  'text.NOTHING_SELECTED': '没有已选择的项。',
+  'text.nothing_selected': '没有已选择的项。',
   'text.Suretologout': '是否注销?',
   'text.out_of_valid_range': '超出有效值范围！',
   'text.target_not_exist': '无作业对象。',
@@ -392,6 +393,7 @@ window.locales['zh-CN'] = {
   'text.single_box_complete': '처리 완료 되었습니다.',
   'text.printer_is_not_set': '프린터가 설정되지 않았습니다. 설정화면에서 설정하세요.',
   'text.this_order_has_been_canceled': '본 주문은 취소되었습니다',
+  'text.please_scan_sku': '상품을 스캔하세요',
 
   // title list
   'title.confirm_inspect': '检验结束',
@@ -434,5 +436,6 @@ window.locales['zh-CN'] = {
   'error.box_id_invalid': '箱编码无效。',
   'error.no_scan_mpi_code': '请先扫描MPI编码。',
   'error.not_recommanded_box': '非推荐的箱号。',
-  'error.transaction_failed': '처리 도중 에러가 발생했습니다.'
+  'error.transaction_failed': '처리 도중 에러가 발생했습니다.',
+  'error.value_is_empty': ' 빈 값은 허용하지 않습니다.'
 };
