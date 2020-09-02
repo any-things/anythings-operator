@@ -728,18 +728,21 @@ Copyright © HatioLab Inc. All rights reserved.
       finishPicking(e) {
         let remainBoxQty = this._getRemainBoxInput().value;
 
-        if (this.currentRow && this.boxType && this.boxType >= 1 && remainBoxQty && remainBoxQty >= 1) {
-          let ajax = this._getFinishJobAjax();
-          ajax.curl = '/device_process/dynamic/dps/single_pack/pick';
-          ajax.customParams = {
-            equipCd: LOGIS_UTIL.getEquipCd(),
-            comCd: this.selectedSku.com_cd,
-            skuCd: this.selectedSku.sku_cd,
-            boxType: this.currentRow.getData().box_type_cd,
-            pickQty: this.currentRow.getData().pick_qty,
-            printerId: LOGIS_UTIL.getPrinterId()
+        if (this.currentRow && this.boxType && remainBoxQty) {
+          let remBoxQty = Number(remainBoxQty);
+          if (remBoxQty >= 1) {
+            let ajax = this._getFinishJobAjax();
+            ajax.curl = '/device_process/dynamic/dps/single_pack/pick';
+            ajax.customParams = {
+              equipCd: LOGIS_UTIL.getEquipCd(),
+              comCd: this.selectedSku.com_cd,
+              skuCd: this.selectedSku.sku_cd,
+              boxType: this.currentRow.getData().box_type_cd,
+              pickQty: this.currentRow.getData().pick_qty,
+              printerId: LOGIS_UTIL.getPrinterId()
+            }
+            ajax.generateRequest();
           }
-          ajax.generateRequest();
 
         } else {
           LOGIS_UTIL.showToastWarnMessage('선택된 작업 대상이 없습니다.');
