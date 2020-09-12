@@ -727,9 +727,10 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       finishPicking(e) {
         let remainBoxQty = this._getRemainBoxInput().value;
+        let remBoxQty = 0;
 
         if (this.currentRow && this.boxType && remainBoxQty) {
-          let remBoxQty = Number(remainBoxQty);
+          remBoxQty = Number(remainBoxQty);
           if (remBoxQty >= 1) {
             let ajax = this._getFinishJobAjax();
             ajax.curl = '/device_process/dynamic/dps/single_pack/pick';
@@ -743,9 +744,11 @@ Copyright © HatioLab Inc. All rights reserved.
             }
             ajax.generateRequest();
           }
+        }
 
-        } else {
+        if (remBoxQty < 1) {
           LOGIS_UTIL.showToastWarnMessage('선택된 작업 대상이 없습니다.');
+          this._resetInputFocus();
         }
       }
 
