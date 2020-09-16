@@ -396,6 +396,7 @@ window.locales['en-US'] = {
 
   // title list
   'title.confirm_inspect': 'Confirm Inspection',
+  'title.confirm': 'Confirmation',
   'title.info': 'Info',
   'title.error': 'Error',
   'title.job_select': 'Job Selection',

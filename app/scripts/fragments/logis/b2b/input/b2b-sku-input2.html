@@ -129,6 +129,10 @@ Copyright © HatioLab Inc. All rights reserved.
         margin: auto 20px auto auto;
       }
 
+      #ind-off-btn {
+        margin-right: 10px
+      }
+
       .label {
         text-align: right;
         color: #D5D7DB;
@@ -164,29 +168,58 @@ Copyright © HatioLab Inc. All rights reserved.
       }
     </style>
 
+    <!-- 표시기 소등 -->
+    <sys-ajax 
+      id="ind-off-all-ajax" 
+      method="DELETE" 
+      curl="device_process/indicators/off/all"
+      content-type="application/json">
+    </sys-ajax>
+
     <!-- 상품 투입 처리 Ajax -->
-    <sys-ajax id="input-sku-ajax" curl="/device_process/input/sku/Rack/:rack_cd/:com_cd/:sku_cd" method="POST"
-      content-type="application/json" custom-error-handler on-sys-ajax-response="_onInputSuccess"
+    <sys-ajax 
+      id="input-sku-ajax" 
+      curl="/device_process/input/sku/Rack/:rack_cd/:com_cd/:sku_cd" 
+      method="POST"
+      content-type="application/json" 
+      custom-error-handler 
+      on-sys-ajax-response="_onInputSuccess"
       on-sys-ajax-error="_onInputSkuError">
     </sys-ajax>
 
     <!-- 상품 검수 트랜잭션을 위한 Ajax -->
-    <sys-ajax id="inspect-sku-ajax" method="POST" content-type="application/json" custom-error-handler
-      on-sys-ajax-response="_onInspectionSuccess" on-sys-ajax-error="_onInputSkuError">
+    <sys-ajax 
+      id="inspect-sku-ajax" 
+      method="POST" 
+      content-type="application/json" 
+      custom-error-handler
+      on-sys-ajax-response="_onInspectionSuccess" 
+      on-sys-ajax-error="_onInputSkuError">
     </sys-ajax>
 
     <!-- 배치 작업 진행율 표시를 위한 Ajax -->
-    <sys-ajax id="batch-summary-ajax" method="GET" content-type="application/json" last-response="{{batchSummaryData}}"
+    <sys-ajax 
+      id="batch-summary-ajax" 
+      method="GET" 
+      content-type="application/json" 
+      last-response="{{batchSummaryData}}"
       on-sys-ajax-error="_stopAutoRefresh">
     </sys-ajax>
 
     <!-- 송장 일괄 출력을 위한 Ajax -->
-    <sys-ajax id="print-all-ajax" method="POST" content-type="application/json"
+    <sys-ajax 
+      id="print-all-ajax" 
+      method="POST" 
+      content-type="application/json"
       on-sys-ajax-response="_onPrintAllSuccess">
     </sys-ajax>
 
     <!-- 투입 리스트 표시를 위한 Ajax -->
-    <sys-ajax id="input-pages-ajax" method="GET" content-type="application/json" last-response="{{inputDataSet}}">
+    <sys-ajax 
+      id="input-pages-ajax" 
+      method="GET" 
+      content-type="application/json" 
+      last-response="{{inputDataSet}}">
     </sys-ajax>
 
     <div id="container">
@@ -298,6 +331,9 @@ Copyright © HatioLab Inc. All rights reserved.
 
       <!-- Input Box 영역 : 바코드 스캔 -->
       <div id="middle-container">
+        <!-- 표시기 소등 버튼 -->
+        <img id="ind-off-btn" src="./images/iconbtn-das-order1.png" on-click="indOffAll" />
+
         <!-- 송장 일괄출력 버튼 -->
         <button id="print-all-btn" on-click="printLabelAll">
           <span>[[printAllLabel]]</span>
@@ -309,8 +345,11 @@ Copyright © HatioLab Inc. All rights reserved.
 
         <!-- 상품 바코드 -->
         <span class="label">[[skuBarcdLabel]]</span>
-        <auto-popup-input id="sku-barcode" popup-title="[[popupTitleLabel]]"
-          button-txt-callback="[[_skuButtonTxtCallback]]" on-before-request="_customAjaxHandler"
+        <auto-popup-input 
+          id="sku-barcode" 
+          popup-title="[[popupTitleLabel]]"
+          button-txt-callback="[[_skuButtonTxtCallback]]" 
+          on-before-request="_customAjaxHandler"
           on-item-selected="itemSelected">
         </auto-popup-input>
 
@@ -325,8 +364,16 @@ Copyright © HatioLab Inc. All rights reserved.
       </div>
 
       <!-- 투입 리스트 -->
-      <item-list show-paginator header="[[header]]" page="[[page]]" total="[[total]]" limit="[[limit]]" data="[[items]]"
-        on-configured="_addInputStatusAttr" on-data-list-click="showDetailList" on-paginator-changed="_pageChanged">
+      <item-list 
+        show-paginator 
+        header="[[header]]" 
+        page="[[page]]" 
+        total="[[total]]" 
+        limit="[[limit]]" 
+        data="[[items]]"
+        on-configured="_addInputStatusAttr" 
+        on-data-list-click="showDetailList" 
+        on-paginator-changed="_pageChanged">
       </item-list>
     </div>
   </template>
@@ -521,7 +568,7 @@ Copyright © HatioLab Inc. All rights reserved.
               }, {
                 display: '로케이션',
                 fieldname: 'input_type',
-                columnWidth: '0.8fr',
+                columnWidth: '0.65fr',
                 style: {
                   textAlign: 'center'
                 }
@@ -913,6 +960,34 @@ Copyright © HatioLab Inc. All rights reserved.
       refresh(e) {
         this._barcodeInputReset();
         this.getBatchSummary();
+      }
+
+      /**
+       * @description 표시기 소등 버튼 클릭 핸들러
+       ***********************
+       * @param {Object} e
+       */
+      indOffAll(e) {
+        let title = t('title.ind_off_all');
+        let msg = title + ' ' + t('text.Sure to process');
+        LOGIS_UTIL.showConfirm(t('title.ind_off_all'), msg, this._initialSetup.bind(this), this._doIndOffAll.bind(this));
+      }
+
+      /**
+       * @description 표시기 소등 처리 
+       ***********************
+       */
+      _doIndOffAll() {
+        const indOffAjax = this.$['ind-off-all-ajax'];
+        let equipType = LOGIS_UTIL.getEquipType();
+        let equipCd = LOGIS_UTIL.getEquipCd();
+        let stationCd = LOGIS_UTIL.getStationCd();
+        indOffAjax.curl = `/device_process/indicators/off/all/${equipType}/${equipCd}`;
+        indOffAjax.customParams = {
+          equipType: equipType,
+          equipCd: equipCd
+        }
+        indOffAjax.generateRequest();
       }
 
       /**

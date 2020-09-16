@@ -397,6 +397,7 @@ window.locales['zh-CN'] = {
 
   // title list
   'title.confirm_inspect': '检验结束',
+  'title.confirm': '확인',
   'title.info': '消息',
   'title.error': '错误',
   'title.job_select': '作业选择',
