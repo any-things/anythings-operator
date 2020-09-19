@@ -167,6 +167,7 @@ window.locales['en-US'] = {
   'label.normal': 'normal',
   'label.station_only': 'Station Only',
   'label.date': 'Date',
+  'label.receiver': 'Receiver',
 
   // menu list
   'menu.Settings': 'Setting',

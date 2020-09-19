@@ -169,6 +169,7 @@ window.locales['ko-KR'] = {
   'label.normal': '정상',
   'label.station_only': '작업 존 범위',
   'label.date': '날짜',
+  'label.receiver': '수령인',
 
   // menu list
   'menu.Settings': '설정',
