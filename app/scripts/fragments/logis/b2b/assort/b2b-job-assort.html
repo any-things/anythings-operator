@@ -459,12 +459,15 @@ Copyright © HatioLab Inc. All rights reserved.
        *********************
        */
       indOffByTabletZone() {
-        const indOffAjax = this.$['ind-off-jobs-ajax'];
-        let equipType = LOGIS_UTIL.getEquipType();
-        let equipCd = LOGIS_UTIL.getEquipCd();
-        let stationCd = LOGIS_UTIL.getStationCd();
-        indOffAjax.curl = `/device_process/indicators/off/${equipType}/${equipCd}/${stationCd}`;
-        indOffAjax.generateRequest();
+        let ledOffStr = t('button.led_off');
+        LOGIS_UTIL.showConfirm(ledOffStr, ledOffStr + ' ' + t('text.Sure to process'), null, function() {
+          const indOffAjax = this.$['ind-off-jobs-ajax'];
+          let equipType = LOGIS_UTIL.getEquipType();
+          let equipCd = LOGIS_UTIL.getEquipCd();
+          let stationCd = LOGIS_UTIL.getStationCd();
+          indOffAjax.curl = `/device_process/indicators/off/${equipType}/${equipCd}/${stationCd}`;
+          indOffAjax.generateRequest();
+        }.bind(this));
       }
 
       /**
@@ -473,13 +476,16 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {String} mode
        */
       indOnByTabletZone(mode) {
-        const indOnAjax = this.$['ind-on-jobs-ajax'];
-        let inputSeqId = this.selectedInput.id;
-        let rackCd = LOGIS_UTIL.getEquipCd();
-        let stationCd = LOGIS_UTIL.getStationCd();
-        let sideCd = LOGIS_UTIL.getWorkSideCd();
-        indOnAjax.curl = `/device_process/indicators/restore/${inputSeqId}/${stationCd}/${mode}`;
-        indOnAjax.generateRequest();
+        let ledOnStr = t('button.led_on');
+        LOGIS_UTIL.showConfirm(ledOnStr, ledOnStr + ' ' + t('text.Sure to process'), null, function() {
+          const indOnAjax = this.$['ind-on-jobs-ajax'];
+          let inputSeqId = this.selectedInput.id;
+          let rackCd = LOGIS_UTIL.getEquipCd();
+          let stationCd = LOGIS_UTIL.getStationCd();
+          let sideCd = LOGIS_UTIL.getWorkSideCd();
+          indOnAjax.curl = `/device_process/indicators/restore/${inputSeqId}/${stationCd}/${mode}`;
+          indOnAjax.generateRequest();
+        }.bind(this));
       }
 
       /**

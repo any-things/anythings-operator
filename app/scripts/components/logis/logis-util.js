@@ -712,6 +712,7 @@ LOGIS_UTIL.showMessage = function(title, message, confirmCallback) {
  ******************
  * @param {String} title
  * @param {String} message
+ * @param {Function} cancelCallback
  * @param {Function} confirmCallback
  */
 LOGIS_UTIL.showConfirm = function(title, message, cancelCallback, confirmCallback) {
