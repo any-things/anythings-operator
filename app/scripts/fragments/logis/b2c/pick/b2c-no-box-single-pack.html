@@ -738,7 +738,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} skuInform
        */
       _skuChangeConfirm(skuInform) {
-        LOGIS_UTIL.showConfirm(t('button.confirm'), t('text.confirm_sku_change'), function() {
+        /*LOGIS_UTIL.showConfirm(t('button.confirm'), t('text.confirm_sku_change'), function() {
           // 1. 상품 변경 취소시 상품 코드를 이전 코드로 다시 변경
           this._getSkuCdInput().value = this.skuCode;
           this._getSkuCdInput().select();
@@ -753,8 +753,17 @@ Copyright © HatioLab Inc. All rights reserved.
           let ajax = this._getSinglePackSummaryAjax();
           ajax.curl = `/device_process/dynamic/dps/single_pack/sku_change?equipType=${equipType}&equipCd=${euqipCd}&skuCd=${this.skuCode}`;
           ajax.generateRequest();
-        }.bind(this));
+        }.bind(this));*/
 
+        // 2. 상품 변경시 ...
+        this.selectedSku = skuInform;
+        this.boxType = '';
+        this.orderQty = '';
+        let equipType = LOGIS_UTIL.getEquipType();
+        let euqipCd = LOGIS_UTIL.getEquipCd();
+        let ajax = this._getSinglePackSummaryAjax();
+        ajax.curl = `/device_process/dynamic/dps/single_pack/sku_change?equipType=${equipType}&equipCd=${euqipCd}&skuCd=${this.skuCode}`;
+        ajax.generateRequest();
         this.blur();
       }
 
@@ -780,6 +789,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _onSearchSinglePackSummary(e) {
         if (e.detail && e.detail.result && e.detail.result[0]) {
+          LOGIS_UTIL.showToastInfoMessage('상품이 변경되었습니다.');
           this._resetScreen(e.detail.result);
 
         } else {
