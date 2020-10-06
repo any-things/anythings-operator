@@ -762,12 +762,12 @@ Copyright © HatioLab Inc. All rights reserved.
           let barcode = e.currentTarget.value;
           barcode = barcode.toUpperCase();
 
-          // 상품 코드 스캔으로 내품 검수 실행 
-          if (barcode.length < 30) {
-            this._doItemInspectionByScan(barcode);
-            // RFID 스캔으로 내품 검수 실행 
-          } else {
+          // RFID 스캔으로 내품 검수 실행 
+          if (barcode.length == 32 && barcode.length == 24) {
             this._doItemInspectionByRfid(barcode);
+            // 상품 코드 스캔으로 내품 검수 실행 
+          } else {
+            this._doItemInspectionByScan(barcode);
           }
         }
       }
@@ -1404,7 +1404,7 @@ Copyright © HatioLab Inc. All rights reserved.
         }
 
         // 4. 검수 항목을 찾았는데 해당 항목이 RFID 검수 항목이면 에러
-        if (found.rfid_item_yn && found.rfid_item_yn == 'Y' && (!rfidInfo || rfidInfo.rfid_id.length < 30)) {
+        if (found.rfid_item_yn && found.rfid_item_yn == 'Y' && (!rfidInfo || rfidInfo.rfid_id.length == 24 || rfidInfo.rfid_id.length == 32)) {
           LOGIS_UTIL.showMessage(t('error.invalid_sku_cd'), 'RFID 검수 항목입니다. RFID 검수를 해주세요.', this.focusSkuBarcdInput.bind(this));
           return false;
         }
