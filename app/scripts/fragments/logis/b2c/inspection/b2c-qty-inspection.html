@@ -1404,7 +1404,7 @@ Copyright © HatioLab Inc. All rights reserved.
         }
 
         // 4. 검수 항목을 찾았는데 해당 항목이 RFID 검수 항목이면 에러
-        if (found.rfid_item_yn && found.rfid_item_yn == 'Y' && (!rfidInfo || rfidInfo.rfid_id.length == 24 || rfidInfo.rfid_id.length == 32)) {
+        if (found.rfid_item_yn && found.rfid_item_yn == 'Y' && (!rfidInfo || (rfidInfo.rfid_id.length != 24 && rfidInfo.rfid_id.length != 32))) {
           LOGIS_UTIL.showMessage(t('error.invalid_sku_cd'), 'RFID 검수 항목입니다. RFID 검수를 해주세요.', this.focusSkuBarcdInput.bind(this));
           return false;
         }
