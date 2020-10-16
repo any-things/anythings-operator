@@ -763,7 +763,7 @@ Copyright © HatioLab Inc. All rights reserved.
           barcode = barcode.toUpperCase();
 
           // RFID 스캔으로 내품 검수 실행 
-          if (barcode.length == 32 && barcode.length == 24) {
+          if (barcode.length == 32 || barcode.length == 24) {
             this._doItemInspectionByRfid(barcode);
             // 상품 코드 스캔으로 내품 검수 실행 
           } else {
