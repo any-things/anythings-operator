@@ -178,6 +178,7 @@ Copyright © HatioLab Inc. All rights reserved.
         if (!this.title || this.title.length <= 0) {
           this._setTitle(this.page);
         }
+        this.set('route',Object.assign({},this.route));
       }
 
       /**
@@ -186,6 +187,17 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} route
        */
       _routeChanged(route) {
+        if(this.routePage.size<=3){
+          var isDefaultPages = false;
+          var routeValue = route.path.replace('/','');
+          this.routePage.forEach(function(value,key,map){
+            isDefaultPages = isDefaultPages||key===routeValue;
+          })
+          if(!isDefaultPages){
+            return;
+          }
+        }
+
         const oldPath = this.page;
         const newPath = route.path.replace('/', '')
 

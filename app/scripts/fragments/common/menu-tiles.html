@@ -55,7 +55,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
     <template is="dom-repeat" items="[[menus]]">
       <menu-tile page="[[item.routing]]" on-click="_menuClicked">
-        <img src="[[_computeImgSrc(item.template)]]" />
+        <img src="[[_computeImgSrc(item.icon_path)]]" />
         [[_computeMenuName(item.name)]]
       </menu-tile>
     </template>

@@ -515,6 +515,11 @@ Copyright © HatioLab Inc. All rights reserved.
             this.$['logis-setting'].saveSetting();
           }
         });
+        
+        document.addEventListener("new-view-loaded", event => {
+          this.$.main.appendChild(event.detail);
+          document.dispatchEvent(new CustomEvent('new-view-appened', event))
+        })
 
         document.addEventListener('page-changed', event => {
           const prevPage = event.detail.prevPage;

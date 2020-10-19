@@ -191,6 +191,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
           <auto-popup-input
             id="sku-barcode"
+            barcode
             popup-title="[[popupTitleLabel]]"
             button-txt-callback="[[_skuButtonTxtCallback]]"
             on-before-request="_customAjaxHandler"
@@ -228,7 +229,7 @@ Copyright © HatioLab Inc. All rights reserved.
   </template>
 
   <script>
-    class B2BOutMiddleAssort extends Polymer.Element {
+    class B2BOutMiddleAssort extends BarcodeScannerMixin(Polymer.Element) {
       static get is() {
         return 'b2b-out-middle-assort'
       }

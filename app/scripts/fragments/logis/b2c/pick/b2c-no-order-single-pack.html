@@ -112,7 +112,7 @@ Copyright © HatioLab Inc. All rights reserved.
         </select>
 
         <span class="label">[[barcodeLabel]]</span>
-        <input id="sku-input" on-keypress="_onSkuCdScan" max-length=32>
+        <input id="sku-input" barcode on-keypress="_onSkuCdScan" max-length=32>
 
         <span class="label">주문자</span>
         <input id="cust-input" on-keypress="_onCustScan">
@@ -144,7 +144,7 @@ Copyright © HatioLab Inc. All rights reserved.
   </template>
 
   <script>
-    class B2CNoOrderSinglePack extends Polymer.Element {
+    class B2CNoOrderSinglePack extends BarcodeScannerMixin(Polymer.Element) {
       static get is() {
         return 'b2c-no-order-single-pack'
       }

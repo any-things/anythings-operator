@@ -21,16 +21,23 @@ Copyright © HatioLab Inc. All rights reserved.
       connectedCallback() {
         super.connectedCallback();
 
-        this.barcodeInput = this.shadowRoot.querySelector('[barcode]');
-        if(this.barcodeInput) this.barcodeInput.addEventListener('focus', this._hideKeyboard);
+        // this.barcodeInput = this.shadowRoot.querySelector('[barcode]');
+        // if(this.barcodeInput) this.barcodeInput.addEventListener('focus', this._hideKeyboard);
 
         document.addEventListener('page-changed', event => {
           if(event.detail.currentPage === location.hash.replace('#/', '')) {
             this._initialSetup();
           }
         });
+        document.addEventListener('new-view-appened', event=>{
+          if(event.detail.name === location.hash.replace('#/', '')) {
+            setTimeout(async ()=>{
+              this._initialSetup();
+            },500)
+          }
+        })
 
-        this._initialSetup();
+        // this._initialSetup();
       }
 
       /**
@@ -38,6 +45,9 @@ Copyright © HatioLab Inc. All rights reserved.
        ************
        */
       _initialSetup() {
+        this.barcodeInput = this.shadowRoot.querySelector('[barcode]');
+        if(this.barcodeInput) this.barcodeInput.addEventListener('focus', this._hideKeyboard);
+        
         if(this.barcodeInput) {
           if(this.barcodeInput.value && this.barcodeInput.value.length > 0) {
             this.barcodeInput.select();

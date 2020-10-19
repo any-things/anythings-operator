@@ -23,134 +23,139 @@ Copyright © HatioLab Inc. All rights reserved.
               src: './scripts/components/sys/sys-route.html'
             }, {
               src: './scripts/fragments/sys/sys-setting.html'
-            }, {
-              src: './scripts/fragments/logis/logis-home.html'
-            }, {
+            }, 
+            // {
+            //   src: './scripts/fragments/logis/logis-home.html'
+            // }, 
+            {
               src: './scripts/fragments/logis/logis-setting.html'
             }, {
               src: './scripts/fragments/logis/logis-login.html'
             }, {
               src: './scripts/components/logis/qrcode-popup.html'
+            }, {
+              route: 'home',
+              src: './scripts/fragments/logis/logis-home.html'
             }]
           },
 
           viewElements: {
             type: Array,
-            value: () => [{
-              route: 'home',
-              src: './scripts/fragments/logis/logis-home.html'
-            }, {
-              route: 'b2b_job_assort',
-              src: './scripts/fragments/logis/b2b/assort/b2b-job-assort.html'
-            }, {
-              route: 'b2c_picking_job',
-              src: './scripts/fragments/logis/b2c/pick/b2c-picking-job.html'
-            }, {
-              route: 'rack_input_list',
-              src: './scripts/fragments/logis/b2b/rack-input-list.html'
-            }, {
-              route: 'stock_status_by_cell',
-              src: './scripts/fragments/logis/b2c/stock/stock-status-by-cell.html'
-            }, {
-              route: 'stock_supplement',
-              src: './scripts/fragments/logis/b2c/stock/stock-supplement.html'
-            }, {
-              route: 'stock_supply',
-              src: './scripts/fragments/logis/b2c/stock/stock-supply.html'
-            }, {
-              route: 'pda_region_sku_info',
-              src: './scripts/fragments/mps/pda/pda-region-sku-info.html'
-            }, {
-              route: 'b2b_assort_job',
-              src: './scripts/fragments/logis/b2b/assort/b2b-assort-job.html'
-            }, {
-              route: 'pda_das2_process',
-              src: './scripts/fragments/mps/pda/pda-das2-process.html'
-            }, {
-              route: 'pda_dps2_process',
-              src: './scripts/fragments/mps/pda/pda-dps2-process.html'
-            }, {
-              route: 'b2b_rtn_assort_job',
-              src: './scripts/fragments/logis/b2b/assort/b2b-rtn-assort-job.html'
-            }, {
-              route: 'b2b_rtn_inspection',
-              src: './scripts/fragments/logis/b2b/inspection/b2b-rtn-inspection.html'
-            }, {
-              route: 'b2b_cell_box_mapping_status',
-              src: './scripts/fragments/logis/b2b/input/b2b-cell-box-mapping-status.html'
-            }, {
-              route: 'pda_one_sku_order',
-              src: './scripts/fragments/logis/b2c/pick/b2c-one-sku-order.html'
-            }, {
-              route: 'b2b_sku_input',
-              src: './scripts/fragments/logis/b2b/input/b2b-sku-input.html'
-            }, {
-              route: 'b2b_sku_input2',
-              src: './scripts/fragments/logis/b2b/input/b2b-sku-input2.html'
-            }, {
-              route: 'b2c_box_input',
-              src: './scripts/fragments/logis/b2c/input/b2c-box-input.html'
-            }, {
-              route: 'b2c_box_requirement',
-              src: './scripts/fragments/logis/b2c/input/b2c-box-requirement.html'
-            }, {
-              route: 'b2b_out_middle_assort',
-              src: './scripts/fragments/logis/b2b/assort/b2b-out-middle-assort.html'
-            }, {
-              route: 'b2b_out_middle_assort_weight',
-              src: './scripts/fragments/logis/b2b/assort/b2b-out-middle-assort-with-weight.html'
-            }, {
-              route: 'b2b_rtn_middle_assort',
-              src: './scripts/fragments/logis/b2b/assort/b2b-rtn-middle-assort.html'
-            }, {
-              route: 'b2c_qty_inspection',
-              src: './scripts/fragments/logis/b2c/inspection/b2c-qty-inspection.html'
-            }, {
-              route: 'b2b_qty_inspection',
-              src: './scripts/fragments/logis/b2b/inspection/b2b-qty-inspection.html'
-            }, {
-              route: 'b2b_weight_inspection',
-              src: './scripts/fragments/logis/b2b/inspection/b2b-weight-inspection.html'
-            }, {
-              route: 'b2c_pick_single_pack',
-              src: './scripts/fragments/logis/b2c/pick/b2c-pick-single-pack.html'
-            }, {
-              route: 'b2c_no_order_single_pack',
-              src: './scripts/fragments/logis/b2c/pick/b2c-no-order-single-pack.html'
-            }, {
-              route: 'b2c_no_box_single_pack',
-              src: './scripts/fragments/logis/b2c/pick/b2c-no-box-single-pack.html'
-            }, {
-              route: 'b2c_packing_check',
-              src: './scripts/fragments/logis/b2c/pack/b2c-packing-check.html'
-            }, {
-              route: 'b2c_packing_popup',
-              src: './scripts/fragments/logis/b2c/pack/b2c-packing-popup.html'
-            }, {
-              route: 'label_list',
-              src: './scripts/fragments/logis/common/label-list.html'
-            }, {
-              route: 'mps_region_input_list',
-              src: './scripts/fragments/mps/rack-input-list.html'
-            }, {
-              route: 'cell_box_mapping_status',
-              src: './scripts/fragments/logis/common/cell-box-mapping-status.html'
-            }, {
-              route: 'box_list',
-              src: './scripts/fragments/logis/common/box-list.html'
-            }, {
-              route: 'picking_status',
-              src: './scripts/fragments/logis/common/picking-status.html'
-            }, {
-              route: 'picking_status_by_cell',
-              src: './scripts/fragments/logis/common/picking-status-by-cell.html'
-            }, {
-              route: 'b2b_remains_fullbox',
-              src: './scripts/fragments/logis/b2b/pack/b2b-remains-fullbox.html'
-            }, {
-              route: 'b2c_rtn_inspection',
-              src: './scripts/fragments/logis/b2c/rtn/b2c-rtn-inspection.html'
-            }]
+            // value: () => [{
+            //   route: 'home',
+            //   src: './scripts/fragments/logis/logis-home.html'
+            // }, {
+            //   route: 'b2b_job_assort',
+            //   src: './scripts/fragments/logis/b2b/assort/b2b-job-assort.html'
+            // }, {
+            //   route: 'b2c_picking_job',
+            //   src: './scripts/fragments/logis/b2c/pick/b2c-picking-job.html'
+            // }, {
+            //   route: 'rack_input_list',
+            //   src: './scripts/fragments/logis/b2b/rack-input-list.html'
+            // }, {
+            //   route: 'stock_status_by_cell',
+            //   src: './scripts/fragments/logis/b2c/stock/stock-status-by-cell.html'
+            // }, {
+            //   route: 'stock_supplement',
+            //   src: './scripts/fragments/logis/b2c/stock/stock-supplement.html'
+            // }, {
+            //   route: 'stock_supply',
+            //   src: './scripts/fragments/logis/b2c/stock/stock-supply.html'
+            // }, {
+            //   route: 'pda_region_sku_info',
+            //   src: './scripts/fragments/mps/pda/pda-region-sku-info.html'
+            // }, {
+            //   route: 'b2b_assort_job',
+            //   src: './scripts/fragments/logis/b2b/assort/b2b-assort-job.html'
+            // }, {
+            //   route: 'pda_das2_process',
+            //   src: './scripts/fragments/mps/pda/pda-das2-process.html'
+            // }, {
+            //   route: 'pda_dps2_process',
+            //   src: './scripts/fragments/mps/pda/pda-dps2-process.html'
+            // }, {
+            //   route: 'b2b_rtn_assort_job',
+            //   src: './scripts/fragments/logis/b2b/assort/b2b-rtn-assort-job.html'
+            // }, {
+            //   route: 'b2b_rtn_inspection',
+            //   src: './scripts/fragments/logis/b2b/inspection/b2b-rtn-inspection.html'
+            // }, {
+            //   route: 'b2b_cell_box_mapping_status',
+            //   src: './scripts/fragments/logis/b2b/input/b2b-cell-box-mapping-status.html'
+            // }, {
+            //   route: 'pda_one_sku_order',
+            //   src: './scripts/fragments/logis/b2c/pick/b2c-one-sku-order.html'
+            // }, {
+            //   route: 'b2b_sku_input',
+            //   src: './scripts/fragments/logis/b2b/input/b2b-sku-input.html'
+            // }, {
+            //   route: 'b2b_sku_input2',
+            //   src: './scripts/fragments/logis/b2b/input/b2b-sku-input2.html'
+            // }, {
+            //   route: 'b2c_box_input',
+            //   src: './scripts/fragments/logis/b2c/input/b2c-box-input.html'
+            // }, {
+            //   route: 'b2c_box_requirement',
+            //   src: './scripts/fragments/logis/b2c/input/b2c-box-requirement.html'
+            // }, {
+            //   route: 'b2b_out_middle_assort',
+            //   src: './scripts/fragments/logis/b2b/assort/b2b-out-middle-assort.html'
+            // }, {
+            //   route: 'b2b_out_middle_assort_weight',
+            //   src: './scripts/fragments/logis/b2b/assort/b2b-out-middle-assort-with-weight.html'
+            // }, {
+            //   route: 'b2b_rtn_middle_assort',
+            //   src: './scripts/fragments/logis/b2b/assort/b2b-rtn-middle-assort.html'
+            // }, {
+            //   route: 'b2c_qty_inspection',
+            //   src: './scripts/fragments/logis/b2c/inspection/b2c-qty-inspection.html'
+            // }, {
+            //   route: 'b2b_qty_inspection',
+            //   src: './scripts/fragments/logis/b2b/inspection/b2b-qty-inspection.html'
+            // }, {
+            //   route: 'b2b_weight_inspection',
+            //   src: './scripts/fragments/logis/b2b/inspection/b2b-weight-inspection.html'
+            // }, {
+            //   route: 'b2c_pick_single_pack',
+            //   src: './scripts/fragments/logis/b2c/pick/b2c-pick-single-pack.html'
+            // }, {
+            //   route: 'b2c_no_order_single_pack',
+            //   src: './scripts/fragments/logis/b2c/pick/b2c-no-order-single-pack.html'
+            // }, {
+            //   route: 'b2c_no_box_single_pack',
+            //   src: './scripts/fragments/logis/b2c/pick/b2c-no-box-single-pack.html'
+            // }, {
+            //   route: 'b2c_packing_check',
+            //   src: './scripts/fragments/logis/b2c/pack/b2c-packing-check.html'
+            // }, {
+            //   route: 'b2c_packing_popup',
+            //   src: './scripts/fragments/logis/b2c/pack/b2c-packing-popup.html'
+            // }, {
+            //   route: 'label_list',
+            //   src: './scripts/fragments/logis/common/label-list.html'
+            // }, {
+            //   route: 'mps_region_input_list',
+            //   src: './scripts/fragments/mps/rack-input-list.html'
+            // }, {
+            //   route: 'cell_box_mapping_status',
+            //   src: './scripts/fragments/logis/common/cell-box-mapping-status.html'
+            // }, {
+            //   route: 'box_list',
+            //   src: './scripts/fragments/logis/common/box-list.html'
+            // }, {
+            //   route: 'picking_status',
+            //   src: './scripts/fragments/logis/common/picking-status.html'
+            // }, {
+            //   route: 'picking_status_by_cell',
+            //   src: './scripts/fragments/logis/common/picking-status-by-cell.html'
+            // }, {
+            //   route: 'b2b_remains_fullbox',
+            //   src: './scripts/fragments/logis/b2b/pack/b2b-remains-fullbox.html'
+            // }, {
+            //   route: 'b2c_rtn_inspection',
+            //   src: './scripts/fragments/logis/b2c/rtn/b2c-rtn-inspection.html'
+            // }]
           }
         }
       }
@@ -166,17 +171,31 @@ Copyright © HatioLab Inc. All rights reserved.
         this.loadViews(this.commonElements);
 
         // 페이지 변경 이벤트 리스너 등록
+        document.addEventListener('menu-info-changed', event => {
+
+            let menus = event.detail;
+            let viewElements = menus.map(menu => {
+              let element = {};
+              element.route = menu.routing;
+              element.elementName = menu.template.substring(menu.template.lastIndexOf('/') + 1, menu.template.length);
+              element.src = './scripts/fragments/' + menu.template + '.html'
+              return element;
+            })
+            this.set('viewElements', viewElements);
+          })
+        // 페이지 변경 이벤트 리스너 등록
         document.addEventListener('page-changed', event => {
           let targetElement = [];
           let targetIndex;
 
-          this.viewElements.forEach((element, index) => {
-            // viewElements 중 현재 라우팅의 src를 찾아서 targetElement와 targetIndex를 초기화
+          this.viewElements?this.viewElements.forEach((element, index) => {
+            // viewElements 중 현재 라우팅의 src를 찾아서
+            // targetElement와 targetIndex를 초기화
             if (element.route === event.detail.currentPage) {
               targetIndex = index;
               targetElement.push(element);
             }
-          });
+          }):null;
 
           // 임포트 대상 엘리먼트가 있다면
           if (targetElement && targetElement.length > 0) {
@@ -208,8 +227,19 @@ Copyright © HatioLab Inc. All rights reserved.
             element.src = element.src.replace('./', `${srcUrl}/`);
           }
 
-          Polymer.importHref(element.src, null, error => {
-            throw `Failed to view importing. Error: ${error}`;
+          Polymer.importHref(element.src, loadEvent => {
+            if (element.elementName) {
+              var content = document.createElement(element.elementName);
+              content.id = element.route;
+              content.name = element.route;
+              content.isKiosk = this.isKiosk;
+              content.isPda = this.isPda;
+              var e = {};
+              e.detail = content;
+              document.dispatchEvent(new CustomEvent('new-view-loaded', e))
+            }
+          }, errorEvent => {
+            throw `Failed to view importing. Error: ${JSON.stringify(errorEvent)}`;
           }, true);
         })
       }
