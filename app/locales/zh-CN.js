@@ -169,6 +169,7 @@ window.locales['zh-CN'] = {
   'label.station_only': '작업 존 범위',
   'label.date': 'Date',
   'label.receiver': '수령인',
+  'label.label_cd': 'Label',
 
   // menu list
   'menu.Settings': '设置',

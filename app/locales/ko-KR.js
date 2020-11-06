@@ -170,6 +170,7 @@ window.locales['ko-KR'] = {
   'label.station_only': '작업 존 범위',
   'label.date': '날짜',
   'label.receiver': '수령인',
+  'label.label_cd': '라벨',
 
   // menu list
   'menu.Settings': '설정',
