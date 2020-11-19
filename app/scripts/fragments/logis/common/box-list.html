@@ -134,31 +134,20 @@ Copyright © HatioLab Inc. All rights reserved.
             type: Array,
             value: function() {
               return [{
-                // 반품 화면일 때 로케이션 대신 상품 표시
-                display: LOGIS_UTIL.getJobType() === 'RTN' ? t('label.sku') : t('label.customer'),
-                fieldname: 'cust_nm',
-                columnWidth: '0.5fr',
-                displayCallback: (value, rowData) => {
-                  return `(${rowData.box_seq}) ${value}`;
-                },
+                display: t('label.order'),
+                fieldname: 'class_cd',
+                columnWidth: '0.5fr'
               }, {
                 display: t('label.cell'),
                 fieldname: 'loc_cd',
                 columnWidth: '0.175fr',
                 style: {
                   textAlign: 'center'
-                },
-                displayCallback: (value) => {
-                  return `${value.split('-')[1]}`;
                 }
               }, {
                 display: t('label.box_id'),
                 fieldname: 'box_id',
                 columnWidth: '0.325fr',
-                displayCallback: (value) => {
-                  var idx = LOGIS_UTIL.getInvoiceNoStartIndex();
-                  return (value && idx && idx > 0) ? value.substring(idx) : value;
-                },
                 style: {
                   textAlign: 'center'
                 }

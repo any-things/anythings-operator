@@ -86,15 +86,15 @@ Copyright © HatioLab Inc. All rights reserved.
             type: Array,
             value: function() {
               return [{
-                display: t('label.customer'),
-                fieldname: 'cust_nm',
+                display: t('label.order'),
+                fieldname: 'class_cd',
                 columnWidth: '0.5fr',
                 displayCallback: (value, rowData) => {
                   return `(${rowData.box_seq}) ${value}`;
                 }
               }, {
                 display: t('label.cell'),
-                fieldname: 'loc_cd',
+                fieldname: 'cell_cd',
                 columnWidth: '0.175fr',
                 style: {
                   textAlign: 'center'
