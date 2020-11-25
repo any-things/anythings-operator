@@ -202,9 +202,8 @@ Copyright © HatioLab Inc. All rights reserved.
         try {
           this.validationBeforeRefreshDetail(stationCd, workSideCd);
           let detailAjax = this.$['input-job-details-ajax'];
-          let indOnYn = indOnFlag ? 'Y' : 'N';
           detailAjax.curl =
-            `/device_process/search/input_jobs/${jobInputId}/${equipType}/${equipCd}?station_cd=${stationCd}&ind_on_yn=${indOnYn}`;
+            `/device_process/search/input_jobs/${jobInputId}/${equipType}/${equipCd}?station_cd=${stationCd}&ind_on_yn=N`;
 
           detailAjax.generateRequest();
         } catch (error) {
@@ -289,8 +288,15 @@ Copyright © HatioLab Inc. All rights reserved.
           // job-progress-bar가 자동피킹 되지 않도록 holdIndicator flag를 on
           if (event.type === 'item-selected-by-click') {
             this.holdIndicator = true;
+            // 태블릿에서 현재 주문을 처리하고 난 후 다음 주문에 대한 선택을 어떻게 할 지에 대한 모드 (job.next.order.selection.mode)
+            // (auto: 자동 처리 모드, scan: 박스 ID를 스캔하여 다음 주문 처리, touch: 태블릿 터치하여 주문 처리)
+            if (selectedInput.status == 'W' && LOGIS_UTIL.getNextOrderSelectionMode() == 'touch') {
+              // 박스 투입 상태가 대기 상태이고 태블릿 도착 처리 touch 모드인 경우 박스 도착 처리
+              this.arriveBox(this.boxId);
+            }
           }
 
+          // 박스 피킹 상세 정보 조회
           this.refreshInputDetails();
         }
       }

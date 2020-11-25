@@ -636,7 +636,7 @@ Copyright © HatioLab Inc. All rights reserved.
         if (inputCode && inputCode.length > 3) {
           // 박스 코드이면 박스 도착 처리
           if (LOGIS_UTIL.isBoxIdValidate(inputCode)) {
-            this.inputBox(inputCode);
+            this.arriveBox(inputCode);
 
             // 그렇지 않으면 상품 코드
           } else {
@@ -651,7 +651,7 @@ Copyright © HatioLab Inc. All rights reserved.
        ******************
        * @param {Object} boxCode
        */
-      inputBox(boxCode) {
+      arriveBox(boxCode) {
         const rackCd = LOGIS_UTIL.getEquipCd();
         const stationCd = LOGIS_UTIL.getStationCd();
         try {
