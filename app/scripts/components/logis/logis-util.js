@@ -285,7 +285,7 @@ LOGIS_UTIL.isShowFullSkuCode = function() {
 };
 
 /**
- * @description 현재 태블릿의 상품 코드를 일부 표시할 지 여부를 리턴 (상품 코드가 길기 때문에 전부 보여줄 지 / 일부만 보여줄 지 여부)
+ * @description 현재 태블릿의 상품 코드를 일부 표시할 지 여부를 리턴 (상품 코드가 긴 경우 전부 보여줄 지 / 일부만 보여줄 지 여부)
  ********************
  * @return 상품 코드를 일부 표시할 지 여부
  */
@@ -303,7 +303,16 @@ LOGIS_UTIL.getSkuCdStartIndex = function() {
 };
 
 /**
- * @description 현재 태블릿의 송장번호를 일부 표시할 지 여부를 리턴 (송장번호가 길기 때문에 전부 보여줄 지 / 일부만 보여줄 지 여부)
+ * @description 현재 태블릿의 박스 ID를 일부 표시할 지 여부를 리턴 (박스 ID가 긴 경우 전부 보여줄 지 / 일부만 보여줄 지 여부)
+ ********************
+ * @return 상품 코드를 일부 표시할 지 여부
+ */
+LOGIS_UTIL.isShowShortBoxId = function() {
+  return LOGIS_UTIL.getBooleanDeviceSetting('display.box_id.shorter.enabled');
+};
+
+/**
+ * @description 현재 태블릿의 송장번호를 일부 표시할 지 여부를 리턴 (송장번호가 긴 경우 전부 보여줄 지 / 일부만 보여줄 지 여부)
  ********************
  * @return 송장번호를 일부 표시할 지 여부
  */

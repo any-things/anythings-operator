@@ -1,0 +1,733 @@
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+
+<link rel="import" href="../../../../../bower_components/polymer/polymer-element.html">
+
+<link rel="import" href="../../../../../styles/tab-order-info-styles.html">
+
+<link rel="import" href="../../../../mixins/common/ble-scanner-mixin.html">
+<link rel="import" href="../../../../mixins/logis/logis-common-assort-mixin.html">
+<link rel="import" href="../../../../mixins/logis/logis-msg-subscribe-mixin.html">
+
+<link rel="import" href="../../../../components/common/bluetooth-scanner-selector.html">
+<link rel="import" href="../../../../components/logis/adjust-qty-popup.html">
+<link rel="import" href="../../../../components/logis/job-transaction-popup.html">
+
+<!--
+  물류 > B2C > 소분류 처리 화면 (Tablet)
+-->
+<dom-module id="b2c-picking-job2">
+  <template>
+    <style include="tab-order-info-styles">
+      #prod-info #prod-info-right {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        margin-right: .5rem;
+      }
+
+      #prod-info-right input {
+        max-width: 4rem;
+        font-size: .8rem;
+        color: white;
+        background-color: var(--things-white-opacity-background-color);
+      }
+
+      #prod-info #prod-info-left {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .prod-list {
+        display: grid;
+        grid-template-columns: max-content auto max-content max-content;
+      }
+
+      .totalaccount {
+        display: inline-block;
+        padding: 0 10px 0 5px;
+        color: rgba(255, 255, 255, .7)
+      }
+
+      #icon-section {
+        display: flex;
+        flex: 1;
+      }
+
+      button#done-btn {
+        margin-left: .5rem;
+        width: 130px;
+      }
+
+      img#qr-done {
+        float: inherit;
+        margin: auto;
+        height: 3rem;
+      }
+
+      #ble-section {
+        display: flex;
+        flex-direction: column;
+      }
+
+      auto-popup-input {
+        display: none;
+      }
+    </style>
+
+    <!-- INDI 리스트 -->
+    <sys-ajax id="ind-get-ajax" method="GET" content-type="application/json" on-sys-ajax-response="_indCodeSetting">
+    </sys-ajax>
+
+    <!-- 상품 정보 스캔 투입 리스트 -->
+    <sys-ajax auto id="input-list-ajax" method="GET" content-type="application/json"
+      on-sys-ajax-response="_inputListResponsed">
+    </sys-ajax>
+
+    <!-- 상품 정보 스캔 투입 리스트 페이지네이션 -->
+    <sys-ajax id="input-list-pages-ajax" method="GET" content-type="application/json"
+      on-sys-ajax-response="_inputListPageResponsed">
+    </sys-ajax>
+
+    <!-- 투입 이벤트의 작업 리스트 -->
+    <sys-ajax id="input-job-details-ajax" method="GET" content-type="application/json" last-response="{{inputDetails}}">
+    </sys-ajax>
+
+    <!-- 태블릿 작업 존의 처리 안된 혹은 처리 완료된 작업을 조회하여 지시기에 점등 -->
+    <sys-ajax id="ind-on-jobs-ajax" method="PUT"
+      curl="/tablet_process/dps/ind_on/:job_input_seq_id/:rack_cd/:zone_cd/:side_cd/:done_or_todo"
+      content-type="application/json">
+    </sys-ajax>
+
+    <!-- 태블릿 작업 존의 모든 지시기를 소등 -->
+    <sys-ajax id="ind-off-my-zone-ajax" method="PUT" curl="/tablet_process/ind_off/:rack_cd/:zone_cd/:side_cd"
+      content-type="application/json">
+    </sys-ajax>
+
+    <!-- 박스 출발 -->
+    <sys-ajax id="depart-ajax" method="PUT" curl="/device_process/dynamic/dps/bucket_depart"
+      content-type="application/json">
+    </sys-ajax>
+
+    <!-- 박스 도착 -->
+    <sys-ajax id="arrive-ajax" method="PUT" curl="/device_process/dynamic/dps/bucket_arrive"
+      content-type="application/json" on-sys-ajax-response="_arriveBucketResponsed">
+    </sys-ajax>
+
+    <div id="status">
+      <div id="chart">[[pickedPercent]]<span>%</span></div>
+
+      <img id="back-to-current-btn" src="./images/iconbtn-das-order3.png" on-click="refreshInputList" />
+      <img id="ind-on-todo-btn" src="./images/iconbtn-das-order1.png" on-click="indOnTodoJobs" />
+      <img id="ind-on-done-btn" src="./images/iconbtn-das-order2.png" on-click="indOnDoneJobs" hidden$="[[isQps]]" />
+      <div id="picked-qty">
+        [[pickedQtyLabel]]
+        <span>[[pickedQty]]</span>
+      </div>
+
+      <div id="total-pick-qty">
+        [[totalOrdQtyLabel]]
+        <span>[[totalPickQty]]</span>
+      </div>
+    </div>
+
+    <div id="prod-info">
+      <div id="prod-info-left">
+        <span>[[orderNoLabel]]</span>
+        <span class="prodname">[[orderNo]]</span>
+      </div>
+
+      <div id="prod-info-right">
+        <label>[[boxArrivedLabel]]</label>
+        <input id="bucket-code" class="row" on-keypress="_onBucketCodeChanged">
+      </div>
+
+      <div id="icon-section">
+        <div id="ble-section">
+          <label id="ble-id">[[deviceName]]</label>
+          <iron-icon id="bluetooth-btn" icon="[[bluetoothIcon]]" on-click="bluetoothIconClicked"></iron-icon>
+        </div>
+
+        <img id="qr-done" src="./static/assets/tab_codes/done_by_qr.png" />
+
+        <button id="done-btn" on-click="doneIconClicked">
+          <!--iron-icon id="done-btn" icon="[[doneIcon]]" on-click="doneIconClicked"></iron-icon-->
+          [[boxDepartureLabel]]
+        </button>
+      </div>
+    </div>
+
+  <div id="content">
+    <dom-if if="[[showFront]]">
+      <template>
+          <div id="left-section">
+            <button class="list-header-btn" disabled>[[frontBtnLabel]]</button>
+
+            <item-list id="front-list" hide-header header="[[header]]" data="[[frontDetailList]]"
+              on-data-list-click="showProcessPopup" on-configured="_addOrderStatusAttr">
+            </item-list>
+          </div>
+        </template>
+  </dom-if>
+
+  <job-progress-bar id="dps-job-indicator" job-type="[[jobType]]" selected-input="{{selectedInput}}" on-item-selected="_selectedInputChanged" on-item-selected-by-click="_selectedInputChanged" input-list="[[inputList]]" on-configured="_addJobStatusAttr">
+  </job-progress-bar>
+
+  <dom-if if="[[showRear]]">
+    <template>
+          <div id="right-section">
+            <button class="list-header-btn" disabled>[[rearBtnLabel]]</button>
+
+            <item-list id="rear-list" hide-header header="[[header]]" data="[[rearDetailList]]"
+              on-data-list-click="showProcessPopup" on-configured="_addOrderStatusAttr">
+            </item-list>
+          </div>
+        </template>
+  </dom-if>
+
+  <dom-if if="[[showTotal]]">
+    <template>
+          <div id="total-section">
+            <button class="list-header-btn" disabled>[[totalBtnLabel]]</button>
+
+            <item-list id="total-list" hide-header header="[[header]]" data="[[totalDetailList]]"
+              on-data-list-click="showProcessPopup" on-configured="_addOrderStatusAttr">
+            </item-list>
+          </div>
+        </template>
+  </dom-if>
+  </div>
+
+  </template>
+
+  <script>
+    class B2cPickingJob2 extends LogisMsgSubscribeMixin(LosigCommonAssortMixin(BleScannerMixin(Polymer.Element))) {
+      static get is() {
+        return 'b2c-picking-job2'
+      }
+
+      static get properties() {
+        return {
+          /**
+           * 주문 번호 라벨
+           ****************
+           * @type {String}
+           */
+          orderNoLabel: {
+            type: String,
+            value: () => t('label.order_no')
+          },
+
+          /**
+           * 완료 버튼 라벨
+           ****************
+           * @type {String}
+           */
+          boxDepartureLabel: {
+            type: String,
+            value: () => t('label.finished')
+          },
+
+          /**
+           * 개발 모드 여부
+           ****************
+           * @type {Boolean}
+           */
+          isDevMode: {
+            type: Boolean,
+            value: window.CONST.IS_DEV_MODE
+          },
+
+          /**
+           * 박스 도착
+           ****************
+           * @type {String}
+           */
+          boxArrivedLabel: {
+            type: String,
+            value: () => t('label.box_arrived')
+          },
+
+          /**
+           * 앞  로케이션 라벨
+           ****************
+           * @type {String}
+           */
+          locFrontLabel: {
+            type: String,
+            value: () => t('label.front')
+          },
+
+          /**
+           * 뒤 로케이션 라벨
+           ****************
+           * @type {String}
+           */
+          locRearLabel: {
+            type: String,
+            value: () => t('label.rear')
+          },
+
+          /**
+           * 지시기 코드
+           ****************
+           * @type {String}
+           */
+          indCd: {
+            type: String,
+            value: 'NaN'
+          },
+
+          /**
+           * 데이트 그리드 헤더
+           ****************
+           * @type {Array}
+           */
+          header: {
+            type: Array,
+            value: function() {
+              return [{
+                fieldname: 'side_nm',
+                columnWidth: 'auto',
+                displayCallback: value => '(' + value + ')'
+              }, {
+                fieldname: 'side_cd',
+                columnWidth: 'auto',
+                hidden: true
+              }, {}, {
+                fieldname: 'sub_equip_cd',
+                style: {
+                  textAlign: 'left'
+                },
+              }, {
+                fieldname: 'sku_nm',
+                columnWidth: 'auto'
+              }, {
+                fieldname: 'picking_sum',
+                style: {
+                  textAlign: 'right'
+                },
+                columnWidth: 'auto',
+                displayCallback: (value, rowData) => {
+                  var processValue = 0;
+                  if (rowData.picking_qty > 0) {
+                    processValue = rowData.picking_qty
+                  } else {
+                    processValue = rowData.picked_qty
+                  }
+
+                  return `${processValue}/${rowData.pick_qty}`;
+                },
+                style: {
+                  width: 'max-content'
+                }
+              }, {
+                fieldname: 'picking_qty',
+                hidden: true
+              }, {
+                fieldname: 'pick_qty',
+                hidden: true
+              }, {
+                fieldname: 'picked_qty',
+                hidden: true
+              }, {
+                fieldname: 'id',
+                hidden: true
+              }, {
+                fieldname: 'status',
+                hidden: true
+              }, {
+                fieldname: 'sku_cd',
+                hidden: true
+              }, {
+                fieldname: 'sku_barcd',
+                hidden: true
+              }, {
+                fieldname: 'ind_cd',
+                hidden: true
+              }]
+            }
+          },
+
+          /**
+           * 화면에서 완료 버튼 아이콘
+           ****************
+           * @type {String}
+           */
+          doneIcon: {
+            type: String,
+            value: 'icons:done'
+          },
+
+          /**
+           * 스캔한 바코드 저장용
+           ****************
+           * @type {String}
+           */
+          scannedBarcode: {
+            type: String
+          },
+
+          /**
+           * 스캔한 바코드 처리후 유형이 input-added이면 scannedBarcode를 boxId에 저장
+           ****************
+           * @type {String}
+           */
+          boxId: {
+            type: String
+          },
+
+          /**
+           * 작업 유형
+           ****************
+           * @type {String}
+           */
+          jobType: {
+            type: String,
+            value: 'DPS'
+          },
+
+          /**
+           * 블루투스 ID
+           ****************
+           * @type {String}
+           */
+          bluetoothId: {
+            type: String
+          }
+        }
+      }
+
+      /**
+       * @description lifecycle
+       ******************
+       */
+      connectedCallback() {
+        super.connectedCallback();
+      }
+
+      /**
+       * @description 상품 투입 상세 정보로 현황 정보 리프레쉬
+       ******************
+       * @param {Array} inputDetails
+       */
+      _updateStatus(inputDetails) {
+        // input detail의 내용이 없을 경우 다음 아이템을 선택함 == 나와 관계 없는 작업들 처리...
+        if (inputDetails.length === 0 && !this.holdIndicator && LOGIS_UTIL.isAutoSelectionNextOrder()) {
+          if (!this.$['dps-job-indicator'].selectNextItem()) {
+            this.refreshInputList();
+          }
+        }
+        let totalPickQty = 0; // 총 주문 수량
+        let pickedQty = 0; // 총 확정 수량
+        let canceledQty = 0; // 작업 취소된 상품 수량
+
+        inputDetails.forEach(item => {
+          totalPickQty += item.pick_qty;
+          pickedQty += item.picked_qty;
+          item.left_qty = item.pick_qty - item.picked_qty;
+          if (item.status === 'C') canceledQty += item.pick_qty;
+        });
+
+        // pickedCanceldPercent를 완료 + 취소된 작업의 전체 작업 대비 퍼센트를 계산하여
+        // 다음 블럭을 선택하는 기준 percent로 삼는다.
+        // inputDetails 중에 완료되지 않았지만 취소상태인 작업이 있다면 해당 작업도 이후에 처리할 것이기 때문에
+        // 다음 블럭을 선택하거나 inputList를 다시 조회해야함
+        const pickedCanceldPercent = (totalPickQty && totalPickQty > 0 && pickedQty && pickedQty > 0) ?
+          Math.floor((pickedQty + canceledQty) / totalPickQty * 100) : 0;
+
+        this.totalPickQty = totalPickQty;
+        this.pickedQty = pickedQty;
+        this.pickedPercent =
+          (totalPickQty && totalPickQty > 0 && pickedQty && pickedQty > 0) ?
+          Math.floor(pickedQty / totalPickQty * 100) : 0;
+
+        this._updateBlockChart(this.pickedPercent);
+
+        // 작업률 100% & 자동피킹이 true로 설정 && 사용자에 의해 클릭을 통해 변경되지 않은 경우 => true
+        if (pickedCanceldPercent === 100 && LOGIS_UTIL.isAutoSelectionNextOrder() && !this.holdIndicator) {
+          // 다음 아이템이 없을 경우 false를 리턴함
+          if (!this.$['dps-job-indicator'].selectNextItem()) {
+            // 마지막 아이템일 경우 input list를 다시 조회
+            this.refreshInputList();
+          }
+        } else if (this.holdIndicator) {
+          // holdIndicator flag에 의해 selectNextItem을 호출 하지 않은 경우 holdIndicator의 값을 변경
+          this.holdIndicator = false;
+        }
+      }
+
+      /**
+       * @description 이미 처리한 작업에 대해서 확인을 위해서 다시 한 번 지시기에 점등
+       * toggle 버튼이기 때문에 active attribute를 추가/제거 함
+       *********************
+       * @param {Object} event
+       */
+      indOnDoneJobs(event) {
+        const indOnDoneJobsBtn = event.currentTarget;
+        const isButtonActive = indOnDoneJobsBtn.getAttribute('active');
+
+        // 태블릿의 작업 존의 모든 지시기 소등
+        if (isButtonActive === '') {
+          indOnDoneJobsBtn.removeAttribute('active');
+          this.indOffByTabletZone();
+
+          // 태블릿의 작업 존에 현재 선택된 버킷 (즉 주문) 중에 처리 완료된 작업 리스트에 대한 지시기 점등
+        } else {
+          indOnDoneJobsBtn.setAttribute('active', '');
+          this.indOnByTabletZone('done');
+        }
+      }
+
+      /**
+       * @description 선택된 버킷 즉 주문의 상품 중에서 아직 처리가 안 된 상품 및 개수를 지시기로 표시
+       * toggle 버튼이기 때문에 active attribute를 추가/제거 함
+       *********************
+       * @param {Object} event
+       */
+      indOnTodoJobs(event) {
+        const indOnTodoJobsBtn = event.currentTarget;
+        const isButtonActive = indOnTodoJobsBtn.getAttribute('active');
+
+        // 태블릿의 작업 존의 모든 지시기 소등
+        if (isButtonActive === '') {
+          indOnTodoJobsBtn.removeAttribute('active');
+          this.indOffByTabletZone();
+
+          // 태블릿의 작업 존에 현재 선택된 버킷 (즉 주문) 중에 처리 안 된 작업 리스트에 대한 지시기 점등
+        } else {
+          indOnTodoJobsBtn.setAttribute('active', '');
+          this.indOnByTabletZone('todo');
+        }
+      }
+
+      /**
+       * @description 태블릿 작업 존에 해당하는 지시기 리스트를 소등한다.
+       ******************
+       */
+      indOffByTabletZone() {
+        const indOffAjax = this.$['ind-off-my-zone-ajax'];
+        let rackCd = LOGIS_UTIL.getEquipCd();
+        let zoneCd = LOGIS_UTIL.getStationCd();
+        let sideCd = LOGIS_UTIL.getWorkSideCd();
+        indOffAjax.curl = `/tablet_process/ind_off/${rackCd}/${zoneCd}/${sideCd}`;
+        indOffAjax.generateRequest();
+      }
+
+      /**
+       * @description mode에 따라 태블릿의 작업 존에 현재 선택된 버킷 (즉 주문) 중에 처리 안 된 혹은 처리 완료된 작업 리스트에 대한 지시기 점등
+       ******************
+       * @param {String} mode
+       */
+      indOnByTabletZone(mode) {
+        const indOnAjax = this.$['ind-on-jobs-ajax'];
+        let inputSeqId = this.selectedInput.id;
+        let rackCd = LOGIS_UTIL.getEquipCd();
+        let zoneCd = LOGIS_UTIL.getStationCd();
+        let sideCd = LOGIS_UTIL.getWorkSideCd();
+        indOnAjax.curl = `/tablet_process/dps/ind_on/${inputSeqId}/${rackCd}/${zoneCd}/${sideCd}/${mode}`;
+        indOnAjax.generateRequest();
+      }
+
+      /**
+       * @description 작업 팝업 정보 표시
+       ******************
+       * @param {Object} event
+       */
+      showProcessPopup(event) {
+        // status가 'F'면 완료된 작업
+        let status = event.detail.data.status;
+        this.selectedBarCode = event.detail.data.sku_barcd;
+        var pickQty = event.detail.data.pick_qty;
+
+        if (status === 'I' || status === 'P') {
+          const popup = document.createElement('job-transaction-popup');
+          popup.skuCd = event.detail.data.sku_barcd
+          popup.jobType = this.jobType;
+          popup.jobId = event.detail.data.id;
+          popup.pickQty = pickQty;
+          popup.pickedQty = event.detail.data.picked_qty;
+          popup.isFinished = (status === 'F');
+          var self = this;
+
+          LOGIS_UTIL.showPopup(t('title.job_select'), popup, 'fit', 'fit', null, closeParam => {
+            if (closeParam && typeof closeParam === 'object' && closeParam.type === 'adjust-qty') {
+              const adjustPopup = document.createElement('adjust-qty-popup');
+
+              setTimeout(() => {
+                LOGIS_UTIL.showPopup(t('button.adjust_qty'), adjustPopup, 'fit', 'fit', () => {
+                  adjustPopup.setCurrentQty(closeParam.pickQty);
+                  adjustPopup.jobId = closeParam.jobId;
+                }, () => {
+                  self.refreshInputDetails(false);
+                });
+              }, 100);
+
+            } else {
+              self.refreshInputDetails(false);
+            }
+          });
+        }
+      }
+
+      /**
+       * @description 웹 소켓으로 부터 데이터 리프레쉬
+       ******************
+       * @param {Object} data
+       */
+      refreshByWs(data) {
+        if (data == 'input-added' || data == 'wait-added') {
+          // 투입 정보 리스트가 없는 경우 투입 정보 리스트 조회
+          if (!this.inputList || this.inputList.length < 4) {
+            this.refreshInputList();
+          }
+        } else if (data == 'arrive-added') {
+          // 투입 정보 리스트가 없는 경우 투입 정보 리스트 조회
+          this.refreshInputList();
+          this.refreshInputDetails(false);
+
+        } else {
+          //this.refreshInputList();
+          this.refreshInputDetails(false);
+        }
+      }
+
+      /**
+       * @description list configured event handler
+       * list 구성이 완료 되면 status 데이터를 바탕으로 status attribute를 추가함
+       ******************
+       * @param {Object} event
+       */
+      _addOrderStatusAttr(event) {
+        let list = event.detail.contentElements;
+        var selectedBCd = this.selectedBarCode;
+
+        list.forEach(row => {
+          let data = row.getData();
+
+          if (data.side_cd == 'F') {
+            row.getElementsByClassName("data-item")[0].innerText = '(' + this.locFrontLabel + ')';
+            row.getElementsByClassName("data-item")[2].innerText = '';
+
+          } else if (data.side_cd == 'R') {
+            row.getElementsByClassName("data-item")[0].innerText = '(' + this.locRearLabel + ')';
+            row.getElementsByClassName("data-item")[2].innerText = '';
+          }
+
+          if (parseInt(data.picked_qty) >= parseInt(data.pick_qty)) {
+            row.classList.add('complete'); // 완료된 데이터에 complete class를 추가
+            var dataList = [];
+            dataList = dataList.concat(this.inputDetails.F, this.inputDetails.R);
+
+            if (selectedBCd == data.sku_barcd) {
+              LOGIS_UTIL.closePopup();
+            }
+          } else {
+            if (data.side_cd == 'F') {
+              row.style.color = 'yellow';
+            } else if (data.side_cd == 'R') {
+              row.style.color = 'aqua';
+            }
+          }
+        });
+      }
+
+      /**
+       * @description 왼쪽으로 Swipe
+       ******************
+       * @param {Object} event
+       */
+      swipeLeft(event) {
+        if (!this.inputList || this.inputList.length == 0) return;
+        let startInputSeq = this.inputList[0].input_seq;
+        let rackCd = LOGIS_UTIL.getEquipCd();
+        let zoneCd = LOGIS_UTIL.getStationCd();
+        let sideCd = LOGIS_UTIL.getWorkSideCd();
+        let pageAjax = this.$['input-list-pages-ajax'];
+        pageAjax.customParams = {
+          show_others_order: LOGIS_UTIL.isShowOthersOrder()
+        };
+        pageAjax.curl = `/tablet_process/dps/input_pages/${rackCd}/${zoneCd}/${sideCd}/DOWN/${startInputSeq}`;
+        pageAjax.generateRequest();
+      }
+
+      /**
+       * @description 오른쪽으로 Swipe
+       ******************
+       * @param {Object} event
+       */
+      swipeRight(event) {
+        if (!this.inputList || this.inputList.length == 0) return;
+        let startInputSeq = this.inputList[this.inputList.length - 1].input_seq;
+        let rackCd = LOGIS_UTIL.getEquipCd();
+        let zoneCd = LOGIS_UTIL.getStationCd();
+        let sideCd = LOGIS_UTIL.getWorkSideCd();
+        let pageAjax = this.$['input-list-pages-ajax'];
+        pageAjax.curl = `/tablet_process/dps/input_pages/${rackCd}/${zoneCd}/${sideCd}/UP/${startInputSeq}`;
+        pageAjax.generateRequest();
+      }
+
+      /**
+       * @description [완료] 버튼 클릭 ( 박스 출발 )
+       ******************
+       * @param {Object} event
+       */
+      doneIconClicked(event) {
+        const inspWithPickAjax = this.$['depart-ajax'];
+        let scannedBarcode = this.selectedInput.bucket_cd;
+        //if(this.selectedInput.status==='F') {
+        let rackCd = LOGIS_UTIL.getEquipCd();
+        let zoneCd = LOGIS_UTIL.getStationCd();
+        inspWithPickAjax.curl = `/tablet_process/dps/box_depart/${rackCd}/${zoneCd}/${scannedBarcode}`;
+        inspWithPickAjax.generateRequest();
+        //}
+      }
+
+      /**
+       * @description 버킷 또는 박스가 스캔되면 scannded 호출하는 테스트 기능
+       ******************
+       * @return {[type]} [description]
+       */
+      _onBucketCodeChanged(event) {
+        if (event.key === 'Enter') {
+          this.scannedBarcode = event.currentTarget.value;
+          event.currentTarget.select();
+          this.scanned(this.scannedBarcode);
+          SOUND.playInfoSound();
+        }
+      }
+
+      /**
+       * @description 블루투스 subscribe callback
+       * 연결된 블루투스 장비에 의해 호출 됨
+       * MpsBluetoothScannerMixin을 사용하는 컴퍼넌트는 scanned 함수를 구현해야함
+       * @param {String} scannedBarcode 스캔은 박스 도착 박스 ID 
+       */
+      scanned(scannedBarcode) {
+        // 박스 도착 이벤트 발생 
+        const bucketArriveAjax = this.$['arrive-ajax'];
+        let equipType = LOGIS_UTIL.getEquipType();
+        let equipCd = LOGIS_UTIL.getEquipCd();
+        let stationCd = LOGIS_UTIL.getStationCd();
+        let bucketCd = scannedBarcode;
+
+        // TODO 버킷인 경우 처리 ...
+        if (LOGIS_UTIL.isBoxIdValid(bucketCd)) {
+          bucketArriveAjax.curl = `/device_process/dynamic/dps/bucket_arrive?equipType=${equipType}&equipCd=${equipCd}&stationCd=${stationCd}&bucketCd=${bucketCd}`;
+          bucketArriveAjax.generateRequest();
+        }
+      }
+
+      /**
+       * @description 버킷 도착 이벤트 response
+       * @param {Object} event
+       */
+      _arriveBucketResponsed(event) {
+        this.inputList = event.detail.result;
+      }
+    }
+    customElements.define(B2cPickingJob2.is, B2cPickingJob2);
+  </script>
+</dom-module>

@@ -243,6 +243,16 @@ Copyright © HatioLab Inc. All rights reserved.
           sensitivity: {
             type: Number,
             value: 50
+          },
+
+          /**
+           * @description 투입 박스의 박스 ID를 전체 보이게 할 것인지 뒷 자리 4자리만 보여줄 것인지 여부 설정
+           ****************
+           * @type {Boolean}
+           */
+          showFullCode: {
+            type: Boolean,
+            value: false
           }
         }
       }
@@ -312,8 +322,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} list
        */
       _isBoxFlowLeftToRight() {
-        //return MPS_UTIL.getBoxFlowDirection() == 'LTR';
-        return true;
+        return LOGIS_UTIL.getWorkFlowDirection() == 'LTR';
       }
 
       /**
@@ -337,17 +346,16 @@ Copyright © HatioLab Inc. All rights reserved.
           };
 
           // 2.2 Job Block에 표시할 투입 정보 설정 
-          let innerCode = item.sku_cd;
-          //let innerCode = item.bucket_cd;
+          let innerCode = item.box_id;
           if (!innerCode) return;
 
           // 2.3 설정 화면에서 설정한 투입 코드 전부 보기 값이 [예]이면 앞자리를 표시 
-          //if (LOGIS_UTIL.getShowFullCode()) { // TODO LOGIS_UTIL에 나오도록 장비 설정 프로파일에 추가
-          const beginSpan = document.createElement('span');
-          beginSpan.classList.add('begin-text');
-          beginSpan.innerHTML = innerCode.substr(0, innerCode.length - 4);
-          block.appendChild(beginSpan);
-          //}
+          if (this.showFullCode) {
+            const beginSpan = document.createElement('span');
+            beginSpan.classList.add('begin-text');
+            beginSpan.innerHTML = innerCode.substr(0, innerCode.length - 4);
+            block.appendChild(beginSpan);
+          }
 
           // 2.4 투입 코드 마지막 네자리를 표시
           const endSpan = document.createElement('span');
