@@ -1,0 +1,1384 @@
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+
+<link rel="import" href="../../../../../bower_components/polymer/polymer-element.html">
+
+<link rel="import" href="../../../../components/logis/inspection-enter-qty-popup.html">
+
+<!--
+  물류 > B2C > 검수 화면 (KIOSK)
+-->
+<dom-module id="b2c-inspection">
+  <template>
+    <style>
+      .container {
+        height: calc(100% - 10px);
+        padding: 10px 15px 0px 15px;
+        display: flex;
+        flex-direction: column;
+      }
+      .input-section {
+        display:grid;
+        grid-template: 1.5fr / 1.5fr 1.5fr 1fr 1fr;
+        background-color: var(--things-white-opacity-background-color);
+        border-radius:var(--things-default-border-radius);
+        overflow: visible;
+        margin-bottom: 10px;
+        padding: 7px;
+      }
+      #bottom-container {
+        flex: 1;
+        border-radius:var(--things-default-border-radius);
+        margin-bottom: 10px;
+      }
+      .input-section div {
+        text-align:center;
+        color:#fff;
+      }
+      .input-section .sku-info span {
+        display:block;
+      }
+      .input-section .sku-info {
+        border-left:1px solid rgba(0,0,0,.3);
+      }
+      .input1 span {
+        display:inline-block;
+        width:30%;
+        text-align:right;
+        font-size:.6rem
+      }
+      .input1 input {
+        display:inline-block;
+        width:62%;height:40px;
+        margin-bottom:5px
+      }
+      .check-section {
+        display:grid;
+        grid-template: 1fr 1fr 1fr 1fr;
+        padding: 5px 0px 0px 32px;
+        display: flex;
+        flex-direction: row;
+      }
+      span.bigtitle {
+        margin:20px 0 15px 0;
+        font-size:0.9rem;
+      }
+      span.smalltitle {
+        margin:15px 0 15px 0;
+        font-size:.7rem;
+      }
+      span.bigtitle,span.smalltitle {
+        display:inline-block !important;
+        border-bottom:3px solid var(--things-secondary-color);
+      }
+      span.proc {
+        font-size:1.2rem;
+        color:rgba(255,255,255,.7);
+      }
+      span.proc b {
+        display:inline-block;
+        text-align:right;
+        color:#fff;
+      }
+      span.proc-reject {
+        font-size:1.2rem;
+        color:rgba(255,255,255,.7);
+      }
+      span.proc-reject b {
+        display:inline-block;
+        text-align:right;
+        color:#f00;
+      }
+      .right-section {
+        display:grid;
+        grid-template-rows: auto min-content;
+      }
+      .right-section .radio-section {
+        grid-row-start:1;
+      }
+      .radio-section label {
+        font-size:.8rem;
+        color:rgba(255,255,255,.8);
+      }
+      .radio-section input {
+        position: relative;
+        top: -7px;
+      }
+      #label {
+        text-align: right;
+        color: #D5D7DB;
+        font-size: 25pt;
+        margin: auto 15px auto 0;
+      }
+      .btn-section {
+        display: flex;
+        flex-direction: row;
+      }
+      button {
+        @apply --operator-default-btn;
+        margin-right: 10px;
+        margin-bottom: 10px;
+        flex: 1;
+      }
+      button:active {
+        @apply --operator-default-btn-active;
+      }
+      button:focus {
+        outline:none
+      }
+      input {
+        background-color: rgba(0, 0, 0, .25);
+        border: 1px solid rgba(255, 255, 255, .2);
+        color: #fff;
+        font-size: .8rem;
+        text-align: center;
+      }
+      auto-popup-input {
+        display: none
+      }
+      item-list {
+        height: 100%;
+      }
+    </style>
+
+    <!-- 검수 정보 조회를 위한 Ajax -->
+    <sys-ajax
+      id="find-inspection-ajax"
+      curl="/device_process/dynamic/dps/inspection/find_by_order/:order_id"
+      method="GET"
+      content-type="application/json"
+      custom-error-handler
+      on-sys-ajax-response="_onFindInpspectionSuccess"
+      on-sys-ajax-error="_onFindInspectionError">
+    </sys-ajax>
+
+    <!-- 박스 내품 검수를 위한 Ajax -->
+    <sys-ajax
+      id="inspection-item-ajax"
+      curl="/device_process/dynamic/dps/inspection/by_item/:order_no"
+      method="PUT"
+      content-type="application/json"
+      custom-error-handler
+      on-sys-ajax-response="_onItemInpspectionSuccess"
+      on-sys-ajax-error="_onItemInspectionError">
+    </sys-ajax>
+
+    <!-- 피킹 완료 가능 여부 체크를 위한 Ajax -->
+    <sys-ajax
+      id="check-manual-picking-ajax"
+      curl="/device_process/dynamic/dps/picking/finish/possible"
+      method="GET"
+      content-type="application/json"
+      on-sys-ajax-response="_onPickingCheckSuccess">
+    </sys-ajax>
+    
+    <!-- 피킹 완료를 위한 Ajax -->
+    <sys-ajax
+      id="picking-complete-ajax"
+      curl="/device_process/dynamic/dps/picking/finish"
+      method="PUT"
+      content-type="application/json"
+      on-sys-ajax-response="_onPickingCompleteSuccess">
+    </sys-ajax>
+
+    <!-- 검수 완료를 위한 Ajax -->
+    <sys-ajax
+      id="inspection-complete-ajax"
+      curl="/device_process/dynamic/dps/inspection/finish/:order_id"
+      method="POST"
+      content-type="application/json"
+      last-response="{{inspectionResult}}">
+    </sys-ajax>
+
+    <!-- 박스 분할을 위한 Ajax -->
+    <sys-ajax
+      id="split-box-ajax"
+      curl="/device_process/dynamic/dps/inspection/split_box/:order_id"
+      method="POST"
+      content-type="application/json"
+      on-sys-ajax-response="_splitBoxSuccess">
+    </sys-ajax>
+
+    <!-- 송장 재발행을 위한 Ajax -->
+    <sys-ajax
+      id="reprint-invoice-ajax"
+      curl="/device_process/dynamic/dps/inspection/print/:order_id"
+      method="PUT"
+      content-type="application/json"
+      on-sys-ajax-response="_reprintSuccess">
+    </sys-ajax>
+
+    <!-- 레이아웃 -->
+    <div class="container">
+      <div class="input-section" id="input-section">
+        <div class="input1">
+          <!-- 트레이 박스, 상품 코드 입력 박스 -->
+          <span class="label">[[trayCdLabel]]</span>
+          <input id="tray-cd" on-keypress="_onTrayCdScan">
+          <span class="label">[[skuBarcdLabel]]</span>
+          <input id="sku-barcode" on-keypress="_onSkuBarcodeScan">
+          <span class="label">[[reprintLabel]]</span>
+          
+          <input type="checkbox" id="reprint-invoice" on-click="focusDefaultInput">
+          <div hidden><input type="checkbox" id="manual-picking" on-click="focusDefaultInput"></div>
+
+          <!--div class="check-section" hidden>
+            <span class="label" hidden>[[manualPickingLabel]]</span>
+            <input type="checkbox" id="manual-picking" on-click="focusDefaultInput" hidden>
+
+            <span class="label">[[reprintLabel]]</span>
+            <input type="checkbox" id="reprint-invoice" on-click="focusDefaultInput">
+          </div-->
+        </div>
+
+        <div class="input1">
+          <!-- 주문 번호, 박스 ID, 송장 번호 입력 박스 -->
+          <span class="label">[[orderNoLabel]]</span>
+          <input id="order-no" on-keypress="_onOrderNoScan">
+          <span class="label">[[boxIdLabel]]</span>
+          <input id="box-id" on-keypress="_onBoxIdScan">
+          <span class="label">[[invoiceIdLabel]]</span>
+          <input id="invoice-id" on-keypress="_onInvoiceIdScan">
+        </div>
+
+        <!-- 상품 건수 -->
+        <div class="sku-info">
+          <span class="smalltitle">[[skuCntLabel]]</span>
+          <span class="proc"><b>[[confirmSkuCnt]]</b> / [[pickedSkuCnt]]</span>
+        </div>
+
+        <!-- 상품 수량 -->
+        <div class="sku-info">
+          <span class="smalltitle">[[skuQtyLabel]]</span>
+          <span class="proc"><b>[[confirmSkuPcsQty]]</b> / [[pickedSkuPcsQty]]</span>
+        </div>
+      </div>
+
+      <div id="bottom-container">
+        <!-- 주문 내품 내역 리스트 -->
+        <item-list 
+          header="[[header]]" 
+          data="[[items]]" 
+          on-configured="_addCompleteClass">
+        </item-list>
+
+        <!-- 검수 방법 -->
+        <div class="right-section" hidden>
+          <div class="radio-section" hidden>
+            <input type="radio" on-click="_handleInspectionMethodClick" name="chk_info" value="each" checked="checked" id="each">
+            <label for="each">[[indivisualLabel]]</label><br/>
+            <input type="radio" on-click="_handleInspectionMethodClick" name="chk_info" value="total" id="total">
+            <label for="total">[[batchLabel]]</label><br/>
+            <input type="radio" on-click="_handleInspectionMethodClick" name="chk_info" value="inputCount" id="inputCount">
+            <label for="inputCount">[[qtyInputLabel]]</label><br/>
+            <input type="radio" on-click="_handleInspectionMethodClick" name="chk_info" value="addSku" id="addSku">
+            <label for="addSku">[[addSkuLabel]]</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- 검수 관련 버튼 -->
+      <div class="btn-section">
+        <button id="inspection-btn" on-click="completeInspection">[[completeLabel]]</button>
+        <button id="reset-btn" on-click="reset">[[resetLabel]]</button>
+        <button id="reset-all-btn" on-click="clearView">[[resetAllLabel]]</button>
+        <button id="reprint-btn" on-click="reprint">[[reprintLabel]]</button>
+      </div>
+    </div>
+  </template>
+
+  <script>
+    class B2CInspection extends Polymer.Element {
+      static get is() {
+        return 'b2c-inspection'
+      }
+
+      static get properties() {
+        return {
+          /**
+           * @description 트레이 코드 라벨
+           ****************
+           * @type {String}
+           */
+          trayCdLabel: {
+            type: String,
+            value: t('label.tray_cd')
+          },
+
+          /**
+           * @description 박스 ID 라벨
+           ****************
+           * @type {String}
+           */
+          boxIdLabel: {
+            type: String,
+            value: t('label.box_id')
+          },
+
+          /**
+           * @description 주문 번호 라벨
+           ****************
+           * @type {String}
+           */
+          orderNoLabel: {
+            type: String,
+            value: t('label.order_no')
+          },
+
+          /**
+           * @description 송장 번호 라벨
+           ****************
+           * @type {String}
+           */
+          invoiceIdLabel: {
+            type: String,
+            value: t('label.invoice_id')
+          },
+
+          /**
+           * @description 상품 바코드 라벨
+           ****************
+           * @type {String}
+           */
+          skuBarcdLabel: {
+            type: String,
+            value: t('label.sku_barcd')
+          },
+
+          /**
+           * @description 상품 개수 라벨
+           ****************
+           * @type {String}
+           */
+          skuCntLabel: {
+            type: String,
+            value: t('label.sku_cnt')
+          },
+
+          /**
+           * @description 상품 수량 라벨
+           ****************
+           * @type {String}
+           */
+          skuQtyLabel: {
+            type: String,
+            value: t('label.sku_qty')
+          },
+
+          /**
+           * @description 검수 완료 라벨
+           ****************
+           * @type {String}
+           */
+          completeLabel: {
+            type: String,
+            value: t('button.inspection_complete')
+          },
+
+          /**
+           * @description 초기화 라벨
+           ****************
+           * @type {String}
+           */
+          resetLabel: {
+            type: String,
+            value: t('button.reset')
+          },
+
+          /**
+           * @description 전체 초기화 라벨
+           ****************
+           * @type {String}
+           */
+          resetAllLabel: {
+            type: String,
+            value: t('button.reset_all')
+          },
+
+          /**
+           * @description 수작업 피킹 라벨
+           ****************
+           * @type {String}
+           */
+          manualPickingLabel: {
+            type: String,
+            value: t('button.manual_picking')
+          },
+
+          /**
+           * @description 재발행 라벨
+           ****************
+           * @type {String}
+           */
+          reprintLabel: {
+            type: String,
+            value: t('button.reprint')
+          },
+
+          /**
+           * @description 개별처리 라벨
+           ****************
+           * @type {String}
+           */
+          indivisualLabel: {
+            type: String,
+            value: t('button.indivisual')
+          },
+
+          /**
+           * @description 일괄처리 라벨
+           ****************
+           * @type {String}
+           */
+          batchLabel: {
+            type: String,
+            value: t('button.batch')
+          },
+
+          /**
+           * @description 수량 입력처리 라벨
+           ****************
+           * @type {String}
+           */
+          qtyInputLabel: {
+            type: String,
+            value: t('button.qty_input')
+          },
+
+          /**
+           * @description 상품 추가 처리 라벨
+           ****************
+           * @type {String}
+           */
+          addSkuLabel: {
+            type: String,
+            value: t('button.add_sku')
+          },
+
+          /**
+           * @description 스캔한 트레이 코드
+           ****************
+           * @type {String}
+           */
+          currentTrayCd: {
+            type: String,
+            value: ''
+          },
+
+          /**
+           * @description 스캔한 주문 번호
+           ****************
+           * @type {String}
+           */
+          currentOrderNo: {
+            type: String,
+            value: ''
+          },
+
+          /**
+           * @description 스캔한 송장 번호
+           ****************
+           * @type {String}
+           */
+          currentInvoiceId: {
+            type: String,
+            value: ''
+          },
+
+          /**
+           * @description 주문 번호와 매핑된 박스 ID
+           ****************
+           * @type {String}
+           */
+          currentBoxId: {
+            type: String,
+            value: ''
+          },
+
+          /**
+           * @description 이전 스캔한 상품 코드
+           ****************
+           * @type {String}
+           */
+          prevSkuBarcode: {
+            type: String
+          },
+
+          /**
+           * @description 피킹한 상품 수
+           ****************
+           * @type {Number}
+           */
+          pickedSkuCnt: {
+            type: Number,
+            value: 0
+          },
+
+          /**
+           * @description 피킹한 상품 낱개 수
+           ****************
+           * @type {Number}
+           */
+          pickedSkuPcsQty: {
+            type: Number,
+            value: 0
+          },
+
+          /**
+           * @description 확인 상품 수
+           ****************
+           * @type {Number}
+           */
+          confirmSkuCnt: {
+            type: Number,
+            value: 0
+          },
+
+          /**
+           * @description 확인 상품의 낱개 수
+           ****************
+           * @type {String}
+           */
+          confirmSkuPcsQty: {
+            type: Number,
+            value: 0
+          },
+
+          /**
+           * @description 검수 방법
+           ****************
+           * @type {String}
+           */
+          inspectionMethodValue: {
+            type: String,
+            value: 'each'
+          },
+
+          /**
+           * @description 검수 결과
+           ****************
+           * @type {Object}
+           */
+          inspectionResult: {
+            type: Object,
+            observer: '_inspectionResultChanged'
+          },
+
+          /**
+           * @description 그리드 데이터를 위한 소스 데이터
+           ****************
+           * @type {Array}
+           */
+          inspection: {
+            type: Object,
+            observer: '_inspectionChanged'
+          },
+
+          /**
+           * @description 그리드 데이터
+           ****************
+           * @type {Array}
+           */
+          items: {
+            type: Array
+          },
+
+          /**
+           * @description 그리드 헤더 정의
+           ****************
+           * @type {Array}
+           */
+          header: {
+            type: Array,
+            value: function() {
+              return [{
+                display: t('label.sku_cd'),
+                fieldname: 'sku_cd',
+                style: {
+                  color: '#fff',
+                  textAlign: 'left'
+                },
+                columnWidth: '1.3fr'
+              }, {
+                display: t('label.sku_barcd'),
+                fieldname: 'sku_barcd',
+                style: {
+                  textAlign: 'center'
+                },
+                columnWidth: '1fr'
+              }, {
+                display: t('label.sku_nm'),
+                fieldname: 'sku_nm',
+                style: {
+                  color: '#ADCBEB',
+                  textAlign: 'left'
+                },
+                columnWidth: '2fr'
+              }, {
+                display: t('label.order'),
+                fieldname: 'picked_qty',
+                style: {
+                  textAlign: 'right'
+                },
+                columnWidth: '0.45fr'
+              }, {
+                display: t('label.inspection'),
+                fieldname: 'confirm_qty',
+                style: {
+                  textAlign: 'right'
+                },
+                columnWidth: '0.45fr'
+              }, {
+                display: t('label.diff_qty'),
+                fieldname: 'diff_qty',
+                style: {
+                  textAlign: 'right'
+                },
+                columnWidth: '0.3fr'
+              }, {
+                fieldname: 'order_qty',
+                columnWidth: '0px'
+              }]
+            }
+          }
+        }
+      }
+
+      /**
+       * @description life cycle - connectedCallback
+       ****************************
+       */
+      connectedCallback() {
+        super.connectedCallback();
+
+        document.addEventListener('page-changed', event => {
+          if (event.detail.currentPage === location.hash.replace('#/', '')) {
+            this.focusDefaultInput();
+          }
+        });
+
+        document.addEventListener(`alert-closed-at-${location.hash.replace('#/', '')}`, event => {
+          if (!event.detail.hasCallback) {
+            this.focusDefaultInput();
+          }
+        });
+
+        this.focusDefaultInput();
+      }
+
+      /**
+       * @description 트레이 코드 스캔 시
+       ****************************
+       * @param {Object} e
+       */
+      _onTrayCdScan(e) {
+        if (e && e.key == 'Enter' && e.currentTarget && e.currentTarget.value) {
+          let barcode = e.currentTarget.value;
+          this.readyTransaction('box', barcode, 'tray');
+        }
+      }
+
+      /**
+       * @description 주문 번호 스캔시
+       *****************
+       * @param {Object} e
+       */
+      _onOrderNoScan(e) {
+        if (e && e.key == 'Enter' && e.currentTarget && e.currentTarget.value) {
+          let orderNo = e.currentTarget.value;
+          this.readyTransaction('order', orderNo);
+        }
+      }
+
+      /**
+       * @description 박스 ID 스캔 시
+       ****************************
+       * @param {Object} e
+       */
+      _onBoxIdScan(e) {
+        if (e && e.key == 'Enter' && e.currentTarget && e.currentTarget.value) {
+          let barcode = e.currentTarget.value;
+          this.refreshInspection('box', barcode, 'box');
+        }
+      }
+
+      /**
+       * @description 송장 번호 스캔시
+       *****************
+       * @param {Object} e
+       */
+      _onInvoiceIdScan(e) {
+        if (e && e.key == 'Enter' && e.currentTarget && e.currentTarget.value) {
+          let invoiceId = e.currentTarget.value;
+          this.refreshInspection('invoice', invoiceId);
+        }
+      }
+
+      /**
+       * @description 상품 바코드 스캔시
+       *****************
+       * @param {Object} e
+       */
+      _onSkuBarcodeScan(e) {
+        if (e && e.key == 'Enter' && e.currentTarget && e.currentTarget.value) {
+          let barcode = e.currentTarget.value;
+          // 상품 코드 스캔으로 내품 검수 실행 
+          this._doItemInspectionByScan(barcode.toUpperCase());
+        }
+      }
+
+      /**
+       * @description 트랜잭션 실행 준비
+       *******************
+       * @param {String} inputType
+       * @param {String} inputId
+       * @param {String} boxType
+       */
+      readyTransaction(inputType, inputId, boxType) {
+        let manualPickingFlag = this.$['manual-picking'].checked;
+        let reprintFlag = this.$['reprint-invoice'].checked;
+
+        if (manualPickingFlag === true) {
+          this.checkManualPickingPossible(inputType, inputId, boxType);
+        } else {
+          if (reprintFlag === true) {
+            this.refreshInspection(inputType, inputId, boxType);
+          } else {
+            this.refreshInspection(inputType, inputId, boxType);
+          }
+        }
+      }
+
+      /**
+       * @description 검수 화면 데이터 조회
+       *******************
+       * @param {String} inputType
+       * @param {String} inputId
+       * @param {String} boxType
+       */
+      refreshInspection(inputType, inputId, boxType) {
+        var findAjax = this.$['find-inspection-ajax'];
+        findAjax.curl = `/device_process/dynamic/dps/inspection/find_by_${inputType}`;
+        // reprintMode는 재 인쇄 모드 체크 박스 선택시 true로 ...
+        let reprintMode = this.$['reprint-invoice'].checked;
+        inputId = inputId.toUpperCase();
+        findAjax.customParams = {
+          equipType: LOGIS_UTIL.getEquipType(),
+          equipCd: LOGIS_UTIL.getEquipCd(),
+          boxType: boxType ? boxType : null,
+          boxId: inputId,
+          orderNo: inputId,
+          invoiceId: inputId,
+          reprintMode: reprintMode
+        };
+
+        findAjax.generateRequest();
+      }
+
+      /**
+       * @description 수동 피킹 확정 처리 가능한 지 체크
+       *******************
+       * @param {String} inputType
+       * @param {String} inputId
+       * @param {String} boxType
+       */
+      checkManualPickingPossible(inputType, inputId, boxType) {
+        var manualPickingAjax = this.$['check-manual-picking-ajax'];
+        inputId = inputId.toUpperCase();
+        let params = {
+          equipType: LOGIS_UTIL.getEquipType(),
+          equipCd: LOGIS_UTIL.getEquipCd()
+        };
+
+        if (inputType == 'order') {
+          params['orderNo'] = inputId;
+
+        } else if (inputType == 'box') {
+          if (boxType && boxType == 'box') {
+            params['boxId'] = inputId;
+          } else if (boxType == 'tray') {
+            params['trayCd'] = inputId;
+          }
+        }
+
+        manualPickingAjax.customParams = params;
+        manualPickingAjax.generateRequest();
+      }
+
+      /**
+       * @description 수동 피킹 확정 처리 
+       *******************
+       * @param {String} orderNo
+       */
+      manualPickingComplete(orderNo) {
+        var completeAjax = this.$['picking-complete-ajax'];
+        completeAjax.customParams = {
+          equipType: LOGIS_UTIL.getEquipType(),
+          equipCd: LOGIS_UTIL.getEquipCd(),
+          orderNo: orderNo
+        };
+
+        completeAjax.generateRequest();
+      }
+
+      /**
+       * @description 수동 피킹 처리 가능 여부 체크
+       **********************
+       * @param {Object} event
+       */
+      _onPickingCheckSuccess(event) {
+        if (event && event.detail) {
+          if (event.detail.success && event.detail.result) {
+            let orderNo = event.detail.result;
+            this.clearView();
+            SOUND.playInfoSound();
+
+            LOGIS_UTIL.showMessage(t('button.confirm'), t('text.sure_to_order_confirm'), function() {
+              this.$['manual-picking'].checked = false;
+              this.$['reprint-invoice'].checked = false;
+              this.manualPickingComplete(orderNo);
+            }.bind(this));
+
+          } else {
+            this.clearView();
+            SOUND.playErrorSound();
+            LOGIS_UTIL.showToastErrorMessage(event.detail.message);
+          }
+        }
+      }
+
+      /**
+       * @description 수동 피킹 완료 성공 후 
+       **********************
+       * @param {Object} event
+       */
+      _onPickingCompleteSuccess(event) {
+        if (event && event.detail) {
+          if (event.detail.success && event.detail.result) {
+            let orderNo = event.detail.result;
+            this.clearView();
+            SOUND.playInfoSound();
+
+            LOGIS_UTIL.showMessage(t('button.confirm'), t('text.sure_to_inspection_continously'), function() {
+              this.$['manual-picking'].checked = false;
+              this.$['reprint-invoice'].checked = false;
+              this.refreshInspection('order', orderNo);
+            }.bind(this));
+
+          } else {
+            this.clearView();
+            SOUND.playErrorSound();
+            LOGIS_UTIL.showToastErrorMessage(event.detail.message);
+          }
+        }
+      }
+
+      /**
+       * @description 검수 조회 성공시
+       **************
+       * @param {Object} event
+       */
+      _onFindInpspectionSuccess(event) {
+        if (event && event.detail && event.detail.success == true) {
+          this.inspection = event.detail.result;
+        }
+      }
+
+      /**
+       * @description 검수 조회 에러시
+       **************
+       * @param {Object} event
+       */
+      _onFindInspectionError(event) {
+        this.clearView();
+        SOUND.playErrorSound();
+        this.focusDefaultInput();
+
+        if (event && event.detail && event.detail.msg) {
+          LOGIS_UTIL.showToastErrorMessage(event.detail.msg);
+        }
+      }
+
+      /**
+       * @description 박스 내품 검수 성공 시
+       **************
+       * @param {Object} event
+       */
+      _onItemInpspectionSuccess(event) {
+        if (event && event.detail) {
+          if (event.detail.success) {
+            // 내품 검수 서버 처리 결과로 넘어온 skuCd로 내품 검수 처리 
+            var result = event.detail.result;
+            this._doItemInspectionByScan(result.sku_cd);
+          } else {
+            LOGIS_UTIL.showToastErrorMessage(event.detail.message);
+            this.focusSkuBarcdInput();
+            SOUND.playErrorSound();
+          }
+        }
+      }
+
+      /**
+       * @description 박스 내품 검수 에러 시
+       **************
+       * @param {Object} event
+       */
+      _onItemInspectionError(event) {
+        LOGIS_UTIL.showMessage(event.detail.code, event.detail.msg, this.focusSkuBarcdInput.bind(this));
+        SOUND.playErrorSound();
+      }
+
+      /**
+       * @description 검수 완료 체크
+       ***************
+       * @param {Array} items
+       */
+      checkFinished(items) {
+        let finished = true;
+        for (let i = 0; i < items.length; i++) {
+          if (items[i].diff_qty > 0) {
+            finished = false;
+            break;
+          }
+        }
+
+        return finished;
+      }
+
+      /**
+       * @description 검사항목 정보 및 내품 내역 정보 변경 핸들러
+       *****************
+       * @param {Object} inspection
+       */
+      _inspectionChanged(inspection) {
+        if (inspection == null) return;
+
+        if (inspection.status == 'C') {
+          LOGIS_UTIL.showToastWarnMessage(t('text.this_order_has_been_canceled'));
+          this.clearView();
+          this.focusDefaultInput();
+          return;
+        }
+
+        if (!(/([BES])/.test(inspection.status))) {
+          LOGIS_UTIL.showToastWarnMessage(t('text.cannot_inspection_now'));
+          this.clearView();
+          this.focusDefaultInput();
+          return;
+        }
+
+        // 검수가 완료되었는지 여부
+        var inspectionFinished = inspection.status != 'B';
+
+        this.currentTrayCd = inspection.tray_cd;
+        this.currentOrderNo = inspection.order_no;
+        this.currentBoxId = inspection.box_id ? inspection.box_id : '';
+        this.currentInvoiceId = inspection.invoice_id ? inspection.invoice_id : '';
+
+        this.$['tray-cd'].value = this.currentTrayCd;
+        this.$['order-no'].value = this.currentOrderNo;
+        this.$['box-id'].value = this.currentBoxId;
+        this.$['invoice-id'].value = this.currentInvoiceId;
+
+        let inspItems = inspection.items ? inspection.items : [];
+        this.inspectionStatus = inspection.status;
+        let skuPcs = 0;
+
+        this.$['inspection-btn'].hidden = inspectionFinished;
+        this.$['reset-btn'].hidden = inspectionFinished;
+        this.$['reset-all-btn'].hidden = inspectionFinished;
+
+        this.items = inspItems.map((item) => {
+          inspectionFinished ? item.confirm_qty = item.picked_qty : item.confirm_qty = 0;
+          inspectionFinished ? item.diff_qty = 0 : item.diff_qty = item.picked_qty;
+          item.sku_barcd = item.sku_barcd ? item.sku_barcd : '';
+          skuPcs += item.picked_qty;
+          return item;
+        });
+
+        this.pickedSkuCnt = this.items.length;
+        this.pickedSkuPcsQty = skuPcs;
+        !inspectionFinished ? this.confirmSkuCnt = 0 : this.confirmSkuCnt = this.pickedSkuCnt;
+        !inspectionFinished ? this.confirmSkuPcsQty = 0 : this.confirmSkuPcsQty = this.pickedSkuPcsQty;
+
+        this.focusSkuBarcdInput();
+        SOUND.playInfoSound();
+      }
+
+      /**
+       * @description 검수 완료 결과 변경 핸들러
+       *****************
+       * @param {Object} inspectionResult
+       */
+      _inspectionResultChanged(inspectionResult) {
+        if (inspectionResult && inspectionResult.result) {
+          if (inspectionResult.result.status == 'C') {
+            LOGIS_UTIL.showMessage(t('button.confirm'), t('text.this_order_has_been_canceled'), this.clearView.bind(this));
+
+          } else {
+            SOUND.playInfoSound();
+            this.clearView();
+          }
+
+        } else {
+          LOGIS_UTIL.showToastInfoMessage(t('text.processing_result_is_unknown'));
+          SOUND.playErrorSound();
+        }
+      }
+
+      /**
+       * @description 검수 리스트가 configured 될 때 호출 되며
+       * diff_qty가 0이면 complete 클래스를 로우에 추가함
+       * item-list의 header 설정에 의해 결정된 color를 제거함
+       *********************
+       * @param {Object} event
+       */
+      _addCompleteClass(event) {
+        let list = event.detail.contentElements;
+
+        list.forEach(row => {
+          let data = row.getData();
+          if (data.diff_qty <= 0) {
+            row.classList.add('complete')
+            let columns = Array.from(row.querySelectorAll('span.data-item'));
+            columns.forEach(column => {
+              column.style.color = '';
+            })
+          }
+        });
+      }
+
+      /**
+       * @description 검수 완료
+       *********************
+       */
+      completeInspection() {
+        // 1. 모두 확인하였다면 검수 완료
+        if (this.pickedSkuCnt > 0 &&
+          this.confirmSkuCnt > 0 &&
+          this.pickedSkuCnt > 0 &&
+          this.confirmSkuCnt > 0 &&
+          this.pickedSkuCnt == this.confirmSkuCnt &&
+          this.pickedSkuPcsQty == this.confirmSkuPcsQty) {
+          this._doCompleteInspection();
+
+          // 2. 하나라도 검수한 다음 검수 완료 버튼을 누르면 송장 분할
+        } else if (this.confirmSkuPcsQty > 0 && this.pickedSkuPcsQty > this.confirmSkuPcsQty) {
+          LOGIS_UTIL.showMessage(t('button.confirm'), t('text.split_invoice'), this.splitBox.bind(this));
+
+          // 3. 검수 완료되지 않았다면 에러 메시지 표시
+        } else {
+          LOGIS_UTIL.showMessage(t('button.confirm'), t('text.inspection_not_finished_yet'), this.focusDefaultInput.bind(this));
+        }
+      }
+
+      /**
+       * @description 초기화
+       ********************
+       */
+      reset() {
+        if (this.items && this.items.length) {
+          this.items = this.items.map((item) => {
+            if (this.prevSkuBarcode == item.sku_cd || this.prevSkuBarcode == item.sku_barcd) {
+              if (item.diff_qty == 0) {
+                this.confirmSkuCnt = this.confirmSkuCnt - 1;
+              }
+
+              this.confirmSkuPcsQty = this.confirmSkuPcsQty - item.confirm_qty;
+              item.confirm_qty = 0;
+              item.diff_qty = item.picked_qty - item.confirm_qty;
+            }
+
+            return item;
+          });
+        }
+
+        this.$['sku-barcode'].value = '';
+        if (this.$['tray-cd'].value) {
+          this.focusSkuBarcdInput();
+        } else {
+          this.focusDefaultInput();
+        }
+      }
+
+      /**
+       * @description 재발행
+       **********************
+       */
+      reprint() {
+        // 검수가 완료되었다면 재발행을 호출할 수 있다.
+        if (this.inspectionStatus === 'S' || this.inspectionStatus == 'E') {
+          var reprintAjax = this.$['reprint-invoice-ajax'];
+          reprintAjax.curl = '/device_process/dynamic/dps/print_invoice';
+          reprintAjax.customParams = {
+            equipType: LOGIS_UTIL.getEquipType(),
+            equipCd: LOGIS_UTIL.getEquipCd(),
+            orderNo: this.currentOrderNo,
+            printerId: LOGIS_UTIL.getPrinterId()
+          };
+          reprintAjax.generateRequest();
+
+          // 유효성 에러 
+        } else {
+          LOGIS_UTIL.showMessage(t('button.confirm'), t('text.reprint_error_msg_1'), this.focusDefaultInput.bind(this));
+        }
+      }
+
+      /**
+       * @description 재발행 후 호출되는 리스너
+       *********************
+       * @param {Object} e
+       */
+      _reprintSuccess(e) {
+        if (e && e.detail) {
+          let msg = e.detail.message;
+
+          if (e.detail.success) {
+            SOUND.playInfoSound();
+
+          } else {
+            LOGIS_UTIL.showToastErrorMessage(msg);
+            SOUND.playErrorSound();
+          }
+
+          this.inspectionStatus = '';
+          this.clearView();
+        }
+      }
+
+      /**
+       * @description 검수 완료 처리
+       **********************
+       */
+      _doCompleteInspection() {
+        let inspectionItems = this._collectInspectionItems();
+
+        if (inspectionItems.length > 0) {
+          let completeAjax = this.$['inspection-complete-ajax'];
+          completeAjax.curl = '/device_process/dynamic/dps/inspection/finish';
+          completeAjax.customParams = {
+            equipType: LOGIS_UTIL.getEquipType(),
+            equipCd: LOGIS_UTIL.getEquipCd(),
+            orderNo: this.currentOrderNo,
+            trayCd: this.currentTrayCd,
+            boxId: this.currentBoxId,
+            printerId: LOGIS_UTIL.getPrinterId()
+          };
+
+          completeAjax.body = inspectionItems;
+          completeAjax.generateRequest();
+        }
+      }
+
+      /**
+       * @description 송장 분할
+       **********************
+       */
+      splitBox() {
+        let splitItems = this._collectInspectionItems();
+
+        if (splitItems.length > 0) {
+          var splitBoxAjax = this.$['split-box-ajax'];
+          splitBoxAjax.curl = '/device_process/dynamic/dps/inspection/split_box';
+          splitBoxAjax.customParams = {
+            equipType: LOGIS_UTIL.getEquipType(),
+            equipCd: LOGIS_UTIL.getEquipCd(),
+            trayCd: this.currentTrayCd,
+            orderNo: this.currentOrderNo,
+            boxId: this.currentBoxId,
+            printerId: LOGIS_UTIL.getPrinterId()
+          };
+
+          splitBoxAjax.body = splitItems;
+          splitBoxAjax.generateRequest();
+        }
+      }
+
+      /**
+       * @description 검수 항목을 모두 모아서 검수 항목 리스트를 구성
+       **********************
+       */
+      _collectInspectionItems() {
+        // 1. 검수 항목 정보 전달을 위한 분할 항목 리스트 
+        let inspectionItems = [];
+
+        // 2. 수동 바코드 스캔 정보 추출
+        if (this.items && this.items.length > 0) {
+          this.items.forEach(function(item) {
+            if (item.confirm_qty && item.confirm_qty > 0) {
+              inspectionItems.push(JSON.parse(JSON.stringify(item)));
+            }
+          });
+        }
+
+        // 3. 검수 항목을 리턴
+        return inspectionItems;
+      }
+
+      /**
+       * @description 송장 분할 완료 후
+       **********************
+       * @param {Object} event
+       */
+      _splitBoxSuccess(event) {
+        if (event && event.detail) {
+          let trayCd = this.currentTrayCd;
+          this.clearView();
+          SOUND.playInfoSound();
+
+          LOGIS_UTIL.showMessage(t('button.confirm'), t('text.split_invoice_complete'), function() {
+            this.refreshInspection('box', trayCd, 'tray');
+          }.bind(this));
+        }
+      }
+
+      /**
+       * @description 화면 정보 클리어
+       **********************
+       */
+      clearView() {
+        this.set('items', []);
+
+        this.$['sku-barcode'].value = '';
+        this.$['order-no'].value = '';
+        this.$['invoice-id'].value = '';
+        this.$['box-id'].value = '';
+        this.$['tray-cd'].value = '';
+
+        this.confirmSkuCnt = 0;
+        this.confirmSkuPcsQty = 0;
+        this.pickedSkuCnt = 0;
+        this.pickedSkuPcsQty = 0;
+
+        this.currentTrayCd = '';
+        this.currentBoxId = '';
+        this.currentInvoiceId = '';
+        this.currentOrderNo = '';
+        this.prevSkuBarcode = '';
+
+        this.focusDefaultInput();
+      }
+
+      /**
+       * @description 내품 항목 검수 전 유효성 체크
+       ***************************
+       * @param {String} skuBarcode
+       */
+      _validateForInspectionItem(skuBarcode) {
+        // 1. 검수 대상 리스트가 존재 하지 않는다면 alert
+        if (!this.items || this.items.length == 0) {
+          LOGIS_UTIL.showMessageWithSound('error', t('error.VALIDATION_ERROR'), t('text.target_not_exist'), this.focusDefaultInput.bind(this));
+          this.$['sku-barcode'].value = '';
+          return false;
+        }
+
+        // 2. 검수 대상 리스트 중 입력한 상품 코드와 일치하는 상품이 있는지 체크 
+        let found = this.items.find((item) => {
+          return (item.sku_cd === skuBarcode || item.sku_barcd === skuBarcode || item.sku_barcd2 === skuBarcode);
+        });
+
+        // 3. 검수 대상 리스트 중 입력한 상품 코드와 일치하는 것이 없다면 에러 
+        if (!found || found.length == 0) {
+          LOGIS_UTIL.showMessage(t('error.invalid_sku_cd'), t('text.scanned_sku_code_not_exist'), this.focusSkuBarcdInput.bind(this));
+          this.$['sku-barcode'].value = '';
+          return false;
+        }
+
+        // 4. 찾은 박스 내품 리턴
+        return found;
+      }
+
+      /**
+       * @description 상품 바코드 스캔으로 상품 내품 검수 
+       *****************
+       * @param {String} skuBarcode
+       */
+      _doItemInspectionByScan(skuBarcode) {
+        // 1. 박스 내품 내역 중에 스캔한 상품 바코드에 해당하는 항목을 추출
+        let item = this._validateForInspectionItem(skuBarcode);
+        if (item === false) {
+          return false;
+        }
+
+        // 2. 상품별 검수 수량을 모두 처리 했는지 체크 
+        if (item.diff_qty == 0) {
+          LOGIS_UTIL.showMessage(t('error.out_of_valid_qty'), t('text.confirm_qty_out_of_item_qty'), this.focusSkuBarcdInput.bind(this));
+          return false;
+        }
+
+        // 3. 검수 수량 처리 
+        item.confirm_qty = ++item.confirm_qty;
+        item.diff_qty = item.picked_qty - item.confirm_qty;
+        this.confirmSkuPcsQty = this.confirmSkuPcsQty + 1;
+        let isItemFinished = item.diff_qty == 0;
+
+        // 4. 상품 하나에 대한 검수가 완료되었다면 상품 검수 수량을 올리고 해당 항목은 아래로 이동
+        if (isItemFinished) {
+          this.confirmSkuCnt = this.confirmSkuCnt + 1;
+          this.items.splice(this.items.indexOf(item), 1);
+          this.items.push(item);
+        }
+
+        // 5. 기존 박스 내품 내역 복사 
+        let newItems = JSON.parse(JSON.stringify(this.items));
+
+        // 6. 박스 내품 리스트를 복사한 리스트로 변경 
+        this.items = newItems;
+
+        // 7. 이전 스캔 상품 바코드를 갱신
+        this.prevSkuBarcode = skuBarcode;
+
+        // 8. 상품 바코드 입력 박스 리셋 
+        this.$['sku-barcode'].value = '';
+
+        // 9. 모든 검수가 완료 되었는지 확인하고 완료 되었다면 자동으로 검수 완료 처리
+        if (this.checkFinished(this.items)) {
+          this.completeInspection();
+        } else {
+          SOUND.playInfoSound();
+        }
+
+        // 10. 정상 처리 결과 리턴
+        return true;
+      }
+
+      /**
+       * @description 라디오 버튼 클릭시
+       ****************
+       * @param {Object} e
+       */
+      _handleInspectionMethodClick(e) {
+        this.inspectionMethodValue = e.currentTarget.value;
+      }
+
+      /**
+       * @description box-id input field select
+       **********************
+       */
+      focusDefaultInput() {
+        this.$['tray-cd'].select();
+      }
+
+      /**
+       * @description order-no input field select
+       **********************
+       */
+      focusOrderInput() {
+        this.$['order-no'].select();
+      }
+
+      /**
+       * @description sku-barcode input field select
+       **********************
+       */
+      focusSkuBarcdInput() {
+        this.$['sku-barcode'].select();
+      }
+    }
+
+    customElements.define(B2CInspection.is, B2CInspection);
+  </script>
+
+</dom-module>

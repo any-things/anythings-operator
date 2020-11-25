@@ -198,7 +198,7 @@ window.locales['ko-KR'] = {
   'menu.MiddleAssort': '중분류',
   'menu.MiddleAssortWeight': '중량중분류',
   'menu.MiddleAssortRtn': '반품중분류',
-  'menu.B2CQtyInspection': 'DPS 수량검수',
+  'menu.B2CQtyInspection': 'B2C 검수',
   'menu.QpsStoreOutInspection': 'DPS 출고검수',
   'menu.B2BQtyInspection': 'B2B 수량검수',
   'menu.B2BWeightInspection': 'B2B 중량검수',
@@ -399,6 +399,9 @@ window.locales['ko-KR'] = {
   'text.this_order_has_been_canceled': '본 주문은 취소되었습니다',
   'text.please_scan_sku': '상품을 스캔하세요.',
   'text.sure_to_indicators_off_all': '표시기 전체 소등 하시겠습니까?',
+  'text.sure_to_order_confirm': '주문 확정이 가능합니다. 주문 확정하시겠습니까?',
+  'text.sure_to_inspection_continously': '수동피킹 완료했습니다. 이어서 검수하시겠습니까?',
+  'text.processing_result_is_unknown': '처리 결과를 알 수 없습니다.',
 
   // title list
   'title.confirm_inspect': '검수 확인',

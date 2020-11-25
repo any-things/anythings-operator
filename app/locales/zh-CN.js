@@ -396,6 +396,10 @@ window.locales['zh-CN'] = {
   'text.printer_is_not_set': '프린터가 설정되지 않았습니다. 설정화면에서 설정하세요.',
   'text.this_order_has_been_canceled': '본 주문은 취소되었습니다',
   'text.please_scan_sku': '상품을 스캔하세요',
+  'text.sure_to_indicators_off_all': '표시기 전체 소등 하시겠습니까?',
+  'text.sure_to_order_confirm': '주문 확정이 가능합니다. 주문 확정하시겠습니까?',
+  'text.sure_to_inspection_continously': '수동피킹 완료했습니다. 이어서 검수하시겠습니까?',
+  'text.processing_result_is_unknown': '처리 결과를 알 수 없습니다.',
 
   // title list
   'title.confirm_inspect': '检验结束',
