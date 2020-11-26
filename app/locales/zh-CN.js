@@ -170,6 +170,9 @@ window.locales['zh-CN'] = {
   'label.date': 'Date',
   'label.receiver': '수령인',
   'label.label_cd': 'Label',
+  'label.input_at': '박스 투입',
+  'label.pick_started_at': '피킹 시작',
+  'label.pick_ended_at': '피킹 완료',
 
   // menu list
   'menu.Settings': '设置',

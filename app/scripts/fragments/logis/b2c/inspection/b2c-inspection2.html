@@ -5,103 +5,103 @@ Copyright © HatioLab Inc. All rights reserved.
 
 <link rel="import" href="../../../../../bower_components/polymer/polymer-element.html">
 
-<link rel="import" href="../../../../components/logis/inspection-enter-qty-popup.html">
-
 <!--
   물류 > B2C > 검수 화면 (KIOSK)
-  트레이 박스를 사용하고 분리포를 검수 시점에 하는 경우
+  분리포가 선 수행된 이후 종이 혹은 냉동 박스를 사용하는 경우
 -->
-<dom-module id="b2c-inspection">
+<dom-module id="b2c-inspection2">
   <template>
     <style>
       .container {
+        display: grid;
+        grid-template-columns: 25% 75%;
         height: calc(100% - 10px);
-        padding: 10px 15px 0px 15px;
-        display: flex;
-        flex-direction: column;
+        padding: 10px 10px 0px 10px;
       }
       .input-section {
-        display:grid;
-        grid-template: 1.5fr / 1.5fr 1.5fr 1fr 1fr;
+        display: flex;
+        flex-direction: column;
         background-color: var(--things-white-opacity-background-color);
         border-radius:var(--things-default-border-radius);
         overflow: visible;
+        margin-right: 10px;
         margin-bottom: 10px;
-        padding: 7px;
+        padding: 7px 7px 7px 0px;
       }
-      #bottom-container {
-        flex: 1;
+      #main-container {
+        display: grid;
+        grid-template-rows: auto 1fr auto;
         border-radius:var(--things-default-border-radius);
-        margin-bottom: 10px;
       }
       .input-section div {
         text-align:center;
         color:#fff;
       }
       .input-section .sku-info span {
-        display:block;
+        display: block;
       }
       .input-section .sku-info {
         border-left:1px solid rgba(0,0,0,.3);
       }
       .input1 span {
-        display:inline-block;
-        width:30%;
-        text-align:right;
-        font-size:.6rem
+        display: inline-block;
+        width: 30%;
+        text-align: right;
+        font-size: .6rem
       }
       .input1 input {
-        display:inline-block;
-        width:62%;height:40px;
-        margin-bottom:5px
+        display: inline-block;
+        width: 62%;
+        height: 40px;
+        margin-bottom: 5px
       }
       .check-section {
-        display:grid;
+        display: grid;
         grid-template: 1fr 1fr 1fr 1fr;
         padding: 5px 0px 0px 32px;
         display: flex;
         flex-direction: row;
       }
       span.bigtitle {
-        margin:20px 0 15px 0;
-        font-size:0.9rem;
+        margin: 20px 0 15px 0;
+        font-size: 0.9rem;
       }
       span.smalltitle {
         margin:15px 0 15px 0;
-        font-size:.7rem;
+        font-size: .7rem;
       }
       span.bigtitle,span.smalltitle {
         display:inline-block !important;
-        border-bottom:3px solid var(--things-secondary-color);
+        border-bottom: 3px solid var(--things-secondary-color);
       }
       span.proc {
-        font-size:1.2rem;
-        color:rgba(255,255,255,.7);
+        font-size: 1.2rem;
+        color: rgba(255,255,255,.7);
       }
       span.proc b {
-        display:inline-block;
-        text-align:right;
-        color:#fff;
+        display: inline-block;
+        text-align: right;
+        color: #fff;
       }
       span.proc-reject {
-        font-size:1.2rem;
-        color:rgba(255,255,255,.7);
+        font-size: 1.2rem;
+        color: rgba(255,255,255,.7);
       }
       span.proc-reject b {
-        display:inline-block;
-        text-align:right;
-        color:#f00;
+        display: inline-block;
+        text-align: right;
+        color: #f00;
       }
       .right-section {
-        display:grid;
+        display: grid;
         grid-template-rows: auto min-content;
       }
       .right-section .radio-section {
-        grid-row-start:1;
+        grid-row-start: 1;
       }
       .radio-section label {
         font-size:.8rem;
-        color:rgba(255,255,255,.8);
+        color: rgba(255,255,255,.8);
       }
       .radio-section input {
         position: relative;
@@ -116,10 +116,11 @@ Copyright © HatioLab Inc. All rights reserved.
       .btn-section {
         display: flex;
         flex-direction: row;
+        flex: 1;
       }
       button {
         @apply --operator-default-btn;
-        margin-right: 10px;
+        margin-left: 10px;
         margin-bottom: 10px;
         flex: 1;
       }
@@ -127,7 +128,7 @@ Copyright © HatioLab Inc. All rights reserved.
         @apply --operator-default-btn-active;
       }
       button:focus {
-        outline:none
+        outline: none
       }
       input {
         background-color: rgba(0, 0, 0, .25);
@@ -136,11 +137,50 @@ Copyright © HatioLab Inc. All rights reserved.
         font-size: .8rem;
         text-align: center;
       }
+      .bar-chart {
+        display: flex;
+        flex-direction: row;
+        margin: auto 5px !important;
+      }
+
+      .bar-chart .label {
+        width: 10vw;
+        font-size: .7rem;
+        color: white;
+        margin: auto 10px auto auto;
+      }
+
+      .bar-chart .bar {
+        display: inline-block;
+        flex: 1;
+        background-color: rgba(0, 0, 0, .2);
+        border-radius: var(--things-default-border-radius);
+      }
+
+      .bar-chart .chart-value {
+        display: inline-block;
+        border-radius: var(--things-default-border-radius);
+        margin: 0px 5px 0px 5px;
+        text-align: right;
+        padding: 0px 5px 0px 5px;
+        font-size: 23px;
+        font-weight: bold;
+        white-space: nowrap;
+      }
+
+      .bar-chart #progress-bar {
+        background-color: #3f89c9;
+        display: block;
+        margin-left: 0px;
+        padding: 5px;
+      }
+
       auto-popup-input {
         display: none
       }
       item-list {
-        height: 100%;
+        margin-top: 10px;
+        height: calc(100% - 20px);
       }
     </style>
 
@@ -215,49 +255,74 @@ Copyright © HatioLab Inc. All rights reserved.
     <div class="container">
       <div class="input-section" id="input-section">
         <div class="input1">
-          <!-- 트레이 박스, 상품 코드 입력 박스 -->
-          <span class="label">[[trayCdLabel]]</span>
-          <input id="tray-cd" on-keypress="_onTrayCdScan">
-          <span class="label">[[skuBarcdLabel]]</span>
-          <input id="sku-barcode" on-keypress="_onSkuBarcodeScan">
-          <span class="label">[[reprintLabel]]</span>
-          
-          <input type="checkbox" id="reprint-invoice" on-click="focusDefaultInput">
+          <!-- 박스 ID 입력 박스 -->
+          <span class="label">[[boxIdLabel]]</span>
+          <input id="box-id" on-keypress="_onTrayCdScan" value="[[currentBoxId]]">
+          <!-- 상품 코드 입력 박스 -->
+          <span class="label">[[skuCdLabel]]</span>
+          <input id="sku-barcode" on-keypress="_onSkuCodeScan" value="[[currentSkuCd]]">
+          <!-- 배치 ID 입력 박스 -->
+          <span class="label">[[batchIdLabel]]</span>
+          <input id="batch-id" readonly value="[[currentBatchId]]">
+          <!-- 주문 번호 입력 박스 -->
+          <span class="label">[[orderNoLabel]]</span>
+          <input id="order-no" on-keypress="_onOrderNoScan" value="[[currentOrderNo]]">
+          <!-- 송장 번호 입력 박스 -->
+          <span class="label">[[invoiceIdLabel]]</span>
+          <input id="invoice-id" on-keypress="_onInvoiceIdScan" value="[[currentInvoiceId]]">
+          <!-- 박스 유형 입력 박스 -->
+          <span class="label">[[boxTypeLabel]]</span>
+          <input id="box-type-cd" readonly value="[[currentBoxTypeCd]]">          
+          <!-- 박스 상태 입력 박스 -->
+          <span class="label">[[boxStatusLabel]]</span>
+          <input id="box-status" readonly value="[[currentBoxStatus]]">
+          <!-- 박스 투입 시간 -->
+          <span class="label">[[inputAtLabel]]</span>
+          <input id="input-at" readonly value="[[currentBoxInputAt]]">
+          <!-- 피킹 시작 시간 -->
+          <span class="label">[[pickStartedAtLabel]]</span>
+          <input id="pick-started-at" readonly value="[[currentPickStartedAt]]">
+          <!-- 주문 완료 시간 -->
+          <span class="label">[[boxedAtLabel]]</span>
+          <input id="boxed-at" readonly value="[[currentPickEndedAt]]">
+
           <div hidden><input type="checkbox" id="manual-picking" on-click="focusDefaultInput"></div>
 
-          <!--div class="check-section" hidden>
+          <!-- 상품 건수 -->
+          <!--div class="sku-info">
+            <span class="smalltitle">[[skuCntLabel]]</span>
+            <span class="proc"><b>[[confirmSkuCnt]]</b> / [[pickedSkuCnt]]</span>
+          </div-->
+
+          <!-- 상품 수량 -->
+          <!--div class="sku-info">
+            <span class="smalltitle">[[skuQtyLabel]]</span>
+            <span class="proc"><b>[[confirmSkuPcsQty]]</b> / [[pickedSkuPcsQty]]</span>
+          </div-->
+
+          <!--span class="label">[[reprintLabel]]</span>
+          <input type="checkbox" id="reprint-invoice" on-click="focusDefaultInput">
+          <span class="label">[[boxIdLabel]]</span>
+          <input id="box-id" on-keypress="_onBoxIdScan">          
+          <div class="check-section" hidden>
             <span class="label" hidden>[[manualPickingLabel]]</span>
             <input type="checkbox" id="manual-picking" on-click="focusDefaultInput" hidden>
-
             <span class="label">[[reprintLabel]]</span>
             <input type="checkbox" id="reprint-invoice" on-click="focusDefaultInput">
           </div-->
         </div>
-
-        <div class="input1">
-          <!-- 주문 번호, 박스 ID, 송장 번호 입력 박스 -->
-          <span class="label">[[orderNoLabel]]</span>
-          <input id="order-no" on-keypress="_onOrderNoScan">
-          <span class="label">[[boxIdLabel]]</span>
-          <input id="box-id" on-keypress="_onBoxIdScan">
-          <span class="label">[[invoiceIdLabel]]</span>
-          <input id="invoice-id" on-keypress="_onInvoiceIdScan">
-        </div>
-
-        <!-- 상품 건수 -->
-        <div class="sku-info">
-          <span class="smalltitle">[[skuCntLabel]]</span>
-          <span class="proc"><b>[[confirmSkuCnt]]</b> / [[pickedSkuCnt]]</span>
-        </div>
-
-        <!-- 상품 수량 -->
-        <div class="sku-info">
-          <span class="smalltitle">[[skuQtyLabel]]</span>
-          <span class="proc"><b>[[confirmSkuPcsQty]]</b> / [[pickedSkuPcsQty]]</span>
-        </div>
       </div>
 
-      <div id="bottom-container">
+      <div id="main-container">
+        <!-- 진척율 차트 -->
+        <div class="bar-chart">
+          <span class="label">[[progressRateLabel]]</span>
+          <div class="bar">
+            <span id="progress-bar" class="chart-value"
+              style="width:calc([[pickedPercent]]% - 10px)">([[confirmSkuPcsQty]]/[[pickedSkuPcsQty]]) [[pickedPercent]]%</span>
+          </div>
+        </div>
+
         <!-- 주문 내품 내역 리스트 -->
         <item-list 
           header="[[header]]" 
@@ -266,7 +331,7 @@ Copyright © HatioLab Inc. All rights reserved.
         </item-list>
 
         <!-- 검수 방법 -->
-        <div class="right-section" hidden>
+        <!--div class="right-section" hidden>
           <div class="radio-section" hidden>
             <input type="radio" on-click="_handleInspectionMethodClick" name="chk_info" value="each" checked="checked" id="each">
             <label for="each">[[indivisualLabel]]</label><br/>
@@ -277,35 +342,45 @@ Copyright © HatioLab Inc. All rights reserved.
             <input type="radio" on-click="_handleInspectionMethodClick" name="chk_info" value="addSku" id="addSku">
             <label for="addSku">[[addSkuLabel]]</label>
           </div>
-        </div>
-      </div>
+        </div-->
 
-      <!-- 검수 관련 버튼 -->
-      <div class="btn-section">
-        <button id="inspection-btn" on-click="completeInspection">[[completeLabel]]</button>
-        <button id="reset-btn" on-click="reset">[[resetLabel]]</button>
-        <button id="reset-all-btn" on-click="clearView">[[resetAllLabel]]</button>
-        <button id="reprint-btn" on-click="reprint">[[reprintLabel]]</button>
+        <!-- 검수 관련 버튼 -->
+        <div class="btn-section">
+          <button id="inspection-btn" on-click="completeInspection">[[completeLabel]]</button>
+          <button id="reset-btn" on-click="reset">[[resetLabel]]</button>
+          <button id="reset-all-btn" on-click="clearView">[[resetAllLabel]]</button>
+          <button id="reprint-btn" on-click="reprint">[[reprintLabel]]</button>
+        </div>
       </div>
     </div>
   </template>
 
   <script>
-    class B2CInspection extends Polymer.Element {
+    class B2CInspection2 extends Polymer.Element {
       static get is() {
-        return 'b2c-inspection'
+        return 'b2c-inspection2'
       }
 
       static get properties() {
         return {
           /**
-           * @description 트레이 코드 라벨
+           * @description 작업 진행율 라벨
            ****************
            * @type {String}
            */
-          trayCdLabel: {
+          progressRateLabel: {
             type: String,
-            value: t('label.tray_cd')
+            value: t('label.progress_rate')
+          },
+
+          /**
+           * @description 배치 ID 라벨
+           ****************
+           * @type {String}
+           */
+          batchIdLabel: {
+            type: String,
+            value: t('label.job_batch')
           },
 
           /**
@@ -339,13 +414,63 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * @description 상품 바코드 라벨
+           * @description 상품 코드 라벨
            ****************
            * @type {String}
            */
-          skuBarcdLabel: {
+          skuCdLabel: {
             type: String,
-            value: t('label.sku_barcd')
+            value: t('label.sku_cd')
+          },
+
+          /**
+           * @description 박스 상태 라벨
+           ****************
+           * @type {String}
+           */
+          boxStatusLabel: {
+            type: String,
+            value: t('label.status')
+          },
+
+          /**
+           * @description 박스 유형 라벨
+           ****************
+           * @type {String}
+           */
+          boxTypeLabel: {
+            type: String,
+            value: t('label.box_type')
+          },
+
+          /**
+           * @description 박스 투입 시간 라벨
+           ****************
+           * @type {String}
+           */
+          inputAtLabel: {
+            type: String,
+            value: t('label.input_at')
+          },
+
+          /**
+           * @description 피킹 시작 시간 라벨
+           ****************
+           * @type {String}
+           */
+          pickStartedAtLabel: {
+            type: String,
+            value: t('label.pick_started_at')
+          },
+
+          /**
+           * @description 피킹 완료 시간 라벨
+           ****************
+           * @type {String}
+           */
+          boxedAtLabel: {
+            type: String,
+            value: t('label.pick_ended_at')
           },
 
           /**
@@ -548,6 +673,16 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
+           * @description 작업 진행율
+           ****************
+           * @type {String}
+           */
+          pickedPercent: {
+            type: Number,
+            value: 75
+          },
+
+          /**
            * @description 검수 방법
            ****************
            * @type {String}
@@ -603,13 +738,6 @@ Copyright © HatioLab Inc. All rights reserved.
                 },
                 columnWidth: '1.3fr'
               }, {
-                display: t('label.sku_barcd'),
-                fieldname: 'sku_barcd',
-                style: {
-                  textAlign: 'center'
-                },
-                columnWidth: '1fr'
-              }, {
                 display: t('label.sku_nm'),
                 fieldname: 'sku_nm',
                 style: {
@@ -619,6 +747,13 @@ Copyright © HatioLab Inc. All rights reserved.
                 columnWidth: '2fr'
               }, {
                 display: t('label.order'),
+                fieldname: 'pick_qty',
+                style: {
+                  textAlign: 'right'
+                },
+                columnWidth: '0.45fr'
+              }, {
+                display: t('label.result'),
                 fieldname: 'picked_qty',
                 style: {
                   textAlign: 'right'
@@ -639,7 +774,7 @@ Copyright © HatioLab Inc. All rights reserved.
                 },
                 columnWidth: '0.3fr'
               }, {
-                fieldname: 'order_qty',
+                fieldname: 'sku_barcd',
                 columnWidth: '0px'
               }]
             }
@@ -718,11 +853,11 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * @description 상품 바코드 스캔시
+       * @description 상품 코드 스캔시
        *****************
        * @param {Object} e
        */
-      _onSkuBarcodeScan(e) {
+      _onSkuCodeScan(e) {
         if (e && e.key == 'Enter' && e.currentTarget && e.currentTarget.value) {
           let barcode = e.currentTarget.value;
           // 상품 코드 스캔으로 내품 검수 실행 
@@ -1379,7 +1514,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
     }
 
-    customElements.define(B2CInspection.is, B2CInspection);
+    customElements.define(B2CInspection2.is, B2CInspection2);
   </script>
 
 </dom-module>

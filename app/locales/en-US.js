@@ -169,6 +169,10 @@ window.locales['en-US'] = {
   'label.date': 'Date',
   'label.receiver': 'Receiver',
   'label.label_cd': 'Label',
+  'label.input_at': 'Box Input At',
+  'label.pick_started_at': 'Picking Started At',
+  'label.pick_ended_at': 'Picking Ended At',
+  'label.result': 'Result',
 
   // menu list
   'menu.Settings': 'Setting',

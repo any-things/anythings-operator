@@ -110,7 +110,7 @@ window.locales['ko-KR'] = {
   'label.current_qty': '현재 수량',
   'label.total_proc_rate': '전체 진행율',
   'label.rack_proc_rate': '랙 별 진행율',
-  'label.progress_rate': '진행율',
+  'label.progress_rate': '작업 진행율',
   'label.please_wait': '잠시만 기다려주세요...',
   'label.fixed': '고정',
   'label.nonfixed': '비고정',
@@ -171,6 +171,10 @@ window.locales['ko-KR'] = {
   'label.date': '날짜',
   'label.receiver': '수령인',
   'label.label_cd': '라벨',
+  'label.input_at': '박스 투입',
+  'label.pick_started_at': '피킹 시작',
+  'label.pick_ended_at': '피킹 완료',
+  'label.result': '실적',
 
   // menu list
   'menu.Settings': '설정',
