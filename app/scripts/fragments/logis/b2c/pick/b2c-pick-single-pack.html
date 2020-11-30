@@ -183,7 +183,12 @@ Copyright © HatioLab Inc. All rights reserved.
       </div>
 
       <!-- 좌측 하단 그리드 컨테이너 -->
-      <item-list id="item-list" header="[[header]]" data="[[items]]" on-configured="_changeGridRowStyle">
+      <item-list 
+        id="item-list" 
+        header="[[header]]" 
+        data="[[items]]"
+        on-data-list-click="selectJobGroupItem"
+        on-configured="_changeGridRowStyle">
       </item-list>
     </div>
 
@@ -545,12 +550,25 @@ Copyright © HatioLab Inc. All rights reserved.
 
         list.forEach(row => {
           let data = row.getData();
-          if (data.selected_job == 1) {
-            row.classList.add('selected');
-          } else {
-            row.classList.remove('selected');
+          if (data.tot_order_cnt == data.comp_order_cnt) {
+            row.classList.add('complete');
           }
         })
+      }
+
+      /**
+       * @description 단포 작업 대상 선택
+       ******************
+       * @param {Object} event
+       */
+      selectJobGroupItem(event) {
+        if (this.currentJobInstance) {
+          this.currentJobInstance.classList.remove('selected');
+        }
+
+        // 1. 선택시 선택 스타일 적용
+        this.currentJobInstance = event.detail.row;
+        this.currentJobInstance.classList.add('selected');
       }
 
       /**
@@ -590,14 +608,24 @@ Copyright © HatioLab Inc. All rights reserved.
               return;
             }
 
-            // 박스 ID가 있으면 피킹 
-            this._getInputBoxAjax().curl = `/device_process/dynamic/dps/single_pack/pick?jobId=${this.currentJobInstance.id}`;
-            this._getInputBoxAjax().generateRequest();
+            // 박스 ID가 있으면 피킹
+            var inputBoxAjax = this._getInputBoxAjax();
+            inputBoxAjax.curl = '/device_process/dynamic/dps/single_pack/pick';
+            inputBoxAjax.customParams = {
+              jobId: this.currentJobInstance.id
+            };
+            inputBoxAjax.generateRequest();
 
           } else {
             // 대상 상품 변경 
-            this._getSinglePackSummaryAjax().curl = `/device_process/dynamic/dps/single_pack/sku_change?equipType=${LOGIS_UTIL.getEquipType()}&equipCd=${this.rackCd}&skuCd=${skuCode}`;
-            this._getSinglePackSummaryAjax().generateRequest();
+            var summaryAjax = this._getSinglePackSummaryAjax();
+            summaryAjax.curl = '/device_process/dynamic/dps/single_pack/sku_change';
+            summaryAjax.customParams = {
+              equipType: LOGIS_UTIL.getEquipType(),
+              equipCd: this.rackCd,
+              skuCd: skuCode
+            };
+            summaryAjax.generateRequest();
           }
         }
       }
@@ -623,8 +651,15 @@ Copyright © HatioLab Inc. All rights reserved.
           self._getSkuNmInput().value = '';
           self.skuCode = skuInform.sku_cd;
           self.skuBarcd = skuInform.sku_barcd;
-          self._getSinglePackSummaryAjax().curl = `/device_process/dynamic/dps/single_pack/sku_change?equipType=${LOGIS_UTIL.getEquipType()}&equipCd=${self.rackCd}&skuCd=${skuInform.sku_cd}`;
-          self._getSinglePackSummaryAjax().generateRequest();
+
+          var summaryAjax = self._getSinglePackSummaryAjax();
+          summaryAjax.curl = '/device_process/dynamic/dps/single_pack/sku_change';
+          summaryAjax.customParams = {
+            equipType: LOGIS_UTIL.getEquipType(),
+            equipCd: self.rackCd,
+            skuCd: skuInform.sku_cd
+          };
+          summaryAjax.generateRequest();
         });
 
         this.blur();
@@ -674,9 +709,16 @@ Copyright © HatioLab Inc. All rights reserved.
           var skuCode = this.selectedSkuInfo.sku_cd;
 
           // 박스 아이디 정규식에 맞으면 박스 투입
-          if (LOGIS_UTIL.isBoxIdValid(boxId)) {
-            this._getInputBoxAjax().curl = `/device_process/dynamic/dps/single_pack/box_input?equipType=${LOGIS_UTIL.getEquipType()}&equipCd=${LOGIS_UTIL.getEquipCd()}&skuCd=${skuCode}&bucketCd=${boxId}`;
-            this._getInputBoxAjax().generateRequest();
+          if (LOGIS_UTIL.isBoxIdValidate(boxId)) {
+            var boxInputAjax = this._getInputBoxAjax();
+            boxInputAjax.curl = '/device_process/dynamic/dps/single_pack/box_input';
+            boxInputAjax.customParams = {
+              equipType: LOGIS_UTIL.getEquipType(),
+              equipCd: LOGIS_UTIL.getEquipCd(),
+              skuCd: skuCode,
+              boxId: boxId
+            };
+            boxInputAjax.generateRequest();
 
             // BoxID 정규식에 맞지 않으면 상품 코드로 인식하여 상품 검색 
           } else {
@@ -764,7 +806,7 @@ Copyright © HatioLab Inc. All rights reserved.
       printInvoiceLabel() {
         var boxId = this._getBoxIdInput().value;
 
-        if (boxId && LOGIS_UTIL.isBoxIdValid(boxId)) {
+        if (boxId && LOGIS_UTIL.isBoxIdValidate(boxId)) {
           var printerId = LOGIS_UTIL.getPrinterId();
 
           if (printerId && printerId.length > 2) {
