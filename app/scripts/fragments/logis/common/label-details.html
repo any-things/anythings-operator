@@ -40,7 +40,7 @@ Copyright © HatioLab Inc. All rights reserved.
     <!-- 송장 라벨 재발행 -->
     <sys-ajax
       id="invoke-print-ajax"
-      method="POST"
+      method="PUT"
       content-type="application/json"
       on-sys-ajax-response="_closeDialog">
     </sys-ajax>
@@ -48,16 +48,16 @@ Copyright © HatioLab Inc. All rights reserved.
     <div id="container">
       <div class="input-container">
         <label class="label">
-          [[custNameLabel]]
+          [[shopNameLabel]]
         </label>
-        <input id="cust-nm-input" readonly>
+        <input id="shop-nm-input" readonly>
       </div>
 
       <div class="input-container">
         <label class="label">
-          [[locationLabel]]
+          [[cellLabel]]
         </label>
-        <input id="loc-cd-input" readonly>
+        <input id="cell-cd-input" readonly>
       </div>
 
       <div class="input-container">
@@ -82,27 +82,27 @@ Copyright © HatioLab Inc. All rights reserved.
       static get properties() {
         return {
           /**
-           * @description 거래처 명 label
+           * @description 거래처 명 라벨
            ****************
            * @type {String}
            */
-          custNameLabel: {
+          shopNameLabel: {
             type: String,
             value: () => t('label.cust_cd')
           },
 
           /**
-           * @description 로케이션  label
+           * @description 셀 번호 라벨 
            ****************
            * @type {String}
            */
-          locationLabel: {
+          cellLabel: {
             type: String,
-            value: () => t('label.loc_cd')
+            value: () => t('label.cell')
           },
 
           /**
-           * @description 송장 번호 label
+           * @description 송장 번호 라벨
            ****************
            * @type {String}
            */
@@ -112,7 +112,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * @description 닫기 버튼 label
+           * @description 닫기 버튼 라벨
            ****************
            * @type {String}
            */
@@ -122,7 +122,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 재발행 버튼 label
+           * 재발행 버튼 라벨
            ****************
            * @type {String}
            */
@@ -132,13 +132,13 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * @description 거래처 명 label
+           * @description 거래처 명
            ****************
            * @type {String}
            */
-          custName: {
+          shopName: {
             type: String,
-            observer: '_custNameChanged'
+            observer: '_shopNameChanged'
           },
 
           /**
@@ -146,7 +146,7 @@ Copyright © HatioLab Inc. All rights reserved.
            ****************
            * @type {String}
            */
-          boxResultId: {
+          boxPackId: {
             type: String
           },
 
@@ -165,22 +165,22 @@ Copyright © HatioLab Inc. All rights reserved.
            ****************
            * @type {String}
            */
-          locCd: {
+          cellCd: {
             type: String,
-            observer: '_locCdChanged'
+            observer: '_cellCdChanged'
           }
         }
       }
 
       /**
-       * @description custNameChanged event handler
-       * custName이 변경되면 cust-nm-input의 값을 변경함
+       * @description shopNameChanged event handler
+       * shopName이 변경되면 shop-nm-input의 값을 변경함
        ****************************
-       * @param {String} custName
+       * @param {String} shopName
        */
-      _custNameChanged(custName) {
-        const custNameInput = this._getCustNameInput();
-        custNameInput.value = custName;
+      _shopNameChanged(shopName) {
+        const shopNameInput = this._getShopNameInput();
+        shopNameInput.value = shopName;
       }
 
       /**
@@ -195,14 +195,14 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * @description locCdChanged event handler
-       * locCd가 변경되면 loc-cd-input의 값을 변경함
+       * @description cellCdChanged event handler
+       * cellCd가 변경되면 cell-cd-input의 값을 변경함
        ****************************
-       * @param {String} locCd
+       * @param {String} cellCd
        */
-      _locCdChanged(locCd) {
-        const locInpupt = this._getLocCdInput();
-        locInpupt.value = locCd;
+      _cellCdChanged(cellCd) {
+        const cellInpupt = this._getCellCdInput();
+        cellInpupt.value = cellCd;
       }
 
       /**
@@ -212,7 +212,8 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _invokePrint() {
         const invokePrintAjax = this._getInvokePrintAjax();
-        invokePrintAjax.curl = `/tablet_process/box/reprint/${this.boxResultId}`;
+        let printerId = LOGIS_UTIL.getPrinterId();
+        invokePrintAjax.curl = `/device_process/reprint/box_label/${LOGIS_UTIL.getEquipType()}/${LOGIS_UTIL.getEquipCd()}/${this.boxPackId}/${printerId}`;
         invokePrintAjax.generateRequest();
       }
 
@@ -225,16 +226,16 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * @description
+       * @description 매장 명 입력 박스
        ****************************
-       * @return cust-nm-input element
+       * @return shop-nm-input element
        */
-      _getCustNameInput() {
-        return this.$['cust-nm-input'];
+      _getShopNameInput() {
+        return this.$['shop-nm-input'];
       }
 
       /**
-       * @description
+       * @description 송장번호 입력 박스
        ****************************
        * @return invoice-input element
        */
@@ -243,16 +244,16 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * @description
+       * @description 셀 번호 입력 박스
        ****************************
-       * @return loc-cd-input element
+       * @return cell-cd-input element
        */
-      _getLocCdInput() {
-        return this.$['loc-cd-input'];
+      _getCellCdInput() {
+        return this.$['cell-cd-input'];
       }
 
       /**
-       * @description
+       * @description 인쇄 Ajax
        ****************************
        * @return invoke-print-ajax element
        */

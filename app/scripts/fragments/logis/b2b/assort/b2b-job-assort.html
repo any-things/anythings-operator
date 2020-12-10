@@ -84,63 +84,68 @@ Copyright © HatioLab Inc. All rights reserved.
           <span class="prodname">[[skuNm]]</span>
         </div>
 
-        <dom-if if="[[useBloothScanner]]">
-          <template>
-            <iron-icon id="bluetooth-btn" icon="[[bluetoothIcon]]" on-click="bluetoothIconClicked"></iron-icon>
+        <iron-icon id="bluetooth-btn" icon="[[bluetoothIcon]]" on-click="bluetoothIconClicked" hidden="[[!useBloothScanner]]"></iron-icon>
+      </div>
+    </div>
+
+    <!-- 투입 목록 기반 블락 표시기 -->
+    <b2b-job-indicator 
+      id="das-job-indicator" 
+      job-type="[[jobType]]" 
+      selected-input="{{selectedInput}}" 
+      on-item-selected="_selectedInputChanged" 
+      on-item-selected-by-click="_selectedInputChanged" 
+      show-full-code$="[[showFullCode]]" 
+      input-list="[[inputList]]"
+      on-swipe-left="swipeLeft" 
+      on-swipe-right="swipeRight" 
+      on-configured="_addJobStatusAttr">
+    </b2b-job-indicator>
+
+    <!-- 작업 내용 표시를 위한 영역 -->
+    <div id="content">
+
+      <!-- 앞쪽 로케이션 작업 표시를 위한 영역 -->
+      <dom-if if="[[showFront]]">
+        <template>
+            <div id="left-section">
+              <!-- 앞 로케이션의 작업 리스트 -->
+              <item-list id="front-list" hide-header header="[[header]]" data="[[frontDetailList]]"
+                on-data-list-click="showProcessPopup" on-configured="_addInputStatusAttr">
+              </item-list>
+              <!-- 앞 로케이션 라벨 -->
+              <button class="list-header-btn" disabled>[[frontBtnLabel]]</button>
+            </div>
           </template>
   </dom-if>
-  </div>
-  </div>
 
-  <!-- 투입 목록 기반 블락 표시기 -->
-  <b2b-job-indicator id="das-job-indicator" job-type="[[jobType]]" selected-input="{{selectedInput}}" on-item-selected="_selectedInputChanged" on-item-selected-by-click="_selectedInputChanged" show-full-code$="[[showFullCode]]" input-list="[[inputList]]"
-    on-swipe-left="swipeLeft" on-swipe-right="swipeRight" on-configured="_addJobStatusAttr">
-  </b2b-job-indicator>
+  <!-- 뒤쪽 로케이션 작업 표시를 위한 영역 -->
+  <dom-if if="[[showRear]]">
+    <template>
+            <div id="right-section">
+              <!-- 뒤 로케이션의 작업 리스트 -->
+              <item-list id="rear-list" hide-header header="[[header]]" data="[[rearDetailList]]"
+                on-data-list-click="showProcessPopup" on-configured="_addInputStatusAttr">
+              </item-list>
+              <!-- 뒤 로케이션 라벨 -->
+              <button class="list-header-btn" disabled>[[rearBtnLabel]]</button>
+            </div>
+          </template>
+  </dom-if>
 
-  <!-- 작업 내용 표시를 위한 영역 -->
-  <div id="content">
-
-    <!-- 앞쪽 로케이션 작업 표시를 위한 영역 -->
-    <dom-if if="[[showFront]]">
-      <template>
-          <div id="left-section">
-            <!-- 앞 로케이션의 작업 리스트 -->
-            <item-list id="front-list" hide-header header="[[header]]" data="[[frontDetailList]]"
-              on-data-list-click="showProcessPopup" on-configured="_addInputStatusAttr">
-            </item-list>
-            <!-- 앞 로케이션 라벨 -->
-            <button class="list-header-btn" disabled>[[frontBtnLabel]]</button>
-          </div>
-        </template>
-    </dom-if>
-
-    <!-- 뒤쪽 로케이션 작업 표시를 위한 영역 -->
-    <dom-if if="[[showRear]]">
-      <template>
-          <div id="right-section">
-            <!-- 뒤 로케이션의 작업 리스트 -->
-            <item-list id="rear-list" hide-header header="[[header]]" data="[[rearDetailList]]"
-              on-data-list-click="showProcessPopup" on-configured="_addInputStatusAttr">
-            </item-list>
-            <!-- 뒤 로케이션 라벨 -->
-            <button class="list-header-btn" disabled>[[rearBtnLabel]]</button>
-          </div>
-        </template>
-    </dom-if>
-
-    <!-- 앞/뒤 모든 로케이션 작업 표시를 위한 영역 -->
-    <dom-if if="[[showTotal]]">
-      <template>
-          <div id="total-section">
-            <!-- 전체 로케이션의 작업 리스트 -->
-            <item-list id="total-list" hide-header header="[[header]]" data="[[totalDetailList]]"
-              on-data-list-click="showProcessPopup" on-configured="_addInputStatusAttr">
-            </item-list>
-            <!-- 전체 로케이션 라벨 -->
-            <button class="list-header-btn" disabled>[[totalBtnLabel]]</button>
-          </div>
-        </template>
-    </dom-if>
+  <!-- 앞/뒤 모든 로케이션 작업 표시를 위한 영역 -->
+  <dom-if if="[[showTotal]]">
+    <template>
+            <div id="total-section">
+              <!-- 전체 로케이션의 작업 리스트 -->
+              <item-list id="total-list" hide-header header="[[header]]" data="[[totalDetailList]]"
+                on-data-list-click="showProcessPopup" on-configured="_addInputStatusAttr">
+              </item-list>
+              <!-- 전체 로케이션 라벨 -->
+              <button class="list-header-btn" disabled>[[totalBtnLabel]]</button>
+            </div>
+          </template>
+  </dom-if>
   </div>
 
   <!-- SKU 정보 조회 시 복수개가 조회된 경우 실행되는 사용자가 고를 수 있는 팝업이 가미된 SKU Input -->

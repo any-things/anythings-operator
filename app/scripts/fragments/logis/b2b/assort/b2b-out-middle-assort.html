@@ -135,12 +135,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
     </style>
 
-    <!--
-      * description : 중분류 시 상품스캔후 랙별 수량 검색
-      * params : @PathVariable(batch_id), @PathVariable(skubarcode)
-      * response :
-     -->
-
+    <!-- 상품 스캔하여 랙 별 수량 검색 -->
      <sys-ajax
       id="middle-assort-ajax"
       on-sys-ajax-response="_middleAssortResponsed">
@@ -199,6 +194,7 @@ Copyright © HatioLab Inc. All rights reserved.
             max-length=13>
           </auto-popup-input>
         </div>
+
         <div class="input-container">
           <span class="label">[[skuNmLabel]]</span>
           <label>([[boxInQtyLabel]] : [[boxInQty]]) [[skuNm]]</label>
@@ -210,22 +206,22 @@ Copyright © HatioLab Inc. All rights reserved.
           <template>
             <div class="rack">
               <div class="title"><span>[[item.rack_nm]]</span></div>
-              <!-- <template is="dom-if" if="[[item.pallet_qty]]">
+              <!--template is="dom-if" if="[[item.pallet_qty]]">
                 <div class="tile-container"><span class="tile">[[item.pallet_qty]]</span></div>
               </template>
 
-              <template is="dom-if" if="[[item.box_qty]]">
+  <template is="dom-if" if="[[item.box_qty]]">
                 <div class="tile-container"><span class="tile">[[item.box_qty]]</span></div>
-              </template> -->
+              </template-->
 
-              <template is="dom-if" if="[[item.pcs_qty]]">
+  <template is="dom-if" if="[[item.pcs_qty]]">
                 <div class="tile-container"><span class="tile">[[_calcRegionDisplay(item)]]</span></div>
               </template>
-            </div>
-          </template>
-        </dom-repeat>
-      </div>
-    </div>
+  </div>
+  </template>
+  </dom-repeat>
+  </div>
+  </div>
   </template>
 
   <script>
@@ -237,7 +233,7 @@ Copyright © HatioLab Inc. All rights reserved.
       static get properties() {
         return {
           /**
-           * 배치 라벨
+           * @description 배치 라벨
            ****************
            * @type {String}
            */
@@ -247,7 +243,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 상품 코드 라벨
+           * @description 상품 코드 라벨
            ****************
            * @type {String}
            */
@@ -257,7 +253,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 상품 명 라벨
+           * @description 상품 명 라벨
            ****************
            * @type {String}
            */
@@ -267,7 +263,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 입수 라벨
+           * @description 박스 입수 라벨
            ****************
            * @type {String}
            */
@@ -277,7 +273,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 고정 수량 라벨
+           * @description 고정 수량 라벨
            ****************
            * @type {String}
            */
@@ -287,7 +283,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 가변 수량 라벨
+           * @description 가변 수량 라벨
            ****************
            * @type {String}
            */
@@ -297,7 +293,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 상품 명
+           * @description 상품 명
            ****************
            * @type {String}
            */
@@ -306,7 +302,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 박스 입수
+           * @description 박스 입수
            ****************
            * @type {Number}
            */
@@ -315,7 +311,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 랙별 분류 정보 리스트
+           * @description 랙 별 분류 정보 리스트
            ****************
            * @type {Array}
            */
@@ -324,7 +320,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 배치 리스트 파라미터
+           * @description 배치 리스트 파라미터
            ****************
            * @type {String}
            */
@@ -345,7 +341,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 작업 배치 선택 화면에 표시할 필드
+           * @description 작업 배치 선택 화면에 표시할 필드
            ****************
            * @type {Array}
            */
@@ -369,7 +365,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 작업 배치 선택 화면의 컬럼 정보
+           * @description 작업 배치 선택 화면의 컬럼 정보
            ****************
            * @type {Array}
            */
@@ -377,39 +373,41 @@ Copyright © HatioLab Inc. All rights reserved.
             type: Array,
             value: () => {
               return [{
-                display: t('label.dc_cd'),
-                fieldname: 'dc_cd'
-              }, {
-                display: t('label.job_date'),
-                fieldname: 'job_date'
-              }, {
-                display: t('label.job_id'),
-                fieldname: 'job_id'
-              }, {
-                display: t('label.batch_group_id'),
-                fieldname: 'batch_group_id'
-              } /*{
-                display: t('label.com_cd'),
-                fieldname: 'com_cd',
-                displayCallback: (value) => {
-                  return value ? value : 'N/A';
+                  display: t('label.dc_cd'),
+                  fieldname: 'dc_cd'
+                }, {
+                  display: t('label.job_date'),
+                  fieldname: 'job_date'
+                }, {
+                  display: t('label.job_id'),
+                  fieldname: 'job_id'
+                }, {
+                  display: t('label.batch_group_id'),
+                  fieldname: 'batch_group_id'
                 }
-              },*/]
+                /*{
+                               display: t('label.com_cd'),
+                               fieldname: 'com_cd',
+                               displayCallback: (value) => {
+                                 return value ? value : 'N/A';
+                               }
+                             },*/
+              ]
             }
           },
 
           /**
-           * 작업 배치 선택 화면이 호출할 URL
+           * @description 작업 배치 선택 화면이 호출할 URL
            ****************
            * @type {String}
            */
           selectorResourceUrl: {
             type: String,
-            value: '/job_batch/search/middle_class'
+            value: '/job_batches/running_main_batch/:stage_cd/:job_type/:job_date'
           },
 
           /**
-           * 작업 배치 선택 화면이 호출할 파라미터
+           * @description 작업 배치 선택 화면이 호출할 파라미터
            ****************
            * @type {Object}
            */
@@ -433,7 +431,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 작업일자 라벨
+           * @description 작업일자 라벨
            ****************
            * @type {String}
            */
@@ -445,7 +443,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 작업일자 기본 값
+           * @description 작업일자 기본 값
            ****************
            * @type {String}
            */
@@ -457,11 +455,11 @@ Copyright © HatioLab Inc. All rights reserved.
             }
           },
 
-           /**
-            * 상품 선택 팝업 타이틀
-            ****************
-            * @type {String}
-            */
+          /**
+           * @description 상품 선택 팝업 타이틀
+           ****************
+           * @type {String}
+           */
           popupTitleLabel: {
             type: String,
             value: () => t('label.sku')
@@ -487,21 +485,22 @@ Copyright © HatioLab Inc. All rights reserved.
         // });
 
         document.addEventListener(`alert-closed-at-${location.hash.replace('#/', '')}`, event => {
-          if(!event.detail.hasCallback) {
+          if (!event.detail.hasCallback) {
             this._initialSetup();
           }
         });
       }
 
       /**
-       * 초기 셋업
+       * @description 초기 셋업
+       ***********************
        */
       _initialSetup() {
         this.$['sku-barcode'].select();
       }
 
       /**
-       * sku 선택 팝업에 나타날 아이템 텍스트 구성을 위한 콜백
+       * @description sku 선택 팝업에 나타날 아이템 텍스트 구성을 위한 콜백
        ***********************
        * @param {Object} item
        */
@@ -511,7 +510,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * auto-popup-input before-request event handler
+       * @description auto-popup-input before-request event handler
        ***********************
        * @param {Object} event
        */
@@ -520,7 +519,7 @@ Copyright © HatioLab Inc. All rights reserved.
         const input = event.detail.input;
         const ajax = event.detail.ajax;
 
-        if(this.batchListParams) {
+        if (this.batchListParams) {
           const skuCd = input.value;
           ajax.curl = `/kiosk_process/middle_assort/find_sku/${this.batchListParams}/${skuCd}`;
         } else {
@@ -531,7 +530,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 고정/비고정 라디오 버튼을 통해 현재 고정 상태인지 여부를 리턴함
+       * @description 고정/비고정 라디오 버튼을 통해 현재 고정 상태인지 여부를 리턴함
        ***********************
        * @return
        */
@@ -540,7 +539,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 상품 선택 팝업을 통해 상품이 선택되었을 때
+       * @description 상품 선택 팝업을 통해 상품이 선택되었을 때
        ***********************
        * @param {Object} event 항목 선택
        */
@@ -554,7 +553,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 중분류 ajax response event handler
+       * @description 중분류 ajax response event handler
        ***********************
        * @param {Object} event 중분류 결과
        */
@@ -575,7 +574,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} item
        */
       _calcRegionDisplay(item) {
-        if(!this.boxInQty || this.boxInQty == 0) {
+        if (!this.boxInQty || this.boxInQty == 0) {
           return `${item.pcs_qty}`
         } else {
           return `${Math.floor(item.pcs_qty / this.boxInQty)}/${item.pcs_qty % this.boxInQty}`
@@ -583,7 +582,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 중분류 대상 상품 총 수량을 계산하여 return
+       * @description 중분류 대상 상품 총 수량을 계산하여 return
        ***********************
        * @param {Array} racks 중분류 대상 랙 리스트
        * @return {Number} totalPcsQty 중분류 대상 상품 총 수량
@@ -598,14 +597,14 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 팔렛, 박스, 낱개 수량을 계산함
+       * @description 팔렛, 박스, 낱개 수량을 계산함
        ***********************
        * @param {Number} pltInBoxQty 팔렛트 당 적재 박스 수량
        * @param {Number} boxInQty 박스 당 상품 입수량
        * @param {Number} totalPcsQty 중분류 대상 상품 총 수량
        */
       computeTotalValues(pltInBoxQty, boxInQty, totalPcsQty) {
-        if(boxInQty <= 0) {
+        if (boxInQty <= 0) {
           this.totalPallet = 0;
           this.totalBox = 0;
           this.totalPallet = totalPcsQty;
@@ -630,7 +629,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 배치 코드 변경 핸들러
+       * @description 배치 코드 변경 핸들러
        ***********************
        * @param {Object} e
        */
@@ -640,7 +639,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 작업일자 변경 핸들러
+       * @description 작업일자 변경 핸들러
        ***********************
        * @param {Object} event
        */
@@ -659,7 +658,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 전체 / 미분류 선택을 위한 라디오 버튼 엘리먼트 리턴
+       * @description 전체 / 미분류 선택을 위한 라디오 버튼 엘리먼트 리턴
        * 전체 : 주문 전체 수량으로 중분류 계산
        * 미분류 : 미분류 작업만 대상으로 중분류 계산
        *************************

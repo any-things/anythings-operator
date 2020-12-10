@@ -6,10 +6,9 @@ Copyright © HatioLab Inc. All rights reserved.
 <link rel="import" href="../../../../../bower_components/polymer/polymer-element.html">
 
 <!--
-  물류 > B2C > 검수 화면 (KIOSK)
-  분리포가 선 수행된 이후 종이 혹은 냉동 박스를 사용하는 경우
+  물류 > B2B > 수량 검수 화면 (KIOSK)
 -->
-<dom-module id="b2c-inspection2">
+<dom-module id="b2b-inspection">
   <template>
     <style>
       .container {
@@ -194,7 +193,7 @@ Copyright © HatioLab Inc. All rights reserved.
     <!-- 검수 정보 조회를 위한 Ajax -->
     <sys-ajax
       id="find-inspection-ajax"
-      curl="/device_process/dynamic/dps/inspection/find_by_order/:order_id"
+      curl="/device_process/dynamic/das/inspection/find_by_order/:order_id"
       method="GET"
       content-type="application/json"
       custom-error-handler
@@ -205,7 +204,7 @@ Copyright © HatioLab Inc. All rights reserved.
     <!-- 검수 완료를 위한 Ajax -->
     <sys-ajax
       id="inspection-complete-ajax"
-      curl="/device_process/dynamic/dps/inspection/finish/:order_id"
+      curl="/device_process/dynamic/das/inspection/finish/:order_id"
       method="POST"
       content-type="application/json"
       last-response="{{inspectionResult}}">
@@ -214,7 +213,7 @@ Copyright © HatioLab Inc. All rights reserved.
     <!-- 송장 재발행을 위한 Ajax -->
     <sys-ajax
       id="reprint-invoice-ajax"
-      curl="/device_process/dynamic/dps/inspection/print/:order_id"
+      curl="/device_process/dynamic/das/inspection/print/:order_id"
       method="PUT"
       content-type="application/json"
       on-sys-ajax-response="_reprintSuccess">
@@ -230,30 +229,33 @@ Copyright © HatioLab Inc. All rights reserved.
           <!-- 상품 코드 입력 박스 -->
           <span class="label">[[skuCdLabel]]</span>
           <input id="sku-barcode" on-keypress="_onSkuCodeScan" value="[[currentSkuCd]]">
-          <!-- 주문 번호 입력 박스 -->
-          <span class="label">[[orderNoLabel]]</span>
-          <input id="order-no" on-keypress="_onOrderNoScan" value="[[currentOrderNo]]">
-          <!-- 송장 번호 입력 박스 -->
-          <span class="label">[[invoiceIdLabel]]</span>
-          <input id="invoice-id" on-keypress="_onInvoiceIdScan" value="[[currentInvoiceId]]">
           <!-- 배치 ID 입력 박스 -->
           <span class="label">[[batchIdLabel]]</span>
           <input id="batch-id" readonly value="[[currentBatchId]]">
-          <!-- 박스 유형 입력 박스 -->
-          <span class="label">[[boxTypeLabel]]</span>
-          <input id="box-type-cd" readonly value="[[currentBoxTypeCd]]">          
+          <!-- 셀 번호 입력 박스 -->
+          <span class="label">[[cellCdLabel]]</span>
+          <input id="cell-cd" readonly value="[[currentCellCd]]">
+          <!-- 분류 코드 입력 박스 -->
+          <span class="label">[[classCdLabel]]</span>
+          <input id="class-cd" readonly value="[[currentClassCd]]">
+          <!-- 거래처 코드 입력 박스 -->
+          <span class="label">[[destinationCdLabel]]</span>
+          <input id="shop-cd" readonly value="[[currentShopCd]]">
+          <!-- 거래처 명 입력 박스 -->
+          <span class="label">[[destinationNmLabel]]</span>
+          <input id="shop-nm" readonly value="[[currentShopNm]]">          
           <!-- 박스 상태 입력 박스 -->
           <span class="label">[[boxStatusLabel]]</span>
           <input id="box-status" readonly value="[[currentBoxStatus]]">
-          <!-- 박스 투입 시간 -->
-          <span class="label">[[inputAtLabel]]</span>
-          <input id="input-at" readonly value="[[currentBoxInputAt]]">
           <!-- 피킹 시작 시간 -->
           <span class="label">[[pickStartedAtLabel]]</span>
           <input id="pick-started-at" readonly value="[[currentPickStartedAt]]">
           <!-- 주문 완료 시간 -->
           <span class="label">[[boxedAtLabel]]</span>
           <input id="boxed-at" readonly value="[[currentPickEndedAt]]">
+          <!-- 검수 완료 시간 -->
+          <span class="label">[[inspectedAtLabel]]</span>
+          <input id="inspected-at" readonly value="[[currentInspectedAt]]">
         </div>
       </div>
 
@@ -283,16 +285,6 @@ Copyright © HatioLab Inc. All rights reserved.
           <span class="qty">[[totalInspectedQty]] / [[totalOrderQty]]</span>        
         </div>
 
-        <!-- 검수 방법 -->
-        <!--div class="right-section" hidden>
-          <div class="radio-section" hidden>
-            <input type="radio" on-click="_handleInspectionMethodClick" name="chk_info" value="each" checked="checked" id="each">
-            <label for="each">[[indivisualLabel]]</label><br/>
-            <input type="radio" on-click="_handleInspectionMethodClick" name="chk_info" value="total" id="total">
-            <label for="total">[[batchLabel]]</label><br/>
-          </div>
-        </div-->
-
         <!-- 검수 관련 버튼 -->
         <div class="btn-section">
           <button id="inspection-btn" on-click="completeInspection">[[completeLabel]]</button>
@@ -305,43 +297,13 @@ Copyright © HatioLab Inc. All rights reserved.
   </template>
 
   <script>
-    class B2CInspection2 extends Polymer.Element {
+    class B2BInspection extends Polymer.Element {
       static get is() {
-        return 'b2c-inspection2'
+        return 'b2b-inspection'
       }
 
       static get properties() {
         return {
-          /**
-           * @description 검수 방법
-           ****************
-           * @type {String}
-           */
-          /*inspectionMethodValue: {
-            type: String,
-            value: 'each'
-          },*/
-
-          /**
-           * @description 개별처리 라벨
-           ****************
-           * @type {String}
-           */
-          /*indivisualLabel: {
-            type: String,
-            value: t('button.indivisual')
-          },*/
-
-          /**
-           * @description 일괄처리 라벨
-           ****************
-           * @type {String}
-           */
-          /*batchLabel: {
-            type: String,
-            value: t('button.batch')
-          },*/
-
           /**
            * @description 작업 진행율 라벨
            ****************
@@ -363,6 +325,16 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
+           * @description 셀 번호 라벨
+           ****************
+           * @type {String}
+           */
+          cellCdLabel: {
+            type: String,
+            value: t('label.cell')
+          },
+
+          /**
            * @description 박스 ID 라벨
            ****************
            * @type {String}
@@ -377,19 +349,29 @@ Copyright © HatioLab Inc. All rights reserved.
            ****************
            * @type {String}
            */
-          orderNoLabel: {
+          classCdLabel: {
             type: String,
-            value: t('label.order_no')
+            value: t('label.class_cd')
           },
 
           /**
-           * @description 송장 번호 라벨
+           * @description 목적지 코드 라벨
            ****************
            * @type {String}
            */
-          invoiceIdLabel: {
+          destinationCdLabel: {
             type: String,
-            value: t('label.invoice_id')
+            value: t('label.dest_cd')
+          },
+
+          /**
+           * @description 목적지 명 라벨
+           ****************
+           * @type {String}
+           */
+          destinationNmLabel: {
+            type: String,
+            value: t('label.dest_nm')
           },
 
           /**
@@ -423,16 +405,6 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * @description 박스 투입 시간 라벨
-           ****************
-           * @type {String}
-           */
-          inputAtLabel: {
-            type: String,
-            value: t('label.input_at')
-          },
-
-          /**
            * @description 피킹 시작 시간 라벨
            ****************
            * @type {String}
@@ -450,6 +422,16 @@ Copyright © HatioLab Inc. All rights reserved.
           boxedAtLabel: {
             type: String,
             value: t('label.pick_ended_at')
+          },
+
+          /**
+           * @description 검수 완료 시간 라벨
+           ****************
+           * @type {String}
+           */
+          inspectedAtLabel: {
+            type: String,
+            value: t('label.inspected_at')
           },
 
           /**
@@ -513,27 +495,37 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * @description 스캔한 주문 번호
+           * @description 박스의 분류 코드
            ****************
            * @type {String}
            */
-          currentOrderNo: {
+          currentClassCd: {
             type: String,
             value: ''
           },
 
           /**
-           * @description 스캔한 송장 번호
+           * @description 박스의 셀 코드
            ****************
            * @type {String}
            */
-          currentInvoiceId: {
+          currentCellCd: {
             type: String,
             value: ''
           },
 
           /**
-           * @description 주문 번호와 매핑된 박스 ID
+           * @description 박스의 거래처 코드
+           ****************
+           * @type {String}
+           */
+          currentShopCd: {
+            type: String,
+            value: ''
+          },
+
+          /**
+           * @description 박스의 박스 ID
            ****************
            * @type {String}
            */
@@ -543,7 +535,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * @description 주문의 배치 ID
+           * @description 박스의 배치 ID
            ****************
            * @type {String}
            */
@@ -553,7 +545,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * @description 주문의 상태
+           * @description 박스의 상태
            ****************
            * @type {String}
            */
@@ -563,27 +555,17 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * @description 주문의 박스 유형
+           * @description 박스의 거래처 명
            ****************
            * @type {String}
            */
-          currentBoxTypeCd: {
+          currentShopNm: {
             type: String,
             value: ''
           },
 
           /**
-           * @description 주문의 박스 투입 시간
-           ****************
-           * @type {String}
-           */
-          currentBoxInputAt: {
-            type: String,
-            value: ''
-          },
-
-          /**
-           * @description 주문의 피킹 시작 시간
+           * @description 박스의 피킹 시작 시간
            ****************
            * @type {String}
            */
@@ -593,7 +575,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * @description 주문의 주문 처리 완료 시간
+           * @description 박스의 피킹 완료 시간
            ****************
            * @type {String}
            */
@@ -724,7 +706,7 @@ Copyright © HatioLab Inc. All rights reserved.
                 fieldname: 'sku_cd',
                 style: {
                   color: '#fff',
-                  textAlign: 'left'
+                  textAlign: 'center'
                 },
                 columnWidth: '1fr'
               }, {
@@ -771,18 +753,6 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * @description 주문 번호 스캔시
-       *****************
-       * @param {Object} e
-       */
-      _onOrderNoScan(e) {
-        if (e && e.key == 'Enter' && e.currentTarget && e.currentTarget.value) {
-          let orderNo = e.currentTarget.value;
-          this.readyTransaction('order', orderNo);
-        }
-      }
-
-      /**
        * @description 박스 ID 스캔 시
        ****************************
        * @param {Object} e
@@ -791,18 +761,6 @@ Copyright © HatioLab Inc. All rights reserved.
         if (e && e.key == 'Enter' && e.currentTarget && e.currentTarget.value) {
           let barcode = e.currentTarget.value;
           this.refreshInspection('box', barcode.trim(), 'box');
-        }
-      }
-
-      /**
-       * @description 송장 번호 스캔시
-       *****************
-       * @param {Object} e
-       */
-      _onInvoiceIdScan(e) {
-        if (e && e.key == 'Enter' && e.currentTarget && e.currentTarget.value) {
-          let invoiceId = e.currentTarget.value;
-          this.refreshInspection('invoice', invoiceId.trim());
         }
       }
 
@@ -839,7 +797,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       refreshInspection(inputType, inputId, boxType) {
         var findAjax = this.$['find-inspection-ajax'];
-        findAjax.curl = `/device_process/dynamic/dps/inspection/find_by_${inputType}`;
+        findAjax.curl = `/device_process/dynamic/das/inspection/find_by_${inputType}`;
         inputId = inputId.toUpperCase();
 
         findAjax.customParams = {
@@ -932,14 +890,15 @@ Copyright © HatioLab Inc. All rights reserved.
 
         // 주문 정보 표시를 위한 변수 설정
         this.currentBoxId = inspection.box_id;
-        this.currentOrderNo = inspection.order_no;
-        this.currentInvoiceId = inspection.invoice_id ? inspection.invoice_id : '';
+        this.currentClassCd = inspection.class_cd;
+        this.currentCellCd = inspection.sub_equip_cd;
+        this.currentShopCd = inspection.shop_cd ? inspection.shop_cd : '';
+        this.currentShopNm = inspection.shop_nm;
         this.currentBoxStatus = inspection.status_str;
         this.inspectionStatus = inspection.status;
-        this.currentBoxTypeCd = inspection.box_type_cd;
         this.currentBatchId = inspection.batch_id;
-        this.currentBoxInputAt = inspection.input_at;
         this.currentPickStartedAt = inspection.pick_started_at;
+        this.currentInspectedAt = inspection.manual_inspected_at;
         this.currentPickEndedAt = inspection.boxed_at;
         let inspItems = inspection.items ? inspection.items : [];
         let totalOrders = 0;
@@ -1071,11 +1030,12 @@ Copyright © HatioLab Inc. All rights reserved.
         // 검수가 완료되었다면 재발행을 호출할 수 있다.
         if (this.inspectionStatus === 'O' || this.inspectionStatus == 'E' || this.inspectionStatus == 'R') {
           var reprintAjax = this.$['reprint-invoice-ajax'];
-          reprintAjax.curl = '/device_process/dynamic/dps/print_invoice';
+          reprintAjax.curl = '/device_process/dynamic/das/print_invoice';
           reprintAjax.customParams = {
             equipType: LOGIS_UTIL.getEquipType(),
             equipCd: LOGIS_UTIL.getEquipCd(),
-            orderNo: this.currentOrderNo,
+            cellCd: this.currentCellCd,
+            boxId: this.currentBoxId,
             printerId: LOGIS_UTIL.getPrinterId()
           };
           reprintAjax.generateRequest();
@@ -1115,13 +1075,12 @@ Copyright © HatioLab Inc. All rights reserved.
       _doCompleteInspection() {
         if (this.items && this.items.length > 0) {
           let completeAjax = this.$['inspection-complete-ajax'];
-          completeAjax.curl = '/device_process/dynamic/dps/inspection/finish';
+          completeAjax.curl = '/device_process/dynamic/das/inspection/finish';
           completeAjax.customParams = {
             equipType: LOGIS_UTIL.getEquipType(),
             equipCd: LOGIS_UTIL.getEquipCd(),
-            orderNo: this.currentOrderNo,
+            classCd: this.currentClassCd,
             boxId: this.currentBoxId,
-            invoiceId: this.currentInvoiceId,
             printerId: LOGIS_UTIL.getPrinterId()
           };
 
@@ -1148,12 +1107,12 @@ Copyright © HatioLab Inc. All rights reserved.
 
         this.inspectionStatus = '';
         this.currentBoxId = '';
-        this.currentInvoiceId = '';
-        this.currentOrderNo = '';
+        this.currentShopCd = '';
+        this.currentClassCd = '';
+        this.currentCellCd = '';
         this.currentBatchId = '';
         this.currentBoxStatus = '';
-        this.currentBoxTypeCd = '';
-        this.currentBoxInputAt = '';
+        this.currentShopNm = '';
         this.currentPickStartedAt = '';
         this.currentPickEndedAt = '';
 
@@ -1257,28 +1216,11 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * @description 라디오 버튼 클릭시
-       ****************
-       * @param {Object} e
-       */
-      _handleInspectionMethodClick(e) {
-        this.inspectionMethodValue = e.currentTarget.value;
-      }
-
-      /**
        * @description box-id input field select
        **********************
        */
       focusDefaultInput() {
         this.$['box-id'].select();
-      }
-
-      /**
-       * @description order-no input field select
-       **********************
-       */
-      focusOrderInput() {
-        this.$['order-no'].select();
       }
 
       /**
@@ -1290,7 +1232,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
     }
 
-    customElements.define(B2CInspection2.is, B2CInspection2);
+    customElements.define(B2BInspection.is, B2BInspection);
   </script>
 
 </dom-module>

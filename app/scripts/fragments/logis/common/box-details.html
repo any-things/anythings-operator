@@ -142,15 +142,6 @@ Copyright © HatioLab Inc. All rights reserved.
       last-response="{{items}}">
     </sys-ajax>
 
-    <!-- 풀 박스 취소 Ajax -->
-    <sys-ajax
-      id="cancel-box-ajax"
-      method="DELETE"
-      content-type="application/json"
-      on-sys-ajax-response="closeDialog"
-      on-sys-ajax-error="closeDialog">
-    </sys-ajax>
-
     <div id="contents">
       <!-- 박스 ID 표시 영역 -->
       <div class="input-row">
@@ -169,8 +160,6 @@ Copyright © HatioLab Inc. All rights reserved.
       <div id="btn-container">
         <!-- 닫기 버튼 -->
         <button id="close-btn" class="button" on-click="closeDialog">[[closeBtnLabel]]</button>
-        <!-- 박스 취소 버튼 -->
-        <button id="cancel-btn" class="button" on-click="cancelBox" hidden="[[!isBoxCancelEnabled]]">[[cancelBtnLabel]]</button>
       </div>
     </div>
   </template>
@@ -187,9 +176,9 @@ Copyright © HatioLab Inc. All rights reserved.
            *******************
            * @type {Object}
            */
-          boxResult: {
+          boxPack: {
             type: Object,
-            observer: '_boxResultChanged'
+            observer: '_boxPackChanged'
           },
 
           /**
@@ -197,9 +186,9 @@ Copyright © HatioLab Inc. All rights reserved.
            *******************
            * @type {String}
            */
-          boxResultId: {
+          boxPackId: {
             type: String,
-            observer: '_boxResultIdChanged'
+            observer: '_boxPackIdChanged'
           },
 
           /**
@@ -220,26 +209,6 @@ Copyright © HatioLab Inc. All rights reserved.
           closeBtnLabel: {
             type: String,
             value: () => t('button.close')
-          },
-
-          /**
-           * @description 풀 박스 취소 버튼 label
-           *******************
-           * @type {String}
-           */
-          cancelBtnLabel: {
-            type: String,
-            value: () => t('button.cancel_full')
-          },
-
-          /**
-           * @description PDA인지 여부
-           ****************
-           * @type {Boolean}
-           */
-          isBoxCancelEnabled: {
-            type: Boolean,
-            value: false
           },
 
           /**
@@ -278,45 +247,24 @@ Copyright © HatioLab Inc. All rights reserved.
       /**
        * @description 선택한 박스 정보가 변경된 이후 박스 상세 정보 조회
        *******************
-       * @param {Object} boxResult
+       * @param {Object} boxPack
        */
-      _boxResultChanged(boxResult) {
-        if (boxResult && boxResult.id) {
-          this.boxResultId = boxResult.id;
-          this.boxInfo = `${boxResult.box_id} [${boxResult.loc_cd}(${boxResult.box_seq})]`;
+      _boxPackChanged(boxPack) {
+        if (boxPack && boxPack.id) {
+          this.boxPackId = boxPack.id;
+          this.boxInfo = `${boxPack.box_id} [${boxPack.class_cd}]`;
         }
       }
 
       /**
-       * @description 팝업 닫기
+       * @description 박스 팩 ID 변경시 
        *******************
-       * @param {String} boxResultId
+       * @param {String} boxPackId
        */
-      _boxResultIdChanged(boxResultId) {
+      _boxPackIdChanged(boxPackId) {
         var ajax = this.$['box-details-ajax'];
-        ajax.curl = `/box_result/${boxResultId}/box_detail`;
+        ajax.curl = `/box_packs/${boxPackId}/items`;
         ajax.generateRequest();
-      }
-
-      /**
-       * @description 박싱 작업 취소
-       ****************
-       * @param {Object} event
-       */
-      cancelBox(event) {
-        openConfirm({
-          title: t('text.cancel_full_box'),
-          message: t('text.cancel_full_box?'),
-          critical: true,
-          confirmCallback: () => {
-            var ajax = this.$['cancel-box-ajax'];
-            var batchId = this.boxResult.batch_id;
-            var locCd = this.boxResult.loc_cd;
-            var boxId = this.boxResult.box_id;
-            ajax.curl = `/tablet_process/cancel_box/${batchId}/${locCd}/${boxId}`;
-            ajax.generateRequest();
-          }
-        });
       }
 
       /**

@@ -29,19 +29,22 @@ Copyright © HatioLab Inc. All rights reserved.
 
     <!-- 박싱 리스트 -->
     <sys-ajax
-      auto
       id="box-list-ajax"
       method="GET"
       content-type="application/json"
-      last-response="{{boxList}}">
+      last-response="{{inputDataSet}}">
     </sys-ajax>
 
     <!-- 박스 리스트 -->
-    <item-list
-      id="box-list"
-      header="[[header]]"
+    <item-list 
+      show-paginator 
+      header="[[header]]" 
+      page="[[page]]" 
+      total="[[total]]" 
+      limit="[[limit]]" 
       data="[[boxList]]"
-      on-data-list-click="_showReprintPopup">
+      on-data-list-click="_showReprintPopup" 
+      on-paginator-changed="_pageChanged">
     </item-list>
 
     <!-- 버튼 리스트 -->
@@ -78,6 +81,35 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
+           * @description 페이지 정보
+           ****************
+           * @type {Number}
+           */
+          page: {
+            type: Number,
+            value: 1
+          },
+
+          /**
+           * @description Limit 정보
+           ****************
+           * @type {Number}
+           */
+          limit: {
+            type: Number,
+            value: 50
+          },
+
+          /**
+           * @description 총 아이템 개수
+           ****************
+           * @type {Number}
+           */
+          total: {
+            type: Number
+          },
+
+          /**
            * @description 그리드 헤더
            ****************
            * @type {Array}
@@ -86,45 +118,41 @@ Copyright © HatioLab Inc. All rights reserved.
             type: Array,
             value: function() {
               return [{
-                display: t('label.order'),
+                display: t('label.class_cd'),
                 fieldname: 'class_cd',
-                columnWidth: '0.5fr',
-                displayCallback: (value, rowData) => {
-                  return `(${rowData.box_seq}) ${value}`;
-                }
+                columnWidth: '0.325fr'
               }, {
                 display: t('label.cell'),
-                fieldname: 'cell_cd',
+                fieldname: 'sub_equip_cd',
                 columnWidth: '0.175fr',
                 style: {
                   textAlign: 'center'
-                },
-                displayCallback: (value, rowData) => {
-                  return `${value.split('-')[1]}`;
                 }
               }, {
                 display: t('label.label_cd'),
-                fieldname: 'invoice_id',
-                columnWidth: '0.325fr',
+                fieldname: 'box_id',
+                columnWidth: '0.5fr',
                 style: {
                   textAlign: 'center'
                 },
                 displayCallback: (value, rowData) => {
-                  var val = value ? value : rowData.box_id;
-                  var idx = LOGIS_UTIL.getInvoiceNoStartIndex();
-                  return (val && idx && idx > 0) ? val.substring(idx) : val;
+                  return value ? value : rowData.invoice_id;
                 }
               }, {
                 fieldname: 'id',
                 hidden: true
-              }, {
-                fieldname: 'box_seq',
-                hidden: true
-              }, {
-                fieldname: 'box_id',
-                hidden: true
               }]
             }
+          },
+
+          /**
+           * @description 투입 리스트 데이터 셋
+           ****************
+           * @type {Object}
+           */
+          inputDataSet: {
+            type: Object,
+            observer: '_inputDataSetChanged'
           },
 
           /**
@@ -142,32 +170,43 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * @description connectedCallback
-       ****************************
-       */
-      connectedCallback() {
-        super.connectedCallback();
-
-        // 해더의 refresh button 클릭시 발생하는 refres-view-[route] event handler
-        document.addEventListener('refresh-view-' + location.hash.replace('#/', ''), event => {
-          this.searchBoxList();
-        });
-
-        this.searchBoxList();
-      }
-
-      /**
        * @description 송장 번호가 발행된 박스 리스트 조회
        ***************************
        */
       searchBoxList() {
         var ajax = this.$['box-list-ajax'];
-        ajax.curl = '/tablet_process/boxed_list/' + LOGIS_UTIL.getEquipCd() + '/' + LOGIS_UTIL.getStationCd() + '/' + LOGIS_UTIL.getWorkSideCd();
+        ajax.curl = `/device_process/paginate/box_list/${LOGIS_UTIL.getEquipType()}/${LOGIS_UTIL.getEquipCd()}/${LOGIS_UTIL.getStationCd()}?page=${this.page}&limit=${this.limit}`;
 
         // 최초 조회 이후 baseUrl이 초기화 되었다면 명시적으로 generateRequest를 호출함
         if (ajax.baseUrl) {
           ajax.generateRequest();
         }
+      }
+
+      /**
+       * @description 투입 데이터 데이터 셋 변경시 핸들러
+       *******************
+       * @param {Object} inputDataSet
+       */
+      _inputDataSetChanged(inputDataSet) {
+        if (inputDataSet) {
+          this.total = inputDataSet.total;
+          this.boxList = inputDataSet.items;
+        }
+      }
+
+      /**
+       * @description item-list paginator-changed event handler
+       * item-list의 page, limit, total property가 변경 되면 호출 됨
+       * event.detail을 통해 현재 리스트의 page, limit을 초기화 하고
+       * batch summary 조회를 요청
+       ***********************
+       * @param {Object} event
+       */
+      _pageChanged(event) {
+        this.page = event.detail.page;
+        this.limit = event.detail.limit;
+        this.searchBoxList();
       }
 
       /**
@@ -177,26 +216,14 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _showReprintPopup(event) {
         const reprintPopup = document.createElement('label-details');
-        reprintPopup.boxResultId = event.detail.data.id;
-        reprintPopup.custName = event.detail.data.cust_nm;
-        reprintPopup.invoiceId = event.detail.data.invoice_id ? event.detail.data.invoice_id : event.detail.data.box_id;
-        reprintPopup.locCd = event.detail.data.loc_cd;
+        reprintPopup.boxPackId = event.detail.data.id;
+        reprintPopup.shopName = event.detail.data.class_cd;
+        reprintPopup.invoiceId = event.detail.data.box_id ? event.detail.data.box_id : event.detail.data.invoice_id;
+        reprintPopup.cellCd = event.detail.data.sub_equip_cd;
 
         LOGIS_UTIL.showPopup(t('button.print_label'), reprintPopup, 'fit', 'fit', null, function() {
           this.searchBoxList();
         }.bind(this));
-
-        /*document.dispatchEvent(new CustomEvent('open-dialog', {
-          detail: {
-            title: t('button.print_label'),
-            content: reprintPopup,
-            width: 'fit',
-            height: 'fit',
-            closeCallback: () => {
-              this.searchBoxList();
-            }
-          }
-        }))*/
       }
     }
 

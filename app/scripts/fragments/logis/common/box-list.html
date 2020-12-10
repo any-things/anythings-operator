@@ -28,29 +28,24 @@ Copyright © HatioLab Inc. All rights reserved.
       }
     </style>
 
-    <!-- 박스 처리 리스트 조회 Ajax -->
+    <!-- 박스 리스트 조회 Ajax -->
     <sys-ajax
-      auto
       id="box-list-ajax"
       method="GET"
       content-type="application/json"
-      last-response="{{boxList}}">
+      last-response="{{inputDataSet}}">
     </sys-ajax>
 
-    <!-- 박스 취소 활성화 여부 조회 Ajax -->
-    <sys-ajax
-      id="cancel-box-enabled-ajax"
-      method="GET"
-      content-type="application/json"
-      on-sys-ajax-response="_cancelBoxEnabledResponsed">
-    </sys-ajax>
-
-    <!-- 리스트  -->
-    <item-list
-      id="cust-list"
-      header="[[header]]"
+    <!-- 투입 리스트 -->
+    <item-list 
+      show-paginator 
+      header="[[header]]" 
+      page="[[page]]" 
+      total="[[total]]" 
+      limit="[[limit]]" 
       data="[[boxList]]"
-      on-data-list-click="_onListClick">
+      on-data-list-click="showBoxItems" 
+      on-paginator-changed="_pageChanged">
     </item-list>
 
     <!-- 버튼 컨테이너 -->
@@ -87,21 +82,12 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * @description 이 화면의 라우팅 URL
-           ****************
-           * @type {String}
-           */
-          routingUrl: {
-            type: String
-          },
-
-          /**
            * @description 작업 유형
            ****************
            * @type {Boolean}
            */
           jobType: {
-            type: Boolean,
+            type: String,
             value: () => LOGIS_UTIL.getJobType()
           },
 
@@ -116,13 +102,32 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * @description PDA인지 여부
+           * @description 페이지 정보
            ****************
-           * @type {Boolean}
+           * @type {Number}
            */
-          isBoxCancelEnabled: {
-            type: Boolean,
-            value: false
+          page: {
+            type: Number,
+            value: 1
+          },
+
+          /**
+           * @description Limit 정보
+           ****************
+           * @type {Number}
+           */
+          limit: {
+            type: Number,
+            value: 50
+          },
+
+          /**
+           * @description 총 아이템 개수
+           ****************
+           * @type {Number}
+           */
+          total: {
+            type: Number
           },
 
           /**
@@ -134,12 +139,12 @@ Copyright © HatioLab Inc. All rights reserved.
             type: Array,
             value: function() {
               return [{
-                display: t('label.order'),
+                display: t('label.class_cd'),
                 fieldname: 'class_cd',
-                columnWidth: '0.5fr'
+                columnWidth: '0.325fr'
               }, {
                 display: t('label.cell'),
-                fieldname: 'loc_cd',
+                fieldname: 'sub_equip_cd',
                 columnWidth: '0.175fr',
                 style: {
                   textAlign: 'center'
@@ -147,13 +152,10 @@ Copyright © HatioLab Inc. All rights reserved.
               }, {
                 display: t('label.box_id'),
                 fieldname: 'box_id',
-                columnWidth: '0.325fr',
+                columnWidth: '0.5fr',
                 style: {
                   textAlign: 'center'
                 }
-              }, {
-                fieldname: 'box_seq',
-                hidden: true
               }, {
                 fieldname: 'batch_id',
                 hidden: true
@@ -162,6 +164,16 @@ Copyright © HatioLab Inc. All rights reserved.
                 hidden: true
               }]
             }
+          },
+
+          /**
+           * @description 투입 리스트 데이터 셋
+           ****************
+           * @type {Object}
+           */
+          inputDataSet: {
+            type: Object,
+            observer: '_inputDataSetChanged'
           },
 
           /**
@@ -182,19 +194,10 @@ Copyright © HatioLab Inc. All rights reserved.
        * @description connectedCallback
        *******************
        */
-      connectedCallback() {
+      /*connectedCallback() {
         super.connectedCallback();
-
-        // 현재 페이지의 URL을 저장
-        this.routingUrl = location.hash.replace('#/', '');
-
-        // 해더의 refresh button 클릭시 발생하는 refres-view-[route] event handler
-        document.addEventListener(`refresh-view-${this.routingUrl}`, event => {
-          this.searchBoxList();
-        });
-
         this.searchBoxList();
-      }
+      }*/
 
       /**
        * @description 이 화면의 표시 상태가 바뀔 때 handle
@@ -202,25 +205,9 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Boolean} visible
        */
       _visibleChanged(visible) {
-        if (visible) {
-          this.searchBoxList();
-
-          /*var brokerSite = LOGIS_UTIL.getBrokerSiteCd();
-          if(this.jobType == 'DAS' && (brokerSite == 'ym01' || brokerSite == 'ym02')) {
-            var boxCancelEnabledAjax = this.$['cancel-box-enabled-ajax'];
-            boxCancelEnabledAjax.curl = '/company_setting/BD5393FB-DBEC-4DF1-A996-4CB3E3F26324';
-            boxCancelEnabledAjax.generateRequest();
-          }*/
-        }
-      }
-
-      /**
-       * @description 박스 취소 활성화 여부 ...
-       *******************
-       * @param {Object} event
-       */
-      _cancelBoxEnabledResponsed(event) {
-        this.isBoxCancelEnabled = (event.detail && event.detail.value) ? event.detail.value === 'true' : false;
+        //if (visible) {
+        //  this.searchBoxList();
+        //}
       }
 
       /**
@@ -229,7 +216,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       searchBoxList() {
         var ajax = this.$['box-list-ajax'];
-        ajax.curl = `/tablet_process/boxed_list/${LOGIS_UTIL.getEquipCd()}/${LOGIS_UTIL.getStationCd()}/${LOGIS_UTIL.getWorkSideCd()}`;
+        ajax.curl = `/device_process/paginate/box_list/${LOGIS_UTIL.getEquipType()}/${LOGIS_UTIL.getEquipCd()}/${LOGIS_UTIL.getStationCd()}?page=${this.page}&limit=${this.limit}`;
 
         // 최초 조회 이후 baseUrl이 초기화 되었다면 명시적으로 generateRequest를 호출함
         if (ajax.baseUrl) {
@@ -242,38 +229,49 @@ Copyright © HatioLab Inc. All rights reserved.
        *******************
        * @param {Object} event
        */
-      _onListClick(event) {
-        let boxResult = event.detail.data;
-        this._showDetailPopup(boxResult);
+      showBoxItems(event) {
+        let boxPack = event.detail.data;
+        this._showDetailPopup(boxPack);
+      }
+
+      /**
+       * @description item-list paginator-changed event handler
+       * item-list의 page, limit, total property가 변경 되면 호출 됨
+       * event.detail을 통해 현재 리스트의 page, limit을 초기화 하고
+       * batch summary 조회를 요청
+       ***********************
+       * @param {Object} event
+       */
+      _pageChanged(event) {
+        this.page = event.detail.page;
+        this.limit = event.detail.limit;
+        this.searchBoxList();
+      }
+
+      /**
+       * @description 투입 데이터 데이터 셋 변경시 핸들러
+       *******************
+       * @param {Object} inputDataSet
+       */
+      _inputDataSetChanged(inputDataSet) {
+        if (inputDataSet) {
+          this.total = inputDataSet.total;
+          this.boxList = inputDataSet.items;
+        }
       }
 
       /**
        * @description 박스 내품 팝업 표시
        *******************
-       * @param {Object} boxResult
+       * @param {Object} boxPack
        */
-      _showDetailPopup(boxResult) {
-        const mpsBoxListDetail = document.createElement('box-details');
-        mpsBoxListDetail.boxResult = boxResult;
+      _showDetailPopup(boxPack) {
+        const boxDetailPopup = document.createElement('box-details');
+        boxDetailPopup.boxPack = boxPack;
 
-        var brokerSite = LOGIS_UTIL.getBrokerSiteCd();
-        if (this.jobType == 'DAS' && (brokerSite == 'ym01' || brokerSite == 'ym02')) {
-          mpsBoxListDetail.isBoxCancelEnabled = true;
-        }
-
-        LOGIS_UTIL.showPopup(t('title.inbox_list'), mpsBoxListDetail, null, null, null, function() {
+        LOGIS_UTIL.showPopup(t('title.inbox_list'), boxDetailPopup, null, null, null, function() {
           this.searchBoxList();
         }.bind(this));
-
-        /*document.dispatchEvent(new CustomEvent('open-dialog', {
-          detail: {
-            title: t('title.inbox_list'),
-            content: mpsBoxListDetail,
-            closeCallback: () => {
-              this.searchBoxList();
-            }
-          }
-        }));*/
       }
     }
 
