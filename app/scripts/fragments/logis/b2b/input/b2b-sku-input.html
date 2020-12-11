@@ -8,7 +8,7 @@ Copyright © HatioLab Inc. All rights reserved.
 <link rel="import" href="../../../../components/logis/sku-selection-popup.html">
 
 <!--
-  물류 > 출고 > 상품 투입 화면
+  물류 > 출고 > 상품 투입 화면 (전체 진행율 / 랙 별 진행율 / 투입 리스트)
 -->
 <dom-module id="b2b-sku-input">
   <template>
@@ -1005,7 +1005,12 @@ Copyright © HatioLab Inc. All rights reserved.
         const equipCd = LOGIS_UTIL.getEquipCd();
         if (equipCd) {
           const batchSummaryAjax = this.$['batch-summary-ajax'];
-          batchSummaryAjax.curl = `/device_process/batch_progress_rate/Rack/${equipCd}`;
+          batchSummaryAjax.curl = '/device_process/dynamic/das/total_progress_rate';
+          batchSummaryAjax.customParams = {
+            equipType: 'Rack',
+            equipCd: equipCd,
+            includeRackRate: true
+          }
           batchSummaryAjax.generateRequest();
         }
       }
@@ -1072,28 +1077,29 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} batchSummaryData
        */
       updateScreen(batchSummaryData) {
-        if (batchSummaryData) {
-          this.orderPicking = batchSummaryData.plan_order;
-          this.orderPicked = batchSummaryData.actual_order;
-          this.skuPicking = batchSummaryData.plan_sku;
-          this.skuPicked = batchSummaryData.actual_sku;
-          this.pcsPicking = batchSummaryData.plan_pcs;
-          this.pcsPicked = batchSummaryData.actual_pcs;
+        if (batchSummaryData && batchSummaryData.result) {
+          let totalRate = batchSummaryData.result.total;
+          let rackRate = batchSummaryData.result.rack;
 
-          this.totalOrderPicking = batchSummaryData.tot_plan_order;
-          this.totalOrderPicked = batchSummaryData.tot_actual_order;
-          this.totalSkuPicking = batchSummaryData.tot_plan_sku;
-          this.totalSkuPicked = batchSummaryData.tot_actual_sku;
-          this.totalPcsPicking = batchSummaryData.tot_plan_pcs;
-          this.totalPcsPicked = batchSummaryData.tot_actual_pcs;
+          this.orderPicking = rackRate.plan_order;
+          this.orderPicked = rackRate.actual_order;
+          this.skuPicking = rackRate.plan_sku;
+          this.skuPicked = rackRate.actual_sku;
+          this.pcsPicking = rackRate.plan_pcs;
+          this.pcsPicked = rackRate.actual_pcs;
+          this.progressRate = rackRate.rate_order;
+          this.progressRateBySku = rackRate.rate_sku;
+          this.gaugeRate = rackRate.rate_pcs;
 
-          this.progressRate = batchSummaryData.rate_order;
-          this.progressRateBySku = batchSummaryData.rate_sku;
-          this.gaugeRate = batchSummaryData.rate_pcs;
-
-          this.totalProgressRate = batchSummaryData.tot_rate_order;
-          this.totalProgressRateBySku = batchSummaryData.tot_rate_sku;
-          this.totalGaugeRate = batchSummaryData.tot_rate_pcs;
+          this.totalOrderPicking = totalRate.plan_order;
+          this.totalOrderPicked = totalRate.actual_order;
+          this.totalSkuPicking = totalRate.plan_sku;
+          this.totalSkuPicked = totalRate.actual_sku;
+          this.totalPcsPicking = totalRate.plan_pcs;
+          this.totalPcsPicked = totalRate.actual_pcs;
+          this.totalProgressRate = totalRate.rate_order;
+          this.totalProgressRateBySku = totalRate.rate_sku;
+          this.totalGaugeRate = totalRate.rate_pcs;
 
           let inputListAjax = this.$['input-pages-ajax'];
           let equipCd = LOGIS_UTIL.getEquipCd();
