@@ -11,125 +11,52 @@ Copyright © HatioLab Inc. All rights reserved.
     <style>
       :host {
         flex: 1;
-        display: grid;
-        height: 100%;
       }
-
-      #contents {
+      #container {
+        display: grid;
+        height: calc(100% - 30px);
+        padding: 10px;
+        text-align: -webkit-center;
+      }
+      #summary {
+        display: flex;
+        flex-direction: column;
+        padding: 10px;
+        margin-bottom: 10px;
+        background-color:var(--things-primary-color) ;
+        border-radius:var(--things-default-border-radius);
+        color:#fff;
+      }
+      #summary span {
+        font-size: .8rem;
+      }
+      #summary .sku-info {
+        display: flex;
+      }
+      #summary .sku-info .label {
+        font-weight: bold;
+        margin-right: 5px;
+      }
+      #summary .sku-info .value {
         flex: 1;
-        display: grid;
-        grid-template-rows: auto 1fr auto;
-      }
-
-      #btn-container {
-        display: flex;
-      }
-
-      .button {
-        flex: auto;
-      }
-
-      #header-form {
-        display: grid;
-        grid-template-columns: 1.5fr 1fr;
-        margin: 5px 10px 0 10px;
-        background-color: var(--things-primary-color);
-        border-radius: var(--things-default-border-radius);
-        color: #fff;
-      }
-
-      p {
-        margin: 0;
-      }
-
-      item-list {
-        margin: 10px 10px 0px 10px;
-      }
-
-      button:focus {
-        outline: 0;
-      }
-
-      button {
-        background: #90cc5d;
-        background: linear-gradient(to bottom, #90cc5d 0%, #5a9802 100%);
-        border-top: .06rem solid #cdff9a;
-        border-bottom: .2rem solid #2e7b00;
-        border-left: none;
-        border-right: none;
-        border-radius: 12px;
-        margin: 10px 0;
-        padding: .3rem;
-        color: #fff;
-        text-shadow: 0px .03rem .03rem rgba(0, 0, 0, 0.4);
-        font-size: 1rem;
-        margin: 10px;
-      }
-
-      button:active {
-        background: #90cc5d;
-        background: linear-gradient(to bottom, #5a9802 0%, #90cc5d 100%);
-        text-shadow: .03rem 0rem .03rem rgba(0, 0, 0, 0.4);
-      }
-
-      #back-btn {
-        background: #737373;
-        background: linear-gradient(to bottom, #737373 0%, #585858 100%);
-        border-top: .06rem solid #999;
-        border-bottom: .2rem solid #333;
-        border-left: none;
-        border-right: none;
-        border-radius: 12px;
-        margin: 10px;
-        padding: .3rem;
-        color: #fff;
-        text-shadow: 0px .03rem .03rem rgba(0, 0, 0, 0.4);
-        font-size: 1rem;
-      }
-
-      #back-btn:active {
-        background: #737373;
-        background: linear-gradient(to bottom, #585858 0%, #737373 100%);
-        text-shadow: .03rem 0rem .03rem rgba(0, 0, 0, 0.4);
-      }
-
-      #left-col,
-      #right-col {
-        margin: 10px 10px 5px 10px;
-        color: #fff;
-        font-size: .5rem;
-      }
-
-      #left-col b,
-      #right-col b {
-        display: block;
-        font-size: 1rem
-      }
-
-      #right-col b span {
-        opacity: .7;
-        font-weight: normal;
-      }
-
-      #right-col {
-        padding-left: 10px;
-        border-left: 1px solid rgba(0, 0, 0, .2);
-      }
-
-      .input-row {
-        display: flex;
-        flex-direction: row;
-        margin-top: 5px;
-      }
-      .input-row .label {
-        font-size:.8rem;
-        margin: auto 5px auto auto;
-        min-width: 15%;
         text-align: right;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
       }
-      .input-row input {
-        width: 80%;
-        margin: auto 10px auto auto;
+      #button-container {
+        display: grid;
+        margin-top: 10px;
+        justify-items: end;
+      }
+      button {
+        @apply --operator-default-btn;
+      }
+      button:active {
+        @apply --operator-default-btn-active;
+      }
+      button:focus {
+        outline:none
       }
     </style>
 
@@ -142,23 +69,32 @@ Copyright © HatioLab Inc. All rights reserved.
       last-response="{{items}}">
     </sys-ajax>
 
-    <div id="contents">
-      <!-- 박스 ID 표시 영역 -->
-      <div class="input-row">
-        <span class="label">[[boxInfoLabel]]</span>
-        <input id="box-id" value$="[[boxInfo]]" readonly>
+    <!-- 팝업 상단 요약 정보 표시 영역 -->
+    <div id="container">
+      <!-- 박스 정보 표시 영역 -->
+      <div id="summary">
+        <!-- 매장 정보 표시 영역 -->
+        <div class="sku-info">
+          <span class="label">[[classCdLabel]]</span>
+          <span class="value">[[classCd]]</span>
+        </div>
+
+        <!-- 박스 코드 정보 표시 영역 -->
+        <div class="sku-info">
+          <span class="label">[[boxIdLabel]]</span>
+          <span class="value">[[boxId]]</span>
+        </div>
       </div>
 
-      <!-- 투입 상품 처리 리스트 표시 영역 -->
+      <!-- 박스 내품 리스트 표시 영역 -->
       <item-list
-        dialog
         header="[[header]]"
-        data="[[items]]">
+        data="[[items]]"
+        dialog>
       </item-list>
 
-      <!-- 버튼 블럭 -->
-      <div id="btn-container">
-        <!-- 닫기 버튼 -->
+      <!-- 버튼 표시 영역 -->
+      <div id="button-container">
         <button id="close-btn" class="button" on-click="closeDialog">[[closeBtnLabel]]</button>
       </div>
     </div>
@@ -192,13 +128,42 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
+           * @description 박스 ID 값
+           ****************
+           * @type {String}
+           */
+          boxId: {
+            type: String
+          },
+
+          /**
+           * @description 분류 코드 값
+           ****************
+           * @type {String}
+           */
+          classCd: {
+            type: String,
+            value: () => t('label.box_id')
+          },
+
+          /**
+           * @description 분류 코드 라벨
+           ****************
+           * @type {String}
+           */
+          classCdLabel: {
+            type: String,
+            value: () => t('label.class_cd')
+          },
+
+          /**
            * @description 박스 ID 라벨
            ****************
            * @type {String}
            */
-          boxInfoLabel: {
+          boxIdLabel: {
             type: String,
-            value: () => t('label.box')
+            value: () => t('label.box_id')
           },
 
           /**
@@ -209,15 +174,6 @@ Copyright © HatioLab Inc. All rights reserved.
           closeBtnLabel: {
             type: String,
             value: () => t('button.close')
-          },
-
-          /**
-           * @description 박스 정보 표시 값
-           ****************
-           * @type {String}
-           */
-          boxInfo: {
-            type: String
           },
 
           /**
@@ -252,7 +208,8 @@ Copyright © HatioLab Inc. All rights reserved.
       _boxPackChanged(boxPack) {
         if (boxPack && boxPack.id) {
           this.boxPackId = boxPack.id;
-          this.boxInfo = `${boxPack.box_id} [${boxPack.class_cd}]`;
+          this.boxId = boxPack.box_id;
+          this.classCd = boxPack.class_cd;
         }
       }
 

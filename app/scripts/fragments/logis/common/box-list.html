@@ -268,10 +268,7 @@ Copyright © HatioLab Inc. All rights reserved.
       _showDetailPopup(boxPack) {
         const boxDetailPopup = document.createElement('box-details');
         boxDetailPopup.boxPack = boxPack;
-
-        LOGIS_UTIL.showPopup(t('title.inbox_list'), boxDetailPopup, null, null, null, function() {
-          this.searchBoxList();
-        }.bind(this));
+        LOGIS_UTIL.showPopup(t('title.inbox_list'), boxDetailPopup, null, null, null);
       }
     }
 

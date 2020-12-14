@@ -262,11 +262,11 @@ Copyright © HatioLab Inc. All rights reserved.
 
       input#page,
       input#limit {
-        width: 50px;
+        width: 40px;
         background-color: rgba(0, 0, 0, .25);
         border: 1px solid rgba(255, 255, 255, .2);
         color: #fff;
-        text-align: right;
+        text-align: center;
         font-size: initial;
       }
 
@@ -297,13 +297,13 @@ Copyright © HatioLab Inc. All rights reserved.
       <iron-icon icon="icons:chevron-left" on-click="prevPage" class="prevPage"></iron-icon>
       <input id="page" type="number" name="page" max="[[lastPage]]" on-change="_initPage" value="[[page]]">
       <iron-icon icon="icons:chevron-right" on-click="nextPage" class="nextPage"></iron-icon>
-      <span><b>[[page]]</b> Page of [[endPage]] Pages</span>
+      <span><b>[[page]]</b> / [[endPage]]</span>
     </div>
 
     <div id="page-summary">
-      <span>Limit</span>
+      <span></span>
       <input id="limit" type="number" name="limit" id="limit" min="[[minLimit]]" max="[[maxLimit]]" on-change="_initLimit" value="[[limit]]">
-      <span>from [[beginDataNumber]] to [[endDataNumber]] Total [[total]]</span>
+      <span>[[beginDataNumber]]~[[endDataNumber]] ([[total]])</span>
     </div>
   </div>
   </div>
@@ -317,28 +317,36 @@ Copyright © HatioLab Inc. All rights reserved.
       static get properties() {
         return {
           /**
-           * list column header
+           * @description list column header
+           ****************
+           * @type {Array}
            */
           header: {
             type: Array
           },
 
           /**
-           * list data
+           * @description list data
+           ****************
+           * @type {Array}
            */
           data: {
             type: Array
           },
 
           /**
-           * header hidden 처리 flag
+           * @description header hidden 처리 flag
+           ****************
+           * @type {Boolean}
            */
           hideHeader: {
             type: Boolean
           },
 
           /**
-           * list header configured 여부 flag
+           * @description list header configured 여부 flag
+           ****************
+           * @type {Boolean}
            */
           isHeaderConfigured: {
             type: Boolean,
@@ -346,7 +354,9 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * list content configured 여부 flag
+           * @description list content configured 여부 flag
+           ****************
+           * @type {Boolean}
            */
           isContentConfigured: {
             type: Boolean,
@@ -354,7 +364,9 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * list 스타일을 dialog 타입에 맞추기 위한 flag
+           * @description list 스타일을 dialog 타입에 맞추기 위한 flag
+           ****************
+           * @type {Boolean}
            */
           dialog: {
             type: Boolean,
@@ -362,7 +374,9 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * pagination 처리 여부 flag
+           * @description pagination 처리 여부 flag
+           ****************
+           * @type {Boolean}
            */
           showPaginator: {
             type: Boolean,
@@ -371,7 +385,9 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 현재 리스트의 page 값
+           * @description 현재 리스트의 page 값
+           ****************
+           * @type {Number}
            */
           page: {
             type: Number,
@@ -379,9 +395,22 @@ Copyright © HatioLab Inc. All rights reserved.
             notify: true
           },
 
+
           /**
-           * 마지막 page 값
+           * @description 총 수량 
+           ****************
+           * @type {Number}
+           */
+          total: {
+            type: Number,
+            value: 0
+          },
+
+          /**
+           * @description 마지막 page 값
            * 기본값: 1
+           ****************
+           * @type {Number}
            */
           endPage: {
             type: Number,
@@ -389,7 +418,29 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 리스트 출력 limit
+           * @description 리스트 표현 범위 From
+           ****************
+           * @type {Number}
+           */
+          beginDataNumber: {
+            type: Number,
+            value: 0
+          },
+
+          /**
+           * @description 리스트 표현 범위 To
+           ****************
+           * @type {Number}
+           */
+          endDataNumber: {
+            type: Number,
+            value: 0
+          },
+
+          /**
+           * @description 리스트 출력 limit
+           ****************
+           * @type {Number}
            */
           limit: {
             type: Number,
@@ -398,7 +449,9 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 리스트 출력 limit minimum
+           * @description 리스트 출력 limit minimum
+           ****************
+           * @type {Number}
            */
           minLimit: {
             type: Number,
@@ -406,7 +459,9 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * 리스트 출력 limit maximum
+           * @description 리스트 출력 limit maximum
+           ****************
+           * @type {Number}
            */
           maxLimit: {
             type: Number,
@@ -424,7 +479,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * header, data의 값이 변경되면 list를 그림
+       * @description header, data의 값이 변경되면 list를 그림
        ****************
        * @param {Array} header,
        * @param {Array} data
@@ -477,8 +532,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * _renderContents에 의해 실행되는
-       * 리스트 해더 구성 function
+       * @description _renderContents에 의해 실행되는 리스트 해더 구성 function
        *****************
        * @param {Array} header
        */
@@ -499,8 +553,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * _renderContents에 의해 실행되는
-       * 리스트 데이터 구성 function
+       * @description _renderContents에 의해 실행되는 리스트 데이터 구성 function
        *****************
        * @param {Array} header
        * @param {Array} data
@@ -554,7 +607,8 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * _renderContent에 의해 실행되는 현재 리스트의 로우를 삭제하는 function
+       * @description _renderContent에 의해 실행되는 현재 리스트의 로우를 삭제하는 function
+       ******************
        */
       _clearRows() {
         const dataContainer = this.$['data-container'];
@@ -564,7 +618,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * _renderContent에 의해 실행되는 리스트의 데이터 로우를 생성하는 function
+       * @description _renderContent에 의해 실행되는 리스트의 데이터 로우를 생성하는 function
        *****************
        * @param {Number} columnCount: 해더 정보에서 추출한 컬럼의 수
        */
@@ -604,7 +658,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 컬럼 타입이 button인 경우에 button 엘리먼트를 생성하여 return 함
+       * @description컬럼 타입이 button인 경우에 button 엘리먼트를 생성하여 return 함
        *************
        * @param {String | Function} buttonCallback 버튼에 표시될 텍스트
        * @param {String} fieldname button이 할당 된 필드명칭 (복수의 버튼 컬럼이 있을 경우 구별하기 위해)
@@ -660,6 +714,13 @@ Copyright © HatioLab Inc. All rights reserved.
         return button;
       }
 
+      /**
+       * @description 이미지 그리드 아이템 생성
+       *************
+       * @param {Object} imageObj
+       * @param {String} src
+       * @param {Object} item
+       */
       createImageItem(imageObj, src, item) {
         const imgTag = new Image(imageObj.width, imageObj.height);
         imgTag.setAttribute('src', src);
@@ -693,7 +754,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 컬럼 타입이 일반인 경우에 span 엘리먼트를 생성하고 return 함
+       * @description 컬럼 타입이 일반인 경우에 span 엘리먼트를 생성하고 return 함
        *************
        * @param {String} value 필드의 값
        * @param {Object} rowData 현재 필드가 속해 있는 로우의 데이터 오브젝트
@@ -721,7 +782,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * style 오브젝트에 정의된 스타일 항목들을 loop를 돌며 적용함
+       * @description style 오브젝트에 정의된 스타일 항목들을 loop를 돌며 적용함
        *************
        * @param {Object} dataItem 필드의 값을 나타내는 span 엘리먼트
        * @param {Object} style 적용할 스타일의 오브젝트
@@ -733,7 +794,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 해더의 속성에서 hidden 처리가 된 컬럼의 데이터 필드들을 hidden 처리함
+       * @description 해더의 속성에서 hidden 처리가 된 컬럼의 데이터 필드들을 hidden 처리함
        *************
        * @param {Object} dataItem 필드의 값을 나타내는 span 엘리먼트
        */
@@ -742,7 +803,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * paginator 사용 여부를 결정하는 showPaginator의 값이 변경되면 호출
+       * @description paginator 사용 여부를 결정하는 showPaginator의 값이 변경되면 호출
        *************
        * @param {Boolean} showPaginator 페이지네이션 처리 여부를 결정하는 flag
        */
@@ -758,7 +819,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 페이지의 값이 변경될 경우 validation 이후 정상적이라면
+       * @description 페이지의 값이 변경될 경우 validation 이후 정상적이라면
        * this.page에 초기화하여 _pageChanged가 호출 되도록 함
        *************
        * @param {Object} event input on-change event
@@ -775,7 +836,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 리미트 값이 변경될 경우 validation 이후 정상적이라면
+       * @description 리미트 값이 변경될 경우 validation 이후 정상적이라면
        * this.limit에 초기화하여 _limitChanged가 호출 되도록 함
        *************
        * @param {Object} event input on-change event
@@ -793,7 +854,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * data, page, total, limit 값들이 변경될 때 호출되며
+       * @description data, page, total, limit 값들이 변경될 때 호출되며
        * 페이지네이터의 beginDataNumber, endDataNumber, endPage를 계산하고 초기화 함
        *************
        * @param {Array} data
@@ -810,7 +871,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 현재 페이지에서 시작되는 데이터가 몇 번째 데이터인지 표시하기 위한 값 중
+       * @description 현재 페이지에서 시작되는 데이터가 몇 번째 데이터인지 표시하기 위한 값 중
        * 첫번째 번호를 계산함
        *************
        * @return {Number}
@@ -820,7 +881,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 현재 페이지에서 끝나는 데이터가 몇 번째 데이터인지 표시하기 위한 값 중
+       * @description 현재 페이지에서 끝나는 데이터가 몇 번째 데이터인지 표시하기 위한 값 중
        * 마지막 번호를 계산함
        *************
        * @return {Number}
@@ -830,7 +891,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 마지막 페이지 값을 계산함
+       * @description 마지막 페이지 값을 계산함
        *************
        * @return {Number}
        */
@@ -839,7 +900,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * page or limit 변경시 호출되며
+       * @description page or limit 변경시 호출되며
        * paginator-changed 이벤트를 발생 시킴
        *************
        * @param {Number} page 현재 리스트의 페이지
@@ -855,7 +916,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * iron-icon click event handler
+       * @description iron-icon click event handler
        * 이전 페이지로
        * _initPage를 통해 this.page 값을 초기화 하기 위해
        * input change 이벤트를 발생
@@ -869,7 +930,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * iron-icon click event handler
+       * @description iron-icon click event handler
        * 다음 페이지로
        * _initPage를 통해 this.page 값을 초기화 하기 위해
        * input change 이벤트를 발생
@@ -883,7 +944,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 현재 페이지 이상의 페이지가 있는지 여부를 return
+       * @description 현재 페이지 이상의 페이지가 있는지 여부를 return
        *************
        * @param {Number} page 현재 페이지 값
        * @return {Boolean}

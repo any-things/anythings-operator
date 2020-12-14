@@ -47,7 +47,7 @@ window.locales['ko-KR'] = {
   'label.box_in_qty': '입수',
   'label.error_range': '오차범위',
   'label.total_weight': '총중량',
-  'label.process_qty': '처리수량',
+  'label.process_qty': '처리 수량',
   'label.work_side': '작업 사이드',
   'label.total_pick_qty': '총 피킹 수량',
   'label.load_qty': '적치 수량',
@@ -177,6 +177,10 @@ window.locales['ko-KR'] = {
   'label.result': '실적',
   'label.dest_cd': '착지 코드',
   'label.dest_nm': '착지 명',
+  'label.input': '투입',
+  'label.not_input': '미투입',
+  'label.middle_assort': '중분류',
+  'label.seq': '순번',
 
   // menu list
   'menu.Settings': '설정',
@@ -224,6 +228,9 @@ window.locales['ko-KR'] = {
   'menu.StockLoadFixed': '고정셀 적치',
   'menu.StockSupply': '사전 보충',
   'menu.ReturnInspection': '반품 검수',
+  'menu.B2BOutAssort': 'DAS 소분류',
+  'menu.B2BOutAssortMobile': 'DAS 소분류',
+  'menu.B2BOutMiddleAssortMobile': 'DAS 중분류',
 
   // button list
   'button.logout': '로그아웃',
@@ -275,6 +282,8 @@ window.locales['ko-KR'] = {
   'button.detailed_content': '내역보기',
   'button.update': '업데이트',
   'button.manual_picking': '피킹',
+  'button.ind_on': '표시기점등',
+  'button.ind_off': '표시기소등',
 
   // text list
   'text.login_failure': '로그인 실패',

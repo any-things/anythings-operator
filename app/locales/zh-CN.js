@@ -176,6 +176,10 @@ window.locales['zh-CN'] = {
   'label.result': 'Result',
   'label.dest_cd': '착지 코드',
   'label.dest_nm': '착지 명',
+  'label.input': '투입',
+  'label.not_input': '미투입',
+  'label.middle_assort': '중분류',
+  'label.seq': '순번',
 
   // menu list
   'menu.Settings': '设置',
@@ -222,6 +226,9 @@ window.locales['zh-CN'] = {
   'menu.RtnRemainsBox': '退货残量处理',
   'menu.StockLoadFixed': '固化库位补充',
   'menu.ReturnInspection': '退貨驗收',
+  'menu.B2BOutAssort': 'DAS 소분류',
+  'menu.B2BOutAssortMobile': 'DAS 소분류',
+  'menu.B2BOutMiddleAssortMobile': 'DAS 중분류',
 
   // button list
   'button.logout': '注销',
@@ -273,6 +280,8 @@ window.locales['zh-CN'] = {
   'button.detailed_content': 'View Contents',
   'button.update': 'Update',
   'button.manual_picking': 'Picking',
+  'button.ind_on': '표시기 점등',
+  'button.ind_off': '표시기 소등',
 
   // text list
   'text.login_failure': '认证失败！',

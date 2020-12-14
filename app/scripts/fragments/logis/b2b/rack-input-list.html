@@ -151,7 +151,7 @@ Copyright © HatioLab Inc. All rights reserved.
               }, {
                 display: t('label.picked_qty') + ' / ' + t('label.pick_qty'),
                 fieldname: 'total_pick_qty',
-                columnWidth: '0.25fr',
+                columnWidth: '0.3fr',
                 style: {
                   textAlign: 'right'
                 },
@@ -335,12 +335,6 @@ Copyright © HatioLab Inc. All rights reserved.
           if (rowData.plan_qty === rowData.result_qty) {
             row.classList.add('complete');
           }
-          /*const status = row.getData().status;
-          if (status === 'F') { // 완료 상태
-            row.classList.add('complete');
-          } else if (status === 'U') { // 미완료 상태
-            row.classList.add('canceled');
-          }*/
         });
       }
 
@@ -353,7 +347,7 @@ Copyright © HatioLab Inc. All rights reserved.
         const content = document.createElement('rack-input-details');
         content.data = event.detail.data;
         content.stationOnly = this.$['station-only'].checked == true ? true : false;
-        LOGIS_UTIL.showPopup(null, content, 'fit', 'fit');
+        LOGIS_UTIL.showPopup(null, content, null, null, null);
       }
     }
 

@@ -175,6 +175,10 @@ window.locales['en-US'] = {
   'label.result': 'Result',
   'label.dest_cd': '착지 코드',
   'label.dest_nm': '착지 명',
+  'label.input': 'Input',
+  'label.not_input': 'NotInput',
+  'label.middle_assort': 'Middle Assort',
+  'label.seq': 'Seq.',
 
   // menu list
   'menu.Settings': 'Setting',
@@ -221,6 +225,9 @@ window.locales['en-US'] = {
   'menu.RtnRemainsBox': 'Fullbox Remains',
   'menu.StockLoadFixed': 'Load Stock To Fixed',
   'menu.ReturnInspection': 'Return Inspection',
+  'menu.B2BOutAssort': 'DAS Assorting',
+  'menu.B2BOutAssortMobile': 'DAS Assorting',
+  'menu.B2BOutMiddleAssortMobile': 'DAS Middle Assort',
 
   // button list
   'button.logout': 'Logout',
@@ -272,6 +279,8 @@ window.locales['en-US'] = {
   'button.detailed_content': 'View Contents',
   'button.update': 'Update',
   'button.manual_picking': 'Picking',
+  'button.ind_on': 'Indicator On',
+  'button.ind_off': 'Indicator Off',
 
   // text list
   'text.login_failure': 'Failed to Login',

@@ -18,7 +18,7 @@ Copyright © HatioLab Inc. All rights reserved.
   물류 > B2B > 출고 소분류 처리 화면 (Tablet)
 -->
 
-<dom-module id="b2b-job-assort">
+<dom-module id="b2b-out-assort">
   <template>
     <style include="tab-das-assort-styles">
       #info-section {
@@ -154,9 +154,9 @@ Copyright © HatioLab Inc. All rights reserved.
   </template>
 
   <script>
-    class B2BJobAssort extends LogisMsgSubscribeMixin(LosisB2BPickerMixin(BleScannerMixin(Polymer.Element))) {
+    class B2BOutAssort extends LogisMsgSubscribeMixin(LosisB2BPickerMixin(BleScannerMixin(Polymer.Element))) {
       static get is() {
-        return 'b2b-job-assort'
+        return 'b2b-out-assort'
       }
 
       static get properties() {
@@ -614,6 +614,6 @@ Copyright © HatioLab Inc. All rights reserved.
       }
     }
 
-    customElements.define(B2BJobAssort.is, B2BJobAssort);
+    customElements.define(B2BOutAssort.is, B2BOutAssort);
   </script>
 </dom-module>

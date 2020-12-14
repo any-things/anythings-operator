@@ -12,22 +12,18 @@ Copyright © HatioLab Inc. All rights reserved.
   <template>
     <style>
       :host {
-        display: flex;
         flex: 1;
-        flex-direction: column;
-        padding: 15px;
-        width: calc(100% - 30px);
-        height: calc(100% - 30px);
       }
       #container {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
+        display: grid;
+        height: calc(100% - 30px);
+        padding: 10px;
+        text-align: -webkit-center;
       }
       #summary {
         display: flex;
         flex-direction: column;
-        padding: 15px;
+        padding: 10px;
         margin-bottom: 10px;
         background-color:var(--things-primary-color) ;
         border-radius:var(--things-default-border-radius);
@@ -52,7 +48,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
       #button-container {
         display: grid;
-        margin-top: 15px;
+        margin-top: 10px;
         justify-items: end;
       }
       button {
@@ -61,7 +57,7 @@ Copyright © HatioLab Inc. All rights reserved.
       button:active {
         @apply --operator-default-btn-active;
       }
-      button:focus{
+      button:focus {
         outline:none
       }
     </style>
@@ -79,6 +75,13 @@ Copyright © HatioLab Inc. All rights reserved.
     <div id="container">
       <!-- 상품 정보 표시 영역 -->
       <div id="summary">
+        <!-- 상품 코드 정보 표시 영역 -->
+        <div class="sku-info">
+          <span class="label">[[skuCodeLabel]]</span>
+          <span class="value">[[skuCode]]</span>
+        </div>
+
+        <!-- 상품명 정보 표시 영역 -->
         <div class="sku-info">
           <span class="label">[[skuNameLabel]]</span>
           <span class="value">[[skuName]]</span>
@@ -91,9 +94,9 @@ Copyright © HatioLab Inc. All rights reserved.
         </div>
       </div>
 
-      <!-- 투입 상품 처리 리스트 표시 영역 -->
+      <!-- 투입 상품 처리 현황 리스트 표시 영역 -->
       <item-list
-        id="cust-list"
+        id="input-list"
         header="[[header]]"
         data="[[items]]"
         dialog
@@ -115,6 +118,16 @@ Copyright © HatioLab Inc. All rights reserved.
 
       static get properties() {
         return {
+          /**
+           * @description 상품 코드 라벨
+           ****************
+           * @type {String}
+           */
+          skuCodeLabel: {
+            type: String,
+            value: () => t('label.seq') + '/' + t('label.sku_cd')
+          },
+
           /**
            * @description 상품명 라벨
            ****************
@@ -231,20 +244,27 @@ Copyright © HatioLab Inc. All rights reserved.
               return [{
                 display: t('label.cell'),
                 fieldname: 'sub_equip_cd',
-                columnWidth: '110px'
+                columnWidth: '1.5fr'
               }, {
                 display: t('label.order'),
-                fieldname: 'class_cd'
+                fieldname: 'class_cd',
+                columnWidth: '2fr'
               }, {
-                display: t('label.qty'),
+                display: t('label.process_qty'),
                 fieldname: 'display_qty',
-                columnWidth: '90px',
+                columnWidth: '1fr',
                 style: {
-                  textAlign: 'right'
+                  textAlign: 'center'
                 },
                 displayCallback: (value, rowData) => {
                   return `${rowData['picked_qty']}/${rowData['pick_qty']}`;
                 }
+              }, {
+                fieldname: 'pick_qty',
+                hidden: true
+              }, {
+                fieldname: 'picked_qty',
+                hidden: true
               }, {
                 fieldname: 'status',
                 hidden: true
@@ -263,11 +283,9 @@ Copyright © HatioLab Inc. All rights reserved.
       _addCompleteAttribute(event) {
         const rows = event.detail.contentElements;
         rows.forEach(row => {
-          const status = row.getData().status;
-          if (status === 'F') { // 완료 상태
+          const data = row.getData();
+          if (data.pick_qty == data.picked_qty) {
             row.classList.add('complete');
-          } else if (status === 'U') { // 미완료 상태
-            row.classList.add('canceled');
           }
         });
       }
@@ -283,7 +301,7 @@ Copyright © HatioLab Inc. All rights reserved.
           this.skuCd = data.sku_cd;
           this.skuName = data.sku_nm;
           this.inputSeq = data.input_seq;
-
+          this.skuCode = `(${this.inputSeq}) ${this.skuCd}`;
           let equipType = LOGIS_UTIL.getEquipType();
           let equipCd = LOGIS_UTIL.getEquipCd();
           let stationCd = LOGIS_UTIL.getStationCd();

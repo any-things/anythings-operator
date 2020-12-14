@@ -55,33 +55,55 @@ Copyright © HatioLab Inc. All rights reserved.
 
       static get properties() {
         return {
+          /**
+           * @description 닫기 버튼 라벨
+           ****************
+           * @type {String}
+           */
           closeBtnLabel: {
             type: String,
             value: () => t('button.close')
           },
 
+          /**
+           * @description 표시기 점/소등 라벨
+           ****************
+           * @type {String}
+           */
           buttons: {
             type: Array,
             value: () => [{
-              id: 'mpi-on',
-              label: t('button.start_job')
+              id: 'ind-on',
+              label: t('button.relight')
             }, {
-              id: 'mpi-off',
-              label: t('button.end_inspection')
+              id: 'ind-off',
+              label: t('button.ind_off')
             }]
           }
         }
       }
 
+      /**
+       * @description 버튼 클릭 핸들러
+       *******************
+       * @param {Object} event
+       */
       _clickHandler(event) {
-        this._closeDialog();
+        // 클릭 이벤트 처리
         this.dispatchEvent(new CustomEvent('btn-click', {
           detail: {
             buttonId: event.currentTarget.id
           }
         }));
+
+        // 팝업 닫기
+        this._closeDialog();
       }
 
+      /**
+       * @description 팝업 닫기
+       *******************
+       */
       _closeDialog() {
         LOGIS_UTIL.closePopup();
       }
