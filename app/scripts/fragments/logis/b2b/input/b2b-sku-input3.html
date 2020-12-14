@@ -1218,10 +1218,11 @@ Copyright © HatioLab Inc. All rights reserved.
         if (detail && detail.msg == 'already-input-sku-want-to-inspection') {
           LOGIS_UTIL.showConfirm(t('text.checking_inspection'), t('text.check_inspection'), this._barcodeInputReset.bind(this), function() {
             const equipCd = LOGIS_UTIL.getEquipCd();
+            const equipType = LOGIS_UTIL.getEquipType();
             let stationCd = LOGIS_UTIL.getStationCd();
             let comCd = this.sku.com_cd;
             let skuCd = this.sku.sku_cd;
-            this.doInspectTransaction(equipCd, stationCd, comCd, skuCd);
+            this.doInspectTransaction(equipType, equipCd, stationCd, comCd, skuCd);
             this._initialSetup();
             this._scannedFlag = false;
           }.bind(this));
@@ -1266,15 +1267,17 @@ Copyright © HatioLab Inc. All rights reserved.
       /**
        * @description 상품 검수 API 호출
        ******************
+       * @param {String} equipType
        * @param {String} equipCd
        * @param {String} stationCd
        * @param {String} comCd
        * @param {String} skuCd
        */
-      doInspectTransaction(equipCd, stationCd, comCd, skuCd) {
+      doInspectTransaction(equipType, equipCd, stationCd, comCd, skuCd) {
         const inspectAjax = this.$['inspect-sku-ajax'];
         inspectAjax.curl = '/device_process/dynamic/DAS/inspect_by_indicator';
         inspectAjax.customParams = {
+          equipType: equipType,
           equipCd: equipCd,
           stationCd: stationCd,
           comCd: comCd,
