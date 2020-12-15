@@ -1,0 +1,392 @@
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+
+<link rel="import" href="../../../../../bower_components/polymer/polymer-element.html">
+
+<!--
+  물류 > B2B > 셀 별 박스 매핑 화면 (PDA)
+-->
+<dom-module id="b2b-cell-box-mapping">
+  <template>
+    <style include="shared-styles">
+      :host {
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+        height: calc(100% - 40px);
+      }
+      #container {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+        background-color: var(--things-white-opacity-background-color);
+        border-radius: var(--things-default-border-radius);
+        color: rgba(255,255,255,.8);
+      }
+      #input-container {
+        display: grid;
+        grid-template-columns: 30% calc(70% - 12px);
+        grid-gap:12px;
+      }
+      .list-container {
+        display: flex;
+        flex: 1;
+        margin-top: 12px;
+      }
+      .label {
+        font-size:.8rem;
+        margin: auto 5px auto auto;
+      }
+      .button-container {
+        text-align: right;
+        justify-content: end;
+        margin-top: 12px;
+      }
+    </style>
+
+    <!-- 새로고침 서비스 -->
+    <sys-ajax
+      auto
+      id="refresh-ajax"
+      method="GET"
+      content-type="application/json"
+      last-response="{{refreshResponse}}">
+    </sys-ajax>
+
+    <!-- 박스 - 셀 매핑 처리 -->
+    <sys-ajax
+      id="box-mapping-ajax"
+      method="PUT"
+      content-type="application/json"
+      on-sys-ajax-response="_onBoxMappingResponse">
+    </sys-ajax>
+
+    <!-- 박스 - 셀 매핑 해제 서비스 -->
+    <sys-ajax
+      id="clear-box-mapping"
+      method="PUT"
+      content-type="application/json"
+      on-sys-ajax-response="_onBoxMappingResponse">
+    </sys-ajax>
+
+    <!-- 화면 -->
+    <div id="container">
+      <div id="input-container">
+        <!-- 셀 코드 입력 -->
+        <span class="label">[[cellCodeLabel]]</span>
+        <input barcode id="cell-cd" type="text" name="cell_cd" on-keypress="_cellInputKeypress">
+
+        <!-- 박스 ID 입력 -->
+        <span class="label">[[boxIdLabel]]</span>
+        <input id="box-id" type="text" name="box_id" on-focus="_hideKeyboard" on-keypress="_boxInputKeypress">
+      </div>
+
+      <!-- 셀 - 박스 매핑 리스트 -->
+      <div class="list-container">
+        <item-list 
+          header="[[header]]" 
+          data="[[items]]"
+          on-btn-click="_cellButtonClicked"
+          on-data-list-click="_onItemClick">
+        </item-list>
+      </div>
+
+      <!-- 버튼 -->
+      <div class="button-container">
+        <button on-click="refreshList">[[refreshBtnLabel]]</button>
+        <button on-click="_clearView">[[resetBtnLabel]]</button>
+      </div>
+    </div>
+  </template>
+
+  <script>
+    class B2BCellBoxMapping extends BarcodeScannerMixin(Polymer.Element) {
+      static get is() {
+        return 'b2b-cell-box-mapping'
+      }
+
+      static get properties() {
+        return {
+          /**
+           * @description 셀 코드 라벨
+           ****************
+           * @type {String}
+           */
+          cellCodeLabel: {
+            type: String,
+            value: () => t('label.cell')
+          },
+
+          /**
+           * @description 박스 ID 라벨
+           ****************
+           * @type {String}
+           */
+          boxIdLabel: {
+            type: String,
+            value: () => t('label.box_id')
+          },
+
+          /**
+           * @description 새로고침 버튼 라벨 
+           ****************
+           * @type {String}
+           */
+          refreshBtnLabel: {
+            type: String,
+            value: () => t('button.refresh')
+          },
+
+          /**
+           * @description 초기화 라벨
+           ****************
+           * @type {String}
+           */
+          resetBtnLabel: {
+            type: String,
+            value: () => t('button.reset')
+          },
+
+          /**
+           * @description 새로고침 서비스 호출 결과
+           ****************
+           * @type {Object}
+           */
+          refreshResponse: {
+            type: Object,
+            observer: "_refreshResponseChanged"
+          },
+
+          /**
+           * @description 그리드 헤더
+           ****************
+           * @type {Array}
+           */
+          header: {
+            type: Array,
+            value: () => {
+              return [{
+                display: t('label.cell'),
+                fieldname: 'cell_cd',
+                style: {
+                  textAlign: 'center'
+                }
+              }, {
+                display: t('label.box_id'),
+                fieldname: 'box_id',
+                style: {
+                  textAlign: 'center'
+                },
+                displayCallback: (value) => {
+                  return value ? value : '';
+                }
+              }, {
+                display: '',
+                fieldname: 'clear_box_id',
+                columnWidth: '50px',
+                displayCallback: (value, row) => {
+                  return row.box_id || '';
+                },
+                button: (item, button) => {
+                  let text = '';
+                  if (item.box_id) {
+                    text = ' X ';
+                  } else {
+                    button.setAttribute('hidden', true);
+                  }
+                  return text;
+                }
+              }]
+            }
+          },
+
+          /**
+           * @description 그리드 데이터 
+           ****************
+           * @type {Array}
+           */
+          items: {
+            type: Array,
+            value: () => {
+              return [];
+            }
+          }
+        }
+      }
+
+      /**
+       * @description connectedCallback
+       ******************
+       */
+      connectedCallback() {
+        super.connectedCallback();
+        document.addEventListener(`alert-closed-at-${location.hash.replace('#/', '')}`, event => {
+          if (!event.detail.hasCallback) {
+            this._initialSetup();
+          }
+        });
+
+        // 3초 후에 데이터 조회
+        setTimeout(this.refreshList.bind(this), 3000);
+      }
+
+      /**
+       * @description cell-cd input keypress event handler
+       * cell-cd 바코드 스캔시 box-id 필드로 이동
+       ******************
+       */
+      _cellInputKeypress(event) {
+        if (event.charCode === 13) {
+          this.$['box-id'].select();
+        }
+      }
+
+      /**
+       * @description box-id input keypress event handler
+       * box-id 바코드 스캔시 박스 매핑 처리
+       ******************
+       */
+      _boxInputKeypress(event) {
+        if (event.charCode === 13) {
+          this.doBoxMapping();
+        }
+      }
+
+      /**
+       * @description validation 진행 후 박스 매핑 처리 
+       ******************
+       */
+      doBoxMapping() {
+        try {
+          this.validateBeforeMapping();
+          const boxMappingAjax = this.$['box-mapping-ajax'];
+          const cellCd = this.$['cell-cd'].value;
+          const boxId = this.$['box-id'].value;
+          const equipType = LOGIS_UTIL.getEquipType();
+          const equipCd = LOGIS_UTIL.getEquipCd();
+          boxMappingAjax.curl = `/device_process/assign/cell_box/${equipType}/${equipCd}/${cellCd}/${boxId}?isSkipEquipCheck=true`;
+          boxMappingAjax.generateRequest();
+        } catch (error) {
+          LOGIS_UTIL.showMessage(error.title, error.message, error.confirmCallback.bind(this));
+        }
+      }
+
+      /**
+       * @description 현재 호기의 로케이션 목록 ajax 호출
+       ********************************************
+       */
+      refreshList() {
+        const refreshAjax = this.$['refresh-ajax'];
+        refreshAjax.curl = `/device_process/search/cell_mappings/${LOGIS_UTIL.getEquipType()}/${LOGIS_UTIL.getEquipCd()}`;
+
+        var params = {
+          sort: JSON.stringify([{
+            field: 'cell_cd',
+            ascending: true
+          }]),
+
+          limit: 1000
+        };
+
+        refreshAjax.params = params;
+        this._clearView();
+      }
+
+      /**
+       * @description 박스 매핑 시도 이전에 수행하는 유효성 검사
+       ******************
+       */
+      validateBeforeMapping() {
+        let cellCd = this.$['cell-cd'].value;
+        let boxId = this.$['box-id'].value;
+
+        if (!cellCd) {
+          throw {
+            title: t('error.VALIDATION_ERROR'),
+            message: t('error.loc_cd_invalid'),
+            confirmCallback: this._clearView
+          }
+        } else if (!boxId) {
+          throw {
+            title: t('error.VALIDATION_ERROR'),
+            message: t('error.box_id_invalid'),
+            confirmCallback: () => {
+              this.$['box-id'].select();
+            }
+          }
+        }
+      }
+
+      /**
+       * @description 새로고침 서비스 호출 결과 변경시
+       *********************
+       * @param {Object} response
+       */
+      _refreshResponseChanged(response) {
+        this.items = response ? response : [];
+      }
+
+      /**
+       * @description 박스 할당 요청 성공 event handler 화면을 clear
+       ******************
+       * @param {Object} event
+       */
+      _onBoxMappingResponse(event) {
+        this.refreshList();
+      }
+
+      /**
+       * @description 초기화 버튼을 통해 화면에서 설정한 값들을 초기화 함
+       ******************
+       */
+      _clearView() {
+        this.$['cell-cd'].value = '';
+        this.$['box-id'].value = '';
+        this._initialSetup();
+      }
+
+      /**
+       * @description 리스트 내부의 버튼 클릭 시 이벤트 핸들러
+       *********************
+       * @param {Object} event
+       */
+      _cellButtonClicked(event) {
+        let fieldname = event && event.detail && event.detail.fieldname;
+        let data = event && event.detail && event.detail.data;
+        let cellCd = data.cell_cd;
+
+        if (fieldname === 'clear_box_id') {
+          this.clearBoxMapping(cellCd);
+        }
+      }
+
+      /**
+       * @description 박스 할당 초기화
+       *********************
+       * @param {String} cellCode
+       */
+      clearBoxMapping(cellCode) {
+        let ajax = this.$['clear-box-mapping'];
+        var equipType = LOGIS_UTIL.getEquipType();
+        var equipCd = LOGIS_UTIL.getEquipCd();
+        ajax.curl = `/device_process/cancel/cell_box/${equipType}/${equipCd}/${cellCode}`;
+        ajax.generateRequest();
+      }
+
+      /**
+       * @description 그리드의 아이템 클릭 이벤트 핸들러 
+       *********************
+       * @param {Object} event
+       */
+      _onItemClick(event) {
+        this.$['cell-cd'].value = event.detail.data.cell_cd;
+        this.$['box-id'].select();
+      }
+    }
+
+    customElements.define(B2BCellBoxMapping.is, B2BCellBoxMapping);
+  </script>
+</dom-module>
