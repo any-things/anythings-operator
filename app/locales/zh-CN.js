@@ -211,7 +211,7 @@ window.locales['zh-CN'] = {
   'menu.QpsStoreOutInspection': 'DAS出库检验',
   'menu.B2BQtyInspection': 'DAS 검수',
   'menu.B2BWeightInspection': 'DAS 검수',
-  'menu.CellBoxMappingStatus': '箱分配',
+  'menu.CellBoxMapping': '箱分配',
   'menu.B2CPickSinglePack': 'B2C单品拣选',
   'menu.PackingCheck': 'B2C包装',
   'menu.TabletBoxCellMappingStatus': '셀-박스 매핑현황',

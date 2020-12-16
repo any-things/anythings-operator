@@ -212,7 +212,7 @@ window.locales['ko-KR'] = {
   'menu.QpsStoreOutInspection': 'DPS 출고검수',
   'menu.B2BQtyInspection': 'DAS 검수',
   'menu.B2BWeightInspection': 'DAS 검수',
-  'menu.CellBoxMappingStatus': '셀-박스 매핑',
+  'menu.CellBoxMapping': '셀-박스 매핑',
   'menu.B2CPickSinglePack': '단포 작업',
   'menu.PackingCheck': '포장 작업',
   'menu.TabletBoxCellMappingStatus': '셀-박스 매핑현황',

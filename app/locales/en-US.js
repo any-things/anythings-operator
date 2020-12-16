@@ -210,7 +210,7 @@ window.locales['en-US'] = {
   'menu.QpsStoreOutInspection': 'DPS Final Inspection',
   'menu.B2BQtyInspection': 'DAS Final Inspection',
   'menu.B2BWeightInspection': 'DAS Final Inspection (With Weight)',
-  'menu.CellBoxMappingStatus': 'Cell-Box Mapping',
+  'menu.CellBoxMapping': 'Cell-Box Mapping',
   'menu.B2CPickSinglePack': 'B2C Single Packing',
   'menu.PackingCheck': 'B2C Packing',
   'menu.TabletBoxCellMappingStatus': 'Cell-Box Mapping Status',
