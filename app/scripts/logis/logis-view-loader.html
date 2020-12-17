@@ -23,11 +23,7 @@ Copyright © HatioLab Inc. All rights reserved.
               src: './scripts/components/sys/sys-route.html'
             }, {
               src: './scripts/fragments/sys/sys-setting.html'
-            }, 
-            // {
-            //   src: './scripts/fragments/logis/logis-home.html'
-            // }, 
-            {
+            }, {
               src: './scripts/fragments/logis/logis-setting.html'
             }, {
               src: './scripts/fragments/logis/logis-login.html'
@@ -172,30 +168,30 @@ Copyright © HatioLab Inc. All rights reserved.
 
         // 페이지 변경 이벤트 리스너 등록
         document.addEventListener('menu-info-changed', event => {
+          let menus = event.detail;
+          let viewElements = menus.map(menu => {
+            let element = {};
+            element.route = menu.routing;
+            element.elementName = menu.template.substring(menu.template.lastIndexOf('/') + 1, menu.template.length);
+            element.src = './scripts/fragments/' + menu.template + '.html'
+            return element;
+          });
+          this.set('viewElements', viewElements);
+        })
 
-            let menus = event.detail;
-            let viewElements = menus.map(menu => {
-              let element = {};
-              element.route = menu.routing;
-              element.elementName = menu.template.substring(menu.template.lastIndexOf('/') + 1, menu.template.length);
-              element.src = './scripts/fragments/' + menu.template + '.html'
-              return element;
-            })
-            this.set('viewElements', viewElements);
-          })
         // 페이지 변경 이벤트 리스너 등록
         document.addEventListener('page-changed', event => {
           let targetElement = [];
           let targetIndex;
 
-          this.viewElements?this.viewElements.forEach((element, index) => {
+          this.viewElements ? this.viewElements.forEach((element, index) => {
             // viewElements 중 현재 라우팅의 src를 찾아서
             // targetElement와 targetIndex를 초기화
             if (element.route === event.detail.currentPage) {
               targetIndex = index;
               targetElement.push(element);
             }
-          }):null;
+          }) : null;
 
           // 임포트 대상 엘리먼트가 있다면
           if (targetElement && targetElement.length > 0) {

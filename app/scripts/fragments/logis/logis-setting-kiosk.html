@@ -307,9 +307,13 @@ Copyright © HatioLab Inc. All rights reserved.
        * menu-info-changed 이벤트를 발생시켜 sys-route를 통해 데이터를 기반으로한
        * header의 title을 결정함
        **********************
-       * @param {Array} screenList
+       * @param {Array} screens
        */
-      _renderScreenCombo(screenList) {
+      _renderScreenCombo(screens) {
+        let screenList = screens.filter(menu => {
+          return menu.menu_type === 'SCREEN'
+        });
+
         const screenCombo = this._getScreenCombo();
         this._clearCombo(screenCombo);
 
