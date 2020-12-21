@@ -231,6 +231,7 @@ window.locales['ko-KR'] = {
   'menu.B2BOutAssort': 'DAS 소분류',
   'menu.B2BOutAssortMobile': 'DAS 소분류',
   'menu.B2BOutMiddleAssortMobile': 'DAS 중분류',
+  'menu.SimpleAssorting': 'PDAS 분류작업',
 
   // button list
   'button.logout': '로그아웃',

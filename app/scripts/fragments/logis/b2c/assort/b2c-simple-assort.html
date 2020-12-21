@@ -1,0 +1,767 @@
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+
+<link rel="import" href="../../../../../bower_components/polymer/polymer-element.html">
+
+<link rel="import" href="../../../../components/common/auto-popup-input.html">
+
+<!--
+  물류 > B2C > PDAS 작업 화면 (PDA)
+-->
+<dom-module id="b2c-simple-assort">
+  <template>
+    <style include="shared-styles">
+      :host {
+        display: block;
+        padding: 10px;
+        height: calc(100% - 20px);
+      }
+      .msg-container {
+        height: 90px;
+        background-color:var(--things-primary-color) ;
+        border-radius:var(--things-default-border-radius);
+        color:#fff;
+        text-align: center;
+        padding: 20px;
+        margin-top: 10px;
+        margin-bottom: 10px;
+      }
+      .msg-container .row .label {
+        font-weight: bold;
+        font-size: 1.1rem;
+        text-align: center;
+      }
+      .input-container {
+        padding: 10px;
+        background-color: var(--things-white-opacity-background-color);
+        border-radius: var(--things-default-border-radius);
+        color: rgba(255,255,255,.8);
+
+        display: grid;
+        grid-template-columns: 35% 65%;
+        grid-gap:7px 0;
+      }
+      #bottom-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr 1fr;
+        grid-template-areas: "a b c d";
+        margin-top: 10px;
+        grid-gap: 15px;
+        padding: 10px;
+        background-color: var(--things-white-opacity-background-color);
+        border-radius: var(--things-default-border-radius);
+        color: rgba(255,255,255,.8);
+      }
+      .button-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr 1fr;
+        grid-template-areas: "a b c d";
+        grid-gap: 15px;
+        justify-content: end;
+        margin-top: 15px;
+      }
+      .label {
+        font-size:.8rem;
+        margin: auto 5px auto auto;
+      }
+      .btn {
+        min-width: 28vw;
+      }
+      #clear-btn {
+        grid-area: d;
+      }
+
+      .bar-chart {
+        display: flex;
+        flex-direction: row;
+        padding-bottom: 10px;
+      }
+      .bar-chart .label {
+        min-width: 12vw;
+        font-size: .8rem;
+        color: white;
+        margin: auto 10px auto auto;
+      }
+      .bar-chart .bar {
+        display: inline-block;
+        flex: 1;
+        background-color: rgba(0, 0, 0, .2);
+        border-radius: var(--things-default-border-radius);
+      }
+      .bar-chart .chart-value {
+        display: inline-block;
+        border-radius: var(--things-default-border-radius);
+        margin: 0px 5px 0px 5px;
+        text-align: right;
+        padding: 0px 5px 0px 5px;
+        font-size: 18px;
+        color: white;
+        font-weight: bold;
+        white-space: nowrap;
+      }
+      .bar-chart #order-progress-bar {
+        background-color: #3f89c9;
+        display: block;
+        margin-left: 0px;
+        padding: 5px;
+      }
+      .bar-chart #pcs-progress-bar {
+        background-color: #0aab4a;
+        display: block;
+        margin-left: 0px;
+        padding: 5px;
+      }
+    </style>
+
+    <!-- 배치의 작업 진행율 조회를 위한 Ajax -->
+    <sys-ajax
+      id="find-job-progress-ajax"
+      curl="/device_process/dynamic/pdas/batch_summary"
+      method="GET"
+      content-type="application/json"
+      on-sys-ajax-response="_onJobProgressFound"
+      on-sys-ajax-error="_commonErrorHandler">
+    </sys-ajax>
+
+    <!-- 상품 정보로 부터 주문 정보 조회를 위한 Ajax -->
+    <sys-ajax
+      id="find-order-ajax"
+      curl="/device_process/dynamic/pdas/find_order"
+      method="GET"
+      content-type="application/json"
+      on-sys-ajax-response="_onOrderFound"
+      on-sys-ajax-error="_commonErrorHandler">
+    </sys-ajax>
+
+    <!-- 분류 처리를 위한 Ajax -->
+    <sys-ajax
+      id="simple-assort-ajax"
+      curl="/device_process/dynamic/pdas/assort"
+      method="PUT"
+      content-type="application/json"
+      on-sys-ajax-response="_onOrderAssorted"
+      on-sys-ajax-error="_assortErrorHandler">
+    </sys-ajax>
+
+    <!-- 박싱 처리를 위한 Ajax -->
+    <sys-ajax
+      id="simple-boxing-ajax"
+      curl="/device_process/dynamic/pdas/boxing"
+      method="PUT"
+      content-type="application/json"
+      on-sys-ajax-response="_onBoxProcessed"
+      on-sys-ajax-error="_boxingErrorHandler">
+    </sys-ajax>
+
+    <!-- 주문 진척율 차트 -->
+    <div class="bar-chart">
+      <span class="label">[[orderProgressRateLabel]]</span>
+      <div class="bar">
+        <span id="order-progress-bar" class="chart-value"
+          style="width:calc([[orderProgressPercent]]% - 10px)">[[planActualLabel]] ([[totalPickedQty]]/[[totalOrderQty]]) [[orderProgressPercent]]%</span>
+      </div>
+    </div>
+
+    <!-- PCS 진척율 차트 -->
+    <div class="bar-chart">
+      <span class="label">[[pcsProgressRateLabel]]</span>
+      <div class="bar">
+        <span id="pcs-progress-bar" class="chart-value"
+          style="width:calc([[pcsProgressPercent]]% - 10px)">[[planActualLabel]] ([[totalPickedPcs]]/[[totalOrderPcs]]) [[pcsProgressPercent]]%</span>
+      </div>
+    </div>
+
+    <!-- 입력 파트 -->
+    <div class="input-container">
+      <!-- 상품 바코드 -->
+      <span class="label">[[skuBarcdLabel]]</span>
+      <auto-popup-input
+        hide-keyboard
+        allowed-focus-out
+        id="sku-barcd"
+        on-before-request = "_beforeFindSkuHandler"
+        resource-url="[[findSkuUrl]]"
+        popup-title="[[popupTitleLabel]]"
+        button-txt-callback="[[_skuButtonTxtCallback]]"
+        on-item-selected="_onSkuItemSelected">
+      </auto-popup-input>
+
+      <!-- 셀 번호 -->
+      <span class="label">[[cellLabel]]</span>
+      <input id="cell-cd" type="text" name="cell_cd" value="[[cellCd]]" on-keypress="_onCellCdScan">
+
+      <!-- 박스 ID -->
+      <span class="label">[[boxLabel]]</span>
+      <input id="box-id" type="text" name="box_id" value="[[boxId]]" on-keypress="_onBoxIdScan">
+    </div>
+
+    <!-- 메시지 박스 -->
+    <div class="msg-container">
+      <div class="row">
+        <span class="label">[[topMessage]]</span>
+      </div>
+      <div class="row">
+        <span class="label">[[centerMessage]]</span>
+      </div>
+    </div>
+
+    <!-- 하단 상품 정보 -->
+    <div class="input-container">
+      <!-- 상품 코드 -->
+      <span class="label">[[skuCdLabel]]</span>
+      <input id="sku-cd" type="text" name="sku_cd" value="[[skuCd]]" readonly>
+
+      <!-- 상품 명 -->
+      <span class="label">[[skuNmLabel]]</span>
+      <input id="sku-nm" type="text" name="sku_nm" value="[[skuNm]]" readonly>
+
+      <!-- 예정 수량 -->
+      <span class="label">[[pickQtyLabel]]</span>
+      <input id="pick-qty" type="text" name="pick_qty" value="[[pickQty]]" readonly>
+
+      <!-- 확정 수량 -->
+      <span class="label">[[pickedQtyLabel]]</span>
+      <input id="picked-qty" type="text" name="picked_qty" value="[[pickedQty]]" readonly>
+    </div>
+
+    <!-- 초기화 버튼 -->
+    <div class="button-container">
+      <button id="refresh-btn" class="btn" on-click="refresh">[[refreshBtnLabel]]</button>
+      <button id="clear-btn" class="btn" on-click="_clearView">[[resetBtnLabel]]</button>
+    </div>
+  </template>
+
+  <script>
+    class B2CSimpleAssort extends BarcodeScannerMixin(Polymer.Element) {
+      static get is() {
+        return 'b2c-simple-assort'
+      }
+
+      static get properties() {
+        return {
+          /**
+           * @description 주문 진행율 라벨
+           ****************
+           * @type {String}
+           */
+          orderProgressRateLabel: {
+            type: String,
+            value: t('label.order') + ' ' + t('label.progress_rate')
+          },
+
+          /**
+           * @description PCS 진행율 라벨
+           ****************
+           * @type {String}
+           */
+          pcsProgressRateLabel: {
+            type: String,
+            value: 'PCS ' + t('label.progress_rate')
+          },
+
+          /**
+           * @description 확정 / 예정 라벨
+           ****************
+           * @type {String}
+           */
+          planActualLabel: {
+            type: String,
+            value: t('label.picked_qty') + '/' + t('label.pick_qty')
+          },
+
+          /**
+           * @description 상품 코드 라벨
+           ****************
+           * @type {String}
+           */
+          skuCdLabel: {
+            type: String,
+            value: () => t('label.sku_cd')
+          },
+
+          /**
+           * @description 상품 바코드 라벨
+           ****************
+           * @type {String}
+           */
+          skuBarcdLabel: {
+            type: String,
+            value: () => t('label.sku_barcd')
+          },
+
+          /**
+           * @description 상품명 라벨
+           ****************
+           * @type {String}
+           */
+          skuNmLabel: {
+            type: String,
+            value: () => t('label.sku_nm')
+          },
+
+          /**
+           * @description 로케이션 라벨
+           ****************
+           * @type {String}
+           */
+          cellLabel: {
+            type: String,
+            value: () => t('label.cell')
+          },
+
+          /**
+           * @description 박스 라벨
+           ****************
+           * @type {String}
+           */
+          boxLabel: {
+            type: String,
+            value: () => t('label.box_id')
+          },
+
+          /**
+           * @description 예정 수량 라벨
+           ****************
+           * @type {String}
+           */
+          pickQtyLabel: {
+            type: String,
+            value: () => t('label.pick_qty')
+          },
+
+          /**
+           * @description 확정 수량 라벨
+           ****************
+           * @type {String}
+           */
+          pickedQtyLabel: {
+            type: String,
+            value: () => t('label.picked_qty')
+          },
+
+          /**
+           * @description 새로고침 버튼 라벨
+           ****************
+           * @type {String}
+           */
+          refreshBtnLabel: {
+            type: String,
+            value: () => t('button.refresh')
+          },
+
+          /**
+           * @description 초기화 버튼 라벨
+           ****************
+           * @type {String}
+           */
+          resetBtnLabel: {
+            type: String,
+            value: () => t('button.reset')
+          },
+
+          /**
+           * @description 상단 메시지
+           ****************
+           * @type {String}
+           */
+          topMessage: {
+            type: String,
+            value: () => t('text.please_scan_sku')
+          },
+
+          /**
+           * @description 중단 메시지
+           ****************
+           * @type {String}
+           */
+          centerMessage: {
+            type: String,
+            value: () => ''
+          },
+
+          /**
+           * @description 상품 조회 URL
+           ****************
+           * @type {String}
+           */
+          findSkuUrl: {
+            type: String
+          },
+
+          /**
+           * @description 팝업 타이틀 라벨
+           ****************
+           * @type {String}
+           */
+          popupTitleLabel: {
+            type: String,
+            value: () => t('title.sku_selection')
+          },
+
+          /**
+           * @description 상품별 예정 수
+           ****************
+           * @type {Number}
+           */
+          pickQty: {
+            type: Number,
+            value: 0
+          },
+
+          /**
+           * @description 상품별 확정 수
+           ****************
+           * @type {Number}
+           */
+          pickedQty: {
+            type: Number,
+            value: 0
+          },
+
+          /**
+           * @description 총 확정 주문 수
+           ****************
+           * @type {Number}
+           */
+          totalPickedQty: {
+            type: Number,
+            value: 0
+          },
+
+          /**
+           * @description 총 주문 수
+           ****************
+           * @type {Number}
+           */
+          totalOrderQty: {
+            type: Number,
+            value: 0
+          },
+
+          /**
+           * @description 총 확정 PCS
+           ****************
+           * @type {Number}
+           */
+          totalPickedPcs: {
+            type: Number,
+            value: 0
+          },
+
+          /**
+           * @description 총 PCS
+           ****************
+           * @type {Number}
+           */
+          totalOrderPcs: {
+            type: Number,
+            value: 0
+          },
+
+          /**
+           * @description 주문 진행율
+           ****************
+           * @type {String}
+           */
+          orderProgressPercent: {
+            type: Number,
+            value: 0
+          },
+
+          /**
+           * @description PCS 진행율
+           ****************
+           * @type {String}
+           */
+          pcsProgressPercent: {
+            type: Number,
+            value: 0
+          }
+        }
+      }
+
+      /**
+       * @description lifecycle
+       **************************
+       */
+      connectedCallback() {
+        super.connectedCallback();
+        // 3초 후 리프레쉬 호출
+        setTimeout(this.refresh.bind(this), 3000);
+      }
+
+      /**
+       * @description refresh
+       **************************
+       */
+      refresh() {
+        // 1. 배치 진행율 조회 
+        let progressRateAjax = this.$['find-job-progress-ajax'];
+        progressRateAjax.customParams = {
+          equipType: LOGIS_UTIL.getEquipType(),
+          equipCd: LOGIS_UTIL.getEquipCd()
+        }
+        progressRateAjax.generateRequest();
+
+        // 2. 뷰 클리어
+        this._clearView();
+      }
+
+      /**
+       * @description 여러 개의 상품이 조회된 경우 사용자가 선택시 로직
+       **************************
+       * @param {Object} item
+       */
+      _skuButtonTxtCallback(item) {
+        return `(${item.sku_cd})
+                ${item.sku_nm}`;
+      }
+
+      /**
+       * @description 상품 조회 전 핸들러
+       **************************
+       * @param {Object} event
+       */
+      _beforeFindSkuHandler(event) {
+        var skuBarcd = this.$['sku-barcd'].value;
+        if (skuBarcd && skuBarcd.length > 1) {
+          this.findSkuUrl = `/sku/search/${skuBarcd}`;
+        }
+      }
+
+      /**
+       * @description 상품 조회 후 선택 시...
+       **************************
+       * @param {Object} event
+       */
+      _onSkuItemSelected(event) {
+        if (!event || !event.detail) return;
+
+        let skuInfo = event.detail;
+        let skuBarcd = this.$['sku-barcd'].value;
+        this.comCd = skuInfo.com_cd;
+        this.skuCd = skuInfo.sku_cd;
+        this.skuNm = skuInfo.sku_nm ? skuInfo.sku_nm : '';
+
+        const findOrderAjax = this.$['find-order-ajax'];
+        findOrderAjax.customParams = {
+          equipType: LOGIS_UTIL.getEquipType(),
+          equipCd: LOGIS_UTIL.getEquipCd(),
+          comCd: this.comCd,
+          skuCd: this.skuCd
+        }
+        findOrderAjax.generateRequest();
+      }
+
+      /**
+       * @description 작업 배치 진행율 조회 이후...
+       **************************
+       * @param {Object} event
+       */
+      _onJobProgressFound(event) {
+        if (!event || !event.detail) return;
+
+        let rateResult = event.detail.result;
+        this.totalOrderQty = rateResult.plan_order;
+        this.totalPickedQty = rateResult.actual_order;
+        this.totalOrderPcs = rateResult.plan_pcs;
+        this.totalPickedPcs = rateResult.actual_pcs;
+        this.orderProgressPercent = rateResult.rate_order;
+        this.pcsProgressPercent = rateResult.rate_pcs;
+      }
+
+      /**
+       * @description 주문 조회 이후...
+       **************************
+       * @param {Object} event
+       */
+      _onOrderFound(event) {
+        if (!event || !event.detail || !event.detail.result) return;
+
+        this.job = event.detail.result;
+        this.pickQty = this.job.pick_qty;
+        this.pickedQty = this.job.picked_qty;
+
+        if (this.job.picked_qty > 0 || (this.job.sub_equip_cd && this.job.sub_equip_cd.length > 3)) {
+          this.cellCd = this.job.sub_equip_cd;
+          this.topMessage = '처리 중인 주문입니다.';
+          this.centerMessage = '셀 번호 [' + this.cellCd + ']를 스캔하세요.';
+          this.$['cell-cd'].select();
+
+        } else {
+          this.cellCd = '';
+          this.topMessage = '새로운 주문입니다.';
+          this.centerMessage = '빈 셀 번호를 스캔하세요.';
+          this.$['cell-cd'].select();
+        }
+      }
+
+      /**
+       * @description 셀 코드 스캔 시 ...
+       **************************
+       * @param {Object} e
+       */
+      _onCellCdScan(e) {
+        if (e && e.key == 'Enter' && e.currentTarget && e.currentTarget.value) {
+          let cellCd = e.currentTarget.value;
+          cellCd = cellCd.trim();
+
+          if (cellCd && cellCd.length >= 5) {
+            const assortAjax = this.$['simple-assort-ajax'];
+            assortAjax.customParams = {
+              equipType: LOGIS_UTIL.getEquipType(),
+              equipCd: LOGIS_UTIL.getEquipCd(),
+              jobInstanceId: this.job.id,
+              cellCd: cellCd
+            };
+
+            // 주문이 이미 셀에 매핑된 경우 
+            if (this.job.sub_equip_cd && this.job.sub_equip_cd.length > 2) {
+              assortAjax.curl = '/device_process/dynamic/pdas/assort';
+              // 주문이 이미 셀에 매핑된 경우
+            } else {
+              assortAjax.curl = '/device_process/dynamic/pdas/assign';
+            }
+            assortAjax.generateRequest();
+          }
+        }
+      }
+
+      /**
+       * @description 박스 ID 스캔 시 ...
+       **************************
+       * @param {Object} e
+       */
+      _onBoxIdScan(e) {
+        if (e && e.key == 'Enter' && e.currentTarget && e.currentTarget.value) {
+          let boxId = e.currentTarget.value;
+          boxId = boxId.trim();
+
+          if (boxId && boxId.length >= 5) {
+            const boxingAjax = this.$['simple-boxing-ajax'];
+            boxingAjax.customParams = {
+              equipType: LOGIS_UTIL.getEquipType(),
+              equipCd: LOGIS_UTIL.getEquipCd(),
+              jobInstanceId: this.job.id,
+              boxId: boxId
+            };
+            boxingAjax.generateRequest();
+          }
+        }
+      }
+
+      /**
+       * @description 공통 에러 핸들러
+       **************************
+       * @param {Object} event
+       */
+      _commonErrorHandler(event) {
+        if (!event || !event.detail) return;
+
+        let errorResult = event.detail;
+        if (errorResult.code) {
+          this.topMessage = errorResult.code;
+          this.centerMessage = errorResult.msg;
+        }
+
+        this._clearView();
+      }
+
+      /**
+       * @description 분류 에러 핸들러
+       **************************
+       * @param {Object} event
+       */
+      _assortErrorHandler(event) {
+        if (!event || !event.detail) return;
+        this.$['cell-cd'].select();
+      }
+
+      /**
+       * @description 박싱 처리 에러 핸들러
+       **************************
+       * @param {Object} event
+       */
+      _boxingErrorHandler(event) {
+        if (!event || !event.detail) return;
+        this.$['box-id'].select();
+      }
+
+      /**
+       * @description 주문 분류 처리 이후...
+       **************************
+       * @param {Object} event
+       */
+      _onOrderAssorted(event) {
+        if (!event || !event.detail) return;
+
+        this.job = event.detail.result;
+        this.pickQty = this.job.pick_qty;
+        this.pickedQty = this.job.picked_qty;
+
+        if (this.job.status == 'F') {
+          this.topMessage = '처리되었습니다.';
+          this.centerMessage = '댜음 상품을 스캔하세요.';
+          this.refresh();
+
+        } else if (this.job.status == 'B') {
+          this.topMessage = '주문이 완성되었습니다.';
+          this.centerMessage = '박스 ID를 스캔하세요.';
+          this.$['box-id'].focus();
+
+        } else if (this.job.status == 'P') {
+          this.cellCd = this.job.sub_equip_cd;
+          this.topMessage = '처리 중인 주문입니다.';
+          this.centerMessage = '셀 번호 [' + this.cellCd + ']를 스캔하세요.';
+          this.$['cell-cd'].select();
+        }
+      }
+
+      /**
+       * @description 박스 처리 이후...
+       **************************
+       * @param {Object} event
+       */
+      _onBoxProcessed(event) {
+        if (!event || !event.detail) return;
+
+        this.job = event.detail.result;
+        this.pickQty = this.job.pick_qty;
+        this.pickedQty = this.job.picked_qty;
+
+        if (this.job.status == 'B') {
+          this.topMessage = '주문이 완성 처리되었습니다.';
+          this.centerMessage = '댜음 상품을 스캔하세요.';
+          this.refresh();
+        }
+      }
+
+      /**
+       * @description 화면의 정보를 모두 클리어
+       ***************************
+       */
+      _clearView() {
+        this.$['box-id'].value = '';
+        this.$['cell-cd'].value = '';
+        this.$['sku-barcd'].value = '';
+
+        this.cellCd = '';
+        this.skuCd = '';
+        this.skuNm = '';
+        this.pickQty = 0;
+        this.pickedQty = 0;
+        this.boxId = '';
+        this.job = null;
+
+        this.topMessage = '상품을 스캔하세요.';
+        this.centerMessage = '';
+
+        this.$['sku-barcd'].select();
+      }
+    }
+
+    customElements.define(B2CSimpleAssort.is, B2CSimpleAssort);
+  </script>
+</dom-module>
