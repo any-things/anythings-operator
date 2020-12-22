@@ -19,29 +19,28 @@ Copyright © HatioLab Inc. All rights reserved.
         height: calc(100% - 20px);
       }
       .msg-container {
-        height: 90px;
+        height: 60px;
         background-color:var(--things-primary-color) ;
         border-radius:var(--things-default-border-radius);
         color:#fff;
         text-align: center;
-        padding: 20px;
+        padding: 10px;
         margin-top: 10px;
         margin-bottom: 10px;
       }
       .msg-container .row .label {
         font-weight: bold;
-        font-size: 1.1rem;
+        font-size: 1rem;
         text-align: center;
       }
       .input-container {
-        padding: 10px;
+        display: grid;
+        grid-template-columns: 35% 65%;
         background-color: var(--things-white-opacity-background-color);
         border-radius: var(--things-default-border-radius);
         color: rgba(255,255,255,.8);
-
-        display: grid;
-        grid-template-columns: 35% 65%;
         grid-gap:7px 0;
+        padding: 10px;
       }
       #bottom-container {
         display: grid;
@@ -60,7 +59,7 @@ Copyright © HatioLab Inc. All rights reserved.
         grid-template-areas: "a b c d";
         grid-gap: 15px;
         justify-content: end;
-        margin-top: 15px;
+        margin-top: 10px;
       }
       .label {
         font-size:.8rem;
@@ -219,11 +218,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
       <!-- 예정 수량 -->
       <span class="label">[[pickQtyLabel]]</span>
-      <input id="pick-qty" type="text" name="pick_qty" value="[[pickQty]]" readonly>
-
-      <!-- 확정 수량 -->
-      <span class="label">[[pickedQtyLabel]]</span>
-      <input id="picked-qty" type="text" name="picked_qty" value="[[pickedQty]]" readonly>
+      <input id="pick-qty" type="text" name="pick_qty" value="[[qtyValue]]" readonly>
     </div>
 
     <!-- 초기화 버튼 -->
@@ -407,7 +402,8 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           pickQty: {
             type: Number,
-            value: 0
+            value: 0,
+            observer: '_pickQtyChanged'
           },
 
           /**
@@ -417,7 +413,17 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           pickedQty: {
             type: Number,
-            value: 0
+            value: 0,
+            observer: '_pickedQtyChanged'
+          },
+
+          /**
+           * @description 상품별 확정 수 / 예정 수 값
+           ****************
+           * @type {Number}
+           */
+          qtyValue: {
+            type: String
           },
 
           /**
@@ -489,7 +495,7 @@ Copyright © HatioLab Inc. All rights reserved.
       connectedCallback() {
         super.connectedCallback();
         // 3초 후 리프레쉬 호출
-        setTimeout(this.refresh.bind(this), 3000);
+        setTimeout(this.refresh.bind(this), 2000);
       }
 
       /**
@@ -759,6 +765,24 @@ Copyright © HatioLab Inc. All rights reserved.
         this.centerMessage = '';
 
         this.$['sku-barcd'].select();
+      }
+
+      /**
+       * @description 예정 수량 변경시 ...
+       **************************
+       * @param {Number} pickQty
+       */
+      _pickQtyChanged(pickQty) {
+        this.qtyValue = this.pickedQty + ' / ' + pickQty;
+      }
+
+      /**
+       * @description 확정 수량 변경시 ...
+       **************************
+       * @param {Number} pickedQty
+       */
+      _pickedQtyChanged(pickedQty) {
+        this.qtyValue = pickedQty + ' / ' + this.pickQty;
       }
     }
 
