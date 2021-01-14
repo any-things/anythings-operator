@@ -10,9 +10,9 @@ Copyright © HatioLab Inc. All rights reserved.
 <link rel="import" href="../rack-input-details.html">
 
 <!--
-  물류 > 출고 > 상품 투입 화면 (작업 진행율 / 미투입 리스트 / 투입 리스트)
+  물류 > 설비에 작업자 투입 화면
 -->
-<dom-module id="b2b-sku-input3">
+<dom-module id="worker-input">
   <template>
     <style>
       #container {
@@ -343,9 +343,9 @@ Copyright © HatioLab Inc. All rights reserved.
   </template>
 
   <script>
-    class B2BSkuInput3 extends Polymer.Element {
+    class WorkerInput extends Polymer.Element {
       static get is() {
-        return 'b2b-sku-input3'
+        return 'worker-input'
       }
 
       static get properties() {
@@ -484,7 +484,7 @@ Copyright © HatioLab Inc. All rights reserved.
               return [{
                 display: t('label.input') + ' ' + t('label.sku'),
                 fieldname: 'sku_cd',
-                columnWidth: '1.3fr',
+                columnWidth: '1fr',
                 style: {
                   textAlign: 'center'
                 },
@@ -510,14 +510,14 @@ Copyright © HatioLab Inc. All rights reserved.
               }, {
                 display: t('label.order'),
                 fieldname: 'input_qty',
-                columnWidth: '0.35fr',
+                columnWidth: '0.3fr',
                 style: {
-                  textAlign: 'center'
+                  textAlign: 'right'
                 }
               }, {
                 display: t('label.picked_qty') + '/' + t('label.pick_qty'),
                 fieldname: 'result_qty',
-                columnWidth: '0.6fr',
+                columnWidth: '0.5fr',
                 style: {
                   textAlign: 'right'
                 },
@@ -551,7 +551,7 @@ Copyright © HatioLab Inc. All rights reserved.
               return [{
                 display: t('label.not_input') + ' ' + t('label.sku'),
                 fieldname: 'sku_cd',
-                columnWidth: '1.4fr',
+                columnWidth: '1.1fr',
                 style: {
                   textAlign: 'center'
                 }
@@ -565,7 +565,7 @@ Copyright © HatioLab Inc. All rights reserved.
               }, {
                 display: t('label.pick_qty'),
                 fieldname: 'plan_qty',
-                columnWidth: '0.9fr',
+                columnWidth: '0.45fr',
                 style: {
                   textAlign: 'right'
                 },
@@ -1298,7 +1298,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
     }
 
-    customElements.define(B2BSkuInput3.is, B2BSkuInput3);
+    customElements.define(WorkerInput.is, WorkerInput);
   </script>
 
 </dom-module>

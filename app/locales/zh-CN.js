@@ -230,6 +230,7 @@ window.locales['zh-CN'] = {
   'menu.B2BOutAssortMobile': 'DAS 소분류',
   'menu.B2BOutMiddleAssortMobile': 'DAS 중분류',
   'menu.SimpleAssorting': 'PDAS 분류작업',
+  'menu.WorkerInput': '작업자 투입',
 
   // button list
   'button.logout': '注销',

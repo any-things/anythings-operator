@@ -229,6 +229,7 @@ window.locales['en-US'] = {
   'menu.B2BOutAssortMobile': 'DAS Assorting',
   'menu.B2BOutMiddleAssortMobile': 'DAS Middle Assort',
   'menu.SimpleAssorting': 'PDAS Assorting',
+  'menu.WorkerInput': 'Worker Input',
 
   // button list
   'button.logout': 'Logout',
