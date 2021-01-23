@@ -18,30 +18,61 @@ Copyright © HatioLab Inc. All rights reserved.
         padding: 10px;
         height: calc(100% - 20px);
       }
+
       .msg-container {
         height: 60px;
-        background-color:var(--things-primary-color) ;
-        border-radius:var(--things-default-border-radius);
-        color:#fff;
+        background-color: var(--things-primary-color);
+        border-radius: var(--things-default-border-radius);
+        border: 0px;
+        border: 5px;
+        color: #fff;
         text-align: center;
         padding: 10px;
         margin-top: 10px;
         margin-bottom: 10px;
       }
+
+      /* 상태 F :  주문 완료  */
+      .msg-container[status=F] {
+        border: 3px solid plum;
+      }
+
+      /* 상태 B : 박스 ID 스캔  */
+      .msg-container[status=B] {
+        border: 3px solid greenyellow;
+      }
+
+      /* 상태 P : 처리중 */
+      .msg-container[status=P] {
+        border: 3px solid #4fa4a6;
+      }
+
+      /* 상태 N : 신규 */
+      .msg-container[status=N] {
+        border: 3px solid white;
+      }
+
+      /* 상태 N : 오류  */
+      .msg-container[status=E] {
+        border: 3px solid red;
+      }
+
       .msg-container .row .label {
         font-weight: bold;
         font-size: 1rem;
         text-align: center;
       }
+
       .input-container {
         display: grid;
         grid-template-columns: 35% 65%;
         background-color: var(--things-white-opacity-background-color);
         border-radius: var(--things-default-border-radius);
-        color: rgba(255,255,255,.8);
-        grid-gap:7px 0;
+        color: rgba(255, 255, 255, .8);
+        grid-gap: 7px 0;
         padding: 10px;
       }
+
       #bottom-container {
         display: grid;
         grid-template-columns: 1fr 1fr 1fr 1fr;
@@ -51,8 +82,9 @@ Copyright © HatioLab Inc. All rights reserved.
         padding: 10px;
         background-color: var(--things-white-opacity-background-color);
         border-radius: var(--things-default-border-radius);
-        color: rgba(255,255,255,.8);
+        color: rgba(255, 255, 255, .8);
       }
+
       .button-container {
         display: grid;
         grid-template-columns: 1fr 1fr 1fr 1fr;
@@ -61,13 +93,16 @@ Copyright © HatioLab Inc. All rights reserved.
         justify-content: end;
         margin-top: 10px;
       }
+
       .label {
-        font-size:.8rem;
+        font-size: .8rem;
         margin: auto 5px auto auto;
       }
+
       .btn {
         min-width: 28vw;
       }
+
       #clear-btn {
         grid-area: d;
       }
@@ -77,18 +112,21 @@ Copyright © HatioLab Inc. All rights reserved.
         flex-direction: row;
         padding-bottom: 10px;
       }
+
       .bar-chart .label {
         min-width: 12vw;
         font-size: .8rem;
         color: white;
         margin: auto 10px auto auto;
       }
+
       .bar-chart .bar {
         display: inline-block;
         flex: 1;
         background-color: rgba(0, 0, 0, .2);
         border-radius: var(--things-default-border-radius);
       }
+
       .bar-chart .chart-value {
         display: inline-block;
         border-radius: var(--things-default-border-radius);
@@ -100,12 +138,14 @@ Copyright © HatioLab Inc. All rights reserved.
         font-weight: bold;
         white-space: nowrap;
       }
+
       .bar-chart #order-progress-bar {
         background-color: #3f89c9;
         display: block;
         margin-left: 0px;
         padding: 5px;
       }
+
       .bar-chart #pcs-progress-bar {
         background-color: #0aab4a;
         display: block;
@@ -115,43 +155,24 @@ Copyright © HatioLab Inc. All rights reserved.
     </style>
 
     <!-- 배치의 작업 진행율 조회를 위한 Ajax -->
-    <sys-ajax
-      id="find-job-progress-ajax"
-      curl="/device_process/dynamic/pdas/batch_summary"
-      method="GET"
-      content-type="application/json"
-      on-sys-ajax-response="_onJobProgressFound"
+    <sys-ajax id="find-job-progress-ajax" curl="/device_process/dynamic/pdas/batch_summary" method="GET"
+      content-type="application/json" on-sys-ajax-response="_onJobProgressFound"
       on-sys-ajax-error="_commonErrorHandler">
     </sys-ajax>
 
     <!-- 상품 정보로 부터 주문 정보 조회를 위한 Ajax -->
-    <sys-ajax
-      id="find-order-ajax"
-      curl="/device_process/dynamic/pdas/find_order"
-      method="GET"
-      content-type="application/json"
-      on-sys-ajax-response="_onOrderFound"
-      on-sys-ajax-error="_commonErrorHandler">
+    <sys-ajax id="find-order-ajax" curl="/device_process/dynamic/pdas/find_order" method="GET"
+      content-type="application/json" on-sys-ajax-response="_onOrderFound" on-sys-ajax-error="_commonErrorHandler">
     </sys-ajax>
 
     <!-- 분류 처리를 위한 Ajax -->
-    <sys-ajax
-      id="simple-assort-ajax"
-      curl="/device_process/dynamic/pdas/assort"
-      method="PUT"
-      content-type="application/json"
-      on-sys-ajax-response="_onOrderAssorted"
-      on-sys-ajax-error="_assortErrorHandler">
+    <sys-ajax id="simple-assort-ajax" curl="/device_process/dynamic/pdas/assort" method="PUT"
+      content-type="application/json" on-sys-ajax-response="_onOrderAssorted" on-sys-ajax-error="_assortErrorHandler">
     </sys-ajax>
 
     <!-- 박싱 처리를 위한 Ajax -->
-    <sys-ajax
-      id="simple-boxing-ajax"
-      curl="/device_process/dynamic/pdas/boxing"
-      method="PUT"
-      content-type="application/json"
-      on-sys-ajax-response="_onBoxProcessed"
-      on-sys-ajax-error="_boxingErrorHandler">
+    <sys-ajax id="simple-boxing-ajax" curl="/device_process/dynamic/pdas/boxing" method="PUT"
+      content-type="application/json" on-sys-ajax-response="_onBoxProcessed" on-sys-ajax-error="_boxingErrorHandler">
     </sys-ajax>
 
     <!-- 주문 진척율 차트 -->
@@ -159,7 +180,8 @@ Copyright © HatioLab Inc. All rights reserved.
       <span class="label">[[orderProgressRateLabel]]</span>
       <div class="bar">
         <span id="order-progress-bar" class="chart-value"
-          style="width:calc([[orderProgressPercent]]% - 10px)">[[planActualLabel]] ([[totalPickedQty]]/[[totalOrderQty]]) [[orderProgressPercent]]%</span>
+          style="width:calc([[orderProgressPercent]]% - 10px)">[[planActualLabel]]
+          ([[totalPickedQty]]/[[totalOrderQty]]) [[orderProgressPercent]]%</span>
       </div>
     </div>
 
@@ -168,7 +190,8 @@ Copyright © HatioLab Inc. All rights reserved.
       <span class="label">[[pcsProgressRateLabel]]</span>
       <div class="bar">
         <span id="pcs-progress-bar" class="chart-value"
-          style="width:calc([[pcsProgressPercent]]% - 10px)">[[planActualLabel]] ([[totalPickedPcs]]/[[totalOrderPcs]]) [[pcsProgressPercent]]%</span>
+          style="width:calc([[pcsProgressPercent]]% - 10px)">[[planActualLabel]] ([[totalPickedPcs]]/[[totalOrderPcs]])
+          [[pcsProgressPercent]]%</span>
       </div>
     </div>
 
@@ -176,14 +199,8 @@ Copyright © HatioLab Inc. All rights reserved.
     <div class="input-container">
       <!-- 상품 바코드 -->
       <span class="label">[[skuBarcdLabel]]</span>
-      <auto-popup-input
-        hide-keyboard
-        allowed-focus-out
-        id="sku-barcd"
-        on-before-request = "_beforeFindSkuHandler"
-        resource-url="[[findSkuUrl]]"
-        popup-title="[[popupTitleLabel]]"
-        button-txt-callback="[[_skuButtonTxtCallback]]"
+      <auto-popup-input hide-keyboard allowed-focus-out id="sku-barcd" on-before-request="_beforeFindSkuHandler"
+        resource-url="[[findSkuUrl]]" popup-title="[[popupTitleLabel]]" button-txt-callback="[[_skuButtonTxtCallback]]"
         on-item-selected="_onSkuItemSelected">
       </auto-popup-input>
 
@@ -197,12 +214,14 @@ Copyright © HatioLab Inc. All rights reserved.
     </div>
 
     <!-- 메시지 박스 -->
-    <div class="msg-container">
+    <div class="msg-container" status$="{{msgContainerStatus}}">
       <div class="row">
         <span class="label">[[topMessage]]</span>
       </div>
       <div class="row">
-        <span class="label">[[centerMessage]]</span>
+        <span class="label">[[centerMessageLeft]]</span>
+        <span class="label" style="color: red; font-size: 25px;">[[centerMessageMiddle]]</span>
+        <span class="label">[[centerMessageRight]]</span>
       </div>
     </div>
 
@@ -236,6 +255,39 @@ Copyright © HatioLab Inc. All rights reserved.
 
       static get properties() {
         return {
+
+          /**
+           * @description 강조 메시지 구간 
+           ****************
+           * @type {String}
+           */
+          centerMessageLeft: {
+            type: String
+          },
+          /**
+           * @description 강조 메시지 구간 
+           ****************
+           * @type {String}
+           */
+          centerMessageMiddle: {
+            type: String
+          },
+          /**
+           * @description 강조 메시지 구간 
+           ****************
+           * @type {String}
+           */
+          centerMessageRight: {
+            type: String
+          },
+          /**
+           * @description 메시지 컨테이너 상태 
+           ****************
+           * @type {String}
+           */
+          msgContainerStatus: {
+            type: String
+          },
           /**
            * @description 주문 진행율 라벨
            ****************
@@ -373,7 +425,8 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           centerMessage: {
             type: String,
-            value: () => ''
+            value: () => '',
+            observer: '_centerMessageChanged'
           },
 
           /**
@@ -594,12 +647,14 @@ Copyright © HatioLab Inc. All rights reserved.
           this.cellCd = this.job.sub_equip_cd;
           this.topMessage = '처리 중인 주문입니다.';
           this.centerMessage = '셀 번호 [' + this.cellCd + ']를 스캔하세요.';
+          this._setMsgContainerStatus("P");
           this.$['cell-cd'].select();
 
         } else {
           this.cellCd = '';
           this.topMessage = '새로운 주문입니다.';
           this.centerMessage = '빈 셀 번호를 스캔하세요.';
+          this._setMsgContainerStatus("N");
           this.$['cell-cd'].select();
         }
       }
@@ -670,6 +725,7 @@ Copyright © HatioLab Inc. All rights reserved.
         if (errorResult.code) {
           this.topMessage = errorResult.code;
           this.centerMessage = errorResult.msg;
+          this._setMsgContainerStatus("E");
         }
 
         this._clearView();
@@ -710,17 +766,20 @@ Copyright © HatioLab Inc. All rights reserved.
         if (this.job.status == 'F') {
           this.topMessage = '처리되었습니다.';
           this.centerMessage = '댜음 상품을 스캔하세요.';
+          this._setMsgContainerStatus("F");
           this.refresh();
 
         } else if (this.job.status == 'B') {
           this.topMessage = '주문이 완성되었습니다.';
-          this.centerMessage = '박스 ID를 스캔하세요.';
+          this.centerMessage = '[박스 ID]를 스캔하세요.';
+          this._setMsgContainerStatus("B");
           this.$['box-id'].focus();
 
         } else if (this.job.status == 'P') {
           this.cellCd = this.job.sub_equip_cd;
           this.topMessage = '처리 중인 주문입니다.';
           this.centerMessage = '셀 번호 [' + this.cellCd + ']를 스캔하세요.';
+          this._setMsgContainerStatus("P");
           this.$['cell-cd'].select();
         }
       }
@@ -740,6 +799,7 @@ Copyright © HatioLab Inc. All rights reserved.
         if (this.job.status == 'B') {
           this.topMessage = '주문이 완성 처리되었습니다.';
           this.centerMessage = '댜음 상품을 스캔하세요.';
+          this._setMsgContainerStatus("B");
           this.refresh();
         }
       }
@@ -763,6 +823,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
         this.topMessage = '상품을 스캔하세요.';
         this.centerMessage = '';
+        this._setMsgContainerStatus("");
 
         this.$['sku-barcd'].select();
       }
@@ -783,6 +844,35 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _pickedQtyChanged(pickedQty) {
         this.qtyValue = pickedQty + ' / ' + this.pickQty;
+      }
+
+      /**
+       * @description 메시지 컨테이너 상태 변경 (컨테이너 보더 색상 변경 )
+       **************************
+       * @param {String} status
+       */
+      _setMsgContainerStatus(status) {
+        this.msgContainerStatus = status;
+      }
+
+      /**
+       * @description 메시지 컨테이너 하단 메시지 변경시 
+       **************************
+       * @param {String} message
+       */
+      _centerMessageChanged(message) {
+        if (message.includes('[')) {
+          var leftEndIdx = message.indexOf('[') + 1;
+          var rightStartIdx = message.indexOf(']');
+
+          this.centerMessageLeft = message.substr(0, leftEndIdx);
+          this.centerMessageMiddle = message.substr(leftEndIdx, rightStartIdx - leftEndIdx);
+          this.centerMessageRight = message.substr(rightStartIdx);
+        } else {
+          this.centerMessageLeft = message;
+          this.centerMessageMiddle = "";
+          this.centerMessageRight = "";
+        }
       }
     }
 
