@@ -285,6 +285,11 @@ window.locales['zh-CN'] = {
   'button.manual_picking': 'Picking',
   'button.ind_on': '표시기 점등',
   'button.ind_off': '표시기 소등',
+  'button.receive_order': '주문수신',
+  'button.start_batch': '배치시작',
+  'button.merge_batch': '배치병합',
+  'button.cancel_start_batch': '배치시작 취소',
+  'button.finish_batch': '배치완료',
 
   // text list
   'text.login_failure': '认证失败！',

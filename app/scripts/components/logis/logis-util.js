@@ -697,6 +697,13 @@ LOGIS_UTIL.isSkuCdValid = function(skuCd, showInvalidMsg, invalidCallback) {
   }
 };
 
+/**
+ * 커스텀 사운드 파일 기본 경로 URL
+ *****************************
+ */
+LOGIS_UTIL.getCustomSoundFileBaseUrl = function() {
+  return LOGIS_UTIL.getDeviceSettingValue('custom.sound.file.url');
+};
 /*******************************************************************************
  *                                  유틸리티 함수
  ******************************************************************************/

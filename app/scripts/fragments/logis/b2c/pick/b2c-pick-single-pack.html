@@ -17,12 +17,26 @@ Copyright © HatioLab Inc. All rights reserved.
     <style include="shared-styles">
       :host {
         display: grid;
-        grid-template-columns: 45% 55%;
+        grid-template-rows: auto 1fr;
         height: calc(100% - 20px);
         padding: 10px;
         border-radius: var(--things-default-border-radius);
         color: rgba(255, 255, 255, .8);
         text-align: center;
+      }
+
+      #top-container {
+        display: grid;
+        background-color: var(--things-white-opacity-background-color);
+        border-radius:var(--things-default-border-radius);
+        margin: 5px;
+        padding: 10px;
+      }
+
+      #main-container {
+        display: grid;
+        grid-template-columns: 45% 55%;
+        border-radius:var(--things-default-border-radius);
       }
 
       #left-container {
@@ -35,7 +49,7 @@ Copyright © HatioLab Inc. All rights reserved.
         grid-template-rows: 45% 45% 10%;
       }
 
-      #top-container {
+      #right-top-container {
         margin: 5px 5px 10px 10px;
         display: grid;
         grid-template-columns: 30% 70%;
@@ -47,7 +61,7 @@ Copyright © HatioLab Inc. All rights reserved.
         display: grid;
         grid-template-rows: 25% 75%;
         grid-template-columns: 50% 50%;
-        margin: 5px 5px 10px 10px;
+        margin: 0px 5px 10px 10px;
         background-color: var(--things-white-opacity-background-color);
         border-radius: var(--things-default-border-radius);
       }
@@ -60,7 +74,7 @@ Copyright © HatioLab Inc. All rights reserved.
         grid-column-end: 2;
       }
 
-      #top-container input {
+      #right-top-container input {
         align-self: center;
         width: 80%;
       }
@@ -68,11 +82,6 @@ Copyright © HatioLab Inc. All rights reserved.
       auto-popup-input {
         align-self: center;
         width: 81.5%;
-      }
-
-      #totalOrderContainer {
-        grid-column-start: 1;
-        grid-column-end: 3;
       }
 
       .order {
@@ -137,6 +146,41 @@ Copyright © HatioLab Inc. All rights reserved.
         background-color: var(--things-white-opacity-background-color);
         border-radius: var(--things-default-border-radius);
       }
+
+      .bar-chart {
+        display: flex;
+        flex-direction: row;
+        margin: auto 5px !important;
+      }
+      .bar-chart .label {
+        width: 10vw;
+        font-size: .7rem;
+        color: white;
+        margin: auto 10px auto auto;
+      }
+      .bar-chart .bar {
+        display: inline-block;
+        flex: 1;
+        background-color: rgba(0, 0, 0, .2);
+        border-radius: var(--things-default-border-radius);
+      }
+      .bar-chart .chart-value {
+        display: inline-block;
+        border-radius: var(--things-default-border-radius);
+        margin: 0px 5px 0px 5px;
+        text-align: right;
+        padding: 0px 5px 0px 5px;
+        font-size: 23px;
+        color: white;
+        font-weight: bold;
+        white-space: nowrap;
+      }
+      .bar-chart #progress-bar {
+        background-color: #3f89c9;
+        display: block;
+        margin-left: 0px;
+        padding: 5px;
+      }
     </style>
 
     <!-- 상품 코드로 단포 작업 현황 조회를 위한 Ajax -->
@@ -159,79 +203,93 @@ Copyright © HatioLab Inc. All rights reserved.
     <!-- 송장 발행을 위한 Ajax -->
     <sys-ajax 
       id="print-invoice-ajax" 
-      curl="/device_process/dynamic/dps/print_invoice" 
+      curl="/device_process/dynamic/sng/print_invoice" 
       method="PUT"
       content-type="application/json" 
       on-sys-ajax-response="_printLabelSucceed">
     </sys-ajax>
 
-    <!-- 좌측 컨테이너 -->
-    <div id="left-container">
-      <!-- 좌측 상단 작업 진행 요약 컨테이너 -->
-      <div id="left-top-container">
-        <!-- 전체 박스 수량 표시 컨테이너 -->
-        <div class="order">
-          <span class="smalltitle">[[total]] [[box]]</span>
-          <span class="proc"><b>[[boxPicking]]</b></span>
-        </div>
-
-        <!-- 완료 박스 수량 표시 컨테이너 -->
-        <div class="order">
-          <span class="smalltitle">[[finished]] [[box]]</span>
-          <span class="proc"><b>[[boxPicked]]</b></span>
+    <!-- Top 컨테이너 -->
+    <div id="top-container">    
+      <div class="bar-chart">
+        <span class="label">[[progressRateLabel]]</span>
+        <div class="bar">
+          <span id="progress-bar" class="chart-value"
+            style="width:calc([[inspectedPercent]]% - 10px)">([[totalPickedQty]]/[[totalPickQty]]) [[progressRate]]%</span>
         </div>
       </div>
-
-      <!-- 좌측 하단 그리드 컨테이너 -->
-      <item-list 
-        id="item-list" 
-        header="[[header]]" 
-        data="[[items]]"
-        on-data-list-click="selectJobGroupItem"
-        on-configured="_changeGridRowStyle">
-      </item-list>
     </div>
 
-    <!-- 우측 컨테이너 -->
-    <div id="right-container">
-      <!-- 우측 상단 작업 진행 요약 컨테이너 -->
-      <div id="top-container">
-        <!-- 상품 코드 라벨 -->
-        <span class="label">[[skuCdLabel]]</span>
+    <!-- 메인 컨테이너 -->
+    <div id="main-container">
+      <!-- 좌측 컨테이너 -->
+      <div id="left-container">
+        <!-- 좌측 상단 작업 진행 요약 컨테이너 -->
+        <div id="left-top-container">
+          <!-- 전체 박스 수량 표시 컨테이너 -->
+          <div class="order">
+            <span class="smalltitle">[[total]] [[box]]</span>
+            <span class="proc"><b>[[boxPicking]]</b></span>
+          </div>
 
-        <!-- 상품 코드 Input -->
-        <auto-popup-input 
-          hide-keyboard 
-          id="sku-code" 
-          resource-url="[[getSkuAjaxUrl]]" 
-          popup-title="[[popupTitleLabel]]"
-          button-txt-callback="[[_skuButtonTxtCallback]]" 
-          on-item-selected="skuSelectionChanged"
-          on-sys-ajax-error="_findSkuError">
-        </auto-popup-input>
+          <!-- 완료 박스 수량 표시 컨테이너 -->
+          <div class="order">
+            <span class="smalltitle">[[finished]] [[box]]</span>
+            <span class="proc"><b>[[boxPicked]]</b></span>
+          </div>
+        </div>
 
-        <!-- 상품 명 -->
-        <span class="label">[[skuNmLabel]]</span>
-        <input id="sku-name" readonly>
-
-        <!-- 박스 ID -->
-        <span class="label">[[boxIdLabel]]</span>
-        <input id="box-id" on-keypress="_boxIdChanged">
+        <!-- 좌측 하단 그리드 컨테이너 -->
+        <item-list 
+          id="item-list" 
+          header="[[header]]" 
+          data="[[items]]"
+          on-data-list-click="selectJobGroupItem"
+          on-configured="_changeGridRowStyle">
+        </item-list>
       </div>
 
-      <!-- 우측 하단 단포 진행 요약 컨테이너 -->
-      <div id="bottom-container">
-        <span id='box-type-label' class="big-label">[[boxTypeLabel]]</span>
-        <span id='order-qty-label' class="big-label">[[orderQtyLabel]]</span>
-        <span id='box-type' class="bigproc"><b>[[boxType]]</b></span>
-        <span id='order-qty' class="bigproc"><b>[[orderQty]]</b></span>
-      </div>
+      <!-- 우측 컨테이너 -->
+      <div id="right-container">
+        <!-- 우측 상단 작업 진행 요약 컨테이너 -->
+        <div id="right-top-container">
+          <!-- 상품 코드 라벨 -->
+          <span class="label">[[skuCdLabel]]</span>
 
-      <!-- 우측 최하단 옵션 컨테이너 -->
-      <div id="input-container">
-        <button id="reprint-btn" on-click="printInvoiceLabel">[[printLabel]]</button>
-        <button id="reset-btn" on-click="refresh">[[clearLabel]]</button>
-      </div>  
+          <!-- 상품 코드 Input -->
+          <auto-popup-input 
+            hide-keyboard 
+            id="sku-code" 
+            resource-url="[[getSkuAjaxUrl]]" 
+            popup-title="[[popupTitleLabel]]"
+            button-txt-callback="[[_skuButtonTxtCallback]]" 
+            on-item-selected="skuSelectionChanged"
+            on-sys-ajax-error="_findSkuError">
+          </auto-popup-input>
+
+          <!-- 상품 명 -->
+          <span class="label">[[skuNmLabel]]</span>
+          <input id="sku-name" readonly>
+
+          <!-- 박스 ID -->
+          <span class="label">[[boxIdLabel]]</span>
+          <input id="box-id" on-keypress="_boxIdChanged">
+        </div>
+
+        <!-- 우측 하단 단포 진행 요약 컨테이너 -->
+        <div id="bottom-container">
+          <span id='box-type-label' class="big-label">[[boxTypeLabel]]</span>
+          <span id='order-qty-label' class="big-label">[[orderQtyLabel]]</span>
+          <span id='box-type' class="bigproc"><b>[[boxType]]</b></span>
+          <span id='order-qty' class="bigproc"><b>[[orderQty]]</b></span>
+        </div>
+
+        <!-- 우측 최하단 옵션 컨테이너 -->
+        <div id="input-container">
+          <button id="reprint-btn" on-click="printInvoiceLabel">[[printLabel]]</button>
+          <button id="reset-btn" on-click="refresh">[[clearLabel]]</button>
+        </div>  
+      </div>
     </div>
   </template>
 
@@ -242,6 +300,46 @@ Copyright © HatioLab Inc. All rights reserved.
       }
       static get properties() {
         return {
+          /**
+           * @description 작업 진행율 라벨
+           ****************
+           * @type {String}
+           */
+          progressRateLabel: {
+            type: String,
+            value: t('label.progress_rate')
+          },
+
+          /**
+           * @description 총 처리 주문 수
+           ****************
+           * @type {String}
+           */
+          totalPickQty: {
+            type: Number,
+            value: 0
+          },
+
+          /**
+           * @description 총 주문 수
+           ****************
+           * @type {String}
+           */
+          totalPickedQty: {
+            type: Number,
+            value: 0
+          },
+
+          /**
+           * @description 작업 진행율
+           ****************
+           * @type {String}
+           */
+          progressRate: {
+            type: Number,
+            value: 0
+          },
+
           /**
            * @description 그리드 데이터 
            ****************
@@ -380,19 +478,7 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * @description 주문 건수 라벨 
-           ****************
-           * @type {String}
-           */
-          order_qty: {
-            type: String,
-            value: function() {
-              return t('label.order_qty')
-            }
-          },
-
-          /**
-           * @description 박스  라벨 
+           * @description 박스 라벨 
            ****************
            * @type {String}
            */
@@ -610,7 +696,8 @@ Copyright © HatioLab Inc. All rights reserved.
 
             // 박스 ID가 있으면 피킹
             var inputBoxAjax = this._getInputBoxAjax();
-            inputBoxAjax.curl = '/device_process/dynamic/dps/single_pack/pick';
+            //inputBoxAjax.curl = '/device_process/dynamic/dps/single_pack/pick';
+            inputBoxAjax.curl = '/device_process/dynamic/sng/pick';
             inputBoxAjax.customParams = {
               jobId: this.currentJobInstance.id
             };
@@ -619,7 +706,8 @@ Copyright © HatioLab Inc. All rights reserved.
           } else {
             // 대상 상품 변경 
             var summaryAjax = this._getSinglePackSummaryAjax();
-            summaryAjax.curl = '/device_process/dynamic/dps/single_pack/sku_change';
+            //summaryAjax.curl = '/device_process/dynamic/dps/single_pack/sku_change';
+            summaryAjax.curl = '/device_process/dynamic/sng/sku_change';
             summaryAjax.customParams = {
               equipType: LOGIS_UTIL.getEquipType(),
               equipCd: this.rackCd,
@@ -653,7 +741,8 @@ Copyright © HatioLab Inc. All rights reserved.
           self.skuBarcd = skuInform.sku_barcd;
 
           var summaryAjax = self._getSinglePackSummaryAjax();
-          summaryAjax.curl = '/device_process/dynamic/dps/single_pack/sku_change';
+          //summaryAjax.curl = '/device_process/dynamic/dps/single_pack/sku_change';
+          summaryAjax.curl = '/device_process/dynamic/sng/sku_change';
           summaryAjax.customParams = {
             equipType: LOGIS_UTIL.getEquipType(),
             equipCd: self.rackCd,
@@ -711,7 +800,8 @@ Copyright © HatioLab Inc. All rights reserved.
           // 박스 아이디 정규식에 맞으면 박스 투입
           if (LOGIS_UTIL.isBoxIdValidate(boxId)) {
             var boxInputAjax = this._getInputBoxAjax();
-            boxInputAjax.curl = '/device_process/dynamic/dps/single_pack/box_input';
+            //boxInputAjax.curl = '/device_process/dynamic/dps/single_pack/box_input';
+            boxInputAjax.curl = '/device_process/dynamic/sng/box_input';
             boxInputAjax.customParams = {
               equipType: LOGIS_UTIL.getEquipType(),
               equipCd: LOGIS_UTIL.getEquipCd(),
@@ -811,7 +901,8 @@ Copyright © HatioLab Inc. All rights reserved.
 
           if (printerId && printerId.length > 2) {
             var printAjax = this.$['print-invoice-ajax'];
-            printAjax.curl = '/device_process/dynamic/dps/print_invoice';
+            //printAjax.curl = '/device_process/dynamic/dps/print_invoice';
+            printAjax.curl = '/device_process/dynamic/sng/print_invoice';
             printAjax.customParams = {
               equipCd: LOGIS_UTIL.getEquipCd(),
               equipType: LOGIS_UTIL.getEquipType(),

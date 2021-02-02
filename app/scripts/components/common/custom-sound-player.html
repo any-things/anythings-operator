@@ -1,0 +1,68 @@
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+
+<link rel="import" href="../../bower_components/polymer/polymer-element.html" />
+
+<!--
+  커스텀 사운드 출력 - 서버에서 설정한 경로를 이용한 사운드 출력
+-->
+<dom-module id="custom-sound-player">
+  <template>
+    <audio id="info" src="[[infoSrc]]"></audio>
+  </template>
+
+  <script>
+    class CustomSoundPlayer extends Polymer.Element {
+      static get is() {
+        return "custom-sound-player";
+      }
+
+      static get properties() {
+        return {
+          /**
+           * @description 사운드 소스
+           ****************
+           * @type {String}
+           */
+          soundSrc: {
+            type: String
+          }
+        };
+      }
+
+      /**
+       * @description life cycle
+       ******************
+       */
+      connectedCallback() {
+        super.connectedCallback();
+        window.CUSTOM_SOUND = this;
+      }
+
+      /**
+       * @description 사운드 파일이 위치한 URL을 리턴 
+       ******************
+       * @return 사운드 파일이 위치한 URL
+       */
+      _getSoundPath() {
+        return LOGIS_UTIL.getCustomSoundFileBaseUrl();
+      }
+
+      /**
+       * @description 사운드 파일이 위치한 URL과 soundFile을 조합하여 완전한 사운드 파일 경로를 만들어서 해당 URL로 사운드 플레이 처리
+       ******************
+       * @param {String} soundFile
+       */
+      playSound(soundFile) {
+        this.$.info.src = this._getSoundPath() + soundFile + '.wav';
+        this.$.info.play().catch(() => {
+          console.warn("Error - CUSTOM_SOUND.playSound(" + soundFile + ")");
+        });
+      }
+    }
+
+    customElements.define(CustomSoundPlayer.is, CustomSoundPlayer);
+  </script>
+</dom-module>

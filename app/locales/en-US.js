@@ -284,6 +284,11 @@ window.locales['en-US'] = {
   'button.manual_picking': 'Picking',
   'button.ind_on': 'Indicator On',
   'button.ind_off': 'Indicator Off',
+  'button.receive_order': 'Receive Orders',
+  'button.start_batch': 'Start Batch',
+  'button.merge_batch': 'Merge Batch',
+  'button.cancel_start_batch': 'Cancel Batch',
+  'button.finish_batch': 'Finish Batch',
 
   // text list
   'text.login_failure': 'Failed to Login',

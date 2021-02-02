@@ -6,6 +6,7 @@ Copyright © HatioLab Inc. All rights reserved.
 <link rel="import" href="../../../../../bower_components/polymer/polymer-element.html">
 
 <link rel="import" href="../../../../components/common/auto-popup-input.html">
+<link rel="import" href="../../../../components/common/custom-sound-player.html">
 
 <!--
   물류 > B2C > PDAS 작업 화면 (PDA)
@@ -261,6 +262,9 @@ Copyright © HatioLab Inc. All rights reserved.
       <button id="refresh-btn" class="btn" on-click="refresh">[[refreshBtnLabel]]</button>
       <button id="clear-btn" class="btn" on-click="_clearView">[[resetBtnLabel]]</button>
     </div>
+
+    <!-- 커스텀 사운드 -->
+    <custom-sound-player></custom-sound-player>
   </template>
 
   <script>
@@ -663,15 +667,17 @@ Copyright © HatioLab Inc. All rights reserved.
           this.cellCd = this.job.sub_equip_cd;
           this.topMessage = '처리 중인 주문입니다.';
           this.centerMessage = '셀 번호 [' + this.cellCd + ']를 스캔하세요.';
-          this._setMsgContainerStatus("P");
+          this._setMsgContainerStatus('P');
           this.$['cell-cd'].select();
+          this._playSoundByTask('running-order');
 
         } else {
           this.cellCd = '';
           this.topMessage = '새로운 주문입니다.';
           this.centerMessage = '빈 셀 번호를 스캔하세요.';
-          this._setMsgContainerStatus("N");
+          this._setMsgContainerStatus('N');
           this.$['cell-cd'].select();
+          this._playSoundByTask('new-order');
         }
       }
 
@@ -782,21 +788,24 @@ Copyright © HatioLab Inc. All rights reserved.
         if (this.job.status == 'F') {
           this.topMessage = '처리되었습니다.';
           this.centerMessage = '댜음 상품을 스캔하세요.';
-          this._setMsgContainerStatus("F");
+          this._setMsgContainerStatus('F');
           this.refresh();
+          this._playSoundByTask('assorted-order');
 
         } else if (this.job.status == 'B') {
           this.topMessage = '주문이 완성되었습니다.';
           this.centerMessage = '[박스 ID]를 스캔하세요.';
-          this._setMsgContainerStatus("B");
+          this._setMsgContainerStatus('B');
           this.$['box-id'].focus();
+          this._playSoundByTask('boxed-order');
 
         } else if (this.job.status == 'P') {
           this.cellCd = this.job.sub_equip_cd;
           this.topMessage = '처리 중인 주문입니다.';
           this.centerMessage = '셀 번호 [' + this.cellCd + ']를 스캔하세요.';
-          this._setMsgContainerStatus("P");
+          this._setMsgContainerStatus('P');
           this.$['cell-cd'].select();
+          this._playSoundByTask('running-order');
         }
       }
 
@@ -815,8 +824,9 @@ Copyright © HatioLab Inc. All rights reserved.
         if (this.job.status == 'B') {
           this.topMessage = '주문이 완성 처리되었습니다.';
           this.centerMessage = '댜음 상품을 스캔하세요.';
-          this._setMsgContainerStatus("B");
+          this._setMsgContainerStatus('B');
           this.refresh();
+          this._playSoundByTask('order-end');
         }
       }
 
@@ -839,7 +849,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
         this.topMessage = '상품을 스캔하세요.';
         this.centerMessage = '';
-        this._setMsgContainerStatus("");
+        this._setMsgContainerStatus('');
 
         this.$['sku-barcd'].select();
       }
@@ -863,7 +873,7 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * @description 메시지 컨테이너 상태 변경 (컨테이너 보더 색상 변경 )
+       * @description 메시지 컨테이너 상태 변경 (컨테이너 보더 색상 변경)
        **************************
        * @param {String} status
        */
@@ -886,8 +896,36 @@ Copyright © HatioLab Inc. All rights reserved.
           this.centerMessageRight = message.substr(rightStartIdx);
         } else {
           this.centerMessageLeft = message;
-          this.centerMessageMiddle = "";
-          this.centerMessageRight = "";
+          this.centerMessageMiddle = '';
+          this.centerMessageRight = '';
+        }
+      }
+
+      /**
+       * @description 작업 상태에 따라 사운드 처리 변경 
+       **************************
+       * @param {String} task
+       */
+      _playSoundByTask(task) {
+        // 새로운 주문입니다. 빈 셀 번호를 스캔하세요
+        if (task == 'new-order') {
+          CUSTOM_SOUND.playSound('pdas-' + task);
+
+          // 처리 중인 주문입니다, 셀 번호를 스캔하세요. 
+        } else if (task == 'running-order') {
+          CUSTOM_SOUND.playSound('pdas-' + task);
+
+          // 처리되었습니다. 다음 상품을 스캔하세요. 
+        } else if (task == 'assorted-order') {
+          CUSTOM_SOUND.playSound('pdas-' + task);
+
+          // 주문이 완성되었습니다. 박스 ID를 스캔하세요. 
+        } else if (task == 'boxed-order') {
+          CUSTOM_SOUND.playSound('pdas-' + task);
+
+          // 주문이 완성 처리되었습니다. 다음 상품을 스캔하세요.
+        } else if (task == 'order-end') {
+          CUSTOM_SOUND.playSound('pdas-' + task);
         }
       }
     }
