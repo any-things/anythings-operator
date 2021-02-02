@@ -231,6 +231,7 @@ window.locales['zh-CN'] = {
   'menu.B2BOutMiddleAssortMobile': 'DAS 중분류',
   'menu.SimpleAssorting': 'PDAS 분류작업',
   'menu.WorkerInput': '작업자 투입',
+  'menu.B2BOutAssortNonRefresh': 'DAS 소분류(고정)',
 
   // button list
   'button.logout': '注销',

@@ -230,6 +230,7 @@ window.locales['en-US'] = {
   'menu.B2BOutMiddleAssortMobile': 'DAS Middle Assort',
   'menu.SimpleAssorting': 'PDAS Assorting',
   'menu.WorkerInput': 'Worker Input',
+  'menu.B2BOutAssortNonRefresh': 'DAS 소분류(고정)',
 
   // button list
   'button.logout': 'Logout',
