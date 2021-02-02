@@ -17,55 +17,73 @@ Copyright © HatioLab Inc. All rights reserved.
         display: block;
         padding: 10px;
         height: calc(100% - 20px);
+        --things-primary-color: #189b9c
+          /* primary color reset */
       }
 
       .msg-container {
-        height: 60px;
+        display: grid;
+        grid-template-columns: 90px 1fr;
+        min-height: 70px;
         background-color: var(--things-primary-color);
         border-radius: var(--things-default-border-radius);
-        border: 0px;
-        border: 5px;
         color: #fff;
-        text-align: center;
+        margin: 10px 0;
+      }
+
+      .msg-container .icon {
+        background: url('../../../../../images/icon-barcode-scan.png') no-repeat center center rgba(0, 0, 0, .15);
+      }
+
+      .msg-container .msg {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
         padding: 10px;
-        margin-top: 10px;
-        margin-bottom: 10px;
+        text-align: center;
+        font-size: 16px;
+      }
+
+      .msg strong {
+        display: none;
+        font-size: 19px;
+      }
+
+      [status=F] strong,
+      [status=B] strong,
+      [status=P] strong,
+      [status=N] strong,
+      [status=E] strong {
+        display: block
       }
 
       /* 상태 F :  주문 완료  */
-      .msg-container[status=F] {
-        border: 3px solid plum;
-      }
+      .msg-container[status=F] {}
 
       /* 상태 B : 박스 ID 스캔  */
       .msg-container[status=B] {
-        border: 3px solid red;
+        background-color: #474bdd;
       }
 
       /* 상태 P : 처리중 */
       .msg-container[status=P] {
-        border: 3px solid #4fa4a6;
+        background-color: #0983c9;
       }
 
       /* 상태 N : 신규 */
       .msg-container[status=N] {
-        border: 3px solid white;
+        background-color: #5ea116;
       }
 
       /* 상태 N : 오류  */
       .msg-container[status=E] {
-        border: 3px solid black;
-      }
-
-      .msg-container .row .label {
-        font-weight: bold;
-        font-size: 1rem;
-        text-align: center;
+        background-color: #d53e15;
       }
 
       .input-container {
         display: grid;
-        grid-template-columns: 35% 65%;
+        grid-template-columns: 80px 1fr;
         background-color: var(--things-white-opacity-background-color);
         border-radius: var(--things-default-border-radius);
         color: rgba(255, 255, 255, .8);
@@ -108,49 +126,48 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       .bar-chart {
-        display: flex;
-        flex-direction: row;
+        display: grid;
+        grid-template-columns: 100px 1fr;
         padding-bottom: 10px;
+        font-size: 1rem;
       }
 
       .bar-chart .label {
         min-width: 12vw;
-        font-size: .8rem;
-        color: white;
         margin: auto 10px auto auto;
+        color: white;
+        font-size: .8rem;
       }
 
       .bar-chart .bar {
-        display: inline-block;
         flex: 1;
         background-color: rgba(0, 0, 0, .2);
         border-radius: var(--things-default-border-radius);
       }
 
       .bar-chart .chart-value {
-        display: inline-block;
+        display: block;
         border-radius: var(--things-default-border-radius);
-        margin: 0px 5px 0px 5px;
-        text-align: right;
-        padding: 0px 5px 0px 5px;
-        font-size: 18px;
-        color: white;
-        font-weight: bold;
+        padding: 3px 5px 5px 5px;
+        color: rgba(255, 255, 255, .6);
         white-space: nowrap;
+      }
+
+      .chart-value * {
+        color: #fff
+      }
+
+      .chart-value span {
+        position: absolute;
+        right: 20px
       }
 
       .bar-chart #order-progress-bar {
         background-color: #3f89c9;
-        display: block;
-        margin-left: 0px;
-        padding: 5px;
       }
 
       .bar-chart #pcs-progress-bar {
         background-color: #0aab4a;
-        display: block;
-        margin-left: 0px;
-        padding: 5px;
       }
     </style>
 
@@ -179,9 +196,10 @@ Copyright © HatioLab Inc. All rights reserved.
     <div class="bar-chart">
       <span class="label">[[orderProgressRateLabel]]</span>
       <div class="bar">
-        <span id="order-progress-bar" class="chart-value"
-          style="width:calc([[orderProgressPercent]]% - 10px)">[[planActualLabel]]
-          ([[totalPickedQty]]/[[totalOrderQty]]) [[orderProgressPercent]]%</span>
+        <span id="order-progress-bar" class="chart-value" style="width:calc([[orderProgressPercent]]% - 10px)">
+          <strong>[[totalPickedQty]]</strong>/[[totalOrderQty]]
+          <span>[[orderProgressPercent]]%</span>
+        </span>
       </div>
     </div>
 
@@ -189,9 +207,10 @@ Copyright © HatioLab Inc. All rights reserved.
     <div class="bar-chart">
       <span class="label">[[pcsProgressRateLabel]]</span>
       <div class="bar">
-        <span id="pcs-progress-bar" class="chart-value"
-          style="width:calc([[pcsProgressPercent]]% - 10px)">[[planActualLabel]] ([[totalPickedPcs]]/[[totalOrderPcs]])
-          [[pcsProgressPercent]]%</span>
+        <span id="pcs-progress-bar" class="chart-value" style="width:calc([[pcsProgressPercent]]% - 10px)">
+          <strong>[[totalPickedPcs]]</strong>/[[totalOrderPcs]]
+          <span>[[pcsProgressPercent]]%</span>
+        </span>
       </div>
     </div>
 
@@ -215,13 +234,10 @@ Copyright © HatioLab Inc. All rights reserved.
 
     <!-- 메시지 박스 -->
     <div class="msg-container" status$="{{msgContainerStatus}}">
-      <div class="row">
-        <span class="label">[[topMessage]]</span>
-      </div>
-      <div class="row">
-        <span class="label">[[centerMessageLeft]]</span>
-        <span class="label" style="color: red; font-size: 25px;">[[centerMessageMiddle]]</span>
-        <span class="label">[[centerMessageRight]]</span>
+      <div class="icon"><img src=""></div>
+      <div class="msg">
+        [[topMessage]]
+        <strong>[[centerMessageLeft]] <u>[[centerMessageMiddle]]</u> [[centerMessageRight]]</strong>
       </div>
     </div>
 
@@ -627,8 +643,8 @@ Copyright © HatioLab Inc. All rights reserved.
         this.totalPickedQty = rateResult.actual_order;
         this.totalOrderPcs = rateResult.plan_pcs;
         this.totalPickedPcs = rateResult.actual_pcs;
-        this.orderProgressPercent = rateResult.rate_order;
-        this.pcsProgressPercent = rateResult.rate_pcs;
+        this.orderProgressPercent = rateResult.rate_order.toFixed(1);
+        this.pcsProgressPercent = rateResult.rate_pcs.toFixed(1);
       }
 
       /**
