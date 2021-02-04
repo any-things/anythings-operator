@@ -231,6 +231,7 @@ window.locales['en-US'] = {
   'menu.SimpleAssorting': 'PDAS Assorting',
   'menu.WorkerInput': 'Worker Input',
   'menu.B2BOutAssortNonRefresh': 'DAS 소분류(고정)',
+  'menu.SimpleAssortInspection': 'PDAS 검수',
 
   // button list
   'button.logout': 'Logout',

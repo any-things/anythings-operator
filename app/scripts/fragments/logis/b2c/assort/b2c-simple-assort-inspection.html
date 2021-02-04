@@ -9,9 +9,9 @@ Copyright © HatioLab Inc. All rights reserved.
 <link rel="import" href="../../../../components/common/custom-sound-player.html">
 
 <!--
-  물류 > B2C > PDAS 작업 화면 (PDA)
+  물류 > B2C > PDAS 작업 검수?
 -->
-<dom-module id="b2c-simple-assort">
+<dom-module id="b2c-simple-assort-inspection">
   <template>
     <style include="shared-styles">
       :host {
@@ -268,9 +268,9 @@ Copyright © HatioLab Inc. All rights reserved.
   </template>
 
   <script>
-    class B2CSimpleAssort extends BarcodeScannerMixin(Polymer.Element) {
+    class B2CSimpleAssortInspection extends BarcodeScannerMixin(Polymer.Element) {
       static get is() {
-        return 'b2c-simple-assort'
+        return 'b2c-simple-assort-inspection'
       }
 
       static get properties() {
@@ -643,6 +643,7 @@ Copyright © HatioLab Inc. All rights reserved.
         if (!event || !event.detail || !event.detail.result) return;
 
         let rateResult = event.detail.result;
+
         this.totalOrderQty = rateResult.plan_order;
         this.totalPickedQty = rateResult.actual_order;
         this.totalOrderPcs = rateResult.plan_pcs;
@@ -930,6 +931,6 @@ Copyright © HatioLab Inc. All rights reserved.
       }
     }
 
-    customElements.define(B2CSimpleAssort.is, B2CSimpleAssort);
+    customElements.define(B2CSimpleAssortInspection.is, B2CSimpleAssortInspection);
   </script>
 </dom-module>
