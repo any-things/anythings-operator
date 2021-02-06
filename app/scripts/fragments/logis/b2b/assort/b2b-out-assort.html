@@ -501,7 +501,7 @@ Copyright © HatioLab Inc. All rights reserved.
       showProcessPopup(event) {
         // status가 'F'면 완료된 작업
         let status = event.detail.data.status;
-        if (status === 'W' || status == 'I' || status == 'P') {
+        if (status === 'W' || status == 'I' || status == 'P' || status == 'F') {
           const popup = document.createElement('job-transaction-popup');
           const data = event.detail.data;
           popup.jobType = this.jobType;
