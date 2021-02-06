@@ -451,6 +451,7 @@ window.locales['en-US'] = {
   'error.VALIDATION_ERROR': 'Validation Error!',
   'error.barcd_is_not_typed': 'Please Type Barcode.',
   'error.loc_cd_invalid': 'Location code is not valid.',
+  'error.sku_cd_invalid': 'SKU Code is not valid.',
   'error.sku_barcd_invalid': 'SKU Barcode is not valid.',
   'error.bucket_cd_invalid': 'Bucket code is not valid.',
   'error.order_id_invalid': 'Order ID is not valid.',

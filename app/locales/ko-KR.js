@@ -454,6 +454,7 @@ window.locales['ko-KR'] = {
   'error.VALIDATION_ERROR': '유효성 검사 오류!',
   'error.barcd_is_not_typed': '바코드를 입력하세요.',
   'error.loc_cd_invalid': '셀 코드가 유효하지 않습니다.',
+  'error.sku_cd_invalid': '상품 코드가 유효하지 않습니다.',
   'error.sku_barcd_invalid': '상품 바코드가 유효하지 않습니다.',
   'error.bucket_cd_invalid': '버킷 코드가 유효하지 않습니다.',
   'error.order_id_invalid': '주문 ID가 유효하지 않습니다.',

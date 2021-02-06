@@ -24,6 +24,11 @@ Copyright © HatioLab Inc. All rights reserved.
         display: grid;
         padding-bottom: 10px;
       }
+
+      #prod-input input[type=text] {
+        height: 45px;
+        width: 78%;
+      }
     </style>
 
     <!-- 상품 정보 스캔 투입 리스트 -->
@@ -86,6 +91,12 @@ Copyright © HatioLab Inc. All rights reserved.
         <iron-icon id="bluetooth-btn" icon="[[bluetoothIcon]]" on-click="bluetoothIconClicked"
           hidden="[[!useBloothScanner]]"></iron-icon>
       </div>
+
+      <!-- 상품 투입 스캔 바코드 -->
+      <div id="prod-input">
+        <span>[[skuCdLabel]]</span>
+        <input id="sku-cd-input" type="text" on-keypress="_onSkuCdScan"></input>
+      </div>
     </div>
 
     <!-- 투입 목록 기반 블락 표시기 -->
@@ -110,11 +121,11 @@ Copyright © HatioLab Inc. All rights reserved.
             <button class="list-header-btn" disabled>[[frontBtnLabel]]</button>
           </div>
         </template>
-      </dom-if>
+  </dom-if>
 
-      <!-- 뒤쪽 로케이션 작업 표시를 위한 영역 -->
-      <dom-if if="[[showRear]]">
-        <template>
+  <!-- 뒤쪽 로케이션 작업 표시를 위한 영역 -->
+  <dom-if if="[[showRear]]">
+    <template>
           <div id="right-section">
             <!-- 뒤 로케이션의 작업 리스트 -->
             <item-list id="rear-list" hide-header header="[[header]]" data="[[rearDetailList]]"
@@ -124,11 +135,11 @@ Copyright © HatioLab Inc. All rights reserved.
             <button class="list-header-btn" disabled>[[rearBtnLabel]]</button>
           </div>
         </template>
-      </dom-if>
+  </dom-if>
 
-      <!-- 앞/뒤 모든 로케이션 작업 표시를 위한 영역 -->
-      <dom-if if="[[showTotal]]">
-        <template>
+  <!-- 앞/뒤 모든 로케이션 작업 표시를 위한 영역 -->
+  <dom-if if="[[showTotal]]">
+    <template>
           <div id="total-section">
             <!-- 전체 로케이션의 작업 리스트 -->
             <item-list id="total-list" hide-header header="[[header]]" data="[[totalDetailList]]"
@@ -138,14 +149,12 @@ Copyright © HatioLab Inc. All rights reserved.
             <button class="list-header-btn" disabled>[[totalBtnLabel]]</button>
           </div>
         </template>
-      </dom-if>
-    </div>
+  </dom-if>
+  </div>
 
-    <!-- SKU 정보 조회 시 복수개가 조회된 경우 실행되는 사용자가 고를 수 있는 팝업이 가미된 SKU Input -->
-    <auto-popup-input hidden hide-keyboard id="sku-barcd" resource-url="[[getSkuAjaxUrl]]"
-      popup-title="[[popupTitleLabel]]" button-txt-callback="[[_skuButtonTxtCallback]]" on-item-selected="inputSku"
-      max-length=13>
-    </auto-popup-input>
+  <!-- SKU 정보 조회 시 복수개가 조회된 경우 실행되는 사용자가 고를 수 있는 팝업이 가미된 SKU Input -->
+  <auto-popup-input hidden hide-keyboard id="sku-barcd" resource-url="[[getSkuAjaxUrl]]" popup-title="[[popupTitleLabel]]" button-txt-callback="[[_skuButtonTxtCallback]]" on-item-selected="inputSku" max-length=13>
+  </auto-popup-input>
   </template>
 
   <script>
@@ -167,6 +176,16 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
+           * @description 상품 코드 라벨
+           ****************
+           * @type {String}
+           */
+          skuCdLabel: {
+            type: String,
+            value: () => t('label.sku_cd')
+          },
+
+          /**
            * @description 진행율 라벨
            ****************
            * @type {String}
@@ -183,7 +202,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           header: {
             type: Array,
-            value: function () {
+            value: function() {
               return [{
                 fieldname: 'sub_equip_cd',
                 columnWidth: 'auto',
@@ -268,7 +287,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           getSkuAjaxUrl: {
             type: String,
-            value: `/tablet_process/find_sku/${LOGIS_UTIL.getEquipCd()}/:inputValue`
+            value: `/device_process/sku/search_by_like/${LOGIS_UTIL.getEquipType()}/${LOGIS_UTIL.getEquipCd()}/:inputValue`
           },
 
           /**
@@ -378,7 +397,7 @@ Copyright © HatioLab Inc. All rights reserved.
         // 총 퍼센트 계산
         this.pickedPercent =
           (totalPickQty && totalPickQty > 0 && pickedQty && pickedQty > 0) ?
-            Math.floor(pickedQty / totalPickQty * 100) : 0;
+          Math.floor(pickedQty / totalPickQty * 100) : 0;
 
         // Job Block의 색상을 투입 정보의 색상과 동일하게 표시 (DAS에서는 진척율이 아닌 단지 색상 표시용으로 사용)
         this._updateBlockChart(100);
@@ -448,7 +467,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       indOffByTabletZone() {
         let ledOffStr = t('button.led_off');
-        LOGIS_UTIL.showConfirm(ledOffStr, ledOffStr + ' ' + t('text.Sure to process'), null, function () {
+        LOGIS_UTIL.showConfirm(ledOffStr, ledOffStr + ' ' + t('text.Sure to process'), null, function() {
           const indOffAjax = this.$['ind-off-jobs-ajax'];
           let equipType = LOGIS_UTIL.getEquipType();
           let equipCd = LOGIS_UTIL.getEquipCd();
@@ -465,7 +484,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       indOnByTabletZone(mode) {
         let ledOnStr = t('button.led_on');
-        LOGIS_UTIL.showConfirm(ledOnStr, ledOnStr + ' ' + t('text.Sure to process'), null, function () {
+        LOGIS_UTIL.showConfirm(ledOnStr, ledOnStr + ' ' + t('text.Sure to process'), null, function() {
           const indOnAjax = this.$['ind-on-jobs-ajax'];
           let inputSeqId = this.selectedInput.id;
           let rackCd = LOGIS_UTIL.getEquipCd();
@@ -549,6 +568,20 @@ Copyright © HatioLab Inc. All rights reserved.
         pageAjax.generateRequest();
       }
 
+      _onSkuCdScan(event) {
+        if (event.key === 'Enter') {
+          var skuCd = event.currentTarget.value;
+
+          if (skuCd && skuCd.length > 3) {
+            this.scanned(skuCd);
+          } else {
+            LOGIS_UTIL.showMessageWithSound('error', t('error.VALIDATION_ERROR'), t('error.sku_cd_invalid'), function() {
+              this.$['sku-cd-input'].select();
+            }.bind(this));
+          }
+        }
+      }
+
       /**
        * @description 블루투스 subscribe callback
        * 연결된 블루투스 장비에 의해 호출됨
@@ -590,10 +623,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} event
        */
       _inputSkuResponsed(event) {
-        let response = event.currentTarget.lastResponse;
-        if (response.items && response.items.length > 0) {
-          this.refreshInputList();
-        }
+        this.refreshInputList();
       }
     }
 

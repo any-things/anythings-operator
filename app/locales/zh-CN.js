@@ -452,6 +452,7 @@ window.locales['zh-CN'] = {
   'error.VALIDATION_ERROR': '验证错误！',
   'error.barcd_is_not_typed': '请输入条形码。',
   'error.loc_cd_invalid': '作业工位无效。',
+  'error.sku_cd_invalid': '商品标签无效。',
   'error.sku_barcd_invalid': '商品标签无效。',
   'error.bucket_cd_invalid': '桶编码无效。',
   'error.order_id_invalid': '订单编码无效。',
