@@ -221,7 +221,6 @@ window.locales['zh-CN'] = {
   'menu.TabletPickingStatus': '拣料列表',
   'menu.PdaPickingList': '拣料列表',
   'menu.PickingStatus': '피킹현황',
-  'menu.B2COneSkuOrder': '1品1订单',
   'menu.RtnPickedByCell': '退货库位状态',
   'menu.RtnRemainsBox': '退货残量处理',
   'menu.StockLoadFixed': '固化库位补充',

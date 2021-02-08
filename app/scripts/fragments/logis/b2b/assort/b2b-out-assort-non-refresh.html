@@ -52,9 +52,12 @@ Copyright © HatioLab Inc. All rights reserved.
       on-sys-ajax-response="_inputListResponsed">
     </sys-ajax>
 
-    <!-- 투입 이벤트의 매장 작업 리스트, Mixin에서 투입 상세 조회를 위해 사용 -->
-    <sys-ajax id="input-job-details-ajax" method="GET"
-      curl="/tablet_process/input_details/:rack_cd/:job_input_seq_id/:side_cd/:zone_cd" content-type="application/json"
+    <!-- 투입 이벤트의 매장 작업 리스트, LogisB2BPickerMixin에서 투입 상세 조회를 위해 사용 -->
+    <sys-ajax 
+      id="input-job-details-ajax" 
+      method="GET"
+      curl="/device_process/search/input_jobs/:jobInputId/:equipType/:equipCd?station_cd=:stationCd&ind_on_yn=N" 
+      content-type="application/json"
       last-response="{{inputDetails}}">
     </sys-ajax>
 
@@ -138,11 +141,11 @@ Copyright © HatioLab Inc. All rights reserved.
             <button class="list-header-btn" disabled>[[frontBtnLabel]]</button>
           </div>
         </template>
-      </dom-if>
+  </dom-if>
 
-      <!-- 뒤쪽 로케이션 작업 표시를 위한 영역 -->
-      <dom-if if="[[showRear]]">
-        <template>
+  <!-- 뒤쪽 로케이션 작업 표시를 위한 영역 -->
+  <dom-if if="[[showRear]]">
+    <template>
           <div id="right-section">
             <!-- 뒤 로케이션의 작업 리스트 -->
             <item-list id="rear-list" hide-header header="[[header]]" data="[[rearDetailList]]"
@@ -152,11 +155,11 @@ Copyright © HatioLab Inc. All rights reserved.
             <button class="list-header-btn" disabled>[[rearBtnLabel]]</button>
           </div>
         </template>
-      </dom-if>
+  </dom-if>
 
-      <!-- 앞/뒤 모든 로케이션 작업 표시를 위한 영역 -->
-      <dom-if if="[[showTotal]]">
-        <template>
+  <!-- 앞/뒤 모든 로케이션 작업 표시를 위한 영역 -->
+  <dom-if if="[[showTotal]]">
+    <template>
           <div id="total-section">
             <!-- 전체 로케이션의 작업 리스트 -->
             <item-list id="total-list" hide-header header="[[header]]" data="[[totalDetailList]]"
@@ -166,14 +169,12 @@ Copyright © HatioLab Inc. All rights reserved.
             <button class="list-header-btn" disabled>[[totalBtnLabel]]</button>
           </div>
         </template>
-      </dom-if>
-    </div>
+  </dom-if>
+  </div>
 
-    <!-- SKU 정보 조회 시 복수개가 조회된 경우 실행되는 사용자가 고를 수 있는 팝업이 가미된 SKU Input -->
-    <auto-popup-input hidden hide-keyboard id="sku-barcd" resource-url="[[getSkuAjaxUrl]]"
-      popup-title="[[popupTitleLabel]]" button-txt-callback="[[_skuButtonTxtCallback]]" on-item-selected="inputSku"
-      max-length=13>
-    </auto-popup-input>
+  <!-- SKU 정보 조회 시 복수개가 조회된 경우 실행되는 사용자가 고를 수 있는 팝업이 가미된 SKU Input -->
+  <auto-popup-input hidden hide-keyboard id="sku-barcd" resource-url="[[getSkuAjaxUrl]]" popup-title="[[popupTitleLabel]]" button-txt-callback="[[_skuButtonTxtCallback]]" on-item-selected="inputSku" max-length=13>
+  </auto-popup-input>
   </template>
 
   <script>
@@ -221,7 +222,7 @@ Copyright © HatioLab Inc. All rights reserved.
            */
           header: {
             type: Array,
-            value: function () {
+            value: function() {
               return [{
                 fieldname: 'sub_equip_cd',
                 columnWidth: 'auto',
@@ -425,7 +426,7 @@ Copyright © HatioLab Inc. All rights reserved.
         // 총 퍼센트 계산
         this.pickedPercent =
           (totalPickQty && totalPickQty > 0 && pickedQty && pickedQty > 0) ?
-            Math.floor(pickedQty / totalPickQty * 100) : 0;
+          Math.floor(pickedQty / totalPickQty * 100) : 0;
 
         // Job Block의 색상을 투입 정보의 색상과 동일하게 표시 (DAS에서는 진척율이 아닌 단지 색상 표시용으로 사용)
         this._updateBlockChart(100);
@@ -495,7 +496,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       indOffByTabletZone() {
         let ledOffStr = t('button.led_off');
-        LOGIS_UTIL.showConfirm(ledOffStr, ledOffStr + ' ' + t('text.Sure to process'), null, function () {
+        LOGIS_UTIL.showConfirm(ledOffStr, ledOffStr + ' ' + t('text.Sure to process'), null, function() {
           const indOffAjax = this.$['ind-off-jobs-ajax'];
           let equipType = LOGIS_UTIL.getEquipType();
           let equipCd = LOGIS_UTIL.getEquipCd();
@@ -512,7 +513,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       indOnByTabletZone(mode) {
         let ledOnStr = t('button.led_on');
-        LOGIS_UTIL.showConfirm(ledOnStr, ledOnStr + ' ' + t('text.Sure to process'), null, function () {
+        LOGIS_UTIL.showConfirm(ledOnStr, ledOnStr + ' ' + t('text.Sure to process'), null, function() {
           const indOnAjax = this.$['ind-on-jobs-ajax'];
           let inputSeqId = this.selectedInput.id;
           let rackCd = LOGIS_UTIL.getEquipCd();
@@ -596,6 +597,11 @@ Copyright © HatioLab Inc. All rights reserved.
         pageAjax.generateRequest();
       }
 
+      /**
+       * @description 상품 코드 스캔시 ...
+       ********************
+       * @param {Object} event
+       */
       _onSkuCdScan(event) {
         if (event.key === 'Enter') {
           var skuCd = event.currentTarget.value;
@@ -603,7 +609,7 @@ Copyright © HatioLab Inc. All rights reserved.
           if (skuCd && skuCd.length > 3) {
             this.scanned(skuCd);
           } else {
-            LOGIS_UTIL.showMessageWithSound('error', t('error.VALIDATION_ERROR'), t('error.sku_cd_invalid'), function () {
+            LOGIS_UTIL.showMessageWithSound('error', t('error.VALIDATION_ERROR'), t('error.sku_cd_invalid'), function() {
               this.$['sku-cd-input'].select();
             }.bind(this));
           }
@@ -652,6 +658,8 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       _inputSkuResponsed(event) {
         this.refreshInputList();
+        this.$['sku-cd-input'].value = '';
+        this.$['sku-cd-input'].focus();
       }
 
       /**

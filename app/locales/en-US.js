@@ -220,7 +220,6 @@ window.locales['en-US'] = {
   'menu.TabletPickingStatus': 'Picking Status',
   'menu.PdaPickingList': 'Picking Status',
   'menu.PickingStatus': 'Picking Status',
-  'menu.B2COneSkuOrder': 'One SKU Order',
   'menu.RtnPickedByCell': 'Cell Status',
   'menu.RtnRemainsBox': 'Fullbox Remains',
   'menu.StockLoadFixed': 'Load Stock To Fixed',

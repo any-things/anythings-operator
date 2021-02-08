@@ -222,7 +222,6 @@ window.locales['ko-KR'] = {
   'menu.TabletPickingStatus': '피킹 현황',
   'menu.PdaPickingList': '피킹 현황',
   'menu.PickingStatus': '피킹 현황',
-  'menu.B2COneSkuOrder': '1-SKU 1-Order',
   'menu.RtnPickedByCell': '반품 셀 별현황',
   'menu.RtnRemainsBox': '반품 잔량처리',
   'menu.StockLoadFixed': '고정셀 적치',
@@ -233,7 +232,7 @@ window.locales['ko-KR'] = {
   'menu.B2BOutMiddleAssortMobile': 'DAS 중분류',
   'menu.SimpleAssorting': 'PDAS 분류작업',
   'menu.WorkerInput': '작업자 투입',
-  'menu.B2BOutAssortNonRefresh': 'DAS 소분류(고정)',
+  'menu.B2BOutAssortNonRefresh': 'DAS 소분류',
   'menu.SimpleAssortInspection': 'PDAS 검수',
 
   // button list
