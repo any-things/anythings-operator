@@ -7,151 +7,53 @@ Copyright © HatioLab Inc. All rights reserved.
 
 <!--
   물류 > 홈 화면
-  TODO 메뉴 리스트 ...
 -->
 <dom-module id="logis-home">
   <template>
     <style include="shared-styles">
       @media (min-width: 0px) and (max-width: 600px) {
-        .container {
-          padding: 30px 20px 0 20px;
-        }
-
-        div.notification {
-          padding: 20px 0 0 20px;
-          color: white;
-          font-size: 1em;
-        }
-
-        .user {
+        :host {
           display: block;
-          position: absolute;
-          bottom: 20px;
-          right: 25px;
-          color: rgba(255, 255, 255, 0);
+          height: 80%;
+          background-image: url(../../../images/home.png);
+          background-repeat: no-repeat;
+          background-position: center center;
+          background-size: 200px 55px;
         }
-
-        .user iron-icon {
-          width: 45px;
-          height: 45px;
-          padding: 0;
-        }
-
-        .grid-container {
-          display: grid;
-          height: 100%;
-          /* grid-template-columns: 130px 130px 130px; */
-          grid-template-columns: 30% 30% 30%;
-          grid-template-rows: 120px 120px 120px 120px auto;
-          grid-column-gap: 5%;
-          grid-row-gap: 6%;
-          align-items: center;
+        .logo {
+          position:absolute;
+          bottom:0;
+          width:99%;
+          height:55px;
+          background-image: url(../../../images/logo.png);
+          background-repeat: no-repeat;
+          background-position: center;
         }
       }
 
       @media (min-width: 601px) {
-        div.notification {
-          padding: 30px 0 0 30px;
-          color: white;
-          font-size: 1em;
+        :host {
+          display: block;
+          height: 85%;
+          background-image: url(../../../images/home.png);
+          background-repeat: no-repeat;
+          background-position: center center;
+          background-size: 300px 90px;
         }
-
-        .container {
-          padding: 30px 0 0 30px;
+        .logo {
+          margin: 0px 10px 0px 0px;
+          position:absolute;
+          bottom:0;
+          width:95%;
+          height:70px;
+          background-image: url(../../../images/logo.png);
+          background-repeat: no-repeat;
+          background-position: right;
         }
-
-        .grid-container {
-          display: grid;
-          height: 100%;
-          grid-template-columns: 15% 15% 15% 15% 15% 15%;
-          grid-template-rows: 35% 35%;
-          grid-column-gap: 1%;
-          grid-row-gap: 3%;
-          align-items: center;
-        }
-      }
-
-      :host {
-        display: block;
-        height: 100%;
-      }
-
-      .icon-menu {
-        background-color: var(--things-menubtn-background-color);
-        height: 100%;
-        border: 2px solid rgba(0, 0, 0, .5);
-        border-radius: var(--things-default-border-radius);
-        color: rgba(255, 255, 255, .8);
-        font-size: 1.38rem;
-        font-weight: normal;
-      }
-
-      .icon-menu:active {
-        border: 2px solid #79ceff;
-        color: rgba(255, 255, 255, 1);
-        font-weight: bold;
-      }
-
-      .icon-menu::before {
-        content: "";
-        width: 105px;
-        height: 105px;
-        display: block;
-        margin: 0 auto 70px auto;
-      }
-
-      span.crossmark:after {
-        padding-left: 1em;
-        font-size: 1em;
-        content: "\274c";
       }
     </style>
 
-    <div class="notification">Notification 1<span class="crossmark"></span></div>
-
-    <div class="notification">Notification 2<span class="crossmark"></span></div>
-
-    <div class="notification">Notification 3<span class="crossmark"></span></div>
-
-    <div class="container">
-      <div class="grid-container">
-        <button class="icon-menu setting">
-        </button>
-
-        <button class="icon-menu">
-        </button>
-
-        <button class="icon-menu">
-        </button>
-
-        <button class="icon-menu">
-        </button>
-
-        <button class="icon-menu">
-        </button>
-
-        <button class="icon-menu">
-        </button>
-
-        <button class="icon-menu">
-        </button>
-
-        <button class="icon-menu">
-        </button>
-
-        <button class="icon-menu">
-        </button>
-
-        <button class="icon-menu">
-        </button>
-
-        <button class="icon-menu">
-        </button>
-
-        <button class="icon-menu">
-        </button>
-      </div>
-    </div>
+    <div class="logo"></div>          
   </template>
 
   <script>
@@ -159,104 +61,6 @@ Copyright © HatioLab Inc. All rights reserved.
       static get is() {
         return 'logis-home'
       };
-
-      static get properties() {
-        return {
-          header: {
-            type: Array,
-            value: () => {
-              return [{
-                display: 'Image',
-                fieldname: 'src',
-                image: {
-                  zoomDialog: true,
-                  style: {
-                    margin: 'auto',
-                    borderRadius: '10px'
-                  }
-                },
-                columnWidth: '220px'
-              }, {
-                display: 'Message',
-                fieldname: 'message'
-              }]
-            }
-          }
-        }
-      }
-
-      /**
-       * @description life cycle
-       *********************
-       */
-      connectedCallback() {
-        super.connectedCallback();
-        // this.searchMenuList();
-      }
-
-      /**
-       * @description 메뉴 리스트 조회
-       *********************
-       * @param {Number} page
-       * @param {Number} limit
-       */
-      searchMenuList(page, limit) {
-        const menuListAjax = this.$['menu-list-ajax'];
-        let category = LOGIS_UTIL.getDeviceType().toUpperCase();
-        let currentPage = page ? page : 1;
-        let currentLimit = limit ? limit : 50;
-
-        const query = JSON.stringify([{
-          field: 'category',
-          value: category
-        }]);
-
-        const sort = JSON.stringify([{
-          field: 'rank',
-          ascending: false
-        }]);
-
-        menuListAjax.curl = '/memus';
-        menuListAjax.params = {
-          page: currentPage,
-          limit: currentLimit,
-          sort: sort,
-          query: query
-        };
-        menuListAjax.generateRequest();
-      }
-
-      /**
-       * @description 에러 로그 조회 성공시
-       *********************
-       * @param {Object} event
-       */
-      _errorLogResponsed(event) {
-        event.detail.items.forEach(item => {
-          item.src = `https://picsum.photos/200/200/?image=${Math.floor((Math.random() * 50) + 1)}`
-        });
-        this.modifiedData = event.detail.items;
-      }
-
-      /**
-       * @description 페이지 변경시
-       *********************
-       * @param {Object} event
-       */
-      _pageChanged(event) {
-        let page = event.detail.page;
-        let limit = event.detail.limit;
-        this.searchMenuList(page, limit);
-      }
-
-      /**
-       * @description 데이터 클릭시
-       *********************
-       * @param {Object} event
-       */
-      _onDataListClick(event) {
-        console.log(event);
-      }
     }
 
     customElements.define(LogisHome.is, LogisHome);

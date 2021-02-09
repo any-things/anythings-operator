@@ -245,28 +245,26 @@ Copyright © HatioLab Inc. All rights reserved.
     </app-header>
 
     <iron-pages id="main" role="main" selected="[[page]]" attr-for-selected="name" selected-attribute="visible">
-
       <!-- Common Views -->
-      <cell-box-mapping-status name="cell_box_mapping_status" is-pda="[[isPDA]]"></cell-box-mapping-status>
+      <!--cell-box-mapping-status name="cell_box_mapping_status" is-pda="[[isPDA]]"></cell-box-mapping-status>
       <picking-status name="picking_status" is-kiosk="[[isKIOSK]]"></picking-status>
       <picking-status-by-cell name="picking_status_by_cell" is-pda="[[isPDA]]"></picking-status-by-cell>
       <box-list name="box_list" is-kiosk="[[isKIOSK]]"></box-list>
-      <label-list name="label_list" is-pda="[[isPDA]]"></label-list>
+      <label-list name="label_list" is-pda="[[isPDA]]"></label-list-->
       <!-- Common Views -->
 
       <!-- DAS Views -->
-      <rack-input-list name="rack_input_list" is-pda="[[isPDA]]"></rack-input-list>
+      <!--rack-input-list name="rack_input_list" is-pda="[[isPDA]]"></rack-input-list-->
       <!-- DAS Views -->
 
       <!-- Tablet Views -->
-      <b2b-job-assort name="b2b_job_assort"></b2b-job-assort>
+      <!--b2b-job-assort name="b2b_job_assort"></b2b-job-assort>
       <b2c-picking-job name="b2c_picking_job"></b2c-picking-job>
-
-      <rack-input-list name="rack_input_list"></rack-input-list>
+      <rack-input-list name="rack_input_list"></rack-input-list-->
       <!-- Tablet Views -->
 
       <!-- PDA Views -->
-      <stock-status-by-cell name="stock_status_by_cell"></stock-status-by-cell>
+      <!--stock-status-by-cell name="stock_status_by_cell"></stock-status-by-cell>
       <stock-supplement name="stock_supplement"></stock-supplement>
       <stock-supply name="stock_supply"></stock-supply>
       <fixed-stock-supplement name="fixed_stock_supplement"></fixed-stock-supplement>
@@ -283,11 +281,11 @@ Copyright © HatioLab Inc. All rights reserved.
 
       <pda-region-sku-info name="pda_region_sku_info"></pda-region-sku-info>
       <pda-das2-process name="pda_das2_process" rack-nm="{{equipNm}}" zone-cd="{{stationCd}}"></pda-das2-process>
-      <pda-dps2-process name="pda_dps2_process" rack-nm="{{equipNm}}" zone-cd="{{stationCd}}"></pda-dps2-process>
+      <pda-dps2-process name="pda_dps2_process" rack-nm="{{equipNm}}" zone-cd="{{stationCd}}"></pda-dps2-process-->
       <!-- PDA Views -->
 
       <!-- KIOSK View -->
-      <b2b-out-middle-assort name="b2b_out_middle_assort"></b2b-out-middle-assort>
+      <!--b2b-out-middle-assort name="b2b_out_middle_assort"></b2b-out-middle-assort>
       <b2b-out-middle-assort-with-weight name="b2b_out_middle_assort_weight"></b2b-out-middle-assort-with-weight>
       <b2b-rtn-middle-assort name="b2b_rtn_middle_assort"></b2b-rtn-middle-assort>
       <b2b-qty-inspection name="b2b_qty_inspection"></b2b-qty-inspection>
@@ -302,7 +300,7 @@ Copyright © HatioLab Inc. All rights reserved.
       <b2c-packing-check name="b2c_packing_check"></b2c-packing-check>
       <b2c-packing-popup name="b2c_packing_popup"></b2c-packing-popup>
       <b2c-qty-inspection name="b2c_qty_inspection"></b2c-qty-inspection>
-      <b2c-rtn-inspection name="b2c_rtn_inspection"></b2c-rtn-inspection>
+      <b2c-rtn-inspection name="b2c_rtn_inspection"></b2c-rtn-inspection-->
       <!-- KIOSK View -->
 
       <logis-login name="login" resources="[[resources]]" language="[[language]]" is-dev-mode="[[_computeIsDev()]]" on-login-succeed="_handleLoginSuccess">
@@ -515,7 +513,7 @@ Copyright © HatioLab Inc. All rights reserved.
             this.$['logis-setting'].saveSetting();
           }
         });
-        
+
         document.addEventListener("new-view-loaded", event => {
           this.$.main.appendChild(event.detail);
           document.dispatchEvent(new CustomEvent('new-view-appened', event))

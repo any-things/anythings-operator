@@ -8,8 +8,6 @@ Copyright © HatioLab Inc. All rights reserved.
 <link rel="import" href="../../../bower_components/iron-form/iron-form.html">
 
 <link rel="import" href="../../components/sys/sys-translator.html">
-<link rel="import" href="../../components/common/portal-display.html">
-
 <link rel="import" href="../../mixins/common/things-encrypt.html">
 
 <link rel="import" href="./logis-site-selector.html">
@@ -51,6 +49,29 @@ Copyright © HatioLab Inc. All rights reserved.
         display: grid;
         justify-content: end;
       }
+
+      @media (min-width: 0px) and (max-width: 600px) {
+        .backimage {
+          display: block;
+          height: 55%;
+          background-image: url(../../../images/mobile-brand.png);
+          background-repeat: no-repeat;
+          background-position: center center;
+          background-size: cover;
+        }
+      }
+
+      @media (min-width: 601px) {
+        .backimage {
+          display: block;
+          height: 50%;
+          background-image: url(../../../images/mobile-brand.png);
+          background-repeat: no-repeat;
+          background-position: center left;
+          background-size: cover;
+        }
+      }
+
     </style>
 
     <sys-translator resources="[[resources]]" language="[[language]]" src="label.user" result="{{labelUser}}"></sys-translator>
@@ -91,9 +112,7 @@ Copyright © HatioLab Inc. All rights reserved.
       </form>
     </iron-form>
 
-    <portal-display
-      background-url="/images/mobile_brand.png">
-    </portal-display>
+    <div class="backimage"></div>
 
     <!-- 로그인 폼 -->
     <form
