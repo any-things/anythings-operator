@@ -194,7 +194,7 @@ Copyright © HatioLab Inc. All rights reserved.
     <!-- 검수 정보 조회를 위한 Ajax -->
     <sys-ajax
       id="find-inspection-ajax"
-      curl="/device_process/dynamic/dps/inspection/find_by_order/:order_id"
+      curl="/device_process/dynamic/out/inspection/find_by_order/:order_id"
       method="GET"
       content-type="application/json"
       custom-error-handler
@@ -205,7 +205,7 @@ Copyright © HatioLab Inc. All rights reserved.
     <!-- 검수 완료를 위한 Ajax -->
     <sys-ajax
       id="inspection-complete-ajax"
-      curl="/device_process/dynamic/dps/inspection/finish/:order_id"
+      curl="/device_process/dynamic/out/inspection/finish/:order_id"
       method="POST"
       content-type="application/json"
       last-response="{{inspectionResult}}">
@@ -214,7 +214,7 @@ Copyright © HatioLab Inc. All rights reserved.
     <!-- 송장 재발행을 위한 Ajax -->
     <sys-ajax
       id="reprint-invoice-ajax"
-      curl="/device_process/dynamic/dps/inspection/print/:order_id"
+      curl="/device_process/dynamic/out/inspection/print/:order_id"
       method="PUT"
       content-type="application/json"
       on-sys-ajax-response="_reprintSuccess">
@@ -223,7 +223,7 @@ Copyright © HatioLab Inc. All rights reserved.
     <!-- 박스 내품 검수를 위한 Ajax --
     <sys-ajax
       id="inspection-item-ajax"
-      curl="/device_process/dynamic/dps/inspection/by_item/:order_no"
+      curl="/device_process/dynamic/out/inspection/by_item/:order_no"
       method="PUT"
       content-type="application/json"
       custom-error-handler
@@ -234,7 +234,7 @@ Copyright © HatioLab Inc. All rights reserved.
     -- 피킹 완료 가능 여부 체크를 위한 Ajax --
     <sys-ajax
       id="check-manual-picking-ajax"
-      curl="/device_process/dynamic/dps/picking/finish/possible"
+      curl="/device_process/dynamic/out/picking/finish/possible"
       method="GET"
       content-type="application/json"
       on-sys-ajax-response="_onPickingCheckSuccess">
@@ -243,7 +243,7 @@ Copyright © HatioLab Inc. All rights reserved.
     -- 피킹 완료를 위한 Ajax --
     <sys-ajax
       id="picking-complete-ajax"
-      curl="/device_process/dynamic/dps/picking/finish"
+      curl="/device_process/dynamic/out/picking/finish"
       method="PUT"
       content-type="application/json"
       on-sys-ajax-response="_onPickingCompleteSuccess">
@@ -252,7 +252,7 @@ Copyright © HatioLab Inc. All rights reserved.
     -- 박스 분할을 위한 Ajax --
     <sys-ajax
       id="split-box-ajax"
-      curl="/device_process/dynamic/dps/inspection/split_box/:order_id"
+      curl="/device_process/dynamic/out/inspection/split_box/:order_id"
       method="POST"
       content-type="application/json"
       on-sys-ajax-response="_splitBoxSuccess">
@@ -895,7 +895,7 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       refreshInspection(inputType, inputId, boxType) {
         var findAjax = this.$['find-inspection-ajax'];
-        findAjax.curl = `/device_process/dynamic/dps/inspection/find_by_${inputType}`;
+        findAjax.curl = `/device_process/dynamic/out/inspection/find_by_${inputType}`;
         inputId = inputId.toUpperCase();
 
         findAjax.customParams = {
@@ -1131,7 +1131,7 @@ Copyright © HatioLab Inc. All rights reserved.
         // 검수가 완료되었다면 재발행을 호출할 수 있다.
         if (this.inspectionStatus === 'O' || this.inspectionStatus == 'E' || this.inspectionStatus == 'R') {
           var reprintAjax = this.$['reprint-invoice-ajax'];
-          reprintAjax.curl = '/device_process/dynamic/dps/print_invoice';
+          reprintAjax.curl = '/device_process/dynamic/out/print_invoice';
           reprintAjax.customParams = {
             equipType: LOGIS_UTIL.getEquipType(),
             equipCd: LOGIS_UTIL.getEquipCd(),
@@ -1175,7 +1175,7 @@ Copyright © HatioLab Inc. All rights reserved.
       _doCompleteInspection() {
         if (this.items && this.items.length > 0) {
           let completeAjax = this.$['inspection-complete-ajax'];
-          completeAjax.curl = '/device_process/dynamic/dps/inspection/finish';
+          completeAjax.curl = '/device_process/dynamic/out/inspection/finish';
           completeAjax.customParams = {
             equipType: LOGIS_UTIL.getEquipType(),
             equipCd: LOGIS_UTIL.getEquipCd(),
@@ -1485,7 +1485,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
         if (splitItems.length > 0) {
           var splitBoxAjax = this.$['split-box-ajax'];
-          splitBoxAjax.curl = '/device_process/dynamic/dps/inspection/split_box';
+          splitBoxAjax.curl = '/device_process/dynamic/out/inspection/split_box';
           splitBoxAjax.customParams = {
             equipType: LOGIS_UTIL.getEquipType(),
             equipCd: LOGIS_UTIL.getEquipCd(),
