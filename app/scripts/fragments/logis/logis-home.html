@@ -11,6 +11,67 @@ Copyright © HatioLab Inc. All rights reserved.
 <dom-module id="logis-home">
   <template>
     <style include="shared-styles">
+      :host {
+        height: 100%;
+        width: 100%;
+      }
+
+      .brand {
+        width: 100%;
+        height: 100%;
+        background-image: url(../../../images/home.png);
+        background-repeat: no-repeat;
+        background-position: center center;
+      }
+
+      .logo_div {
+        width: 100%;
+        height: 100%;
+        background-color: white;
+      }
+
+      /* .logo {
+        background-image: url(../../../images/logo.png);
+        background-repeat: no-repeat;
+        background-position: center center;
+      } */
+
+      @media (min-width: 0px) and (max-width: 600px) {
+        :host {
+          display: grid;
+          grid-template-rows: 1fr 55px;
+        }
+
+        .brand {
+          background-size: 200px 55px;
+        }
+
+        .logo {
+          margin: auto;
+          width: 158px;
+          height: 55px;
+        }
+      }
+
+      @media (min-width: 601px) {
+        :host {
+          display: grid;
+          grid-template-rows: 1fr 70px;
+        }
+
+        .brand {
+          background-size: 300px 90px;
+        }
+
+        .logo {
+          float: right;
+          margin-right: 5px;
+          width: 200px;
+          height: 70px;
+        }
+      }
+
+      /*
       @media (min-width: 0px) and (max-width: 600px) {
         :host {
           display: block;
@@ -20,11 +81,12 @@ Copyright © HatioLab Inc. All rights reserved.
           background-position: center center;
           background-size: 200px 55px;
         }
+
         .logo {
-          position:absolute;
-          bottom:0;
-          width:99%;
-          height:55px;
+          position: absolute;
+          bottom: 0;
+          width: 99%;
+          height: 55px;
           background-image: url(../../../images/logo.png);
           background-repeat: no-repeat;
           background-position: center;
@@ -40,20 +102,28 @@ Copyright © HatioLab Inc. All rights reserved.
           background-position: center center;
           background-size: 300px 90px;
         }
+
         .logo {
-          margin: 0px 10px 0px 0px;
-          position:absolute;
-          bottom:0;
-          width:95%;
-          height:70px;
+          position: absolute;
+          bottom: 0;
+          width: 99%;
+          height: 70px;
           background-image: url(../../../images/logo.png);
           background-repeat: no-repeat;
           background-position: right;
         }
       }
+      */
     </style>
+    <script src="../../../lib/lottie-player/lottie-player.js"></script>
 
-    <div class="logo"></div>          
+    <div class="brand"></div>
+    <div class="logo_div">
+      <div class="logo">
+        <lottie-player autoplay loop src="../../../lib/lottie-player/logo.json" speed="2" background="transparent">
+        </lottie-player>
+      </div>
+    </div>
   </template>
 
   <script>
