@@ -175,6 +175,15 @@ Copyright © HatioLab Inc. All rights reserved.
                   textAlign: 'center'
                 }
               }, {
+                display: t('label.class_cd'),
+                fieldname: 'class_cd',
+                style: {
+                  textAlign: 'center'
+                },
+                displayCallback: (value) => {
+                  return value ? value : '';
+                }
+              }, {
                 display: t('label.box_id'),
                 fieldname: 'box_id',
                 style: {
