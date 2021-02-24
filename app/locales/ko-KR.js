@@ -29,6 +29,7 @@ window.locales['ko-KR'] = {
   'label.order_qty': '주문 수량',
   'label.can_load_qty': '적치가능량',
   'label.status': '상태',
+  'label.seq': '순서',
   'label.input_seq': '투입순서',
   'label.order_no': '주문 번호',
   'label.bucket_cd': '버킷 코드',
@@ -287,6 +288,7 @@ window.locales['ko-KR'] = {
   'button.merge_batch': '배치병합',
   'button.cancel_start_batch': '배치시작 취소',
   'button.finish_batch': '배치완료',
+  'button.end_cells_on': '표시기 완료 표시',
 
   // text list
   'text.login_failure': '로그인 실패',

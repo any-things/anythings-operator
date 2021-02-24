@@ -178,6 +178,23 @@ Copyright © HatioLab Inc. All rights reserved.
       content-type="application/json">
     </sys-ajax>
 
+    <!-- 마지막 상품 투입 취소 -->
+    <sys-ajax 
+      id="cancel-input-sku-ajax" 
+      method="POST" 
+      curl="device_process/dynamic/das/cancel/input/sku"
+      content-type="application/json"
+      on-sys-ajax-response="_onCancelInputSuccess">
+    </sys-ajax>
+
+    <!-- 완료된 셀 표시기에 END 표시 -->
+    <sys-ajax 
+      id="end-list-on-ajax"
+      method="POST" 
+      curl="device_process/dynamic/das/indicators/on/end_cells"
+      content-type="application/json">
+    </sys-ajax>
+
     <!-- 상품 투입 처리 Ajax -->
     <sys-ajax 
       id="input-sku-ajax" 
@@ -299,13 +316,17 @@ Copyright © HatioLab Inc. All rights reserved.
             on-item-selected="itemSelected">
           </auto-popup-input>
           <!-- 일괄 풀 박스 버튼 -->
-          <img id="batch-fullbox-btn" src="./images/iconbtn-das-order2.png" on-click="batchFullbox" />
+          <!--img id="batch-fullbox-btn" src="./images/iconbtn-das-order2.png" on-click="batchFullbox" /-->
+          <!-- 완료된 셀 END 표시 버튼 -->
+          <img id="batch-fullbox-btn" src="./images/iconbtn-das-order2.png" on-click="displayEndCells" />
 
           <!-- 해당 호기에서 분류할 스캔한 상품에 대한 총 박스 수 / PCS 수 -->
           <span class="label">[[qtyLabel]]</span>
           <input id="total-assort-qty" readonly value="[[totalAssortQty]]">
           <!-- 표시기 소등 버튼 -->
-          <img id="ind-off-btn" src="./images/iconbtn-das-order1.png" on-click="indOffAll" />
+          <!--img id="ind-off-btn" src="./images/iconbtn-das-order1.png" on-click="indOffAll" /-->
+          <!-- 상품 투입 취소 버튼 -->
+          <img id="ind-off-btn" src="./images/iconbtn-das-order1.png" on-click="cancelInputSku" />
 
           <!-- 미완료 -->
           <span class="label">[[unfinishedLabel]]</span>
@@ -323,7 +344,8 @@ Copyright © HatioLab Inc. All rights reserved.
           page="[[page2]]"
           total="[[total2]]"
           limit="[[limit2]]"
-          data="[[items2]]">
+          data="[[items2]]"
+          on-paginator-changed="_page2Changed">
         </item-list>
 
         <!-- 투입 리스트 -->
@@ -482,6 +504,13 @@ Copyright © HatioLab Inc. All rights reserved.
             type: Array,
             value: function() {
               return [{
+                display: t('label.seq'),
+                columnWidth: '0.3fr',
+                fieldname: 'input_seq',
+                style: {
+                  textAlign: 'right'
+                }
+              }, {
                 display: t('label.input') + ' ' + t('label.sku'),
                 fieldname: 'sku_cd',
                 columnWidth: '1.3fr',
@@ -526,9 +555,6 @@ Copyright © HatioLab Inc. All rights reserved.
                 }
               }, {
                 fieldname: 'plan_qty',
-                hidden: true
-              }, {
-                fieldname: 'input_seq',
                 hidden: true
               }, {
                 fieldname: 'status',
@@ -938,16 +964,7 @@ Copyright © HatioLab Inc. All rights reserved.
       batchFullbox(e) {
         var title = t('button.print_all');
         var msg = title + ' ' + t('text.Sure to process');
-
-        LOGIS_UTIL.showConfirm(title, msg, this._initialSetup.bind(this), function() {
-          var ajax = this.$['batch-fullbox-ajax'];
-          ajax.curl = `/device_process/dynamic/das/batch_boxing`;
-          ajax.customParams = {
-            equipType: 'Rack',
-            equipCd: LOGIS_UTIL.getEquipCd()
-          };
-          ajax.generateRequest();
-        }.bind(this));
+        LOGIS_UTIL.showConfirm(title, msg, this._initialSetup.bind(this), this._doBatchFullBox.bind(this));
       }
 
       /**
@@ -958,7 +975,45 @@ Copyright © HatioLab Inc. All rights reserved.
       indOffAll(e) {
         let title = t('title.ind_off_all');
         let msg = title + ' ' + t('text.Sure to process');
-        LOGIS_UTIL.showConfirm(t('title.ind_off_all'), msg, this._initialSetup.bind(this), this._doIndOffAll.bind(this));
+        LOGIS_UTIL.showConfirm(title, msg, this._initialSetup.bind(this), this._doIndOffAll.bind(this));
+      }
+
+      /**
+       * @description 상품 투입 취소 버튼 클릭 핸들러
+       ***********************
+       * @param {Object} e
+       */
+      cancelInputSku(e) {
+        var title = '마지막 상품 ' + t('button.cancel_input');
+        var msg = title + ' ' + t('text.Sure to process');
+        LOGIS_UTIL.showConfirm(title, msg, this._initialSetup.bind(this), this._doCancelInputSku.bind(this));
+      }
+
+      /**
+       * @description 완료된 셀 END 표시 클릭 핸들러
+       ***********************
+       * @param {Object} e
+       */
+      displayEndCells(e) {
+        let title = t('button.end_cells_on');
+        let msg = title + ' ' + t('text.Sure to process');
+        LOGIS_UTIL.showConfirm(title, msg, this._initialSetup.bind(this), this._doDisplayEndCells.bind(this));
+      }
+
+      /**
+       * @description 일괄 풀 박스 처리
+       ***********************
+       */
+      _doBatchFullBox() {
+        const batchFullBox = this.$['batch-fullbox-ajax'];
+        let equipType = LOGIS_UTIL.getEquipType();
+        let equipCd = LOGIS_UTIL.getEquipCd();
+        batchFullBox.curl = '/device_process/dynamic/das/batch_boxing';
+        batchFullBox.customParams = {
+          equipType: equipType,
+          equipCd: equipCd
+        }
+        batchFullBox.generateRequest();
       }
 
       /**
@@ -976,6 +1031,38 @@ Copyright © HatioLab Inc. All rights reserved.
           equipCd: equipCd
         }
         indOffAjax.generateRequest();
+      }
+
+      /**
+       * @description 작업 완료된 셀 END 표시 처리 
+       ***********************
+       */
+      _doDisplayEndCells() {
+        const displayEndCellsAjax = this.$['end-list-on-ajax'];
+        let equipType = LOGIS_UTIL.getEquipType();
+        let equipCd = LOGIS_UTIL.getEquipCd();
+        displayEndCellsAjax.curl = '/device_process/dynamic/das/indicators/on/end_cells';
+        displayEndCellsAjax.customParams = {
+          equipType: equipType,
+          equipCd: equipCd
+        }
+        displayEndCellsAjax.generateRequest();
+      }
+
+      /**
+       * @description 마지막 상품 투입 취소 처리 
+       ***********************
+       */
+      _doCancelInputSku() {
+        const cancelInputAjax = this.$['cancel-input-sku-ajax'];
+        let equipType = LOGIS_UTIL.getEquipType();
+        let equipCd = LOGIS_UTIL.getEquipCd();
+        cancelInputAjax.curl = '/device_process/dynamic/das/cancel/input/sku';
+        cancelInputAjax.customParams = {
+          equipType: equipType,
+          equipCd: equipCd
+        }
+        cancelInputAjax.generateRequest();
       }
 
       /**
@@ -1252,6 +1339,15 @@ Copyright © HatioLab Inc. All rights reserved.
         }
 
         this._scannedFlag = false;
+        this.refresh();
+      }
+
+      /**
+       * @description 상품 투입 취소 성공시
+       *******************
+       * @param {Object} event
+       */
+      _onCancelInputSuccess(event) {
         this.refresh();
       }
 

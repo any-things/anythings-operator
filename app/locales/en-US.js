@@ -28,6 +28,7 @@ window.locales['en-US'] = {
   'label.order_line_no': 'Order Line',
   'label.order_qty': 'Order Qty.',
   'label.status': 'Status',
+  'label.seq': 'Seq.',
   'label.input_seq': 'Input Seq.',
   'label.order_no': 'Order No.',
   'label.bucket_cd': 'Bucket Code',
@@ -286,6 +287,7 @@ window.locales['en-US'] = {
   'button.merge_batch': 'Merge Batch',
   'button.cancel_start_batch': 'Cancel Batch',
   'button.finish_batch': 'Finish Batch',
+  'button.end_cells_on': 'Display End Cells',
 
   // text list
   'text.login_failure': 'Failed to Login',

@@ -28,6 +28,7 @@ window.locales['zh-CN'] = {
   'label.order_line_no': '订单行号',
   'label.order_qty': '订单数量',
   'label.status': '状态',
+  'label.seq': '顺序',
   'label.input_seq': '投入顺序',
   'label.order_no': '订单编码',
   'label.bucket_cd': '桶编码',
@@ -285,6 +286,7 @@ window.locales['zh-CN'] = {
   'button.merge_batch': '배치병합',
   'button.cancel_start_batch': '배치시작 취소',
   'button.finish_batch': '배치완료',
+  'button.end_cells_on': '표시기 완료 표시',
 
   // text list
   'text.login_failure': '认证失败！',
