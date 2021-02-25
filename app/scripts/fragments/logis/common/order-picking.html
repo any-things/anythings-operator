@@ -40,7 +40,7 @@ Copyright © HatioLab Inc. All rights reserved.
     <!-- 보관 존별 예정 / 처리 수량 조회 -->
     <sys-ajax 
       id="order-picking-status-ajax"
-      method="GET" 
+      method="POST" 
       content-type="application/json" 
       last-response="{{items}}">
     </sys-ajax>
@@ -105,30 +105,7 @@ Copyright © HatioLab Inc. All rights reserved.
            * @type {Array}
            */
           items: {
-            type: Array,
-            value: function() {
-              return [{
-                store_zone_cd: 'A',
-                pick_qty: 25,
-                printed_qty: 25,
-                printing_qty: 0
-              }, {
-                store_zone_cd: 'B',
-                pick_qty: 17,
-                printed_qty: 0,
-                printing_qty: 17
-              }, {
-                store_zone_cd: 'C',
-                pick_qty: 35,
-                printed_qty: 0,
-                printing_qty: 35
-              }, {
-                store_zone_cd: 'D',
-                pick_qty: 8,
-                printed_qty: 0,
-                printing_qty: 8
-              }];
-            }
+            type: Array
           },
 
           /**
@@ -241,14 +218,9 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} event
        */
       refresh(event) {
-        var equipCd = LOGIS_UTIL.getEquipCd();
-        var equipType = LOGIS_UTIL.getEquipType();
-
-        if (equipCd) {
-          var requestAjax = this.$['order-picking-status-ajax'];
-          requestAjax.curl = `/device_process/dynamic/dps/box_requirement?equipCd=${equipCd}&equipType=${equipType}`;
-          requestAjax.generateRequest();
-        }
+        var requestAjax = this.$['order-picking-status-ajax'];
+        requestAjax.curl = '/diy_services/order-picking-label-status/shoot';
+        requestAjax.generateRequest();
       }
 
       /**
@@ -257,14 +229,9 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} event
        */
       printLabel(event) {
-        var equipCd = LOGIS_UTIL.getEquipCd();
-        var equipType = LOGIS_UTIL.getEquipType();
-
-        if (equipCd) {
-          var requestAjax = this.$['order-picking-status-ajax'];
-          requestAjax.curl = `/device_process/dynamic/dps/box_requirement?equipCd=${equipCd}&equipType=${equipType}`;
-          requestAjax.generateRequest();
-        }
+        var requestAjax = this.$['order-picking-status-ajax'];
+        requestAjax.curl = '/diy_services/order-picking-print-labels/shoot';
+        requestAjax.generateRequest();
       }
     }
 
