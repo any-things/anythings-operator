@@ -38,16 +38,29 @@ Copyright © HatioLab Inc. All rights reserved.
     </style>
 
     <!-- 보관 존별 예정 / 처리 수량 조회 -->
-    <sys-ajax 
+    <sys-ajax
       id="order-picking-status-ajax"
-      method="POST" 
-      content-type="application/json" 
+      method="GET"
+      content-type="application/json"
       last-response="{{items}}">
+    </sys-ajax>
+
+    <!-- 오더 피킹 송장 출력 -->
+    <sys-ajax
+      id="order-picking-print-ajax"
+      method="POST"
+      content-type="application/json"
+      on-sys-ajax-response="refresh">
     </sys-ajax>
 
     <div id="container">
       <!-- 그리드 -->
-      <item-list id="item-list" header="[[header]]" data="[[items]]">
+      <item-list
+        id="item-list"
+        header="[[header]]"
+        data="[[items]]"
+        on-data-list-click="_selectItem"
+        on-configured="_changeRowStyle">
       </item-list>
 
       <!-- 새로 고침 버튼  -->
@@ -213,23 +226,54 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
-       * 새로고침 - 박스 유형별 예정 / 확정 주문 수량 조회
+       * @description 그리드 행에 대한 스타일 변경
+       *******************
+       * @param {Object} event
+       */
+      _changeRowStyle(event) {
+        let list = event.detail.contentElements;
+        list.forEach(row => {
+          let data = row.getData();
+          if (data.tot_order_cnt == data.comp_order_cnt) {
+            row.classList.add('complete');
+          }
+        })
+      }
+
+      /**
+       * @description 보관 존 항목 선택
+       ******************
+       * @param {Object} event
+       */
+      _selectItem(event) {
+        if (this.selectedItem) {
+          // 1. 이미 작업 대상이 선택되어 있다면 선택된 대상의 하일라이트 스타일 제거
+          this.selectedItem.classList.remove('selected');
+        }
+
+        // 2. 선택시 하일라이트 스타일 적용
+        this.selectedItem = event.detail.row;
+        this.selectedItem.classList.add('selected');
+      }
+
+      /**
+       * @description 데이터 새로 고침
        *******************
        * @param {Object} event
        */
       refresh(event) {
         var requestAjax = this.$['order-picking-status-ajax'];
-        requestAjax.curl = '/diy_services/order-picking-label-status/shoot';
+        requestAjax.curl = '/diy_services/order-picking-label-status/read';
         requestAjax.generateRequest();
       }
 
       /**
-       * 송장 라벨 출력
+       * @description 송장 라벨 출력
        *******************
        * @param {Object} event
        */
       printLabel(event) {
-        var requestAjax = this.$['order-picking-status-ajax'];
+        var requestAjax = this.$['order-picking-print-ajax'];
         requestAjax.curl = '/diy_services/order-picking-print-labels/shoot';
         requestAjax.generateRequest();
       }
