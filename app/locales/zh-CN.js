@@ -181,6 +181,9 @@ window.locales['zh-CN'] = {
   'label.not_input': '미투입',
   'label.middle_assort': '중분류',
   'label.seq': '순번',
+  'label.store_zone': '보관 존',
+  'label.printing_qty': '출력할 수량',
+  'label.printed_qty': '출력 수량',
 
   // menu list
   'menu.Settings': '设置',
@@ -228,6 +231,7 @@ window.locales['zh-CN'] = {
   'menu.WorkerInput': '작업자 투입',
   'menu.B2BOutAssortNonRefresh': 'DAS 소분류(고정)',
   'menu.SimpleAssortInspection': 'PDAS 검수',
+  'menu.OrderPicking': 'Order Picking Printing',
 
   // button list
   'button.logout': '注销',

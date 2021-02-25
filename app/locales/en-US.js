@@ -180,6 +180,9 @@ window.locales['en-US'] = {
   'label.not_input': 'NotInput',
   'label.middle_assort': 'Middle Assort',
   'label.seq': 'Seq.',
+  'label.store_zone': 'Zone',
+  'label.printing_qty': 'Printing Qty.',
+  'label.printed_qty': 'Printed Qty.',
 
   // menu list
   'menu.Settings': 'Setting',
@@ -229,6 +232,7 @@ window.locales['en-US'] = {
   'menu.WorkerInput': 'Worker Input',
   'menu.B2BOutAssortNonRefresh': 'DAS 소분류(고정)',
   'menu.SimpleAssortInspection': 'PDAS 검수',
+  'menu.OrderPicking': 'Order Picking Printing',
 
   // button list
   'button.logout': 'Logout',
