@@ -234,7 +234,7 @@ Copyright © HatioLab Inc. All rights reserved.
         let list = event.detail.contentElements;
         list.forEach(row => {
           let data = row.getData();
-          if (data.tot_order_cnt == data.comp_order_cnt) {
+          if (!data.printing_qty || data.printing_qty == 0) {
             row.classList.add('complete');
           }
         })
@@ -273,9 +273,10 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} event
        */
       printLabel(event) {
-        var requestAjax = this.$['order-picking-print-ajax'];
-        requestAjax.curl = '/diy_services/order-picking-print-labels/shoot';
-        requestAjax.generateRequest();
+        var printAjax = this.$['order-picking-print-ajax'];
+        printAjax.curl = '/diy_services/order-picking-print-labels/shoot';
+        printAjax.param = this.selectedItem.getData();
+        printAjax.generateRequest();
       }
     }
 
