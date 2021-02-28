@@ -1,0 +1,403 @@
+<!--
+@license
+Copyright © HatioLab Inc. All rights reserved.
+-->
+
+<link rel="import" href="../../../../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../../../components/common/item-list.html">
+<link rel="import" href="../../../../components/sys/sys-ajax.html">
+
+<!--
+  물류 > 오더 피킹 > 존별 송장 수량 조회 & 송장 출력
+-->
+<dom-module id="order-picking2">
+  <template>
+    <style include="shared-styles">
+      :host {
+        display: flex;
+        flex-direction: column;
+        height: calc(100% - 20px);
+        font-size: 40;
+        padding: 10px;
+      }
+
+      #container {
+        display: grid;
+        grid-template-rows: 1fr auto;
+        flex: 1;
+        padding: 5px;
+      }
+
+      .button-container {
+        display: grid;
+        grid-template-columns: auto auto;
+        justify-content: flex-end;
+        padding-top: 10px;
+        grid-gap: 15px;
+      }
+
+      #content-container {
+        display: grid;
+        grid-template-columns: 0.8fr 1fr;
+        grid-gap: 15px;
+        flex: 1;
+        padding: 5px;
+      }
+    </style>
+
+    <!-- 보관 존별 예정 / 처리 수량 조회 -->
+    <sys-ajax
+      id="order-picking-status-ajax"
+      method="GET"
+      content-type="application/json"
+      last-response="{{items}}">
+    </sys-ajax>
+
+    <!-- 오더 피킹 송장 리스트 조회 -->
+    <sys-ajax
+      id="order-picking-invoice-list-ajax"
+      method="POST"
+      content-type="application/json"
+      last-response="{{invoiceList}}">
+    </sys-ajax>
+
+    <!-- 오더 피킹 송장 출력 -->
+    <sys-ajax
+      id="order-picking-print-ajax"
+      method="POST"
+      content-type="application/json"
+      on-sys-ajax-response="refresh">
+    </sys-ajax>
+
+    <div id="container">
+      <div id="content-container">
+        <!-- 좌측 로케이션 별 송장 서머리 그리드 -->
+        <item-list
+          id="item-list"
+          header="[[header]]"
+          data="[[items]]"
+          on-data-list-click="_selectItem"
+          on-configured="_changeRowStyle">
+        </item-list>
+
+        <!-- 우측 송장 리스트 표시 컨테이너 -->
+        <item-list 
+          id="invoice-list" 
+          header="[[invoiceHeader]]" 
+          data="[[invoiceList]]"
+          on-data-list-click="_selectInvoiceItem"
+          on-configured="_changeInvoiceRowStyle">
+        </item-list>
+      </div>
+
+      <!-- 새로 고침 버튼  -->
+      <div class="button-container">
+        <button id="print-btn" on-click="printInvoiceLabel">[[printLabel]]</button>
+        <button id="refresh-btn" on-click="refresh">[[refreshLabel]]</button>
+      </div>
+    </div>
+  </template>
+
+  <script>
+    class OrderPicking2 extends Polymer.Element {
+      static get is() {
+        return 'order-picking2'
+      }
+
+      static get properties() {
+        return {
+          /**
+           * @description 송장 출력 라벨
+           ****************
+           * @type {String}
+           */
+          printLabel: {
+            type: String,
+            value: function() {
+              return t('button.print_label');
+            }
+          },
+
+          /**
+           * @description 새로고침 라벨
+           ****************
+           * @type {String}
+           */
+          refreshLabel: {
+            type: String,
+            value: function() {
+              return t('button.refresh');
+            }
+          },
+
+          /**
+           * @description 자동 리프레쉬 활성화
+           ****************
+           * @type {Boolean}
+           */
+          enableAutoRefresh: {
+            type: Boolean
+          },
+
+          /**
+           * @description 그리드 데이터
+           ****************
+           * @type {Array}
+           */
+          items: {
+            type: Array
+          },
+
+          /**
+           * @description 그리드 헤더 정보
+           ****************
+           * @type {Array}
+           */
+          header: {
+            type: Array,
+            value: function() {
+              return [{
+                display: t('label.store_zone'),
+                fieldname: 'store_zone_cd',
+                columnWidth: '1fr',
+                style: {
+                  'color': 'red',
+                  textAlign: 'center'
+                }
+              }, {
+                display: t('label.pick_qty'),
+                fieldname: 'pick_qty',
+                columnWidth: '1fr',
+                style: {
+                  textAlign: 'right'
+                }
+              }, {
+                display: t('label.printed_qty'),
+                fieldname: 'printed_qty',
+                columnWidth: '1fr',
+                style: {
+                  textAlign: 'right'
+                }
+              }, {
+                display: t('label.printing_qty'),
+                fieldname: 'printing_qty',
+                columnWidth: '1fr',
+                style: {
+                  'color': 'red',
+                  textAlign: 'right'
+                }
+              }]
+            }
+          },
+
+          /**
+           * @description 송장 리스트 헤더 
+           ****************
+           * @type {Array}
+           */
+          invoiceHeader: {
+            type: Array,
+            value: function() {
+              // 송장 번호 / 주문자 / 박스 타입
+              return [{
+                display: t('label.invoice_id'),
+                fieldname: 'invoice_id',
+                columnWidth: '0.55fr'
+              }, {
+                display: t('label.receiver'),
+                fieldname: 'orderer_nm',
+                columnWidth: '0.25fr'
+              }, {
+                display: t('label.order_qty'),
+                fieldname: 'order_qty',
+                columnWidth: '0.2fr',
+                style: {
+                  textAlign: 'right',
+                },
+              }, {
+                hidden: true,
+                fieldname: 'status',
+              }]
+            }
+          },
+
+          /**
+           * @description 송장 리스트 데이터 
+           ****************
+           * @type {Array}
+           */
+          invoiceList: {
+            type: Array
+          }
+        }
+      }
+
+      /**
+       * @description life cycle connectedCallback
+       *********************
+       */
+      connectedCallback() {
+        // 1. Super
+        super.connectedCallback();
+        // 2. 라우팅 변경시
+        this._routingChanged();
+        // 3. alert close화면에 따른 화면 리프레시
+        document.addEventListener(`alert-closed-at-${location.hash.replace('#/', '')}`, this._alertClosedHandler.bind(this));
+      }
+
+      /**
+       * @description life cycle disconnectedCallback
+       *********************
+       */
+      disconnectedCallback() {
+        document.removeEventListener(`alert-closed-at-${location.hash.replace('#/', '')}`, this._alertClosedHandler.bind(this));
+      }
+
+      /**
+       * @description 
+       *********************
+       * @param {Object} event
+       */
+      _alertClosedHandler(event) {
+        if (!event.detail.hasCallback) {
+          this.startAutoRefresh();
+        }
+      }
+
+      /**
+       * @description 페이지 변경 시
+       *******************
+       * @param {Object} e
+       */
+      _routingChanged() {
+        if (location.hash.replace('#/', '') == 'order-picking') {
+          this.enableAutoRefresh = true;
+          this.startAutoRefresh();
+        } else {
+          this.enableAutoRefresh = false;
+        }
+      }
+
+      /**
+       * @description 자동 리프레쉬 시작
+       ********************
+       */
+      startAutoRefresh() {
+        if (this.enableAutoRefresh) {
+          this.refresh();
+        }
+
+        setTimeout(function() {
+          this.startAutoRefresh();
+        }.bind(this), LOGIS_UTIL.getRefreshInterval());
+      }
+
+      /**
+       * @description 그리드 행에 대한 스타일 변경
+       *******************
+       * @param {Object} event
+       */
+      _changeRowStyle(event) {
+        let list = event.detail.contentElements;
+        list.forEach(row => {
+          let data = row.getData();
+          if (!data.printing_qty || data.printing_qty == 0) {
+            row.classList.add('complete');
+          }
+        })
+      }
+
+      /**
+       * @description 송장 그리드 행에 대한 스타일 변경
+       *******************
+       * @param {Object} event
+       */
+      _changeInvoiceRowStyle(event) {
+        let list = event.detail.contentElements;
+
+        list.forEach(row => {
+          let data = row.getData();
+          if (data.status == 'P') {
+            row.classList.add('complete');
+          }
+        })
+      }
+
+      /**
+       * @description 보관 존 항목 선택
+       ******************
+       * @param {Object} event
+       */
+      _selectItem(event) {
+        if (this.selectedItem) {
+          // 1. 이미 작업 대상이 선택되어 있다면 선택된 대상의 하일라이트 스타일 제거
+          this.selectedItem.classList.remove('selected');
+        }
+
+        // 2. 선택시 하일라이트 스타일 적용
+        this.selectedItem = event.detail.row;
+        this.selectedItem.classList.add('selected');
+
+        // 3. 송장 리스트 호출
+        this.searchInvoiceList(this.selectedItem.getData());
+      }
+
+      /**
+       * @description 송장 대상 선택
+       ******************
+       * @param {Object} event
+       */
+      _selectInvoiceItem(event) {
+        if (this.selectedInvoiceItem) {
+          // 1. 이미 송장이 선택되어 있다면 선택된 대상의 하일라이트 스타일 제거
+          this.selectedInvoiceItem.classList.remove('selected');
+        }
+
+        // 2. 선택시 선택 스타일 적용
+        this.selectedInvoiceItem = event.detail.row;
+        this.selectedInvoiceItem.classList.add('selected');
+      }
+
+      /**
+       * @description 데이터 새로 고침
+       *******************
+       * @param {Object} event
+       */
+      refresh(event) {
+        var requestAjax = this.$['order-picking-status-ajax'];
+        requestAjax.curl = '/diy_services/order-picking-label-status/read';
+        requestAjax.generateRequest();
+      }
+
+      /**
+       * @description 송장 리스트 새로 고침
+       *******************
+       * @param {Object} params
+       */
+      searchInvoiceList(params) {
+        var requestAjax = this.$['order-picking-invoice-list-ajax'];
+        requestAjax.curl = '/diy_services/order-picking-invoice-list/shoot';
+        requestAjax.body = {
+          input: params
+        };
+        requestAjax.generateRequest();
+      }
+
+      /**
+       * @description 송장 라벨 출력
+       *******************
+       * @param {Object} event
+       */
+      printInvoiceLabel(event) {
+        var printAjax = this.$['order-picking-print-ajax'];
+        printAjax.curl = '/diy_services/order-picking-print-labels/shoot';
+        printAjax.body = {
+          input: this.selectedItem.getData()
+        };
+        printAjax.generateRequest();
+      }
+    }
+
+    customElements.define(OrderPicking2.is, OrderPicking2);
+  </script>
+</dom-module>
