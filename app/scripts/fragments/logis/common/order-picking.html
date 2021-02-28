@@ -65,7 +65,7 @@ Copyright © HatioLab Inc. All rights reserved.
 
       <!-- 새로 고침 버튼  -->
       <div class="button-container">
-        <button id="print-btn" on-click="printLabel">[[printLabel]]</button>
+        <button id="print-btn" on-click="printInvoiceLabel">[[printLabel]]</button>
         <button id="refresh-btn" on-click="refresh">[[refreshLabel]]</button>
       </div>
     </div>
@@ -272,10 +272,12 @@ Copyright © HatioLab Inc. All rights reserved.
        *******************
        * @param {Object} event
        */
-      printLabel(event) {
+      printInvoiceLabel(event) {
         var printAjax = this.$['order-picking-print-ajax'];
         printAjax.curl = '/diy_services/order-picking-print-labels/shoot';
-        printAjax.param = this.selectedItem.getData();
+        printAjax.body = {
+          input: this.selectedItem.getData()
+        };
         printAjax.generateRequest();
       }
     }

@@ -405,9 +405,17 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} data
        */
       refreshByWs(data) {
+        if (!data) return;
+
         // 작업 상세 정보 리프레쉬
-        if (data && data.startsWith('refresh')) {
-          this.refreshInputDetails();
+        if (data == 'refresh' || data == 'refresh-details') {
+          if (!this.selectedInput) {
+            this.refreshInputList();
+          } else {
+            this.refreshInputDetails();
+          }
+        } else if (data == 'refresh-list') {
+          this.refreshInputList();
         }
       }
 
