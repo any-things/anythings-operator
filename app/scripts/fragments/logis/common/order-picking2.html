@@ -66,7 +66,8 @@ Copyright © HatioLab Inc. All rights reserved.
       id="order-picking-print-ajax"
       method="POST"
       content-type="application/json"
-      on-sys-ajax-response="refresh">
+			on-sys-ajax-response="refreshSelectedZone"
+			on-sys-ajax-error="refreshSelectedZone">
     </sys-ajax>
 
     <div id="container">
@@ -202,11 +203,18 @@ Copyright © HatioLab Inc. All rights reserved.
               return [{
                 display: t('label.invoice_id'),
                 fieldname: 'invoice_id',
-                columnWidth: '0.55fr'
+                columnWidth: '0.4fr'
               }, {
                 display: t('label.receiver'),
                 fieldname: 'orderer_nm',
-                columnWidth: '0.25fr'
+                columnWidth: '0.2fr'
+              }, {
+                display: t('label.seq'),
+                fieldname: 'sub_equip_cd',
+                columnWidth: '0.2fr',
+                style: {
+                  textAlign: 'right',
+                },
               }, {
                 display: t('label.order_qty'),
                 fieldname: 'order_qty',
@@ -370,6 +378,17 @@ Copyright © HatioLab Inc. All rights reserved.
       }
 
       /**
+       * @description 선택 존 데이터 새로 고침
+       *******************
+       * @param {Object} event
+       */
+      refreshSelectedZone(event) {
+        if (this.selectedItem) {
+          this.searchInvoiceList(this.selectedItem.getData());
+        }
+      }
+
+      /**
        * @description 송장 리스트 새로 고침
        *******************
        * @param {Object} params
@@ -389,12 +408,18 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} event
        */
       printInvoiceLabel(event) {
-        var printAjax = this.$['order-picking-print-ajax'];
-        printAjax.curl = '/diy_services/order-picking-print-labels/shoot';
-        printAjax.body = {
-          input: this.selectedItem.getData()
-        };
-        printAjax.generateRequest();
+        if (this.selectedItem) {
+          var printAjax = this.$['order-picking-print-ajax'];
+          printAjax.curl = '/diy_services/order-picking-print-labels/shoot';
+          let printParams = this.selectedItem.getData();
+          printParams.printer_id = LOGIS_UTIL.getPrinterId();
+          printAjax.body = {
+            input: printParams
+          };
+          printAjax.generateRequest();
+        } else {
+          LOGIS_UTIL.showConfirm('송장 출력', '송장 출력할 보관 존을 선택하세요');
+        }
       }
     }
 

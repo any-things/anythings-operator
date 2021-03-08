@@ -471,5 +471,6 @@ window.locales['ko-KR'] = {
   'error.no_scan_mpi_code': '표시기 코드부터 스캔해주세요.',
   'error.not_recommanded_box': '추천 박스가 아닙니다.',
   'error.transaction_failed': '처리 도중 에러가 발생했습니다.',
-  'error.value_is_empty': ' 빈 값은 허용하지 않습니다.'
+  'error.value_is_empty': '빈 값은 허용하지 않습니다.',
+  'error.sku_cd_is_not_equal_prev_sku_cd': '이전에 스캔한 상품 코드와 일치하지 않습니다.'
 };

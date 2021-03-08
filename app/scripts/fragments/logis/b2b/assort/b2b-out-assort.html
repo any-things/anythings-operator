@@ -429,18 +429,19 @@ Copyright © HatioLab Inc. All rights reserved.
         if (!this.inputDetails || this.inputDetails.length == 0) return;
 
         const indOnTodoJobsBtn = event.currentTarget;
-        const isButtonActive = indOnTodoJobsBtn.getAttribute('active');
+        //const isButtonActive = indOnTodoJobsBtn.getAttribute('active');
+        this.indOnByTabletZone('todo');
 
-        // 태블릿의 작업 존의 모든 표시기 소등
-        if (isButtonActive === '') {
-          indOnTodoJobsBtn.removeAttribute('active');
-          this.indOffByTabletZone();
+        // // 태블릿의 작업 존의 모든 표시기 소등
+        // if (isButtonActive === '') {
+        //   indOnTodoJobsBtn.removeAttribute('active');
+        //   this.indOffByTabletZone();
 
-          // 태블릿의 작업 존에 현재 선택된 버킷 (즉 주문) 중에 처리 안 된 작업 리스트에 대한 표시기 점등
-        } else {
-          indOnTodoJobsBtn.setAttribute('active', '');
-          this.indOnByTabletZone('todo');
-        }
+        //   // 태블릿의 작업 존에 현재 선택된 버킷 (즉 주문) 중에 처리 안 된 작업 리스트에 대한 표시기 점등
+        // } else {
+        //   indOnTodoJobsBtn.setAttribute('active', '');
+        //   this.indOnByTabletZone('todo');
+        // }
       }
 
       /**
