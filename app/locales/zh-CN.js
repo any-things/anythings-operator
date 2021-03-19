@@ -181,6 +181,7 @@ window.locales['zh-CN'] = {
   'label.not_input': '미투입',
   'label.middle_assort': '중분류',
   'label.seq': '순번',
+  'label.zone': 'Zone',
   'label.store_zone': '보관 존',
   'label.printing_qty': '출력할 수량',
   'label.printed_qty': '출력 수량',
@@ -232,6 +233,7 @@ window.locales['zh-CN'] = {
   'menu.B2BOutAssortNonRefresh': 'DAS 소분류(고정)',
   'menu.SimpleAssortInspection': 'PDAS 검수',
   'menu.OrderPicking': 'Order Picking Printing',
+  'menu.ManualPicking': 'DPS 매뉴얼 송장 출력',
 
   // button list
   'button.logout': '注销',
@@ -424,6 +426,7 @@ window.locales['zh-CN'] = {
   'text.sure_to_order_confirm': '주문 확정이 가능합니다. 주문 확정하시겠습니까?',
   'text.sure_to_inspection_continously': '수동피킹 완료했습니다. 이어서 검수하시겠습니까?',
   'text.processing_result_is_unknown': '처리 결과를 알 수 없습니다.',
+  'text.select_zone_to_print': '송장 출력할 존을 선택하세요',
 
   // title list
   'title.confirm_inspect': '检验结束',

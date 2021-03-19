@@ -180,6 +180,7 @@ window.locales['en-US'] = {
   'label.not_input': 'NotInput',
   'label.middle_assort': 'Middle Assort',
   'label.seq': 'Seq.',
+  'label.zone': 'Zone',
   'label.store_zone': 'Zone',
   'label.printing_qty': 'Printing Qty.',
   'label.printed_qty': 'Printed Qty.',
@@ -233,6 +234,7 @@ window.locales['en-US'] = {
   'menu.B2BOutAssortNonRefresh': 'DAS 소분류(고정)',
   'menu.SimpleAssortInspection': 'PDAS 검수',
   'menu.OrderPicking': 'Order Picking Printing',
+  'menu.ManualPicking': 'DPS 매뉴얼 송장 출력',
 
   // button list
   'button.logout': 'Logout',
@@ -425,6 +427,7 @@ window.locales['en-US'] = {
   'text.sure_to_order_confirm': '주문 확정이 가능합니다. 주문 확정하시겠습니까?',
   'text.sure_to_inspection_continously': '수동피킹 완료했습니다. 이어서 검수하시겠습니까?',
   'text.processing_result_is_unknown': 'Processing result is unknown.',
+  'text.select_zone_to_print': '송장 출력할 존을 선택하세요',
 
   // title list
   'title.confirm_inspect': 'Confirm Inspection',

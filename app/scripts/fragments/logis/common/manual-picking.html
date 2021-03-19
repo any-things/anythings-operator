@@ -8,9 +8,9 @@ Copyright © HatioLab Inc. All rights reserved.
 <link rel="import" href="../../../../components/sys/sys-ajax.html">
 
 <!--
-  물류 > 오더 피킹 > 존별 송장 수량 조회 & 송장 출력
+  물류 > 매뉴얼 피킹을 위한 송장 출력
 -->
-<dom-module id="order-picking2">
+<dom-module id="manual-picking">
   <template>
     <style include="shared-styles">
       :host {
@@ -45,25 +45,25 @@ Copyright © HatioLab Inc. All rights reserved.
       }
     </style>
 
-    <!-- 보관 존별 예정 / 처리 수량 조회 -->
+    <!-- 존 별 예정 / 처리 수량 조회 -->
     <sys-ajax
-      id="order-picking-status-ajax"
+      id="manual-picking-status-ajax"
       method="GET"
       content-type="application/json"
       last-response="{{items}}">
     </sys-ajax>
 
-    <!-- 오더 피킹 송장 리스트 조회 -->
+    <!-- 매뉴얼 피킹 송장 리스트 조회 -->
     <sys-ajax
-      id="order-picking-invoice-list-ajax"
+      id="manual-picking-invoice-list-ajax"
       method="POST"
       content-type="application/json"
       last-response="{{invoiceList}}">
     </sys-ajax>
 
-    <!-- 오더 피킹 송장 출력 -->
+    <!-- 매뉴얼 피킹 송장 출력 -->
     <sys-ajax
-      id="order-picking-print-ajax"
+      id="manual-picking-print-ajax"
       method="POST"
       content-type="application/json"
 			on-sys-ajax-response="refreshSelectedZone"
@@ -100,9 +100,9 @@ Copyright © HatioLab Inc. All rights reserved.
   </template>
 
   <script>
-    class OrderPicking2 extends Polymer.Element {
+    class ManualPicking extends Polymer.Element {
       static get is() {
-        return 'order-picking2'
+        return 'manual-picking'
       }
 
       static get properties() {
@@ -158,8 +158,8 @@ Copyright © HatioLab Inc. All rights reserved.
             type: Array,
             value: function() {
               return [{
-                display: t('label.store_zone'),
-                fieldname: 'store_zone_cd',
+                display: t('label.zone'),
+                fieldname: 'zone_cd',
                 columnWidth: '1fr',
                 style: {
                   'color': 'red',
@@ -201,6 +201,13 @@ Copyright © HatioLab Inc. All rights reserved.
             value: function() {
               // 송장 번호 / 주문자 / 박스 타입
               return [{
+                display: t('label.seq'),
+                fieldname: 'sub_equip_cd',
+                columnWidth: '0.2fr',
+                style: {
+                  textAlign: 'right',
+                },
+              }, {
                 display: t('label.invoice_id'),
                 fieldname: 'invoice_id',
                 columnWidth: '0.4fr'
@@ -208,13 +215,6 @@ Copyright © HatioLab Inc. All rights reserved.
                 display: t('label.receiver'),
                 fieldname: 'orderer_nm',
                 columnWidth: '0.2fr'
-              }, {
-                display: t('label.seq'),
-                fieldname: 'sub_equip_cd',
-                columnWidth: '0.2fr',
-                style: {
-                  textAlign: 'right',
-                },
               }, {
                 display: t('label.order_qty'),
                 fieldname: 'order_qty',
@@ -278,7 +278,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} e
        */
       _routingChanged() {
-        if (location.hash.replace('#/', '') == 'order-picking') {
+        if (location.hash.replace('#/', '') == 'manual-picking') {
           this.enableAutoRefresh = true;
           this.startAutoRefresh();
         } else {
@@ -372,8 +372,8 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} event
        */
       refresh(event) {
-        var requestAjax = this.$['order-picking-status-ajax'];
-        requestAjax.curl = '/diy_services/order-picking-label-status/read';
+        var requestAjax = this.$['manual-picking-status-ajax'];
+        requestAjax.curl = '/diy_services/manual-picking-label-status/read';
         requestAjax.generateRequest();
       }
 
@@ -394,8 +394,8 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Object} params
        */
       searchInvoiceList(params) {
-        var requestAjax = this.$['order-picking-invoice-list-ajax'];
-        requestAjax.curl = '/diy_services/order-picking-invoice-list/shoot';
+        var requestAjax = this.$['manual-picking-invoice-list-ajax'];
+        requestAjax.curl = '/diy_services/manual-picking-invoice-list/shoot';
         requestAjax.body = {
           input: params
         };
@@ -409,8 +409,8 @@ Copyright © HatioLab Inc. All rights reserved.
        */
       printInvoiceLabel(event) {
         if (this.selectedItem) {
-          var printAjax = this.$['order-picking-print-ajax'];
-          printAjax.curl = '/diy_services/order-picking-print-labels/shoot';
+          var printAjax = this.$['manual-picking-print-ajax'];
+          printAjax.curl = '/diy_services/manual-picking-print-labels/shoot';
           let printParams = this.selectedItem.getData();
           printParams.printer_id = LOGIS_UTIL.getPrinterId();
           printAjax.body = {
@@ -423,6 +423,6 @@ Copyright © HatioLab Inc. All rights reserved.
       }
     }
 
-    customElements.define(OrderPicking2.is, OrderPicking2);
+    customElements.define(ManualPicking.is, ManualPicking);
   </script>
 </dom-module>
