@@ -185,6 +185,12 @@ window.locales['zh-CN'] = {
   'label.store_zone': '보관 존',
   'label.printing_qty': '출력할 수량',
   'label.printed_qty': '출력 수량',
+  'label.worker_id': '작업자 ID',
+  'label.worker_name': '작업자 이름',
+  'label.work_type': '작업 구분',
+  'label.started_at': '시작 시간',
+  'label.finished_at': '완료 시간',
+  'label.out': '퇴장',
 
   // menu list
   'menu.Settings': '设置',

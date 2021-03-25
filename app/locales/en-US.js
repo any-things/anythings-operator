@@ -184,6 +184,12 @@ window.locales['en-US'] = {
   'label.store_zone': 'Zone',
   'label.printing_qty': 'Printing Qty.',
   'label.printed_qty': 'Printed Qty.',
+  'label.worker_id': 'Worker ID',
+  'label.worker_name': 'Worker Name',
+  'label.work_type': 'Work Type',
+  'label.started_at': 'Started At',
+  'label.finished_at': 'Finished At',
+  'label.out': 'Out',
 
   // menu list
   'menu.Settings': 'Setting',
