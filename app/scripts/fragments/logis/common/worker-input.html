@@ -5,16 +5,12 @@ Copyright © HatioLab Inc. All rights reserved.
 
 <link rel="import" href="../../../../../bower_components/polymer/polymer-element.html">
 
-<link rel="import" href="../../../../components/logis/sku-selection-popup.html">
-
-<link rel="import" href="../rack-input-details.html">
-
 <!--
   물류 > 설비에 작업자 투입 화면
 -->
 <dom-module id="worker-input">
   <template>
-    <style>
+    <style include="shared-styles">
       #container {
         display: flex;
         flex-direction: column;
@@ -101,11 +97,6 @@ Copyright © HatioLab Inc. All rights reserved.
         border-radius: var(--things-default-border-radius);
       }
 
-      #middle-container input {
-        align-self: center;
-        width: 90%;
-      }
-
       #middle-container .label {
         font-size: .8rem;
         margin: auto 15px;
@@ -133,27 +124,6 @@ Copyright © HatioLab Inc. All rights reserved.
         color: #D5D7DB;
       }
 
-      button {
-        @apply --operator-default-btn;
-      }
-
-      button:active {
-        @apply --operator-default-btn-active;
-      }
-
-      button:focus {
-        outline: none
-      }
-
-      input {
-        background-color: rgba(0, 0, 0, .25);
-        border: 1px solid rgba(255, 255, 255, .2);
-        height: 54px;
-        color: #fff;
-        font-size: 1.3rem;
-        text-align: center;
-      }
-
       input:focus {
         outline: none;
       }
@@ -170,7 +140,8 @@ Copyright © HatioLab Inc. All rights reserved.
 
     <!-- 투입 작업자 리스트 표시를 위한 Ajax -->
     <sys-ajax 
-      id="search-input-workers-ajax" 
+      id="search-input-workers-ajax"
+      curl="/worker_actuals/search/input_workers/:equip_type/:equip_cd"
       method="GET" 
       content-type="application/json" 
       last-response="{{items}}">
@@ -179,10 +150,28 @@ Copyright © HatioLab Inc. All rights reserved.
     <!-- 작업자 투입 처리 Ajax -->
     <sys-ajax 
       id="input-worker-ajax" 
-      curl="/device_process/input/worker/Rack/:rack_cd/:worker_id" 
+      curl="/worker_actuals/input_worker"
       method="POST"
       content-type="application/json" 
-      on-sys-ajax-response="_onInputSuccess">
+      on-sys-ajax-response="refresh">
+    </sys-ajax>
+
+    <!-- 작업자 투입 취소 처리 Ajax -->
+    <sys-ajax 
+      id="cancel-input-worker-ajax" 
+      curl="/worker_actuals/:id"
+      method="DELETE"
+      content-type="application/json" 
+      on-sys-ajax-response="refresh">
+    </sys-ajax>
+
+    <!-- 작업자 퇴장 처리 Ajax -->
+    <sys-ajax 
+      id="out-worker-ajax" 
+      curl="/worker_actuals/out_worker/:id"
+      method="PUT"
+      content-type="application/json" 
+      on-sys-ajax-response="refresh">
     </sys-ajax>
 
     <div id="container">
@@ -243,15 +232,19 @@ Copyright © HatioLab Inc. All rights reserved.
         <div id="middle-container" class="barchart-section">
           <!-- 작업자 ID -->
           <span class="label">[[workerIdLabel]]</span>
-          <input id="worker_id"></input>
+          <input id="worker_id" value="[[workerId]]"></input>
 
           <!-- 작업자 이름 -->
           <span class="label">[[workerNameLabel]]</span>
-          <input id="worker_name" readonly value="[[workerName]]">
+          <input id="worker_name" value="[[workerName]]">
 
           <!-- 작업자 구분 -->
           <span class="label">[[workTypeLabel]]</span>
-          <input id="worker_type" readonly value="[[workType]]">
+          <select id="work_type" on-change="_onWorkTypeChanged">
+            <option value="A">분류</option>
+            <option value="I">투입</option>
+            <option value="S">재고보충</option>
+          </select>  
         </div>
       </div>
 
@@ -260,7 +253,8 @@ Copyright © HatioLab Inc. All rights reserved.
         <item-list 
           header="[[header]]" 
           data="[[items]]"
-          on-configured="_addInputStatusAttr">
+          on-data-list-click="_selectItem" 
+          on-configured="_addStatusAttr">
         </item-list>
       </div>
 
@@ -432,14 +426,14 @@ Copyright © HatioLab Inc. All rights reserved.
               return [{
                 display: t('label.worker_id'),
                 fieldname: 'worker_id',
-                columnWidth: '0.65fr',
+                columnWidth: '0.6fr',
                 style: {
-                  textAlign: 'center'
+                  textAlign: 'left'
                 }
               }, {
                 display: t('label.worker_name'),
                 fieldname: 'worker_name',
-                columnWidth: '0.7fr',
+                columnWidth: '0.65fr',
                 style: {
                   textAlign: 'left'
                 }
@@ -456,35 +450,44 @@ Copyright © HatioLab Inc. All rights reserved.
                 columnWidth: '0.5fr',
                 style: {
                   textAlign: 'center'
+                },
+                displayCallback: (workType, data) => {
+                  return !workType ? '' : (workType == 'A' ? '분류' : (workType == 'I' ? '투입' : (workType == 'S' ? '재고보충' : '')));
                 }
               }, {
                 display: t('label.equipment_type'),
                 fieldname: 'equip_type',
-                columnWidth: '0.6fr',
+                columnWidth: '0.45fr',
                 style: {
                   textAlign: 'center'
                 }
               }, {
                 display: t('label.equipment'),
                 fieldname: 'equip_cd',
-                columnWidth: '0.5fr',
+                columnWidth: '0.35fr',
                 style: {
                   textAlign: 'center'
                 }
               }, {
                 display: t('label.started_at'),
                 fieldname: 'started_at',
-                columnWidth: '1fr',
+                columnWidth: '1.2fr',
                 style: {
                   textAlign: 'center'
                 }
               }, {
                 display: t('label.finished_at'),
                 fieldname: 'finished_at',
-                columnWidth: '1fr',
+                columnWidth: '1.2fr',
                 style: {
                   textAlign: 'center'
+                },
+                displayCallback: (finishedAt, data) => {
+                  return !finishedAt ? '' : finishedAt;
                 }
+              }, {
+                fieldname: 'id',
+                hidden: true
               }]
             }
           },
@@ -600,13 +603,12 @@ Copyright © HatioLab Inc. All rights reserved.
           },
 
           /**
-           * @description 현재 작업자
+           * @description 작업자 ID
            ****************
            * @type {String}
            */
-          currentWorker: {
-            type: Object,
-            observer: '_currentWorkerChanged'
+          workerId: {
+            type: String
           },
 
           /**
@@ -615,8 +617,26 @@ Copyright © HatioLab Inc. All rights reserved.
            * @type {String}
            */
           workerName: {
+            type: String
+          },
+
+          /**
+           * @description 작업 구분
+           ****************
+           * @type {String}
+           */
+          workType: {
             type: String,
-            value: ''
+            value: 'A'
+          },
+
+          /**
+           * @description 현재 선택된 작업자 정보 
+           ****************
+           * @type {Object}
+           */
+          currentWorker: {
+            type: Object
           }
         }
       }
@@ -671,11 +691,11 @@ Copyright © HatioLab Inc. All rights reserved.
        *********************
        * @param {Object} event
        */
-      _addInputStatusAttr(event) {
+      _addStatusAttr(event) {
         let list = event.detail.contentElements;
         list.forEach(row => {
           let data = row.getData();
-          if (data.plan_qty == data.result_qty) {
+          if (data.finished_at) {
             row.classList.add('complete');
           }
         });
@@ -686,7 +706,8 @@ Copyright © HatioLab Inc. All rights reserved.
        ******************
        */
       _initialSetup() {
-        this.$['worker_id'].select();
+        this.currentWorker = null;
+        this._resetWorkerInput();
       }
 
       /**
@@ -718,7 +739,7 @@ Copyright © HatioLab Inc. All rights reserved.
        * @param {Array} items
        */
       _itemsChanged(items) {
-        this._resetWorkerInput();
+        this._initialSetup();
       }
 
       /**
@@ -726,11 +747,10 @@ Copyright © HatioLab Inc. All rights reserved.
        ***********************
        */
       _resetWorkerInput() {
-        if (this._scannedFlag) {
-          this.$['worker_id'].value = '';
-          this._scannedFlag = false;
-        }
-
+        this.$['worker_id'].value = '';
+        this.$['worker_name'].value = '';
+        this.workerId = '';
+        this.workerName = '';
         this.$['worker_id'].focus();
       }
 
@@ -824,46 +844,117 @@ Copyright © HatioLab Inc. All rights reserved.
         let equipType = LOGIS_UTIL.getEquipType();
         let equipCd = LOGIS_UTIL.getEquipCd();
         let inputListAjax = this.$['search-input-workers-ajax'];
-        inputListAjax.curl = `/device_process/search/input_workers/${equipType}/${equipCd}`;
+        inputListAjax.curl = `/worker_actuals/search/input_workers/${equipType}/${equipCd}`;
         inputListAjax.generateRequest();
       }
 
       /**
        * @description 작업자 투입 트랜잭션 처리
        ***********************
-       * @param {String} workerId
+       * @param {Object} event
        */
-      inputWorker(workerId) {
-        if (workerId.length >= 3) {
-          let equipType = LOGIS_UTIL.getEquipType();
-          var equipCd = LOGIS_UTIL.getEquipCd();
+      inputWorker(event) {
+        if (this._checkValidOnInputWorker()) {
           var inputWorkerAjax = this.$['input-worker-ajax'];
-          inputWorkerAjax.curl = `/device_process/input_worker/${equipType}/${workerId}`;
+          inputWorkerAjax.body = {
+            worker_id: this.workerId,
+            worker_name: this.workerName,
+            work_type: this.workType,
+            equip_type: LOGIS_UTIL.getEquipType(),
+            equip_cd: LOGIS_UTIL.getEquipCd(),
+          }
           inputWorkerAjax.generateRequest();
         }
       }
 
       /**
-       * @description 작업자 투입 성공시
-       *******************
+       * @description 작업자 투입 취소 트랜잭션 처리
+       ***********************
        * @param {Object} event
        */
-      _onInputSuccess(event) {
-        if (event && event.detail && event.detail.length > 0) {
-          // TODO
-        }
+      cancelInputWorker(event) {
+        if (this.currentWorker) {
+          var selectedId = this.currentWorker.getData().id;
+          var cacncelWorkerAjax = this.$['cancel-input-worker-ajax'];
+          cacncelWorkerAjax.curl = `/worker_actuals/${selectedId}`;
+          cacncelWorkerAjax.generateRequest();
 
-        this._scannedFlag = false;
-        this.refresh();
+        } else {
+          LOGIS_UTIL.showMessageWithSound('error', t('title.job_select'), t('text.select'));
+        }
       }
 
       /**
-       * @description 현재 작업자 변경시
-       *******************
-       * @param {Object} currentWorker
+       * @description 작업자 퇴장 트랜잭션 처리
+       ***********************
+       * @param {Object} event
        */
-      _currentWorkerChanged(currentWorker) {
+      outWorker(event) {
+        if (this.currentWorker) {
+          var data = this.currentWorker.getData();
 
+          if (data.finished_at) {
+            LOGIS_UTIL.showMessageWithSound('error', t('title.confirm'), '이미 퇴장한 작업자입니다.');
+          } else {
+            var outWorkerAjax = this.$['out-worker-ajax'];
+            outWorkerAjax.curl = `/worker_actuals/out_worker/${data.id}`;
+            outWorkerAjax.generateRequest();
+          }
+        } else {
+          LOGIS_UTIL.showMessageWithSound('error', t('title.job_select'), t('text.select'));
+        }
+      }
+
+      /**
+       * @description 투입 전 Validation Check
+       ***********************
+       */
+      _checkValidOnInputWorker() {
+        this.workerId = this.$['worker_id'].value;
+        this.workerName = this.$['worker_name'].value;
+
+        if (!this.workerId) {
+          LOGIS_UTIL.showMessageWithSound('error', t('label.worker_id'), t('label.worker_id') + ' ' + t('error.value_is_empty'));
+          return false;
+        }
+
+        if (!this.workerName) {
+          LOGIS_UTIL.showMessageWithSound('error', t('label.worker_name'), t('label.worker_name') + ' ' + t('error.value_is_empty'));
+          return false;
+        }
+
+        if (!this.workType) {
+          LOGIS_UTIL.showMessageWithSound('error', t('label.work_type'), t('label.work_type') + ' ' + t('error.value_is_empty'));
+          return false;
+        }
+
+        return true;
+      }
+
+      /**
+       * @description 개발 모드에서 장치 콤보의 값이 변경 되었을 경우
+       * 화면을 재구성 하기 위해 localStorage 값 변경 및 reload를 실시
+       *********************
+       * @param {Object} event
+       */
+      _onWorkTypeChanged(event) {
+        this.workType = event.currentTarget.selectedOptions[0].value;
+      }
+
+      /**
+       * @description 작업 대상 선택
+       ******************
+       * @param {Object} event
+       */
+      _selectItem(event) {
+        if (this.currentWorker) {
+          // 1. 이미 작업이 선택되어 있다면 선택된 대상의 하일라이트 스타일 제거
+          this.currentWorker.classList.remove('selected');
+        }
+
+        // 2. 작업 선택시 선택 스타일 적용
+        this.currentWorker = event.detail.row;
+        this.currentWorker.classList.add('selected');
       }
     }
 
